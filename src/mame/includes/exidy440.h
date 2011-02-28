@@ -7,18 +7,37 @@
 #define EXIDY440_MASTER_CLOCK		(XTAL_12_9792MHz)
 
 
+class exidy440_state : public driver_device
+{
+public:
+	exidy440_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 bank;
+	const UINT8 *showdown_bank_data[2];
+	INT8 showdown_bank_select;
+	UINT8 showdown_bank_offset;
+	UINT8 *imageram;
+	UINT8 *scanline;
+	UINT8 firq_vblank;
+	UINT8 firq_beam;
+	UINT8 *topsecex_yscroll;
+	UINT8 latched_x;
+	UINT8 *local_videoram;
+	UINT8 *local_paletteram;
+	UINT8 firq_enable;
+	UINT8 firq_select;
+	UINT8 palettebank_io;
+	UINT8 palettebank_vis;
+};
+
+
 /*----------- defined in drivers/exidy440.c -----------*/
 
 void exidy440_bank_select(running_machine *machine, UINT8 bank);
 
 
 /*----------- defined in video/exidy440.c -----------*/
-
-extern UINT8 *exidy440_imageram;
-extern UINT8 *exidy440_scanline;
-extern UINT8  exidy440_firq_vblank;
-extern UINT8  exidy440_firq_beam;
-extern UINT8 *topsecex_yscroll;
 
 INTERRUPT_GEN( exidy440_vblank_interrupt );
 

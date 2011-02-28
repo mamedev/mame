@@ -515,7 +515,7 @@
  *************************************/
 
 static ADDRESS_MAP_START( defender_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(williams_state, videoram)
 	/* range from 0xc000-0xcfff is mapped programmatically below */
 	AM_RANGE(0xc000, 0xc00f) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc400, 0xc4ff) AM_SHARE("nvram")
@@ -552,7 +552,7 @@ void defender_install_io_space(address_space *space)
  *************************************/
 
 static ADDRESS_MAP_START( williams_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
@@ -567,7 +567,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( williams_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
@@ -590,10 +590,10 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( blaster_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x4000, 0x8fff) AM_READ_BANK("bank2") AM_WRITEONLY
-	AM_RANGE(0xbb00, 0xbbff) AM_WRITEONLY AM_BASE(&blaster_palette_0)
-	AM_RANGE(0xbc00, 0xbcff) AM_WRITEONLY AM_BASE(&blaster_scanline_control)
+	AM_RANGE(0xbb00, 0xbbff) AM_WRITEONLY AM_BASE_MEMBER(williams_state, blaster_palette_0)
+	AM_RANGE(0xbc00, 0xbcff) AM_WRITEONLY AM_BASE_MEMBER(williams_state, blaster_scanline_control)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_r, pia6821_w)
@@ -618,9 +618,9 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( williams2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE(&williams2_tileram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE_MEMBER(williams_state, williams2_tileram)
 	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
 	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xc900, 0xc97f) AM_WRITE(williams2_watchdog_reset_w)
@@ -640,9 +640,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( williams2_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE(&williams_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE(&williams2_tileram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE_MEMBER(williams_state, williams2_tileram)
 	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
 	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xc900, 0xc97f) AM_WRITE(williams2_watchdog_reset_w)
@@ -2688,11 +2688,11 @@ ROM_END
  *************************************/
 
 #define CONFIGURE_BLITTER(x,c) \
-	williams_blitter_config = x; \
-	williams_blitter_clip_address = c
+	state->blitter_config = x; \
+	state->blitter_clip_address = c
 
 #define CONFIGURE_TILEMAP(x) \
-	williams2_tilemap_config = x
+	state->williams2_tilemap_config = x
 
 
 
@@ -2704,12 +2704,14 @@ ROM_END
 
 static DRIVER_INIT( defender )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 }
 
 
 static DRIVER_INIT( defndjeu )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
@@ -2723,10 +2725,11 @@ static DRIVER_INIT( defndjeu )
 
 static DRIVER_INIT( mayday )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* install a handler to catch protection checks */
-	mayday_protection = memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa190, 0xa191, 0, 0, mayday_protection_r);
+	state->mayday_protection = memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa190, 0xa191, 0, 0, mayday_protection_r);
 }
 
 
@@ -2739,24 +2742,28 @@ static DRIVER_INIT( mayday )
 
 static DRIVER_INIT( stargate )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 }
 
 
 static DRIVER_INIT( robotron )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 }
 
 
 static DRIVER_INIT( joust )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 }
 
 
 static DRIVER_INIT( bubbles )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* bubbles has a full 8-bit-wide CMOS */
@@ -2766,36 +2773,42 @@ static DRIVER_INIT( bubbles )
 
 static DRIVER_INIT( splat )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0xc000);
 }
 
 
 static DRIVER_INIT( sinistar )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0x7400);
 }
 
 
 static DRIVER_INIT( playball )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 }
 
 
 static DRIVER_INIT( blaster )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9700);
 }
 
 
 static DRIVER_INIT( blastkit )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9700);
 }
 
 
 static DRIVER_INIT( spdball )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	device_t *pia_3 = machine->device("pia_3");
 
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
@@ -2813,6 +2826,7 @@ static DRIVER_INIT( spdball )
 
 static DRIVER_INIT( alienar )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0);
 }
@@ -2820,6 +2834,7 @@ static DRIVER_INIT( alienar )
 
 static DRIVER_INIT( alienaru )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0);
 }
@@ -2827,6 +2842,7 @@ static DRIVER_INIT( alienaru )
 
 static DRIVER_INIT( lottofun )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 }
 
@@ -2840,6 +2856,7 @@ static DRIVER_INIT( lottofun )
 
 static DRIVER_INIT( mysticm )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_MYSTICM);
 }
@@ -2847,6 +2864,7 @@ static DRIVER_INIT( mysticm )
 
 static DRIVER_INIT( tshoot )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
@@ -2854,6 +2872,7 @@ static DRIVER_INIT( tshoot )
 
 static DRIVER_INIT( inferno )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_TSHOOT);
 }
@@ -2861,6 +2880,7 @@ static DRIVER_INIT( inferno )
 
 static DRIVER_INIT( joust2 )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC02, 0x9000);
 	CONFIGURE_TILEMAP(WILLIAMS_TILEMAP_JOUST2);
 }

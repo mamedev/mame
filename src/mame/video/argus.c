@@ -914,7 +914,7 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const r
 		{
 			int step=state->mosaic;
 			UINT32 *dest;
-			int x,y,xx,yy;
+			int x,y,xx,yy,c=0;
 			int width = screen.width();
 			int height = screen.height();
 
@@ -923,9 +923,7 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const r
 			for (y=0;y<width+step;y+=step)
 				for (x=0;x<height+step;x+=step)
 				{
-					static int c=0;
-
-					if (y<height && x< width)
+					if (y < height && x < width)
 						c=*BITMAP_ADDR32(state->mosaicbitmap, y, x);
 
 					if (state->mosaic<0)
@@ -958,15 +956,13 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const r
 		tilemap_draw(state->mosaicbitmap, cliprect, state->bg1_tilemap, 0, 0);
 		{
 			UINT32 *dest;
-			int x,y,xx,yy;
+			int x,y,xx,yy,c=0;
 			int width = screen.width();
 			int height = screen.height();
 
 			for (y = 0; y < width+step; y += step)
 				for (x = 0; x < height+step; x += step)
 				{
-					static int c = 0;
-
 					if (y < height && x < width)
 						c = *BITMAP_ADDR32(state->mosaicbitmap, y, x);
 

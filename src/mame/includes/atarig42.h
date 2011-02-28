@@ -30,6 +30,7 @@ public:
 	UINT16 *		sloop_base;
 
 	device_t *		rle;
+	UINT32			last_accesses[8];
 };
 
 

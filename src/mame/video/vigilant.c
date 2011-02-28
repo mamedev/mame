@@ -24,36 +24,24 @@ static const rectangle bottomvisiblearea =
 	6*8, 32*8-1
 };
 
-//UINT8 *vigilant_paletteram;
-//UINT8 *vigilant_sprite_paletteram;
-
-static int horiz_scroll_low=0;
-static int horiz_scroll_high=0;
-static int rear_horiz_scroll_low=0;
-static int rear_horiz_scroll_high=0;
-static int rear_color=0;
-static int rear_disable;
-
-static int rear_refresh;
-
-static bitmap_t *bg_bitmap;
-
 
 VIDEO_START( vigilant )
 {
-	bg_bitmap = auto_bitmap_alloc(machine,512*4,256,machine->primary_screen->format());
+	vigilant_state *state = machine->driver_data<vigilant_state>();
+	state->bg_bitmap = auto_bitmap_alloc(machine,512*4,256,machine->primary_screen->format());
 }
 
 
 VIDEO_RESET( vigilant )
 {
-	horiz_scroll_low = 0;
-	horiz_scroll_high = 0;
-	rear_horiz_scroll_low = 0;
-	rear_horiz_scroll_high = 0;
-	rear_color = 0;
-	rear_disable = 1;
-	rear_refresh = 1;
+	vigilant_state *state = machine->driver_data<vigilant_state>();
+	state->horiz_scroll_low = 0;
+	state->horiz_scroll_high = 0;
+	state->rear_horiz_scroll_low = 0;
+	state->rear_horiz_scroll_high = 0;
+	state->rear_color = 0;
+	state->rear_disable = 1;
+	state->rear_refresh = 1;
 }
 
 
@@ -65,6 +53,7 @@ VIDEO_RESET( vigilant )
  **************************************************************************/
 static void update_background(running_machine *machine)
 {
+	vigilant_state *state = machine->driver_data<vigilant_state>();
 	int row,col,page;
 	int charcode;
 
@@ -78,7 +67,7 @@ static void update_background(running_machine *machine)
 		{
 			for( col=0; col<512; col+=32 )
 			{
-				drawgfx_opaque(bg_bitmap,
+				drawgfx_opaque(state->bg_bitmap,
 						0,machine->gfx[2],
 						charcode,
 						row < 128 ? 0 : 1,
@@ -133,10 +122,11 @@ WRITE8_HANDLER( vigilant_paletteram_w )
  **************************************************************************/
 WRITE8_HANDLER( vigilant_horiz_scroll_w )
 {
+	vigilant_state *state = space->machine->driver_data<vigilant_state>();
 	if (offset==0)
-		horiz_scroll_low = data;
+		state->horiz_scroll_low = data;
 	else
-		horiz_scroll_high = (data & 0x01) * 256;
+		state->horiz_scroll_high = (data & 0x01) * 256;
 }
 
 /***************************************************************************
@@ -147,10 +137,11 @@ WRITE8_HANDLER( vigilant_horiz_scroll_w )
 ***************************************************************************/
 WRITE8_HANDLER( vigilant_rear_horiz_scroll_w )
 {
+	vigilant_state *state = space->machine->driver_data<vigilant_state>();
 	if (offset==0)
-		rear_horiz_scroll_low = data;
+		state->rear_horiz_scroll_low = data;
 	else
-		rear_horiz_scroll_high = (data & 0x07) * 256;
+		state->rear_horiz_scroll_high = (data & 0x07) * 256;
 }
 
 /***************************************************************************
@@ -170,8 +161,9 @@ WRITE8_HANDLER( vigilant_rear_horiz_scroll_w )
  **************************************************************************/
 WRITE8_HANDLER( vigilant_rear_color_w )
 {
-	rear_disable = data & 0x40;
-	rear_color = (data & 0x0d);
+	vigilant_state *state = space->machine->driver_data<vigilant_state>();
+	state->rear_disable = data & 0x40;
+	state->rear_color = (data & 0x0d);
 }
 
 /***************************************************************************
@@ -185,7 +177,7 @@ static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const re
 	vigilant_state *state = machine->driver_data<vigilant_state>();
 	UINT8 *videoram = state->videoram;
 	int offs;
-	int scroll = -(horiz_scroll_low + horiz_scroll_high);
+	int scroll = -(state->horiz_scroll_low + state->horiz_scroll_high);
 
 
 	for (offs = 0; offs < 0x1000; offs += 2)
@@ -231,16 +223,17 @@ static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const re
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	int scrollx = 0x17a + 16*8 - (rear_horiz_scroll_low + rear_horiz_scroll_high);
+	vigilant_state *state = machine->driver_data<vigilant_state>();
+	int scrollx = 0x17a + 16*8 - (state->rear_horiz_scroll_low + state->rear_horiz_scroll_high);
 
 
-	if (rear_refresh)
+	if (state->rear_refresh)
 	{
 		update_background(machine);
-		rear_refresh=0;
+		state->rear_refresh=0;
 	}
 
-	copyscrollbitmap(bitmap,bg_bitmap,1,&scrollx,0,0,&bottomvisiblearea);
+	copyscrollbitmap(bitmap,state->bg_bitmap,1,&scrollx,0,0,&bottomvisiblearea);
 }
 
 
@@ -307,6 +300,7 @@ SCREEN_UPDATE( kikcubic )
 
 SCREEN_UPDATE( vigilant )
 {
+	vigilant_state *state = screen->machine->driver_data<vigilant_state>();
 	int i;
 
 	/* copy the background palette */
@@ -315,20 +309,20 @@ SCREEN_UPDATE( vigilant )
 		int r,g,b;
 
 
-		r = (screen->machine->generic.paletteram.u8[0x400 + 16 * rear_color + i] << 3) & 0xFF;
-		g = (screen->machine->generic.paletteram.u8[0x500 + 16 * rear_color + i] << 3) & 0xFF;
-		b = (screen->machine->generic.paletteram.u8[0x600 + 16 * rear_color + i] << 3) & 0xFF;
+		r = (screen->machine->generic.paletteram.u8[0x400 + 16 * state->rear_color + i] << 3) & 0xFF;
+		g = (screen->machine->generic.paletteram.u8[0x500 + 16 * state->rear_color + i] << 3) & 0xFF;
+		b = (screen->machine->generic.paletteram.u8[0x600 + 16 * state->rear_color + i] << 3) & 0xFF;
 
 		palette_set_color(screen->machine,512 + i,MAKE_RGB(r,g,b));
 
-		r = (screen->machine->generic.paletteram.u8[0x400 + 16 * rear_color + 32 + i] << 3) & 0xFF;
-		g = (screen->machine->generic.paletteram.u8[0x500 + 16 * rear_color + 32 + i] << 3) & 0xFF;
-		b = (screen->machine->generic.paletteram.u8[0x600 + 16 * rear_color + 32 + i] << 3) & 0xFF;
+		r = (screen->machine->generic.paletteram.u8[0x400 + 16 * state->rear_color + 32 + i] << 3) & 0xFF;
+		g = (screen->machine->generic.paletteram.u8[0x500 + 16 * state->rear_color + 32 + i] << 3) & 0xFF;
+		b = (screen->machine->generic.paletteram.u8[0x600 + 16 * state->rear_color + 32 + i] << 3) & 0xFF;
 
 		palette_set_color(screen->machine,512 + 16 + i,MAKE_RGB(r,g,b));
 	}
 
-	if (rear_disable)	 /* opaque foreground */
+	if (state->rear_disable)	 /* opaque foreground */
 	{
 		draw_foreground(screen->machine,bitmap,cliprect,0,1);
 		draw_sprites(screen->machine,bitmap,&bottomvisiblearea);

@@ -2353,8 +2353,7 @@ static void mix_all_layers(segas32_state *state, int which, int xoffs, bitmap_t 
 
 static void print_mixer_data(segas32_state *state, int which)
 {
-	static int count = 0;
-	if (++count > 60 * 5)
+	if (++state->print_count > 60 * 5)
 	{
 		mame_printf_debug("\n");
 		mame_printf_debug("OP: %04X\n", state->system32_videoram[0x1ff8e/2]);
@@ -2418,7 +2417,7 @@ static void print_mixer_data(segas32_state *state, int which)
 			state->mixer_control[which][0x2d],
 			state->mixer_control[which][0x2e],
 			state->mixer_control[which][0x2f]);
-		count = 0;
+		state->print_count = 0;
 	}
 }
 

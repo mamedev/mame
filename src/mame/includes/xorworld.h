@@ -5,6 +5,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT16 *videoram;
+	tilemap_t *bg_tilemap;
 };
 
 

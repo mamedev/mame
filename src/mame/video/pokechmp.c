@@ -3,14 +3,13 @@
 #include "emu.h"
 #include "includes/pokechmp.h"
 
-static tilemap_t *bg_tilemap;
 
 WRITE8_HANDLER( pokechmp_videoram_w )
 {
 	pokechmp_state *state = space->machine->driver_data<pokechmp_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( pokechmp_flipscreen_w )
@@ -34,7 +33,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( pokechmp )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	pokechmp_state *state = machine->driver_data<pokechmp_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 }
 
@@ -73,7 +73,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pokechmp )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	pokechmp_state *state = screen->machine->driver_data<pokechmp_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

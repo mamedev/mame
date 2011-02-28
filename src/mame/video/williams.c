@@ -99,58 +99,6 @@
 
 /*************************************
  *
- *  Global variables
- *
- *************************************/
-
-/* RAM globals */
-UINT8 *williams_videoram;
-UINT8 *williams2_tileram;
-UINT8 *blaster_palette_0;
-UINT8 *blaster_scanline_control;
-
-/* blitter globals */
-UINT8 williams_blitter_config;
-UINT16 williams_blitter_clip_address;
-UINT8 williams_blitter_window_enable;
-
-/* tilemap globals */
-UINT8 williams2_tilemap_config;
-
-/* rendering globals */
-UINT8 williams_cocktail;
-
-
-
-/*************************************
- *
- *  Static global variables
- *
- *************************************/
-
-/* palette variables */
-static rgb_t *palette_lookup;
-
-/* blitter variables */
-static UINT8 blitterram[8];
-static UINT8 blitter_xor;
-static UINT8 blitter_remap_index;
-static const UINT8 *blitter_remap;
-static UINT8 *blitter_remap_lookup;
-
-/* Blaster-specific variables */
-static rgb_t blaster_color0;
-static UINT8 blaster_video_control;
-
-/* tilemap variables */
-static tilemap_t *bg_tilemap;
-static UINT16 tilemap_xscroll;
-static UINT8 williams2_fg_color;
-
-
-
-/*************************************
- *
  *  Prototypes
  *
  *************************************/
@@ -170,20 +118,22 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 
 static void state_save_register(running_machine *machine)
 {
-	state_save_register_global(machine, williams_blitter_window_enable);
-	state_save_register_global(machine, williams_cocktail);
-	state_save_register_global_array(machine, blitterram);
-	state_save_register_global(machine, blitter_remap_index);
-	state_save_register_global(machine, blaster_color0);
-	state_save_register_global(machine, blaster_video_control);
-	state_save_register_global(machine, tilemap_xscroll);
-	state_save_register_global(machine, williams2_fg_color);
+	williams_state *state = machine->driver_data<williams_state>();
+	state_save_register_global(machine, state->blitter_window_enable);
+	state_save_register_global(machine, state->cocktail);
+	state_save_register_global_array(machine, state->blitterram);
+	state_save_register_global(machine, state->blitter_remap_index);
+	state_save_register_global(machine, state->blaster_color0);
+	state_save_register_global(machine, state->blaster_video_control);
+	state_save_register_global(machine, state->tilemap_xscroll);
+	state_save_register_global(machine, state->williams2_fg_color);
 }
 
 
 VIDEO_START( williams )
 {
-	blitter_init(machine, williams_blitter_config, NULL);
+	williams_state *state = machine->driver_data<williams_state>();
+	blitter_init(machine, state->blitter_config, NULL);
 	create_palette_lookup(machine);
 	state_save_register(machine);
 }
@@ -191,7 +141,8 @@ VIDEO_START( williams )
 
 VIDEO_START( blaster )
 {
-	blitter_init(machine, williams_blitter_config, machine->region("proms")->base());
+	williams_state *state = machine->driver_data<williams_state>();
+	blitter_init(machine, state->blitter_config, machine->region("proms")->base());
 	create_palette_lookup(machine);
 	state_save_register(machine);
 }
@@ -199,15 +150,16 @@ VIDEO_START( blaster )
 
 VIDEO_START( williams2 )
 {
-	blitter_init(machine, williams_blitter_config, NULL);
+	williams_state *state = machine->driver_data<williams_state>();
+	blitter_init(machine, state->blitter_config, NULL);
 
 	/* allocate paletteram */
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x400 * 2);
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x400 * 2);
 
 	/* create the tilemap */
-	bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols,  24,16, 128,16);
-	tilemap_set_scrolldx(bg_tilemap, 2, 0);
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols,  24,16, 128,16);
+	tilemap_set_scrolldx(state->bg_tilemap, 2, 0);
 
 	state_save_register(machine);
 }
@@ -222,17 +174,18 @@ VIDEO_START( williams2 )
 
 SCREEN_UPDATE( williams )
 {
+	williams_state *state = screen->machine->driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = palette_lookup[screen->machine->generic.paletteram.u8[x]];
+		pens[x] = state->palette_lookup[screen->machine->generic.paletteram.u8[x]];
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT8 *source = &williams_videoram[y];
+		UINT8 *source = &state->videoram[y];
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		/* loop over columns */
@@ -249,27 +202,28 @@ SCREEN_UPDATE( williams )
 
 SCREEN_UPDATE( blaster )
 {
+	williams_state *state = screen->machine->driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = palette_lookup[screen->machine->generic.paletteram.u8[x]];
+		pens[x] = state->palette_lookup[screen->machine->generic.paletteram.u8[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
-	if (cliprect->min_y == screen->visible_area().min_y || !(blaster_video_control & 1))
-		blaster_color0 = pens[0];
+	if (cliprect->min_y == screen->visible_area().min_y || !(state->blaster_video_control & 1))
+		state->blaster_color0 = pens[0];
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		int erase_behind = blaster_video_control & blaster_scanline_control[y] & 2;
-		UINT8 *source = &williams_videoram[y];
+		int erase_behind = state->blaster_video_control & state->blaster_scanline_control[y] & 2;
+		UINT8 *source = &state->videoram[y];
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		/* latch a new color0 pen? */
-		if (blaster_video_control & blaster_scanline_control[y] & 1)
-			blaster_color0 = palette_lookup[blaster_palette_0[y] ^ 0xff];
+		if (state->blaster_video_control & state->blaster_scanline_control[y] & 1)
+			state->blaster_color0 = state->palette_lookup[state->blaster_palette_0[y] ^ 0xff];
 
 		/* loop over columns */
 		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
@@ -281,8 +235,8 @@ SCREEN_UPDATE( blaster )
 				source[(x/2) * 256] = 0;
 
 			/* now draw */
-			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : blaster_color0;
-			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : blaster_color0;
+			dest[x+0] = (pix & 0xf0) ? pens[pix >> 4] : state->blaster_color0;
+			dest[x+1] = (pix & 0x0f) ? pens[pix & 0x0f] : state->blaster_color0;
 		}
 	}
 	return 0;
@@ -291,20 +245,21 @@ SCREEN_UPDATE( blaster )
 
 SCREEN_UPDATE( williams2 )
 {
+	williams_state *state = screen->machine->driver_data<williams_state>();
 	rgb_t pens[16];
 	int x, y;
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* fetch the relevant pens */
 	for (x = 1; x < 16; x++)
-		pens[x] = palette_get_color(screen->machine, williams2_fg_color * 16 + x);
+		pens[x] = palette_get_color(screen->machine, state->williams2_fg_color * 16 + x);
 
 	/* loop over rows */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		UINT8 *source = &williams_videoram[y];
+		UINT8 *source = &state->videoram[y];
 		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
 
 		/* loop over columns */
@@ -331,6 +286,7 @@ SCREEN_UPDATE( williams2 )
 
 static void create_palette_lookup(running_machine *machine)
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	static const int resistances_rg[3] = { 1200, 560, 330 };
 	static const int resistances_b[2]  = { 560, 330 };
 	double weights_r[3], weights_g[3], weights_b[2];
@@ -345,14 +301,14 @@ static void create_palette_lookup(running_machine *machine)
 			2, resistances_b,  weights_b, 0, 0);
 
 	/* build a palette lookup */
-	palette_lookup = auto_alloc_array(machine, rgb_t, 256);
+	state->palette_lookup = auto_alloc_array(machine, rgb_t, 256);
 	for (i = 0; i < 256; i++)
 	{
 		int r = combine_3_weights(weights_r, BIT(i,0), BIT(i,1), BIT(i,2));
 		int g = combine_3_weights(weights_g, BIT(i,3), BIT(i,4), BIT(i,5));
 		int b = combine_2_weights(weights_b, BIT(i,6), BIT(i,7));
 
-		palette_lookup[i] = MAKE_RGB(r, g, b);
+		state->palette_lookup[i] = MAKE_RGB(r, g, b);
 	}
 }
 
@@ -384,7 +340,8 @@ WRITE8_HANDLER( williams2_paletteram_w )
 
 WRITE8_HANDLER( williams2_fg_select_w )
 {
-	williams2_fg_color = data & 0x3f;
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->williams2_fg_color = data & 0x3f;
 }
 
 
@@ -416,12 +373,13 @@ READ8_HANDLER( williams2_video_counter_r )
 
 static TILE_GET_INFO( get_tile_info )
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	int mask = machine->gfx[0]->total_elements - 1;
-	int data = williams2_tileram[tile_index];
+	int data = state->williams2_tileram[tile_index];
 	int y = (tile_index >> 1) & 7;
 	int color = 0;
 
-	switch (williams2_tilemap_config)
+	switch (state->williams2_tilemap_config)
 	{
 		case WILLIAMS_TILEMAP_MYSTICM:
 		{
@@ -450,9 +408,10 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_HANDLER( williams2_bg_select_w )
 {
+	williams_state *state = space->machine->driver_data<williams_state>();
 	/* based on the tilemap config, only certain bits are used */
 	/* the rest are determined by other factors */
-	switch (williams2_tilemap_config)
+	switch (state->williams2_tilemap_config)
 	{
 		case WILLIAMS_TILEMAP_MYSTICM:
 			/* IC79 is a 74LS85 comparator that controls the low bit */
@@ -469,28 +428,31 @@ WRITE8_HANDLER( williams2_bg_select_w )
 			data &= 0x3f;
 			break;
 	}
-	tilemap_set_palette_offset(bg_tilemap, data * 16);
+	tilemap_set_palette_offset(state->bg_tilemap, data * 16);
 }
 
 
 WRITE8_HANDLER( williams2_tileram_w )
 {
-	williams2_tileram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->williams2_tileram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( williams2_xscroll_low_w )
 {
-	tilemap_xscroll = (tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
-	tilemap_set_scrollx(bg_tilemap, 0, (tilemap_xscroll & 7) + ((tilemap_xscroll >> 3) * 6));
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->tilemap_xscroll = (state->tilemap_xscroll & ~0x00f) | ((data & 0x80) >> 4) | (data & 0x07);
+	tilemap_set_scrollx(state->bg_tilemap, 0, (state->tilemap_xscroll & 7) + ((state->tilemap_xscroll >> 3) * 6));
 }
 
 
 WRITE8_HANDLER( williams2_xscroll_high_w )
 {
-	tilemap_xscroll = (tilemap_xscroll & 0x00f) | (data << 4);
-	tilemap_set_scrollx(bg_tilemap, 0, (tilemap_xscroll & 7) + ((tilemap_xscroll >> 3) * 6));
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->tilemap_xscroll = (state->tilemap_xscroll & 0x00f) | (data << 4);
+	tilemap_set_scrollx(state->bg_tilemap, 0, (state->tilemap_xscroll & 7) + ((state->tilemap_xscroll >> 3) * 6));
 }
 
 
@@ -503,14 +465,16 @@ WRITE8_HANDLER( williams2_xscroll_high_w )
 
 WRITE8_HANDLER( blaster_remap_select_w )
 {
-	blitter_remap_index = data;
-	blitter_remap = blitter_remap_lookup + data * 256;
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->blitter_remap_index = data;
+	state->blitter_remap = state->blitter_remap_lookup + data * 256;
 }
 
 
 WRITE8_HANDLER( blaster_video_control_w )
 {
-	blaster_video_control = data;
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->blaster_video_control = data;
 }
 
 
@@ -523,47 +487,49 @@ WRITE8_HANDLER( blaster_video_control_w )
 
 static void blitter_init(running_machine *machine, int blitter_config, const UINT8 *remap_prom)
 {
+	williams_state *state = machine->driver_data<williams_state>();
 	static const UINT8 dummy_table[] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
 	int i,j;
 
 	/* by default, there is no clipping window - this will be touched only by games that have one */
-	williams_blitter_window_enable = 0;
+	state->blitter_window_enable = 0;
 
 	/* switch off the video config */
-	blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC01) ? 4 : 0;
+	state->blitter_xor = (blitter_config == WILLIAMS_BLITTER_SC01) ? 4 : 0;
 
 	/* create the remap table; if no PROM, make an identity remap table */
-	blitter_remap_lookup = auto_alloc_array(machine, UINT8, 256 * 256);
-	blitter_remap_index = 0;
-	blitter_remap = blitter_remap_lookup;
+	state->blitter_remap_lookup = auto_alloc_array(machine, UINT8, 256 * 256);
+	state->blitter_remap_index = 0;
+	state->blitter_remap = state->blitter_remap_lookup;
 	for (i = 0; i < 256; i++)
 	{
 		const UINT8 *table = remap_prom ? (remap_prom + (i & 0x7f) * 16) : dummy_table;
 		for (j = 0; j < 256; j++)
-			blitter_remap_lookup[i * 256 + j] = (table[j >> 4] << 4) | table[j & 0x0f];
+			state->blitter_remap_lookup[i * 256 + j] = (table[j >> 4] << 4) | table[j & 0x0f];
 	}
 }
 
 
 WRITE8_HANDLER( williams_blitter_w )
 {
+	williams_state *state = space->machine->driver_data<williams_state>();
 	int sstart, dstart, w, h, accesses;
 	int estimated_clocks_at_4MHz;
 
 	/* store the data */
-	blitterram[offset] = data;
+	state->blitterram[offset] = data;
 
 	/* only writes to location 0 trigger the blit */
 	if (offset != 0)
 		return;
 
 	/* compute the starting locations */
-	sstart = (blitterram[2] << 8) + blitterram[3];
-	dstart = (blitterram[4] << 8) + blitterram[5];
+	sstart = (state->blitterram[2] << 8) + state->blitterram[3];
+	dstart = (state->blitterram[4] << 8) + state->blitterram[5];
 
 	/* compute the width and height */
-	w = blitterram[6] ^ blitter_xor;
-	h = blitterram[7] ^ blitter_xor;
+	w = state->blitterram[6] ^ state->blitter_xor;
+	h = state->blitterram[7] ^ state->blitter_xor;
 
 	/* adjust the width and height */
 	if (w == 0) w = 1;
@@ -582,17 +548,18 @@ WRITE8_HANDLER( williams_blitter_w )
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",
 			cpu_get_pc(space->cpu), space->machine->primary_screen->vpos(),
-			blitterram[2], blitterram[3],
-			blitterram[4], blitterram[5],
-			blitterram[6], blitterram[7],
-			blitterram[1], blitterram[0],
-			((estimated_clocks_at_4MHz + 3) / 4), williams_blitter_window_enable);
+			state->blitterram[2], state->blitterram[3],
+			state->blitterram[4], state->blitterram[5],
+			state->blitterram[6], state->blitterram[7],
+			state->blitterram[1], state->blitterram[0],
+			((estimated_clocks_at_4MHz + 3) / 4), state->blitter_window_enable);
 }
 
 
 WRITE8_HANDLER( williams2_blit_window_enable_w )
 {
-	williams_blitter_window_enable = data & 0x01;
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->blitter_window_enable = data & 0x01;
 }
 
 
@@ -605,8 +572,9 @@ WRITE8_HANDLER( williams2_blit_window_enable_w )
 
 INLINE void blit_pixel(address_space *space, int offset, int srcdata, int data, int mask, int solid)
 {
+	williams_state *state = space->machine->driver_data<williams_state>();
 	/* always read from video RAM regardless of the bank setting */
-	int pix = (offset < 0xc000) ? williams_videoram[offset] : space->read_byte(offset);
+	int pix = (offset < 0xc000) ? state->videoram[offset] : space->read_byte(offset);
 
 	/* handle transparency */
 	if (data & 0x08)
@@ -625,13 +593,14 @@ INLINE void blit_pixel(address_space *space, int offset, int srcdata, int data, 
 	/* if the window is enabled, only blit to videoram below the clipping address */
 	/* note that we have to allow blits to non-video RAM (e.g. tileram) because those */
 	/* are not blocked by the window enable */
-	if (!williams_blitter_window_enable || offset < williams_blitter_clip_address || offset >= 0xc000)
+	if (!state->blitter_window_enable || offset < state->blitter_clip_address || offset >= 0xc000)
 		space->write_byte(offset, pix);
 }
 
 
 static int blitter_core(address_space *space, int sstart, int dstart, int w, int h, int data)
 {
+	williams_state *state = space->machine->driver_data<williams_state>();
 	int source, sxadv, syadv;
 	int dest, dxadv, dyadv;
 	int i, j, solid;
@@ -652,7 +621,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 		return accesses;
 
 	/* set the solid pixel value to the mask value */
-	solid = blitterram[1];
+	solid = state->blitterram[1];
 
 	/* first case: no shifting */
 	if (!(data & 0x20))
@@ -666,7 +635,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			/* loop over the width */
 			for (j = w; j > 0; j--)
 			{
-				blit_pixel(space, dest, blitter_remap[space->read_byte(source)], data, keepmask, solid);
+				blit_pixel(space, dest, state->blitter_remap[space->read_byte(source)], data, keepmask, solid);
 				accesses += 2;
 
 				/* advance */
@@ -700,7 +669,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			dest = dstart & 0xffff;
 
 			/* left edge case */
-			pixdata = blitter_remap[space->read_byte(source)];
+			pixdata = state->blitter_remap[space->read_byte(source)];
 			blit_pixel(space, dest, (pixdata >> 4) & 0x0f, data, keepmask | 0xf0, solid);
 			accesses += 2;
 
@@ -710,7 +679,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			/* loop over the width */
 			for (j = w - 1; j > 0; j--)
 			{
-				pixdata = (pixdata << 8) | blitter_remap[space->read_byte(source)];
+				pixdata = (pixdata << 8) | state->blitter_remap[space->read_byte(source)];
 				blit_pixel(space, dest, (pixdata >> 4) & 0xff, data, keepmask, solid);
 				accesses += 2;
 

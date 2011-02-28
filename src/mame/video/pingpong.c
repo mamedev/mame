@@ -9,9 +9,6 @@
 #include "emu.h"
 #include "includes/pingpong.h"
 
-static tilemap_t *bg_tilemap;
-UINT8 *pingpong_videoram;
-UINT8 *pingpong_colorram;
 
 
 /* This is strange; it's unlikely that the sprites actually have a hardware */
@@ -98,20 +95,23 @@ PALETTE_INIT( pingpong )
 
 WRITE8_HANDLER( pingpong_videoram_w )
 {
-	pingpong_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	pingpong_state *state = space->machine->driver_data<pingpong_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( pingpong_colorram_w )
 {
-	pingpong_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	pingpong_state *state = space->machine->driver_data<pingpong_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = pingpong_colorram[tile_index];
-	int code = pingpong_videoram[tile_index] + ((attr & 0x20) << 3);
+	pingpong_state *state = machine->driver_data<pingpong_state>();
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0x20) << 3);
 	int color = attr & 0x1f;
 	int flags = ((attr & 0x40) ? TILE_FLIPX : 0) | ((attr & 0x80) ? TILE_FLIPY : 0);
 
@@ -120,7 +120,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( pingpong )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	pingpong_state *state = machine->driver_data<pingpong_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
@@ -152,7 +153,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( pingpong )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	pingpong_state *state = screen->machine->driver_data<pingpong_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

@@ -1,6 +1,23 @@
-/*----------- defined in video/m90.c -----------*/
+class m90_state : public driver_device
+{
+public:
+	m90_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT16 *m90_video_data;
+	UINT32 bankaddress;
+	UINT16 *video_data;
+	UINT16 *spriteram;
+	UINT16 video_control_data[8];
+	tilemap_t *pf1_layer;
+	tilemap_t *pf2_layer;
+	tilemap_t *pf1_wide_layer;
+	tilemap_t *pf2_wide_layer;
+	int last_pf1;
+	int last_pf2;
+};
+
+
+/*----------- defined in video/m90.c -----------*/
 
 VIDEO_START( m90 );
 VIDEO_START( dynablsb );

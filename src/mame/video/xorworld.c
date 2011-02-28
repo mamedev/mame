@@ -1,7 +1,6 @@
 #include "emu.h"
 #include "includes/xorworld.h"
 
-static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 
@@ -54,7 +53,7 @@ WRITE16_HANDLER( xorworld_videoram16_w )
 	xorworld_state *state = space->machine->driver_data<xorworld_state>();
 	UINT16 *videoram = state->videoram;
 	COMBINE_DATA(&videoram[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 /*
@@ -79,7 +78,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( xorworld )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	xorworld_state *state = machine->driver_data<xorworld_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 }
 
@@ -114,7 +114,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( xorworld )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	xorworld_state *state = screen->machine->driver_data<xorworld_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

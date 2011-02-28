@@ -70,6 +70,17 @@ Notes:
 #include "machine/nvram.h"
 
 
+struct blitter_t
+{
+
+	UINT16	x, y, w, h,
+			gfx_lo, gfx_hi,
+			depth,
+			pen,
+			flags;
+
+};
+
 class igs011_state : public driver_device
 {
 public:
@@ -93,6 +104,7 @@ public:
 	UINT16 igs003_reg[2];
 	UINT16 lhb_irq_enable;
 	UINT16 *vbowl_trackball;
+	blitter_t blitter;
 };
 
 
@@ -277,31 +289,68 @@ static WRITE16_HANDLER( igs011_palette )
 
 ***************************************************************************/
 
-static struct
+
+static WRITE16_HANDLER( igs011_blit_x_w )
 {
+	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
+	COMBINE_DATA(&blitter.x);
+}
 
-	UINT16	x, y, w, h,
-			gfx_lo, gfx_hi,
-			depth,
-			pen,
-			flags;
+static WRITE16_HANDLER( igs011_blit_y_w )
+{
+	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
+	COMBINE_DATA(&blitter.y);
+}
 
-}	blitter;
+static WRITE16_HANDLER( igs011_blit_gfx_lo_w )
+{
+	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
+	COMBINE_DATA(&blitter.gfx_lo);
+}
 
+static WRITE16_HANDLER( igs011_blit_gfx_hi_w )
+{
+	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
+	COMBINE_DATA(&blitter.gfx_hi);
+}
 
-static WRITE16_HANDLER( igs011_blit_x_w )		{	COMBINE_DATA(&blitter.x);		}
-static WRITE16_HANDLER( igs011_blit_y_w )		{	COMBINE_DATA(&blitter.y);		}
-static WRITE16_HANDLER( igs011_blit_gfx_lo_w )	{	COMBINE_DATA(&blitter.gfx_lo);	}
-static WRITE16_HANDLER( igs011_blit_gfx_hi_w )	{	COMBINE_DATA(&blitter.gfx_hi);	}
-static WRITE16_HANDLER( igs011_blit_w_w )		{	COMBINE_DATA(&blitter.w);		}
-static WRITE16_HANDLER( igs011_blit_h_w )		{	COMBINE_DATA(&blitter.h);		}
-static WRITE16_HANDLER( igs011_blit_depth_w )	{	COMBINE_DATA(&blitter.depth);	}
-static WRITE16_HANDLER( igs011_blit_pen_w )		{	COMBINE_DATA(&blitter.pen);		}
+static WRITE16_HANDLER( igs011_blit_w_w )
+{
+	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
+	COMBINE_DATA(&blitter.w);
+}
+
+static WRITE16_HANDLER( igs011_blit_h_w )
+{
+	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
+	COMBINE_DATA(&blitter.h);
+}
+
+static WRITE16_HANDLER( igs011_blit_depth_w )
+{
+	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
+	COMBINE_DATA(&blitter.depth);
+}
+
+static WRITE16_HANDLER( igs011_blit_pen_w )
+{
+	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
+	COMBINE_DATA(&blitter.pen);
+}
 
 
 static WRITE16_HANDLER( igs011_blit_flags_w )
 {
 	igs011_state *state = space->machine->driver_data<igs011_state>();
+	struct blitter_t &blitter = state->blitter;
 	int x, xstart, xend, xinc, flipx;
 	int y, ystart, yend, yinc, flipy;
 	int depth4, clear, opaque, z;

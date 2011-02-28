@@ -9,6 +9,7 @@ public:
 	UINT8 *spriteram;
 	UINT8 *videoram;
 	UINT8 *textram;
+	int bFlicker;
 };
 
 

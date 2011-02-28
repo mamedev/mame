@@ -15,22 +15,19 @@ To Do:
 #include "machine/nvram.h"
 #include "includes/triplhnt.h"
 
-static UINT8 triplhnt_cmos[16];
-static UINT8 triplhnt_da_latch;
-static UINT8 triplhnt_misc_flags;
-static UINT8 triplhnt_cmos_latch;
-static UINT8 triplhnt_hit_code;
 
 
 static DRIVER_INIT( triplhnt )
 {
-	machine->device<nvram_device>("nvram")->set_base(triplhnt_cmos, sizeof(triplhnt_cmos));
+	triplhnt_state *state = machine->driver_data<triplhnt_state>();
+	machine->device<nvram_device>("nvram")->set_base(state->cmos, sizeof(state->cmos));
 }
 
 
 void triplhnt_set_collision(running_machine *machine, int code)
 {
-	triplhnt_hit_code = code;
+	triplhnt_state *state = machine->driver_data<triplhnt_state>();
+	state->hit_code = code;
 
 	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
 }
@@ -38,6 +35,7 @@ void triplhnt_set_collision(running_machine *machine, int code)
 
 static void triplhnt_update_misc(running_machine *machine, int offset)
 {
+	triplhnt_state *state = machine->driver_data<triplhnt_state>();
 	device_t *samples = machine->device("samples");
 	device_t *discrete = machine->device("discrete");
 	UINT8 is_witch_hunt;
@@ -54,32 +52,32 @@ static void triplhnt_update_misc(running_machine *machine, int offset)
 
 	if (offset & 1)
 	{
-		triplhnt_misc_flags |= 1 << bit;
+		state->misc_flags |= 1 << bit;
 
 		if (bit == 5)
 		{
-			triplhnt_cmos[triplhnt_cmos_latch] = triplhnt_da_latch;
+			state->cmos[state->cmos_latch] = state->da_latch;
 		}
 	}
 	else
 	{
-		triplhnt_misc_flags &= ~(1 << bit);
+		state->misc_flags &= ~(1 << bit);
 	}
 
-	triplhnt_sprite_zoom = (triplhnt_misc_flags >> 4) & 1;
-	triplhnt_sprite_bank = (triplhnt_misc_flags >> 7) & 1;
+	state->sprite_zoom = (state->misc_flags >> 4) & 1;
+	state->sprite_bank = (state->misc_flags >> 7) & 1;
 
-	set_led_status(machine, 0, triplhnt_misc_flags & 0x02);
+	set_led_status(machine, 0, state->misc_flags & 0x02);
 
-	coin_lockout_w(machine, 0, !(triplhnt_misc_flags & 0x08));
-	coin_lockout_w(machine, 1, !(triplhnt_misc_flags & 0x08));
+	coin_lockout_w(machine, 0, !(state->misc_flags & 0x08));
+	coin_lockout_w(machine, 1, !(state->misc_flags & 0x08));
 
-	discrete_sound_w(discrete, TRIPLHNT_SCREECH_EN, triplhnt_misc_flags & 0x04);	// screech
-	discrete_sound_w(discrete, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
-	discrete_sound_w(discrete, TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
+	discrete_sound_w(discrete, TRIPLHNT_SCREECH_EN, state->misc_flags & 0x04);	// screech
+	discrete_sound_w(discrete, TRIPLHNT_LAMP_EN, state->misc_flags & 0x02);	// Lamp is used to reset noise
+	discrete_sound_w(discrete, TRIPLHNT_BEAR_EN, state->misc_flags & 0x80);	// bear
 
 	is_witch_hunt = input_port_read(machine, "0C09") == 0x40;
-	bit = ~triplhnt_misc_flags & 0x40;
+	bit = ~state->misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
 	if (!sample_playing(samples, 0))
@@ -101,9 +99,10 @@ static WRITE8_HANDLER( triplhnt_misc_w )
 
 static READ8_HANDLER( triplhnt_cmos_r )
 {
-	triplhnt_cmos_latch = offset;
+	triplhnt_state *state = space->machine->driver_data<triplhnt_state>();
+	state->cmos_latch = offset;
 
-	return triplhnt_cmos[triplhnt_cmos_latch] ^ 15;
+	return state->cmos[state->cmos_latch] ^ 15;
 }
 
 
@@ -116,17 +115,19 @@ static READ8_HANDLER( triplhnt_input_port_4_r )
 
 static READ8_HANDLER( triplhnt_misc_r )
 {
+	triplhnt_state *state = space->machine->driver_data<triplhnt_state>();
 	triplhnt_update_misc(space->machine, offset);
-	return input_port_read(space->machine, "VBLANK") | triplhnt_hit_code;
+	return input_port_read(space->machine, "VBLANK") | state->hit_code;
 }
 
 
 static READ8_HANDLER( triplhnt_da_latch_r )
 {
+	triplhnt_state *state = space->machine->driver_data<triplhnt_state>();
 	int cross_x = input_port_read(space->machine, "STICKX");
 	int cross_y = input_port_read(space->machine, "STICKY");
 
-	triplhnt_da_latch = offset;
+	state->da_latch = offset;
 
 	/* the following is a slight simplification */
 
@@ -137,11 +138,11 @@ static READ8_HANDLER( triplhnt_da_latch_r )
 static ADDRESS_MAP_START( triplhnt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x04ff) AM_WRITEONLY AM_BASE(&triplhnt_playfield_ram)
-	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_BASE(&triplhnt_vpos_ram)
-	AM_RANGE(0x0810, 0x081f) AM_WRITEONLY AM_BASE(&triplhnt_hpos_ram)
-	AM_RANGE(0x0820, 0x082f) AM_WRITEONLY AM_BASE(&triplhnt_orga_ram)
-	AM_RANGE(0x0830, 0x083f) AM_WRITEONLY AM_BASE(&triplhnt_code_ram)
+	AM_RANGE(0x0400, 0x04ff) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, playfield_ram)
+	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, vpos_ram)
+	AM_RANGE(0x0810, 0x081f) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, hpos_ram)
+	AM_RANGE(0x0820, 0x082f) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, orga_ram)
+	AM_RANGE(0x0830, 0x083f) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, code_ram)
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("0C00")
 	AM_RANGE(0x0c08, 0x0c08) AM_READ_PORT("0C08")
 	AM_RANGE(0x0c09, 0x0c09) AM_READ_PORT("0C09")
@@ -309,7 +310,7 @@ static PALETTE_INIT( triplhnt )
 }
 
 
-static MACHINE_CONFIG_START( triplhnt, driver_device )
+static MACHINE_CONFIG_START( triplhnt, triplhnt_state )
 
 /* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 800000)

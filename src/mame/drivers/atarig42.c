@@ -291,7 +291,7 @@ static WRITE16_HANDLER( roadriot_sloop_data_w )
 
 static void guardians_sloop_tweak(atarig42_state *state, int offset)
 {
-	static UINT32 last_accesses[8];
+	UINT32 *last_accesses = state->last_accesses;
 
 	if (offset >= 0x7f7c0/2)
 	{

@@ -37,6 +37,10 @@ public:
 		: amiga_state(machine, config) { }
 
 	UINT8	m_nvram[0x100];
+	UINT8 prev_cia1_porta;
+	UINT8 parallel_data;
+	UINT8 nvram_address_latch;
+	UINT8 nvram_data_latch;
 };
 
 
@@ -52,26 +56,14 @@ public:
 
 /*************************************
  *
- *  Globals
- *
- *************************************/
-
-static UINT8 prev_cia1_porta;
-static UINT8 parallel_data;
-static UINT8 nvram_address_latch;
-static UINT8 nvram_data_latch;
-
-
-
-/*************************************
- *
  *  Reset state
  *
  *************************************/
 
 static void upscope_reset(running_machine *machine)
 {
-	prev_cia1_porta = 0xff;
+	upscope_state *state = machine->driver_data<upscope_state>();
+	state->prev_cia1_porta = 0xff;
 }
 
 
@@ -125,12 +117,14 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_0_porta_w )
 
 static WRITE8_DEVICE_HANDLER( upscope_cia_0_portb_w )
 {
-	parallel_data = data;
+	upscope_state *state = device->machine->driver_data<upscope_state>();
+	state->parallel_data = data;
 }
 
 static READ8_DEVICE_HANDLER( upscope_cia_0_portb_r )
 {
-	return nvram_data_latch;
+	upscope_state *state = device->machine->driver_data<upscope_state>();
+	return state->nvram_data_latch;
 }
 
 
@@ -152,25 +146,27 @@ static READ8_DEVICE_HANDLER( upscope_cia_0_portb_r )
 
 static READ8_DEVICE_HANDLER( upscope_cia_1_porta_r )
 {
-	return 0xf8 | (prev_cia1_porta & 0x07);
+	upscope_state *state = device->machine->driver_data<upscope_state>();
+	return 0xf8 | (state->prev_cia1_porta & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 {
+	upscope_state *state = device->machine->driver_data<upscope_state>();
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
-	if ((prev_cia1_porta & 2) && !(data & 2))
+	if ((state->prev_cia1_porta & 2) && !(data & 2))
 	{
 		/* if SEL == 1 && BUSY == 0, we latch an address */
 		if ((data & 5) == 4)
 		{
-			if (LOG_IO) logerror("Latch address: %02X\n", parallel_data);
-			nvram_address_latch = parallel_data;
+			if (LOG_IO) logerror("Latch address: %02X\n", state->parallel_data);
+			state->nvram_address_latch = state->parallel_data;
 		}
 
 		/* if SEL == 1 && BUSY == 1, we write data to internal registers */
 		else if ((data & 5) == 5)
 		{
-			switch (nvram_address_latch)
+			switch (state->nvram_address_latch)
 			{
 				case 0x01:
 					/* lamps:
@@ -195,7 +191,7 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 					break;
 
 				default:
-					logerror("Internal register (%d) = %02X\n", nvram_address_latch, parallel_data);
+					logerror("Internal register (%d) = %02X\n", state->nvram_address_latch, state->parallel_data);
 					break;
 			}
 		}
@@ -203,9 +199,8 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
 		else if ((data & 5) == 1)
 		{
-			upscope_state *state = device->machine->driver_data<upscope_state>();
-			if (LOG_IO) logerror("NVRAM data write @ %02X = %02X\n", nvram_address_latch, parallel_data);
-			state->m_nvram[nvram_address_latch] = parallel_data;
+			if (LOG_IO) logerror("NVRAM data write @ %02X = %02X\n", state->nvram_address_latch, state->parallel_data);
+			state->m_nvram[state->nvram_address_latch] = state->parallel_data;
 		}
 
 		/* if SEL == 0 && BUSY == 0, who knows? */
@@ -216,26 +211,25 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 	}
 
 	/* on a low transition of BUSY, we latch stuff for reading */
-	else if ((prev_cia1_porta & 1) && !(data & 1))
+	else if ((state->prev_cia1_porta & 1) && !(data & 1))
 	{
 		/* if SEL == 1, we read internal data registers */
 		if (data & 4)
 		{
-			if (LOG_IO) logerror("Internal register (%d) read\n", nvram_address_latch);
-			nvram_data_latch = (nvram_address_latch == 0) ? input_port_read(device->machine, "IO0") : 0xff;
+			if (LOG_IO) logerror("Internal register (%d) read\n", state->nvram_address_latch);
+			state->nvram_data_latch = (state->nvram_address_latch == 0) ? input_port_read(device->machine, "IO0") : 0xff;
 		}
 
 		/* if SEL == 0, we read NVRAM */
 		else
 		{
-			upscope_state *state = device->machine->driver_data<upscope_state>();
-			nvram_data_latch = state->m_nvram[nvram_address_latch];
-			if (LOG_IO) logerror("NVRAM data read @ %02X = %02X\n", nvram_address_latch, nvram_data_latch);
+			state->nvram_data_latch = state->m_nvram[state->nvram_address_latch];
+			if (LOG_IO) logerror("NVRAM data read @ %02X = %02X\n", state->nvram_address_latch, state->nvram_data_latch);
 		}
 	}
 
 	/* remember the previous value */
-	prev_cia1_porta = data;
+	state->prev_cia1_porta = data;
 }
 
 

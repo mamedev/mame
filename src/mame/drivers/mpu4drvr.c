@@ -197,39 +197,6 @@ TODO:
 
 #define VIDEO_MASTER_CLOCK			XTAL_10MHz
 
-/* IRQ states for 68k */
-static UINT8 m6840_irq_state;
-static UINT8 m6850_irq_state;
-static UINT8 scn2674_irq_state;
-
-/* UART source/sinks */
-static UINT8 m68k_m6809_line;
-static UINT8 m6809_m68k_line;
-static UINT8 m68k_acia_cts;
-static UINT8 m6809_acia_cts;
-static UINT8 m6809_acia_rts;
-static UINT8 m6809_acia_dcd;
-
-/* SCN2674 AVDC stuff */
-static int mpu4_gfx_index;
-static UINT16 * mpu4_vid_vidram;
-static UINT16 * mpu4_vid_mainram;
-
-static UINT8 scn2674_IR[16];
-static UINT8 scn2675_IR_pointer;
-static UINT8 scn2674_screen1_l;
-static UINT8 scn2674_screen1_h;
-static UINT8 scn2674_cursor_l;
-static UINT8 scn2674_cursor_h;
-static UINT8 scn2674_screen2_l;
-static UINT8 scn2674_screen2_h;
-
-static UINT8 scn2674_irq_register = 0;
-static UINT8 scn2674_status_register = 0;
-static UINT8 scn2674_irq_mask = 0;
-static UINT8 scn2674_gfx_enabled;
-static UINT8 scn2674_display_enabled;
-static UINT8 scn2674_cursor_enabled;
 
 static READ16_HANDLER( characteriser16_r );
 static WRITE16_HANDLER( characteriser16_w );
@@ -258,9 +225,10 @@ static WRITE16_HANDLER( characteriser16_w );
 
 static void update_mpu68_interrupts(running_machine *machine)
 {
-	cputag_set_input_line(machine, "video", 1, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cputag_set_input_line(machine, "video", 2, m6850_irq_state ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(machine, "video", 3, scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	cputag_set_input_line(machine, "video", 1, state->m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "video", 2, state->m6850_irq_state ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "video", 3, state->scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Communications with 6809 board */
@@ -268,32 +236,38 @@ static void update_mpu68_interrupts(running_machine *machine)
 
 static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
 {
-	return m68k_m6809_line;
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	return state->m68k_m6809_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_tx_w )
 {
-	m6809_m68k_line = state;
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	drvstate->m6809_m68k_line = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( m6809_acia_cts_r )
 {
-	return m6809_acia_cts;
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	return state->m6809_acia_cts;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_rts_w )
 {
-	m6809_acia_rts = state;
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	drvstate->m6809_acia_rts = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( m6809_acia_dcd_r )
 {
-	return m6809_acia_dcd;
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	return state->m6809_acia_dcd;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m6809_acia_irq )
 {
-	m68k_acia_cts = !state;
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	drvstate->m68k_acia_cts = !state;
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -311,33 +285,39 @@ static ACIA6850_INTERFACE( m6809_acia_if )
 
 static READ_LINE_DEVICE_HANDLER( m68k_acia_rx_r )
 {
-	return m6809_m68k_line;
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	return state->m6809_m68k_line;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m68k_acia_tx_w )
 {
-	m68k_m6809_line = state;
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	drvstate->m68k_m6809_line = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( m68k_acia_cts_r )
 {
-	return m68k_acia_cts;
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	return state->m68k_acia_cts;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m68k_acia_rts_w )
 {
-	m6809_acia_dcd = state;
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	drvstate->m6809_acia_dcd = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( m68k_acia_dcd_r )
 {
-	return m6809_acia_rts;
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	return state->m6809_acia_rts;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( m68k_acia_irq )
 {
-	m6809_acia_cts = !state;
-	m6850_irq_state = state;
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	drvstate->m6809_acia_cts = !state;
+	drvstate->m6850_irq_state = state;
 	update_mpu68_interrupts(device->machine);
 }
 
@@ -356,7 +336,8 @@ static ACIA6850_INTERFACE( m68k_acia_if )
 
 static WRITE_LINE_DEVICE_HANDLER( cpu1_ptm_irq )
 {
-	m6840_irq_state = state;
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	drvstate->m6840_irq_state = state;
 	update_mpu68_interrupts(device->machine);
 }
 
@@ -460,33 +441,11 @@ static const gfx_layout mpu4_vid_char_16x16_layout =
 };
 
 
-static UINT8 IR0_scn2674_double_ht_wd;
-static UINT8 IR0_scn2674_scanline_per_char_row;
-static UINT8 IR0_scn2674_sync_select;
-static UINT8 IR0_scn2674_buffer_mode_select;
-static UINT8 IR1_scn2674_interlace_enable;
-static UINT8 IR1_scn2674_equalizing_constant;
-static UINT8 IR2_scn2674_row_table;
-static UINT8 IR2_scn2674_horz_sync_width;
-static UINT8 IR2_scn2674_horz_back_porch;
-static UINT8 IR3_scn2674_vert_front_porch;
-static UINT8 IR3_scn2674_vert_back_porch;
-static UINT8 IR4_scn2674_rows_per_screen;
-static UINT8 IR4_scn2674_character_blink_rate;
-static UINT8 IR5_scn2674_character_per_row;
-static UINT8 IR8_scn2674_display_buffer_first_address_LSB;
-static UINT8 IR9_scn2674_display_buffer_first_address_MSB;
-static UINT8 IR9_scn2674_display_buffer_last_address;
-static UINT8 IR10_scn2674_display_pointer_address_lower;
-static UINT8 IR11_scn2674_display_pointer_address_upper;
-static UINT8 IR12_scn2674_scroll_start;
-static UINT8 IR12_scn2674_split_register_1;
-static UINT8 IR13_scn2674_scroll_end;
-static UINT8 IR13_scn2674_split_register_2;
 
 
 static SCREEN_UPDATE( mpu4_vid )
 {
+	mpu4_state *state = screen->machine->driver_data<mpu4_state>();
 	int x, y/*, count = 0*/;
 
 	bitmap_fill(bitmap,cliprect,0);
@@ -495,11 +454,11 @@ static SCREEN_UPDATE( mpu4_vid )
 	/* count = 0x0018b6/2; - crmaze count = 0x004950/2; - turnover */
 
 	/* we're in row table mode...thats why */
-	for(y = 0; y <= IR4_scn2674_rows_per_screen; y++)
+	for(y = 0; y <= state->IR4_scn2674_rows_per_screen; y++)
 	{
-		int screen2_base = (scn2674_screen2_h << 8) | scn2674_screen2_l;
+		int screen2_base = (state->scn2674_screen2_h << 8) | state->scn2674_screen2_l;
 
-		UINT16 rowbase = (mpu4_vid_mainram[1+screen2_base+(y*2)]<<8)|mpu4_vid_mainram[screen2_base+(y*2)];
+		UINT16 rowbase = (state->vid_mainram[1+screen2_base+(y*2)]<<8)|state->vid_mainram[screen2_base+(y*2)];
 		int dbl_size;
 		int gfxregion = 0;
 
@@ -507,12 +466,12 @@ static SCREEN_UPDATE( mpu4_vid )
 
 		if (dbl_size&2) gfxregion = 1;
 
-		for(x = 0; x <= IR5_scn2674_character_per_row; x++)
+		for(x = 0; x <= state->IR5_scn2674_character_per_row; x++)
 		{
 			UINT16 tiledat;
 			UINT16 attr;
 
-			tiledat = mpu4_vid_mainram[(rowbase+x)&0x7fff];
+			tiledat = state->vid_mainram[(rowbase+x)&0x7fff];
 			attr = tiledat >>12;
 
 			if (attr)
@@ -531,18 +490,20 @@ static SCREEN_UPDATE( mpu4_vid )
 
 static READ16_HANDLER( mpu4_vid_vidram_r )
 {
-	return mpu4_vid_vidram[offset];
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	return state->vid_vidram[offset];
 }
 
 
 static WRITE16_HANDLER( mpu4_vid_vidram_w )
 {
-	COMBINE_DATA(&mpu4_vid_vidram[offset]);
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	COMBINE_DATA(&state->vid_vidram[offset]);
 	offset <<= 1;
-	gfx_element_mark_dirty(space->machine->gfx[mpu4_gfx_index+0], offset/0x20);
-	gfx_element_mark_dirty(space->machine->gfx[mpu4_gfx_index+1], offset/0x20);
-	gfx_element_mark_dirty(space->machine->gfx[mpu4_gfx_index+2], offset/0x20);
-	gfx_element_mark_dirty(space->machine->gfx[mpu4_gfx_index+3], offset/0x20);
+	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index+0], offset/0x20);
+	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index+1], offset/0x20);
+	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index+2], offset/0x20);
+	gfx_element_mark_dirty(space->machine->gfx[state->gfx_index+3], offset/0x20);
 }
 
 
@@ -571,67 +532,67 @@ IR14 ---- ----
 */
 
 
-static void scn2674_write_init_regs(UINT8 data)
+static void scn2674_write_init_regs(mpu4_state *state, UINT8 data)
 {
-	LOGSTUFF(("scn2674_write_init_regs %02x %02x\n",scn2675_IR_pointer,data));
+	LOGSTUFF(("scn2674_write_init_regs %02x %02x\n",state->scn2675_IR_pointer,data));
 
-	scn2674_IR[scn2675_IR_pointer]=data;
+	state->scn2674_IR[state->scn2675_IR_pointer]=data;
 
 
-	switch ( scn2675_IR_pointer) /* display some debug info, set mame specific variables */
+	switch ( state->scn2675_IR_pointer) /* display some debug info, set mame specific variables */
 	{
 		case 0:
-			IR0_scn2674_double_ht_wd = (data & 0x80)>>7;
-			IR0_scn2674_scanline_per_char_row = (data & 0x78)>>3;
-			IR0_scn2674_sync_select = (data&0x04)>>2;
-			IR0_scn2674_buffer_mode_select = (data&0x03);
+			state->IR0_scn2674_double_ht_wd = (data & 0x80)>>7;
+			state->IR0_scn2674_scanline_per_char_row = (data & 0x78)>>3;
+			state->IR0_scn2674_sync_select = (data&0x04)>>2;
+			state->IR0_scn2674_buffer_mode_select = (data&0x03);
 
-			LOGSTUFF(("IR0 - Double Ht Wd %02x\n",IR0_scn2674_double_ht_wd));
-			LOGSTUFF(("IR0 - Scanlines per Character Row %02x\n",IR0_scn2674_scanline_per_char_row));
-			LOGSTUFF(("IR0 - Sync Select %02x\n",IR0_scn2674_sync_select));
-			LOGSTUFF(("IR0 - Buffer Mode Select %02x\n",IR0_scn2674_buffer_mode_select));
+			LOGSTUFF(("IR0 - Double Ht Wd %02x\n",state->IR0_scn2674_double_ht_wd));
+			LOGSTUFF(("IR0 - Scanlines per Character Row %02x\n",state->IR0_scn2674_scanline_per_char_row));
+			LOGSTUFF(("IR0 - Sync Select %02x\n",state->IR0_scn2674_sync_select));
+			LOGSTUFF(("IR0 - Buffer Mode Select %02x\n",state->IR0_scn2674_buffer_mode_select));
 			break;
 
 		case 1:
-			IR1_scn2674_interlace_enable = (data&0x80)>>7;
-			IR1_scn2674_equalizing_constant = (data&0x7f);
+			state->IR1_scn2674_interlace_enable = (data&0x80)>>7;
+			state->IR1_scn2674_equalizing_constant = (data&0x7f);
 
-			LOGSTUFF(("IR1 - Interlace Enable %02x\n",IR1_scn2674_interlace_enable));
-			LOGSTUFF(("IR1 - Equalizing Constant %02x\n",IR1_scn2674_equalizing_constant));
+			LOGSTUFF(("IR1 - Interlace Enable %02x\n",state->IR1_scn2674_interlace_enable));
+			LOGSTUFF(("IR1 - Equalizing Constant %02x\n",state->IR1_scn2674_equalizing_constant));
 			break;
 
 		case 2:
-			IR2_scn2674_row_table = (data&0x80)>>7;
-			IR2_scn2674_horz_sync_width = (data&0x78)>>3;
-			IR2_scn2674_horz_back_porch = (data&0x07);
+			state->IR2_scn2674_row_table = (data&0x80)>>7;
+			state->IR2_scn2674_horz_sync_width = (data&0x78)>>3;
+			state->IR2_scn2674_horz_back_porch = (data&0x07);
 
-			LOGSTUFF(("IR2 - Row Table %02x\n",IR2_scn2674_row_table));
-			LOGSTUFF(("IR2 - Horizontal Sync Width %02x\n",IR2_scn2674_horz_sync_width));
-			LOGSTUFF(("IR2 - Horizontal Back Porch %02x\n",IR2_scn2674_horz_back_porch));
+			LOGSTUFF(("IR2 - Row Table %02x\n",state->IR2_scn2674_row_table));
+			LOGSTUFF(("IR2 - Horizontal Sync Width %02x\n",state->IR2_scn2674_horz_sync_width));
+			LOGSTUFF(("IR2 - Horizontal Back Porch %02x\n",state->IR2_scn2674_horz_back_porch));
 			break;
 
 		case 3:
-			IR3_scn2674_vert_front_porch = (data&0xe0)>>5;
-			IR3_scn2674_vert_back_porch = (data&0x1f)>>0;
+			state->IR3_scn2674_vert_front_porch = (data&0xe0)>>5;
+			state->IR3_scn2674_vert_back_porch = (data&0x1f)>>0;
 
-			LOGSTUFF(("IR3 - Vertical Front Porch %02x\n",IR3_scn2674_vert_front_porch));
-			LOGSTUFF(("IR3 - Vertical Back Porch %02x\n",IR3_scn2674_vert_back_porch));
+			LOGSTUFF(("IR3 - Vertical Front Porch %02x\n",state->IR3_scn2674_vert_front_porch));
+			LOGSTUFF(("IR3 - Vertical Back Porch %02x\n",state->IR3_scn2674_vert_back_porch));
 			break;
 
 		case 4:
-			IR4_scn2674_rows_per_screen = data&0x7f;
-			IR4_scn2674_character_blink_rate = (data & 0x80)>>7;
+			state->IR4_scn2674_rows_per_screen = data&0x7f;
+			state->IR4_scn2674_character_blink_rate = (data & 0x80)>>7;
 
-			LOGSTUFF(("IR4 - Rows Per Screen %02x\n",IR4_scn2674_rows_per_screen));
-			LOGSTUFF(("IR4 - Character Blink Rate %02x\n",IR4_scn2674_character_blink_rate));
+			LOGSTUFF(("IR4 - Rows Per Screen %02x\n",state->IR4_scn2674_rows_per_screen));
+			LOGSTUFF(("IR4 - Character Blink Rate %02x\n",state->IR4_scn2674_character_blink_rate));
 			break;
 
 		case 5:
 		   /* IR5 - Active Characters Per Row
              cccc cccc
              c = Characters Per Row */
-			IR5_scn2674_character_per_row = data;
-			LOGSTUFF(("IR5 - Active Characters Per Row %02x\n",IR5_scn2674_character_per_row));
+			state->IR5_scn2674_character_per_row = data;
+			LOGSTUFF(("IR5 - Active Characters Per Row %02x\n",state->IR5_scn2674_character_per_row));
 			break;
 
 		case 6:
@@ -641,39 +602,39 @@ static void scn2674_write_init_regs(UINT8 data)
 			break;
 
 		case 8:
-			IR8_scn2674_display_buffer_first_address_LSB = data;
-			LOGSTUFF(("IR8 - Display Buffer First Address LSB %02x\n",IR8_scn2674_display_buffer_first_address_LSB));
+			state->IR8_scn2674_display_buffer_first_address_LSB = data;
+			LOGSTUFF(("IR8 - Display Buffer First Address LSB %02x\n",state->IR8_scn2674_display_buffer_first_address_LSB));
 			break;
 
 		case 9:
-			IR9_scn2674_display_buffer_first_address_MSB = data & 0x0f;
-			IR9_scn2674_display_buffer_last_address = (data & 0xf0)>>4;
-			LOGSTUFF(("IR9 - Display Buffer First Address MSB %02x\n",IR9_scn2674_display_buffer_first_address_MSB));
-			LOGSTUFF(("IR9 - Display Buffer Last Address %02x\n",IR9_scn2674_display_buffer_last_address));
+			state->IR9_scn2674_display_buffer_first_address_MSB = data & 0x0f;
+			state->IR9_scn2674_display_buffer_last_address = (data & 0xf0)>>4;
+			LOGSTUFF(("IR9 - Display Buffer First Address MSB %02x\n",state->IR9_scn2674_display_buffer_first_address_MSB));
+			LOGSTUFF(("IR9 - Display Buffer Last Address %02x\n",state->IR9_scn2674_display_buffer_last_address));
 			break;
 
 		case 10:
-			IR10_scn2674_display_pointer_address_lower = data;
-			LOGSTUFF(("IR10 - Display Pointer Address Lower %02x\n",IR10_scn2674_display_pointer_address_lower));
+			state->IR10_scn2674_display_pointer_address_lower = data;
+			LOGSTUFF(("IR10 - Display Pointer Address Lower %02x\n",state->IR10_scn2674_display_pointer_address_lower));
 			break;
 
 		case 11:
-			IR11_scn2674_display_pointer_address_upper= data&0x3f;
-			LOGSTUFF(("IR11 - Display Pointer Address Lower %02x\n",IR11_scn2674_display_pointer_address_upper));
+			state->IR11_scn2674_display_pointer_address_upper= data&0x3f;
+			LOGSTUFF(("IR11 - Display Pointer Address Lower %02x\n",state->IR11_scn2674_display_pointer_address_upper));
 			break;
 
 		case 12:
-			IR12_scn2674_scroll_start = (data & 0x80)>>7;
-			IR12_scn2674_split_register_1 = (data & 0x7f);
-			LOGSTUFF(("IR12 - Scroll Start %02x\n",IR12_scn2674_scroll_start));
-			LOGSTUFF(("IR12 - Split Register 1 %02x\n",IR12_scn2674_split_register_1));
+			state->IR12_scn2674_scroll_start = (data & 0x80)>>7;
+			state->IR12_scn2674_split_register_1 = (data & 0x7f);
+			LOGSTUFF(("IR12 - Scroll Start %02x\n",state->IR12_scn2674_scroll_start));
+			LOGSTUFF(("IR12 - Split Register 1 %02x\n",state->IR12_scn2674_split_register_1));
 			break;
 
 		case 13:
-			IR13_scn2674_scroll_end = (data & 0x80)>>7;
-			IR13_scn2674_split_register_2 = (data & 0x7f);
-			LOGSTUFF(("IR13 - Scroll End %02x\n",IR13_scn2674_scroll_end));
-			LOGSTUFF(("IR13 - Split Register 2 %02x\n",IR13_scn2674_split_register_2));
+			state->IR13_scn2674_scroll_end = (data & 0x80)>>7;
+			state->IR13_scn2674_split_register_2 = (data & 0x7f);
+			LOGSTUFF(("IR13 - Scroll End %02x\n",state->IR13_scn2674_scroll_end));
+			LOGSTUFF(("IR13 - Split Register 2 %02x\n",state->IR13_scn2674_split_register_2));
 			break;
 
 		case 14:
@@ -684,12 +645,13 @@ static void scn2674_write_init_regs(UINT8 data)
 
 	}
 
-	scn2675_IR_pointer++;
-	if (scn2675_IR_pointer>14)scn2675_IR_pointer=14;
+	state->scn2675_IR_pointer++;
+	if (state->scn2675_IR_pointer>14)state->scn2675_IR_pointer=14;
 }
 
 static void scn2674_write_command(running_machine *machine, UINT8 data)
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	UINT8 oprand;
 	int i;
 
@@ -699,14 +661,14 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 	{
 		/* master reset, configures registers */
 		LOGSTUFF(("master reset\n"));
-		scn2675_IR_pointer=0;
-		scn2674_irq_register = 0x20;
-		scn2674_status_register = 0x20;
-		scn2674_irq_mask = 0x20;
-		scn2674_gfx_enabled = 0;
-		scn2674_display_enabled = 0;
-		scn2674_cursor_enabled = 0;
-		IR2_scn2674_row_table = 0;
+		state->scn2675_IR_pointer=0;
+		state->scn2674_irq_register = 0x20;
+		state->scn2674_status_register = 0x20;
+		state->scn2674_irq_mask = 0x20;
+		state->scn2674_gfx_enabled = 0;
+		state->scn2674_display_enabled = 0;
+		state->scn2674_cursor_enabled = 0;
+		state->IR2_scn2674_row_table = 0;
 	}
 
 	if ((data&0xf0)==0x10)
@@ -715,7 +677,7 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 		LOGSTUFF(("set IR pointer %02x\n",data));
 
 		oprand = data & 0x0f;
-		scn2675_IR_pointer=oprand;
+		state->scn2675_IR_pointer=oprand;
 
 	}
 
@@ -725,14 +687,14 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 	{
 		/* Disable GFX */
 		LOGSTUFF(("disable GFX %02x\n",data));
-		scn2674_gfx_enabled = 0;
+		state->scn2674_gfx_enabled = 0;
 	}
 
 	if ((data&0xe3)==0x23)
 	{
 		/* Enable GFX */
 		LOGSTUFF(("enable GFX %02x\n",data));
-		scn2674_gfx_enabled = 1;
+		state->scn2674_gfx_enabled = 1;
 	}
 
 	if ((data&0xe9)==0x28)
@@ -740,7 +702,7 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 		/* Display off */
 		oprand = data & 0x04;
 
-		scn2674_display_enabled = 0;
+		state->scn2674_display_enabled = 0;
 
 		if (oprand)
 			LOGSTUFF(("display OFF - float DADD bus %02x\n",data));
@@ -753,7 +715,7 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 		/* Display on */
 		oprand = data & 0x04;
 
-		scn2674_display_enabled = 1;
+		state->scn2674_display_enabled = 1;
 
 		if (oprand)
 			LOGSTUFF(("display ON - next field %02x\n",data));
@@ -765,14 +727,14 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 	{
 		/* Cursor Off */
 		LOGSTUFF(("cursor off %02x\n",data));
-		scn2674_cursor_enabled = 0;
+		state->scn2674_cursor_enabled = 0;
 	}
 
 	if ((data&0xf1)==0x31)
 	{
 		/* Cursor On */
 		LOGSTUFF(("cursor on %02x\n",data));
-		scn2674_cursor_enabled = 1;
+		state->scn2674_cursor_enabled = 1;
 	}
 
 	/* END */
@@ -789,13 +751,13 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 		LOGSTUFF(("Line Zero IRQ: %d Reset\n",(data>>3)&1));
 		LOGSTUFF(("V-Blank   IRQ: %d Reset\n",(data>>4)&1));
 
-		scn2674_irq_register &= ((data & 0x1f)^0x1f);
-		scn2674_status_register &= ((data & 0x1f)^0x1f);
+		state->scn2674_irq_register &= ((data & 0x1f)^0x1f);
+		state->scn2674_status_register &= ((data & 0x1f)^0x1f);
 
-		scn2674_irq_state = 0;
-		if (scn2674_irq_register)
+		state->scn2674_irq_state = 0;
+		if (state->scn2674_irq_register)
 		{
-			scn2674_irq_state = 1;
+			state->scn2674_irq_state = 1;
 		}
 		update_mpu68_interrupts(machine);
 	}
@@ -810,17 +772,17 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 		LOGSTUFF(("Line Zero IRQ: %d Disabled\n",(data>>3)&1));
 		LOGSTUFF(("V-Blank   IRQ: %d Disabled\n",(data>>4)&1));
 
-/*      scn2674_irq_mask &= ((data & 0x1f)^0x1f); disables.. doesn't enable? */
+/*      state->scn2674_irq_mask &= ((data & 0x1f)^0x1f); disables.. doesn't enable? */
 
-		scn2674_irq_mask &= ~(data & 0x1f);
+		state->scn2674_irq_mask &= ~(data & 0x1f);
 
-		scn2674_irq_state = 0;
+		state->scn2674_irq_state = 0;
 
 		for (i = 0; i < 5; i++)
 		{
-			if ((scn2674_irq_register>>i&1)&(scn2674_irq_mask>>i&1))
+			if ((state->scn2674_irq_register>>i&1)&(state->scn2674_irq_mask>>i&1))
 			{
-				scn2674_irq_state = 1;
+				state->scn2674_irq_state = 1;
 			}
 		}
 		update_mpu68_interrupts(machine);
@@ -837,15 +799,15 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 		LOGSTUFF(("Line Zero IRQ: %d Enabled\n",(data>>3)&1));
 		LOGSTUFF(("V-Blank   IRQ: %d Enabled\n",(data>>4)&1));
 
-		scn2674_irq_mask |= (data & 0x1f);  /* enables .. doesn't disable? */
+		state->scn2674_irq_mask |= (data & 0x1f);  /* enables .. doesn't disable? */
 
-		scn2674_irq_state = 0;
+		state->scn2674_irq_state = 0;
 
 		for (i = 0; i < 5; i++)
 		{
-			if ((scn2674_irq_register>>i&1)&(scn2674_irq_mask>>i&1))
+			if ((state->scn2674_irq_register>>i&1)&(state->scn2674_irq_mask>>i&1))
 			{
-				scn2674_irq_state = 1;
+				state->scn2674_irq_state = 1;
 			}
 		}
 		update_mpu68_interrupts(machine);
@@ -911,6 +873,7 @@ static void scn2674_write_command(running_machine *machine, UINT8 data)
 
 static READ16_HANDLER( mpu4_vid_scn2674_r )
 {
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
 	/*
     Offset:  Purpose
      0       Interrupt Register
@@ -941,18 +904,18 @@ static READ16_HANDLER( mpu4_vid_scn2674_r )
 
 		case 0:
 			LOGSTUFF(("Read Irq Register %06x\n",cpu_get_pc(space->cpu)));
-			return scn2674_irq_register;
+			return state->scn2674_irq_register;
 
 		case 1:
 			LOGSTUFF(("Read Status Register %06x\n",cpu_get_pc(space->cpu)));
-			return scn2674_status_register;
+			return state->scn2674_status_register;
 
-		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_screen1_l;
-		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_screen1_h;
-		case 4: LOGSTUFF(("Read Cursor_l Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_cursor_l;
-		case 5: LOGSTUFF(("Read Cursor_h Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_cursor_h;
-		case 6:	LOGSTUFF(("Read Screen2_l Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_screen2_l;
-		case 7: LOGSTUFF(("Read Screen2_h Register %06x\n",cpu_get_pc(space->cpu)));return scn2674_screen2_h;
+		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_screen1_l;
+		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_screen1_h;
+		case 4: LOGSTUFF(("Read Cursor_l Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_cursor_l;
+		case 5: LOGSTUFF(("Read Cursor_h Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_cursor_h;
+		case 6:	LOGSTUFF(("Read Screen2_l Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_screen2_l;
+		case 7: LOGSTUFF(("Read Screen2_h Register %06x\n",cpu_get_pc(space->cpu)));return state->scn2674_screen2_h;
 	}
 
 	return 0xffff;
@@ -961,6 +924,7 @@ static READ16_HANDLER( mpu4_vid_scn2674_r )
 
 static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 {
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
 	/*
     Offset:  Purpose
      0       Initialization Registers
@@ -978,46 +942,47 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 	switch (offset)
 	{
 		case 0:
-			scn2674_write_init_regs(data);
+			scn2674_write_init_regs(state, data);
 			break;
 
 		case 1:
 			scn2674_write_command(space->machine, data);
 			break;
 
-		case 2: scn2674_screen1_l = data; break;
-		case 3: scn2674_screen1_h = data; break;
-		case 4: scn2674_cursor_l  = data; break;
-		case 5: scn2674_cursor_h  = data; break;
-		case 6:	scn2674_screen2_l = data; break;
-		case 7: scn2674_screen2_h = data; break;
+		case 2: state->scn2674_screen1_l = data; break;
+		case 3: state->scn2674_screen1_h = data; break;
+		case 4: state->scn2674_cursor_l  = data; break;
+		case 5: state->scn2674_cursor_h  = data; break;
+		case 6:	state->scn2674_screen2_l = data; break;
+		case 7: state->scn2674_screen2_h = data; break;
 	}
 }
 
 
 static VIDEO_START( mpu4_vid )
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	/* if anything uses tile sizes other than 8x8 we can't really do it this way.. we'll have to draw tiles by hand.
       maybe we will anyway, but for now we don't need to */
 
-	mpu4_vid_vidram = auto_alloc_array(machine, UINT16, 0x20000/2);
+	state->vid_vidram = auto_alloc_array(machine, UINT16, 0x20000/2);
 
-	memset(mpu4_vid_vidram,0,0x20000);
+	memset(state->vid_vidram,0,0x20000);
 
 	/* find first empty slot to decode gfx */
-	for (mpu4_gfx_index = 0; mpu4_gfx_index < MAX_GFX_ELEMENTS; mpu4_gfx_index++)
-		if (machine->gfx[mpu4_gfx_index] == 0)
+	for (state->gfx_index = 0; state->gfx_index < MAX_GFX_ELEMENTS; state->gfx_index++)
+		if (machine->gfx[state->gfx_index] == 0)
 			break;
 
-	assert(mpu4_gfx_index != MAX_GFX_ELEMENTS);
+	assert(state->gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[mpu4_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)mpu4_vid_vidram, machine->total_colors() / 16, 0);
-	machine->gfx[mpu4_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)mpu4_vid_vidram, machine->total_colors() / 16, 0);
-	machine->gfx[mpu4_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)mpu4_vid_vidram, machine->total_colors() / 16, 0);
-	machine->gfx[mpu4_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)mpu4_vid_vidram, machine->total_colors() / 16, 0);
+	machine->gfx[state->gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)state->vid_vidram, machine->total_colors() / 16, 0);
+	machine->gfx[state->gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)state->vid_vidram, machine->total_colors() / 16, 0);
+	machine->gfx[state->gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)state->vid_vidram, machine->total_colors() / 16, 0);
+	machine->gfx[state->gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)state->vid_vidram, machine->total_colors() / 16, 0);
 
-	scn2675_IR_pointer = 0;
+	state->scn2675_IR_pointer = 0;
 }
 
 
@@ -1028,17 +993,12 @@ static VIDEO_START( mpu4_vid )
  *  (16 colors from 4096)
  ****************************/
 
-static struct ef9369
-{
-	UINT32 addr;
-	UINT16 clut[16];	/* 13-bits - a marking bit and a 444 color */
-} pal;
-
-
 /* Non-multiplexed mode */
 
 static WRITE16_HANDLER( ef9369_w )
 {
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	struct ef9369_t &pal = state->pal;
 	data &= 0x00ff;
 
 	/* Address register */
@@ -1079,6 +1039,8 @@ static WRITE16_HANDLER( ef9369_w )
 
 static READ16_HANDLER( ef9369_r )
 {
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	struct ef9369_t &pal = state->pal;
 	if ((offset & 1) == 0)
 	{
 		UINT16 col = pal.clut[pal.addr >> 1];
@@ -1102,16 +1064,6 @@ static READ16_HANDLER( ef9369_r )
  *  Impact, may not be 100% (that has a 477)
  ******************************************/
 
-static struct
-{
-	UINT8 address;
-	UINT8 addr_cnt;
-	UINT8 pixmask;
-	UINT8 command;
-	rgb_t color;
-} bt471;
-
-
 /*
  *  0 0 0    Address register (RAM write mode)
  *  0 0 1    Color palette RAMs
@@ -1124,6 +1076,8 @@ static struct
 
 WRITE16_HANDLER( bt471_w )
 {
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	struct bt471_t &bt471 = state->bt471;
 	UINT8 val = data & 0xff;
 		{
 			popmessage("Bt477: Unhandled write access (offset:%x, data:%x)", offset, val);
@@ -1182,6 +1136,7 @@ READ16_HANDLER( bt471_r )
 
 static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
     mainboard. As per usual, they've taken the cheap route here, reading and processing the
     raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
@@ -1193,23 +1148,22 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine->describe_context()));
 
-	static INT8 cur[2];
 
 	UINT8 data = input_port_read(device->machine, "AUX1");
 
 	INT8 dx = input_port_read(device->machine, "TRACKX");
 	INT8 dy = input_port_read(device->machine, "TRACKY");
 
-	cur[0] = dy + dx;
-	cur[1] = dy - dx;
+	state->cur[0] = dy + dx;
+	state->cur[1] = dy - dx;
 
 	UINT8 xa, xb, ya, yb;
 
 	/* generate pulses for the input port (A and B are 1 unit out of phase for direction sensing)*/
-	xa = ((cur[0] + 1) & 3) <= 1;
-	xb = (cur[0] & 3) <= 1;
-	ya = ((cur[1] + 1) & 3) <= 1;
-	yb = (cur[1] & 3) <= 1;
+	xa = ((state->cur[0] + 1) & 3) <= 1;
+	xb = (state->cur[0] & 3) <= 1;
+	ya = ((state->cur[1] + 1) & 3) <= 1;
+	yb = (state->cur[1] & 3) <= 1;
 
 	data |= (xa << 4); // XA
 	data |= (ya << 5); // YA
@@ -1965,11 +1919,12 @@ static void video_reset(device_t *device)
 /* machine start (called only once) */
 static MACHINE_START( mpu4_vid )
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	mpu4_config_common(machine);
 
-	mod_number=4; //No AY chip
+	state->mod_number=4; //No AY chip
 	/* setup communications */
-	link7a_connected = 1;
+	state->link7a_connected = 1;
 
 	/* setup 8 mechanical meters */
 	MechMtr_config(machine,8);
@@ -1983,27 +1938,28 @@ static MACHINE_START( mpu4_vid )
 
 static MACHINE_RESET( mpu4_vid )
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	ROC10937_reset(0);
 
-	mpu4_stepper_reset();
+	mpu4_stepper_reset(state);
 
-	lamp_strobe    = 0;
-	lamp_strobe2   = 0;
-	lamp_data      = 0;
+	state->lamp_strobe    = 0;
+	state->lamp_strobe2   = 0;
+	state->lamp_data      = 0;
 
-	IC23GC    = 0;
-	IC23GB    = 0;
-	IC23GA    = 0;
-	IC23G1    = 1;
-	IC23G2A   = 0;
-	IC23G2B   = 0;
+	state->IC23GC    = 0;
+	state->IC23GB    = 0;
+	state->IC23GA    = 0;
+	state->IC23G1    = 1;
+	state->IC23G2A   = 0;
+	state->IC23G2B   = 0;
 
-	prot_col  = 0;
+	state->prot_col  = 0;
 }
 
 static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&mpu4_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, vid_mainram)
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
@@ -2036,7 +1992,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&mpu4_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, vid_mainram)
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
@@ -2070,7 +2026,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bwbvid_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&mpu4_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, vid_mainram)
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
@@ -2086,7 +2042,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bwbvid5_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&mpu4_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, vid_mainram)
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
@@ -2127,7 +2083,6 @@ static GFXDECODE_START( dealem )
 GFXDECODE_END
 
 
-static UINT8 *dealem_videoram;
 
 /***************************************************************************
 
@@ -2190,6 +2145,7 @@ static PALETTE_INIT( dealem )
 
 static SCREEN_UPDATE(dealem)
 {
+	mpu4_state *state = screen->machine->driver_data<mpu4_state>();
 	int x,y;
 	int count = 0;
 
@@ -2197,7 +2153,7 @@ static SCREEN_UPDATE(dealem)
 	{
 		for (x = 0; x < 40; x++)
 		{
-			int tile = dealem_videoram[count + 0x1000] | (dealem_videoram[count] << 8);
+			int tile = state->dealem_videoram[count + 0x1000] | (state->dealem_videoram[count] << 8);
 			count++;
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x * 8,y * 8);
 		}
@@ -2251,16 +2207,15 @@ static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
 	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_BASE(&dealem_videoram)
+	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_BASE_MEMBER(mpu4_state, dealem_videoram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP/* 64k  paged ROM (4 pages) */
 ADDRESS_MAP_END
 
-static int rowcounter = 0;
-static int linecounter = 0;
 
 
 static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
+	mpu4_state *state = timer.machine->driver_data<mpu4_state>();
 	int current_scanline=param;
 	timer.machine->scheduler().synchronize();
 
@@ -2269,17 +2224,17 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	{
 		// these will be used to track which row / line we're on eventually
 		// and used by the renderer to render the correct data
-		rowcounter = 0; linecounter = 0;
+		state->rowcounter = 0; state->linecounter = 0;
 
-	//  scn2674_status_register &= ~0x10; // clear vblank
+	//  state->scn2674_status_register &= ~0x10; // clear vblank
 
-		scn2674_status_register |= 0x02;
+		state->scn2674_status_register |= 0x02;
 		/* Ready - this triggers for the first scanline of the screen */
-		if (scn2674_irq_mask&0x02)
+		if (state->scn2674_irq_mask&0x02)
 		{
 			LOGSTUFF(("SCN2674 Ready\n"));
-			scn2674_irq_state = 1;
-			scn2674_irq_register |= 0x02;
+			state->scn2674_irq_state = 1;
+			state->scn2674_irq_register |= 0x02;
 			update_mpu68_interrupts(timer.machine);
 		}
 	}
@@ -2287,50 +2242,50 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	// should be triggered at the start of each ROW (line zero for that row)
 	if ((current_scanline%8 == 7) && (current_scanline<296))
 	{
-		scn2674_status_register |= 0x08;
-		if (scn2674_irq_mask&0x08)
+		state->scn2674_status_register |= 0x08;
+		if (state->scn2674_irq_mask&0x08)
 		{
 			LOGSTUFF(("SCN2674 Line Zero\n"));
-			scn2674_irq_state = 1;
-			scn2674_irq_register |= 0x08;
+			state->scn2674_irq_state = 1;
+			state->scn2674_irq_register |= 0x08;
 			update_mpu68_interrupts(timer.machine);
 		}
 	}
 
 	// this is ROWS not scanlines!!
-	if (current_scanline == IR12_scn2674_split_register_1*8)
+	if (current_scanline == state->IR12_scn2674_split_register_1*8)
 	/* Split Screen 1 */
 	{
-		if (scn2674_screen2_h & 0x40)
+		if (state->scn2674_screen2_h & 0x40)
 		{
 			popmessage("Split screen 1 address shift required, contact MAMEDEV");
 		}
-		scn2674_status_register |= 0x04;
-		if (scn2674_irq_mask&0x04)
+		state->scn2674_status_register |= 0x04;
+		if (state->scn2674_irq_mask&0x04)
 		{
 			LOGSTUFF(("SCN2674 Split Screen 1\n"));
-			scn2674_irq_state = 1;
+			state->scn2674_irq_state = 1;
 			update_mpu68_interrupts(timer.machine);
 			timer.machine->primary_screen->update_partial(timer.machine->primary_screen->vpos());
 
-			scn2674_irq_register |= 0x04;
+			state->scn2674_irq_register |= 0x04;
 		}
 	}
 
 	// this is in ROWS not scanlines!!!
-	if (current_scanline == IR13_scn2674_split_register_2*8)
+	if (current_scanline == state->IR13_scn2674_split_register_2*8)
 	/* Split Screen 2 */
 	{
-		if (scn2674_screen2_h & 0x80)
+		if (state->scn2674_screen2_h & 0x80)
 		{
 			popmessage("Split screen 2 address shift required, contact MAMEDEV");
 		}
-		scn2674_status_register |= 0x01;
-		if (scn2674_irq_mask&0x01)
+		state->scn2674_status_register |= 0x01;
+		if (state->scn2674_irq_mask&0x01)
 		{
 			LOGSTUFF(("SCN2674 Split Screen 2 irq\n"));
-			scn2674_irq_state = 1;
-			scn2674_irq_register |= 0x01;
+			state->scn2674_irq_state = 1;
+			state->scn2674_irq_register |= 0x01;
 			update_mpu68_interrupts(timer.machine);
 			timer.machine->primary_screen->update_partial(timer.machine->primary_screen->vpos());
 
@@ -2340,25 +2295,25 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	// vblank?
 	if (current_scanline == 300)
 	{
-	/*  if (scn2674_display_enabled) ? */
+	/*  if (state->scn2674_display_enabled) ? */
 		{
-			if (scn2674_irq_mask&0x10)
+			if (state->scn2674_irq_mask&0x10)
 			{
 				LOGSTUFF(("vblank irq\n"));
-				scn2674_irq_state = 1;
+				state->scn2674_irq_state = 1;
 				update_mpu68_interrupts(timer.machine);
 
-				scn2674_irq_register |= 0x10;
+				state->scn2674_irq_register |= 0x10;
 			}
 		}
-		scn2674_status_register |= 0x10;
+		state->scn2674_status_register |= 0x10;
 	}
 
 //  printf("scanline %d\n",current_scanline);
 }
 
 
-static MACHINE_CONFIG_START( mpu4_vid, driver_device )
+static MACHINE_CONFIG_START( mpu4_vid, mpu4_state )
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
 	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
@@ -2423,7 +2378,7 @@ static MACHINE_CONFIG_DERIVED( vgpoker, mpu4_vid )
 	MCFG_CPU_PROGRAM_MAP(vp_68k_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bwbvid, driver_device )
+static MACHINE_CONFIG_START( bwbvid, mpu4_state )
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MCFG_CPU_PROGRAM_MAP(bwbvid_6809_map)
 	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
@@ -2488,7 +2443,7 @@ static MACHINE_CONFIG_DERIVED( bwbvid5, bwbvid )
 MACHINE_CONFIG_END
 
 /* machine driver for Zenitone Deal 'Em board */
-static MACHINE_CONFIG_START( dealem, driver_device )
+static MACHINE_CONFIG_START( dealem, mpu4_state )
 	MCFG_MACHINE_START(mpu4mod2)							/* main mpu4 board initialisation */
 	MCFG_MACHINE_RESET(mpu4_vid)
 	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
@@ -2548,25 +2503,26 @@ Characteriser (CHR)
 
 static WRITE16_HANDLER( characteriser16_w )
 {
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
 	int x;
 	int call=data;
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(space->cpu),offset,data));
 
-	if (!mpu4_current_chr_table)
+	if (!state->current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
 
-	for (x = prot_col; x < 64; x++)
+	for (x = state->prot_col; x < 64; x++)
 	{
 		if (call == 0)
 		{
-			prot_col = 0;
+			state->prot_col = 0;
 		}
 		else
 		{
-			if	(mpu4_current_chr_table[(x)].call == call)
+			if	(state->current_chr_table[(x)].call == call)
 			{
-				prot_col = x;
-				LOG_CHR(("Characteriser find column %02X\n",prot_col));
+				state->prot_col = x;
+				LOG_CHR(("Characteriser find column %02X\n",state->prot_col));
 				break;
 			}
 		}
@@ -2576,11 +2532,12 @@ static WRITE16_HANDLER( characteriser16_w )
 
 static READ16_HANDLER( characteriser16_r )
 {
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(space->cpu),offset,mpu4_current_chr_table[prot_col].response));
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(space->cpu),offset,state->current_chr_table[state->prot_col].response));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
-	LOG_CHR(("Characteriser read data %02X \n",mpu4_current_chr_table[prot_col].response));
+	LOG_CHR(("Characteriser read data %02X \n",state->current_chr_table[state->prot_col].response));
 
-	if (!mpu4_current_chr_table)
+	if (!state->current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
 
 
@@ -2590,7 +2547,7 @@ static READ16_HANDLER( characteriser16_r )
 		return 0x00;
 	}
 
-	return mpu4_current_chr_table[prot_col].response;
+	return state->current_chr_table[state->prot_col].response;
 }
 
 
@@ -2739,36 +2696,43 @@ static const mpu4_chr_table quidgrid_data[64] = {
 
 static DRIVER_INIT (adders)
 {
-	mpu4_current_chr_table = adders_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = adders_data;
 }
 
 static DRIVER_INIT (crmaze)
 {
-	mpu4_current_chr_table = crmaze_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = crmaze_data;
 }
 
 static DRIVER_INIT (crmazea)
 {
-	mpu4_current_chr_table = crmazea_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = crmazea_data;
 }
 
 static DRIVER_INIT (crmaze2)
 {
-	mpu4_current_chr_table = crmaze2_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = crmaze2_data;
 }
 
 static DRIVER_INIT (crmaze3)
 {
-	mpu4_current_chr_table = crmaze3_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = crmaze3_data;
 }
 
 static DRIVER_INIT (crmaze3a)
 {
-	mpu4_current_chr_table = crmaze3a_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = crmaze3a_data;
 }
 
 static DRIVER_INIT (mating)
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	address_space *space = cputag_get_address_space(machine, "video", ADDRESS_SPACE_PROGRAM);
 	device_t *device = machine->device("oki");
 
@@ -2778,38 +2742,44 @@ static DRIVER_INIT (mating)
 	/* There is also an OKIM6376 present on the program card */
 	memory_install_readwrite16_device_handler(space, device, 0xffa040, 0xffa0ff, 0, 0, oki_r, oki_w );
 
-	mpu4_current_chr_table = mating_data;
+	state->current_chr_table = mating_data;
 }
 
 
 static DRIVER_INIT (skiltrek)
 {
-	mpu4_current_chr_table = skiltrek_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = skiltrek_data;
 }
 
 static DRIVER_INIT (timemchn)
 {
-	mpu4_current_chr_table = timemchn_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = timemchn_data;
 }
 
 static DRIVER_INIT (strikeit)
 {
-	mpu4_current_chr_table = strikeit_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = strikeit_data;
 }
 
 static DRIVER_INIT (turnover)
 {
-	mpu4_current_chr_table = turnover_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = turnover_data;
 }
 
 static DRIVER_INIT (eyesdown)
 {
-	mpu4_current_chr_table = eyesdown_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = eyesdown_data;
 }
 
 static DRIVER_INIT (quidgrid)
 {
-	mpu4_current_chr_table = quidgrid_data;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = quidgrid_data;
 }
 
 

@@ -26,24 +26,6 @@
 #define SPRITE_COUNT		(0x28)
 
 
-/* globals */
-UINT8 *exidy440_scanline;
-UINT8 *exidy440_imageram;
-UINT8  exidy440_firq_vblank;
-UINT8  exidy440_firq_beam;
-UINT8 *topsecex_yscroll;
-
-/* local allocated storage */
-static UINT8 exidy440_latched_x;
-static UINT8 *local_videoram;
-static UINT8 *local_paletteram;
-
-/* local variables */
-static UINT8 firq_enable;
-static UINT8 firq_select;
-static UINT8 palettebank_io;
-static UINT8 palettebank_vis;
-
 /* function prototypes */
 static void exidy440_update_firq(running_machine *machine);
 
@@ -57,29 +39,31 @@ static void exidy440_update_firq(running_machine *machine);
 
 static VIDEO_START( exidy440 )
 {
+	exidy440_state *state = machine->driver_data<exidy440_state>();
 	/* reset the system */
-	firq_enable = 0;
-	firq_select = 0;
-	palettebank_io = 0;
-	palettebank_vis = 0;
-	exidy440_firq_vblank = 0;
-	exidy440_firq_beam = 0;
+	state->firq_enable = 0;
+	state->firq_select = 0;
+	state->palettebank_io = 0;
+	state->palettebank_vis = 0;
+	state->firq_vblank = 0;
+	state->firq_beam = 0;
 
 	/* allocate a buffer for VRAM */
-	local_videoram = auto_alloc_array(machine, UINT8, 256 * 256 * 2);
-	memset(local_videoram, 0, 256 * 256 * 2);
+	state->local_videoram = auto_alloc_array(machine, UINT8, 256 * 256 * 2);
+	memset(state->local_videoram, 0, 256 * 256 * 2);
 
 	/* allocate a buffer for palette RAM */
-	local_paletteram = auto_alloc_array(machine, UINT8, 512 * 2);
-	memset(local_paletteram, 0, 512 * 2);
+	state->local_paletteram = auto_alloc_array(machine, UINT8, 512 * 2);
+	memset(state->local_paletteram, 0, 512 * 2);
 }
 
 
 static VIDEO_START( topsecex )
 {
+	exidy440_state *state = machine->driver_data<exidy440_state>();
 	VIDEO_START_CALL(exidy440);
 
-	*topsecex_yscroll = 0;
+	*state->topsecex_yscroll = 0;
 }
 
 
@@ -92,7 +76,8 @@ static VIDEO_START( topsecex )
 
 READ8_HANDLER( exidy440_videoram_r )
 {
-	UINT8 *base = &local_videoram[(*exidy440_scanline * 256 + offset) * 2];
+	exidy440_state *state = space->machine->driver_data<exidy440_state>();
+	UINT8 *base = &state->local_videoram[(*state->scanline * 256 + offset) * 2];
 
 	/* combine the two pixel values into one byte */
 	return (base[0] << 4) | base[1];
@@ -101,7 +86,8 @@ READ8_HANDLER( exidy440_videoram_r )
 
 WRITE8_HANDLER( exidy440_videoram_w )
 {
-	UINT8 *base = &local_videoram[(*exidy440_scanline * 256 + offset) * 2];
+	exidy440_state *state = space->machine->driver_data<exidy440_state>();
+	UINT8 *base = &state->local_videoram[(*state->scanline * 256 + offset) * 2];
 
 	/* expand the two pixel values into two bytes */
 	base[0] = (data >> 4) & 15;
@@ -118,23 +104,25 @@ WRITE8_HANDLER( exidy440_videoram_w )
 
 READ8_HANDLER( exidy440_paletteram_r )
 {
-	return local_paletteram[palettebank_io * 512 + offset];
+	exidy440_state *state = space->machine->driver_data<exidy440_state>();
+	return state->local_paletteram[state->palettebank_io * 512 + offset];
 }
 
 
 WRITE8_HANDLER( exidy440_paletteram_w )
 {
+	exidy440_state *state = space->machine->driver_data<exidy440_state>();
 	/* update palette ram in the I/O bank */
-	local_paletteram[palettebank_io * 512 + offset] = data;
+	state->local_paletteram[state->palettebank_io * 512 + offset] = data;
 
 	/* if we're modifying the active palette, change the color immediately */
-	if (palettebank_io == palettebank_vis)
+	if (state->palettebank_io == state->palettebank_vis)
 	{
 		int word;
 
 		/* combine two bytes into a word */
-		offset = palettebank_vis * 512 + (offset & 0x1fe);
-		word = (local_paletteram[offset] << 8) + local_paletteram[offset + 1];
+		offset = state->palettebank_vis * 512 + (offset & 0x1fe);
+		word = (state->local_paletteram[offset] << 8) + state->local_paletteram[offset + 1];
 
 		/* extract the 5-5-5 RGB colors */
 		palette_set_color_rgb(space->machine, offset / 2, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
@@ -151,13 +139,14 @@ WRITE8_HANDLER( exidy440_paletteram_w )
 
 READ8_HANDLER( exidy440_horizontal_pos_r )
 {
+	exidy440_state *state = space->machine->driver_data<exidy440_state>();
 	/* clear the FIRQ on a read here */
-	exidy440_firq_beam = 0;
+	state->firq_beam = 0;
 	exidy440_update_firq(space->machine);
 
 	/* according to the schems, this value is only latched on an FIRQ
      * caused by collision or beam */
-	return exidy440_latched_x;
+	return state->latched_x;
 }
 
 
@@ -197,29 +186,30 @@ WRITE8_HANDLER( exidy440_spriteram_w )
 
 WRITE8_HANDLER( exidy440_control_w )
 {
-	int oldvis = palettebank_vis;
+	exidy440_state *state = space->machine->driver_data<exidy440_state>();
+	int oldvis = state->palettebank_vis;
 
 	/* extract the various bits */
 	exidy440_bank_select(space->machine, data >> 4);
-	firq_enable = (data >> 3) & 1;
-	firq_select = (data >> 2) & 1;
-	palettebank_io = (data >> 1) & 1;
-	palettebank_vis = data & 1;
+	state->firq_enable = (data >> 3) & 1;
+	state->firq_select = (data >> 2) & 1;
+	state->palettebank_io = (data >> 1) & 1;
+	state->palettebank_vis = data & 1;
 
 	/* update the FIRQ in case we enabled something */
 	exidy440_update_firq(space->machine);
 
 	/* if we're swapping palettes, change all the colors */
-	if (oldvis != palettebank_vis)
+	if (oldvis != state->palettebank_vis)
 	{
 		int i;
 
 		/* pick colors from the visible bank */
-		offset = palettebank_vis * 512;
+		offset = state->palettebank_vis * 512;
 		for (i = 0; i < 256; i++, offset += 2)
 		{
 			/* extract a word and the 5-5-5 RGB components */
-			int word = (local_paletteram[offset] << 8) + local_paletteram[offset + 1];
+			int word = (state->local_paletteram[offset] << 8) + state->local_paletteram[offset + 1];
 			palette_set_color_rgb(space->machine, i, pal5bit(word >> 10), pal5bit(word >> 5), pal5bit(word >> 0));
 		}
 	}
@@ -228,8 +218,9 @@ WRITE8_HANDLER( exidy440_control_w )
 
 WRITE8_HANDLER( exidy440_interrupt_clear_w )
 {
+	exidy440_state *state = space->machine->driver_data<exidy440_state>();
 	/* clear the VBLANK FIRQ on a write here */
-	exidy440_firq_vblank = 0;
+	state->firq_vblank = 0;
 	exidy440_update_firq(space->machine);
 }
 
@@ -243,7 +234,8 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
 
 static void exidy440_update_firq(running_machine *machine)
 {
-	if (exidy440_firq_vblank || (firq_enable && exidy440_firq_beam))
+	exidy440_state *state = machine->driver_data<exidy440_state>();
+	if (state->firq_vblank || (state->firq_enable && state->firq_beam))
 		cputag_set_input_line(machine, "maincpu", 1, ASSERT_LINE);
 	else
 		cputag_set_input_line(machine, "maincpu", 1, CLEAR_LINE);
@@ -252,8 +244,9 @@ static void exidy440_update_firq(running_machine *machine)
 
 INTERRUPT_GEN( exidy440_vblank_interrupt )
 {
+	exidy440_state *state = device->machine->driver_data<exidy440_state>();
 	/* set the FIRQ line on a VBLANK */
-	exidy440_firq_vblank = 1;
+	state->firq_vblank = 1;
 	exidy440_update_firq(device->machine);
 }
 
@@ -267,10 +260,11 @@ INTERRUPT_GEN( exidy440_vblank_interrupt )
 
 static TIMER_CALLBACK( beam_firq_callback )
 {
+	exidy440_state *state = machine->driver_data<exidy440_state>();
 	/* generate the interrupt, if we're selected */
-	if (firq_select && firq_enable)
+	if (state->firq_select && state->firq_enable)
 	{
-		exidy440_firq_beam = 1;
+		state->firq_beam = 1;
 		exidy440_update_firq(machine);
 	}
 
@@ -278,16 +272,17 @@ static TIMER_CALLBACK( beam_firq_callback )
 	param = (param + 1) / 2;
 
 	/* latch the x value; this convolution comes from the read routine */
-	exidy440_latched_x = (param + 3) ^ 2;
+	state->latched_x = (param + 3) ^ 2;
 }
 
 
 static TIMER_CALLBACK( collide_firq_callback )
 {
+	exidy440_state *state = machine->driver_data<exidy440_state>();
 	/* generate the interrupt, if we're selected */
-	if (!firq_select && firq_enable)
+	if (!state->firq_select && state->firq_enable)
 	{
-		exidy440_firq_beam = 1;
+		state->firq_beam = 1;
 		exidy440_update_firq(machine);
 	}
 
@@ -295,7 +290,7 @@ static TIMER_CALLBACK( collide_firq_callback )
 	param = (param + 1) / 2;
 
 	/* latch the x value; this convolution comes from the read routine */
-	exidy440_latched_x = (param + 3) ^ 2;
+	state->latched_x = (param + 3) ^ 2;
 }
 
 
@@ -309,10 +304,11 @@ static TIMER_CALLBACK( collide_firq_callback )
 static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect,
 						 int scroll_offset, int check_collision)
 {
+	exidy440_state *state = screen.machine->driver_data<exidy440_state>();
 	int i;
 
 	/* get a pointer to the palette to look for collision flags */
-	UINT8 *palette = &local_paletteram[palettebank_vis * 512];
+	UINT8 *palette = &state->local_paletteram[state->palettebank_vis * 512];
 	int count = 0;
 
 	/* draw the sprite images, checking for collisions along the way */
@@ -331,7 +327,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 			continue;
 
 		/* get a pointer to the source image */
-		src = &exidy440_imageram[image * 128];
+		src = &state->imageram[image * 128];
 
 		/* account for large positive offsets meaning small negative values */
 		if (xoffs >= 0x1ff - 16)
@@ -354,7 +350,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 			/* only draw scanlines that are in this cliprect */
 			if (yoffs <= cliprect->max_y)
 			{
-				UINT8 *old = &local_videoram[sy * 512 + xoffs];
+				UINT8 *old = &state->local_videoram[sy * 512 + xoffs];
 				int currx = xoffs;
 
 				/* loop over x */
@@ -409,6 +405,7 @@ static void draw_sprites(screen_device &screen, bitmap_t *bitmap, const rectangl
 static void update_screen(screen_device &screen, bitmap_t *bitmap, const rectangle *cliprect,
 						  int scroll_offset, int check_collision)
 {
+	exidy440_state *state = screen.machine->driver_data<exidy440_state>();
 	int y, sy;
 
 	/* draw any dirty scanlines from the VRAM directly */
@@ -420,7 +417,7 @@ static void update_screen(screen_device &screen, bitmap_t *bitmap, const rectang
 			sy -= (VBSTART - VBEND);
 
 		/* draw line */
-		draw_scanline8(bitmap, 0, y, (HBSTART - HBEND), &local_videoram[sy * 512], NULL);
+		draw_scanline8(bitmap, 0, y, (HBSTART - HBEND), &state->local_videoram[sy * 512], NULL);
 	}
 
 	/* draw the sprites */
@@ -469,8 +466,9 @@ static SCREEN_UPDATE( exidy440 )
 
 static SCREEN_UPDATE( topsecex )
 {
+	exidy440_state *state = screen->machine->driver_data<exidy440_state>();
 	/* redraw the screen */
-	update_screen(*screen, bitmap, cliprect, *topsecex_yscroll, FALSE);
+	update_screen(*screen, bitmap, cliprect, *state->topsecex_yscroll, FALSE);
 
 	return 0;
 }

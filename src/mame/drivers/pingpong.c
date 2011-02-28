@@ -11,39 +11,38 @@ Ping Pong (c) 1985 Konami
 #include "machine/nvram.h"
 #include "includes/pingpong.h"
 
-static int intenable;
 
-static int question_addr_high = 0;
 
 static WRITE8_HANDLER( cashquiz_question_bank_high_w )
 {
+	pingpong_state *state = space->machine->driver_data<pingpong_state>();
 	if( data != 0xff )
 	{
 		switch( ~data & 0xff )
 		{
 		case 0x01:
-			question_addr_high = 0;
+			state->question_addr_high = 0;
 			break;
 		case 0x02:
-			question_addr_high = 0x8000;
+			state->question_addr_high = 0x8000;
 			break;
 		case 0x04:
-			question_addr_high = 0x10000;
+			state->question_addr_high = 0x10000;
 			break;
 		case 0x08:
-			question_addr_high = 0x18000;
+			state->question_addr_high = 0x18000;
 			break;
 		case 0x10:
-			question_addr_high = 0x20000;
+			state->question_addr_high = 0x20000;
 			break;
 		case 0x20:
-			question_addr_high = 0x28000;
+			state->question_addr_high = 0x28000;
 			break;
 		case 0x40:
-			question_addr_high = 0x30000;
+			state->question_addr_high = 0x30000;
 			break;
 		case 0x80:
-			question_addr_high = 0x38000;
+			state->question_addr_high = 0x38000;
 			break;
 		}
 	}
@@ -51,11 +50,12 @@ static WRITE8_HANDLER( cashquiz_question_bank_high_w )
 
 static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 {
+	pingpong_state *state = space->machine->driver_data<pingpong_state>();
 	if(data >= 0x60 && data <= 0xdf)
 	{
 		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 		const char *bank = bankname[data & 7];
-		int bankaddr = question_addr_high | ((data - 0x60) * 0x100);
+		int bankaddr = state->question_addr_high | ((data - 0x60) * 0x100);
 		UINT8 *questions = space->machine->region("user1")->base() + bankaddr;
 		memory_set_bankptr(space->machine, bank,questions);
 
@@ -65,8 +65,9 @@ static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 
 static WRITE8_HANDLER( coin_w )
 {
+	pingpong_state *state = space->machine->driver_data<pingpong_state>();
 	/* bit 2 = irq enable, bit 3 = nmi enable */
-	intenable = data & 0x0c;
+	state->intenable = data & 0x0c;
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(space->machine, 0,data & 1);
@@ -77,20 +78,21 @@ static WRITE8_HANDLER( coin_w )
 
 static INTERRUPT_GEN( pingpong_interrupt )
 {
+	pingpong_state *state = device->machine->driver_data<pingpong_state>();
 	if (cpu_getiloops(device) == 0)
 	{
-		if (intenable & 0x04) cpu_set_input_line(device, 0, HOLD_LINE);
+		if (state->intenable & 0x04) cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (intenable & 0x08) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->intenable & 0x08) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static ADDRESS_MAP_START( pingpong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(&pingpong_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(&pingpong_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_MEMBER(pingpong_state, colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_MEMBER(pingpong_state, videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
 	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
@@ -110,8 +112,8 @@ static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN4")
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(&pingpong_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(&pingpong_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_MEMBER(pingpong_state, colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_MEMBER(pingpong_state, videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
 	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
@@ -449,7 +451,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( pingpong, driver_device )
+static MACHINE_CONFIG_START( pingpong, pingpong_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,18432000/6)		/* 3.072 MHz (probably) */

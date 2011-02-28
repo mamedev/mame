@@ -5,6 +5,14 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	int horiz_scroll_low;
+	int horiz_scroll_high;
+	int rear_horiz_scroll_low;
+	int rear_horiz_scroll_high;
+	int rear_color;
+	int rear_disable;
+	int rear_refresh;
+	bitmap_t *bg_bitmap;
 };
 
 

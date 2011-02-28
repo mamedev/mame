@@ -56,6 +56,7 @@ public:
 	UINT8 sprite_control[8];
 	UINT32 *spriteram_32bit;
 	void (*system32_prot_vblank)(device_t *device);
+	int print_count;
 };
 
 

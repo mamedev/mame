@@ -59,6 +59,21 @@ Hopper, Ticket Counter, Prize System (Option)
 #include "machine/i2cmem.h"
 
 
+enum nand_mode_t
+{
+	NAND_M_INIT,		// initial state
+	NAND_M_READ,		// read page data
+};
+
+struct nand_t
+{
+	nand_mode_t mode;
+	int page_addr;
+	int byte_addr;
+	int addr_load_ptr;
+};
+
+
 class ghosteo_state : public driver_device
 {
 public:
@@ -69,6 +84,7 @@ public:
 	UINT32 *steppingstone;
 	int security_count;
 	UINT32 bballoon_port[20];
+	struct nand_t nand;
 };
 
 
@@ -97,22 +113,6 @@ NAND Flash Controller (4KB internal buffer)
 
 static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22 };
 
-
-enum nand_mode_t
-{
-	NAND_M_INIT,		// initial state
-	NAND_M_READ,		// read page data
-};
-
-struct nand_t
-{
-	nand_mode_t mode;
-	int page_addr;
-	int byte_addr;
-	int addr_load_ptr;
-};
-
-static struct nand_t nand;
 
 static UINT32 s3c2410_gpio_port_r( device_t *device, int port)
 {
@@ -167,6 +167,8 @@ static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 data)
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
+	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	struct nand_t &nand = state->nand;
 //  device_t *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	switch (data)
@@ -189,6 +191,8 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 {
+	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	struct nand_t &nand = state->nand;
 //  device_t *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	switch (nand.mode)
@@ -221,6 +225,8 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 
 static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 {
+	ghosteo_state *state = device->machine->driver_data<ghosteo_state>();
+	struct nand_t &nand = state->nand;
 //  device_t *nand = device->machine->device( "nand");
 	UINT8 data = 0;
 	switch (nand.mode)

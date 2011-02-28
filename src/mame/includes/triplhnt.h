@@ -16,6 +16,29 @@
 #define TRIPLHNT_LAMP_EN		NODE_05
 
 
+class triplhnt_state : public driver_device
+{
+public:
+	triplhnt_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 cmos[16];
+	UINT8 da_latch;
+	UINT8 misc_flags;
+	UINT8 cmos_latch;
+	UINT8 hit_code;
+	UINT8* playfield_ram;
+	UINT8* vpos_ram;
+	UINT8* hpos_ram;
+	UINT8* code_ram;
+	UINT8* orga_ram;
+	int sprite_zoom;
+	int sprite_bank;
+	bitmap_t* helper;
+	tilemap_t* bg_tilemap;
+};
+
+
 /*----------- defined in drivers/triplhnt.c -----------*/
 
 void triplhnt_set_collision(running_machine *machine, int data);
@@ -32,11 +55,4 @@ extern const samples_interface triplhnt_samples_interface;
 VIDEO_START( triplhnt );
 SCREEN_UPDATE( triplhnt );
 
-extern UINT8* triplhnt_playfield_ram;
-extern UINT8* triplhnt_vpos_ram;
-extern UINT8* triplhnt_hpos_ram;
-extern UINT8* triplhnt_code_ram;
-extern UINT8* triplhnt_orga_ram;
 
-extern int triplhnt_sprite_zoom;
-extern int triplhnt_sprite_bank;

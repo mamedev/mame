@@ -15,6 +15,36 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
+	UINT8 sound_int_state;
+	UINT8 audio_talkback;
+	UINT8 audio_sync;
+	device_t *sound_cpu;
+	device_t *soundalt_cpu;
+	UINT8 *mayday_protection;
+	UINT8 *videoram;
+	UINT8 *williams2_tileram;
+	UINT8 *blaster_palette_0;
+	UINT8 *blaster_scanline_control;
+	UINT8 blitter_config;
+	UINT16 blitter_clip_address;
+	UINT8 blitter_window_enable;
+	UINT8 williams2_tilemap_config;
+	UINT8 cocktail;
+	UINT8 blaster_bank;
+	UINT8 vram_bank;
+	UINT16 joust2_current_sound_data;
+	UINT8 port_select;
+	rgb_t *palette_lookup;
+	UINT8 blitterram[8];
+	UINT8 blitter_xor;
+	UINT8 blitter_remap_index;
+	const UINT8 *blitter_remap;
+	UINT8 *blitter_remap_lookup;
+	rgb_t blaster_color0;
+	UINT8 blaster_video_control;
+	tilemap_t *bg_tilemap;
+	UINT16 tilemap_xscroll;
+	UINT8 williams2_fg_color;
 };
 
 
@@ -87,7 +117,6 @@ WRITE8_HANDLER( williams2_7segment_w );
 CUSTOM_INPUT( williams_mux_r );
 
 /* Mayday protection */
-extern UINT8 *mayday_protection;
 READ8_HANDLER( mayday_protection_r );
 
 WRITE8_HANDLER( defender_video_control_w );
@@ -101,24 +130,6 @@ WRITE8_HANDLER( defender_video_control_w );
 #define WILLIAMS_TILEMAP_MYSTICM	0		/* IC79 is a 74LS85 comparator */
 #define WILLIAMS_TILEMAP_TSHOOT		1		/* IC79 is a 74LS157 selector jumpered to be enabled */
 #define WILLIAMS_TILEMAP_JOUST2		2		/* IC79 is a 74LS157 selector jumpered to be disabled */
-
-/* RAM globals */
-extern UINT8 *williams_videoram;
-extern UINT8 *williams2_tileram;
-extern UINT8 *blaster_palette_0;
-extern UINT8 *blaster_scanline_control;
-
-/* blitter globals */
-extern UINT8 williams_blitter_config;
-extern UINT16 williams_blitter_clip_address;
-extern UINT8 williams_blitter_window_enable;
-
-/* tilemap globals */
-extern UINT8 williams2_tilemap_config;
-
-/* rendering globals */
-extern UINT8 williams_cocktail;
-
 
 WRITE8_HANDLER( williams_blitter_w );
 WRITE8_HANDLER( blaster_remap_select_w );

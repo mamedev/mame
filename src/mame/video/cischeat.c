@@ -1110,7 +1110,6 @@ if (input_code_pressed(machine, KEYCODE_X))
 ***************************************************************************/
 
 #ifdef MAME_DEBUG
-static int show_unknown;
 #define CISCHEAT_LAYERSCTRL \
 state->debugsprites = 0; \
 if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) ) \
@@ -1131,8 +1130,8 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen
 \
 { \
 	if ( input_code_pressed(screen->machine, KEYCODE_Z) && input_code_pressed_once(screen->machine, KEYCODE_U) ) \
-		show_unknown ^= 1; \
-	if (show_unknown) \
+		state->show_unknown ^= 1; \
+	if (state->show_unknown) \
 		popmessage("0:%04X 2:%04X 4:%04X 6:%04X c:%04X", \
 			megasys1_vregs[0],megasys1_vregs[1],megasys1_vregs[2],megasys1_vregs[3],megasys1_vregs[0xc/2] ); \
 }

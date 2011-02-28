@@ -237,51 +237,16 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #include "mpu4ext.lh"
 #define MPU4_MASTER_CLOCK (6880000)
 
-/* local vars */
-static int mod_number;
-static int mmtr_data;
-static int alpha_data_line;
-static int alpha_clock;
-static int ay8913_address;
-static int serial_data;
-static int signal_50hz;
-static int ic4_input_b;
-static int aux1_input;
-static int aux2_input;
-static int IC23G1;
-static int IC23G2A;
-static int IC23G2B;
-static int IC23GC;
-static int IC23GB;
-static int IC23GA;
-static int prot_col;
-static int lamp_col;
-static int reel_flag;
-static int ic23_active;
-static int led_lamp;
-static int link7a_connected;
-static emu_timer *ic24_timer;
 static TIMER_CALLBACK( ic24_timeout );
 
-static int expansion_latch;// OKI MOD 4 and above only (PIA on Gamecard)
-static int global_volume;// OKI MOD 4 and above only (PIA on Gamecard)
 /* 32 multiplexed inputs - but a further 8 possible per AUX.
 Two connectors 'orange' (sampled every 8ms) and 'black' (sampled every 16ms)
 Each connector carries two banks of eight inputs and two enable signals */
-static int	  input_strobe;	  /* IC23 74LS138 A = CA2 IC7, B = CA2 IC4, C = CA2 IC8 */
-static UINT8  lamp_strobe,lamp_strobe2;
-static UINT8  lamp_data;
-static UINT8  ay_data;
 
-static UINT8 Lamps[224];		/* 128 multiplexed lamps + 96 extension */
-static int optic_pattern;
-static int active_reel;
-static int remote_meter;
 
-static UINT8 reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used
-static UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
+static const UINT8 reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used
+static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 
-static int reel_mux;		/* added support for up to 8 reels */
 #define STANDARD_REEL  0	/* As originally designed 3/4 reels*/
 #define FIVE_REEL_5TO8 1	/* Interfaces to meter port, allows some mechanical metering, but there is significant 'bounce' in the extra reel*/
 #define FIVE_REEL_8TO5 2	/* Mounted backwards for space reasons, but different board*/
@@ -290,24 +255,17 @@ static int reel_mux;		/* added support for up to 8 reels */
 #define SIX_REEL_5TO8  5	/* Like FIVE_REEL_5TO8, but with an extra reel elsewhere*/
 #define SEVEN_REEL     6	/* Mainly club machines, significant reworking of reel hardware*/
 
-static int lamp_extender;/* Plug in boards that add additional lamps and leds via the AUX ports. */
-static int last_b7;
-static int last_latch;
 #define NO_EXTENDER			0	/* As originally designed */
 #define SMALL_CARD			1
 #define LARGE_CARD_A		2 //96 Lamps
 #define LARGE_CARD_B		3 // 96 Lamps, 16 LEDs - as used by BwB
 #define LARGE_CARD_C		4 //Identical to B, no built in LED support
 
-static int lamp_sense;
-static int card_live;
 
-static int led_extender;	/* Plug in boards that add leds via the AUX ports. */
 #define CARD_A			1
 #define CARD_B			2
 #define CARD_C			3
 
-static int hopper =0;
 #define TUBES				0
 #define HOPPER_DUART_A		1
 #define HOPPER_DUART_B		2
@@ -322,7 +280,129 @@ struct mpu4_chr_table
 	UINT8 response;
 };
 
-static const mpu4_chr_table* mpu4_current_chr_table;
+struct ef9369_t
+{
+	UINT32 addr;
+	UINT16 clut[16];	/* 13-bits - a marking bit and a 444 color */
+};
+
+struct bt471_t
+{
+	UINT8 address;
+	UINT8 addr_cnt;
+	UINT8 pixmask;
+	UINT8 command;
+	rgb_t color;
+};
+
+
+class mpu4_state : public driver_device
+{
+public:
+	mpu4_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int mod_number;
+	int mmtr_data;
+	int alpha_data_line;
+	int alpha_clock;
+	int ay8913_address;
+	int serial_data;
+	int signal_50hz;
+	int ic4_input_b;
+	int aux1_input;
+	int aux2_input;
+	int IC23G1;
+	int IC23G2A;
+	int IC23G2B;
+	int IC23GC;
+	int IC23GB;
+	int IC23GA;
+	int prot_col;
+	int lamp_col;
+	int reel_flag;
+	int ic23_active;
+	int led_lamp;
+	int link7a_connected;
+	emu_timer *ic24_timer;
+	int expansion_latch;
+	int global_volume;
+	int input_strobe;
+	UINT8 lamp_strobe;
+	UINT8 lamp_strobe2;
+	UINT8 lamp_data;
+	UINT8 ay_data;
+	UINT8 Lamps[224];
+	int optic_pattern;
+	int active_reel;
+	int remote_meter;
+	int reel_mux;
+	int lamp_extender;
+	int last_b7;
+	int last_latch;
+	int lamp_sense;
+	int card_live;
+	int led_extender;
+	int hopper;
+	const mpu4_chr_table* current_chr_table;
+	UINT8 led_segs[40];
+
+	UINT8 m6840_irq_state;
+	UINT8 m6850_irq_state;
+	UINT8 scn2674_irq_state;
+	UINT8 m68k_m6809_line;
+	UINT8 m6809_m68k_line;
+	UINT8 m68k_acia_cts;
+	UINT8 m6809_acia_cts;
+	UINT8 m6809_acia_rts;
+	UINT8 m6809_acia_dcd;
+	int gfx_index;
+	UINT16 * vid_vidram;
+	UINT16 * vid_mainram;
+	UINT8 scn2674_IR[16];
+	UINT8 scn2675_IR_pointer;
+	UINT8 scn2674_screen1_l;
+	UINT8 scn2674_screen1_h;
+	UINT8 scn2674_cursor_l;
+	UINT8 scn2674_cursor_h;
+	UINT8 scn2674_screen2_l;
+	UINT8 scn2674_screen2_h;
+	UINT8 scn2674_irq_register;
+	UINT8 scn2674_status_register;
+	UINT8 scn2674_irq_mask;
+	UINT8 scn2674_gfx_enabled;
+	UINT8 scn2674_display_enabled;
+	UINT8 scn2674_cursor_enabled;
+	UINT8 IR0_scn2674_double_ht_wd;
+	UINT8 IR0_scn2674_scanline_per_char_row;
+	UINT8 IR0_scn2674_sync_select;
+	UINT8 IR0_scn2674_buffer_mode_select;
+	UINT8 IR1_scn2674_interlace_enable;
+	UINT8 IR1_scn2674_equalizing_constant;
+	UINT8 IR2_scn2674_row_table;
+	UINT8 IR2_scn2674_horz_sync_width;
+	UINT8 IR2_scn2674_horz_back_porch;
+	UINT8 IR3_scn2674_vert_front_porch;
+	UINT8 IR3_scn2674_vert_back_porch;
+	UINT8 IR4_scn2674_rows_per_screen;
+	UINT8 IR4_scn2674_character_blink_rate;
+	UINT8 IR5_scn2674_character_per_row;
+	UINT8 IR8_scn2674_display_buffer_first_address_LSB;
+	UINT8 IR9_scn2674_display_buffer_first_address_MSB;
+	UINT8 IR9_scn2674_display_buffer_last_address;
+	UINT8 IR10_scn2674_display_pointer_address_lower;
+	UINT8 IR11_scn2674_display_pointer_address_upper;
+	UINT8 IR12_scn2674_scroll_start;
+	UINT8 IR12_scn2674_split_register_1;
+	UINT8 IR13_scn2674_scroll_end;
+	UINT8 IR13_scn2674_split_register_2;
+	INT8 cur[2];
+	UINT8 *dealem_videoram;
+	int rowcounter;
+	int linecounter;
+	struct ef9369_t pal;
+	struct bt471_t bt471;
+};
 
 /*
 LED Segments related to pins (5 is not connected):
@@ -343,7 +423,6 @@ with settings like this in the majority of cases.
 8 display enables (pins 10 - 17)
 */
 
-static UINT8 led_segs[40];//8 regular, up to 32 on extender cards
 
 
 /* Process lamp and LED data for output system */
@@ -353,36 +432,36 @@ static void mpu4_draw_led(UINT8 id, UINT8 value)
 }
 
 
-static void draw_lamps(void)
+static void draw_lamps(mpu4_state *state)
 {
 	int i,j;
 
 	for (i = 0; i < 8; i++)
 	{
-		output_set_lamp_value((8*input_strobe)+i, (Lamps[(8*input_strobe)+i]));
-		output_set_lamp_value((8*input_strobe)+i+64, (Lamps[(8*input_strobe)+i+64]));
+		output_set_lamp_value((8*state->input_strobe)+i, (state->Lamps[(8*state->input_strobe)+i]));
+		output_set_lamp_value((8*state->input_strobe)+i+64, (state->Lamps[(8*state->input_strobe)+i+64]));
 	}
-	if (lamp_extender)
+	if (state->lamp_extender)
 	{
 		for (j = 0; j < 6; j++)
 		{
-			output_set_lamp_value((6*input_strobe)+128+j, (Lamps[(6*input_strobe)+128+j]));
-			output_set_lamp_value((6*input_strobe)+176+j, (Lamps[(6*input_strobe)+176+j]));
+			output_set_lamp_value((6*state->input_strobe)+128+j, (state->Lamps[(6*state->input_strobe)+128+j]));
+			output_set_lamp_value((6*state->input_strobe)+176+j, (state->Lamps[(6*state->input_strobe)+176+j]));
 		}
 	}
 }
 
-static void update_lamps(void)
+static void update_lamps(mpu4_state *state)
 {
 	int i,j;
 
 	for (i = 0; i < 8; i++)
 	{
-		Lamps[(8*input_strobe)+i]    = (lamp_strobe  & (1 << i)) != 0;
-		Lamps[(8*input_strobe)+i+64] = (lamp_strobe2 & (1 << i)) != 0;
+		state->Lamps[(8*state->input_strobe)+i]    = (state->lamp_strobe  & (1 << i)) != 0;
+		state->Lamps[(8*state->input_strobe)+i+64] = (state->lamp_strobe2 & (1 << i)) != 0;
 	}
 
-	if (led_lamp)
+	if (state->led_lamp)
 	{
 		/* Some games (like Connect 4) use 'programmable' LED displays, built from light display lines. */
 		UINT8 pled_segs[2] = {0,0};
@@ -400,18 +479,18 @@ static void update_lamps(void)
 		mpu4_draw_led(9, pled_segs[1]);
 	}
 
-	draw_lamps();
-	mpu4_draw_led(input_strobe, led_segs[input_strobe]);
-	if (led_extender)
+	draw_lamps(state);
+	mpu4_draw_led(state->input_strobe, state->led_segs[state->input_strobe]);
+	if (state->led_extender)
 	{
 		for (j = 0; j < 5; j++)
 		{
-			mpu4_draw_led(((8*input_strobe)+8+j), led_segs[((8*input_strobe)+8+j)]);
+			mpu4_draw_led(((8*state->input_strobe)+8+j), state->led_segs[((8*state->input_strobe)+8+j)]);
 		}
 	}
 }
 
-static void lamp_extend_small(int data)
+static void lamp_extend_small(mpu4_state *state, int data)
 {
 	int lamp_strobe_ext,column,i;
 	column = data & 0x07;
@@ -421,18 +500,18 @@ static void lamp_extend_small(int data)
 	{
 		for (i = 0; i < 5; i++)
 		{
-			Lamps[(5*column)+i+128]    = (lamp_strobe_ext  & (1 << i)) != 0;
+			state->Lamps[(5*column)+i+128]    = (lamp_strobe_ext  & (1 << i)) != 0;
 		}
     }
 }
 
-static void lamp_extend_largea(int data,int column,int active)
+static void lamp_extend_largea(mpu4_state *state, int data,int column,int active)
 {
 	int lampbase,i,byte7;
 
-	lamp_sense = 0;
+	state->lamp_sense = 0;
 	byte7 = data & 0x80;
-	if ( byte7 != last_b7 )
+	if ( byte7 != state->last_b7 )
 	{
 		if ( byte7 )
 		{
@@ -444,29 +523,29 @@ static void lamp_extend_largea(int data,int column,int active)
 		}
 		if ( data & 0x3f )
 		{
-	        lamp_sense = 1;
+			state->lamp_sense = 1;
 		}
 		if ( active )
 		{
 			for (i = 0; i < 6; i++)
 			{
-				Lamps[(lampbase)+i]    = (data  & (1 << i)) != 0;
+				state->Lamps[(lampbase)+i]    = (data  & (1 << i)) != 0;
 			}
 		}
     }
-    last_b7 = byte7;
+    state->last_b7 = byte7;
 }
 
-static void lamp_extend_largebc(int data,int column,int active)
+static void lamp_extend_largebc(mpu4_state *state, int data,int column,int active)
 {
 	int lampbase,i,byte7;
 
-	lamp_sense = 0;
+	state->lamp_sense = 0;
 	byte7 = data & 0x80;
-	if ( byte7 != last_b7 )
+	if ( byte7 != state->last_b7 )
 	{
-		card_live = 1;
-	    if ( byte7 )
+		state->card_live = 1;
+		if ( byte7 )
 		{
 			lampbase = 128 + column * 8;
 		}
@@ -476,60 +555,60 @@ static void lamp_extend_largebc(int data,int column,int active)
 		}
 		if ( data & 0x3f )
 		{
-			lamp_sense = 1;
+			state->lamp_sense = 1;
 		}
-    	if ( active )
+		if ( active )
 		{
 			for (i = 0; i < 6; i++)
 			{
-				Lamps[(lampbase)+i]    = (data  & (1 << i)) != 0;
+				state->Lamps[(lampbase)+i]    = (data  & (1 << i)) != 0;
 			}
 		}
-	last_b7 = byte7;
+	state->last_b7 = byte7;
 	}
 	else
 	{
-		card_live = 0;
+		state->card_live = 0;
 	}
 }
 
-static void led_write_latch(int latch, int data, int column)
+static void led_write_latch(mpu4_state *state, int latch, int data, int column)
 {
 	int diff;
 
-	diff = (latch ^ last_latch) & latch;
+	diff = (latch ^ state->last_latch) & latch;
 	column = 7 - column;
 	data = ~data;//inverted?
 
 	if ( diff & 1 )
 	{
-		led_segs[column] = data;
-    }
+		state->led_segs[column] = data;
+	}
 	if ( diff & 2 )
 	{
-		led_segs[8+column] = data;
+		state->led_segs[8+column] = data;
 	}
 	if ( diff & 4 )
 	{
-		led_segs[16+column] = data;
+		state->led_segs[16+column] = data;
 	}
 	if ( diff & 8 )
 	{
-		led_segs[24+column] = data;
+		state->led_segs[24+column] = data;
 	}
 	if ( diff & 16 )
 	{
-		led_segs[32+column] = data;
+		state->led_segs[32+column] = data;
 	}
-	last_latch = diff;
+	state->last_latch = diff;
 }
 
 
-static void update_meters(void)
+static void update_meters(mpu4_state *state)
 {
 	int meter;
-	int data = ((mmtr_data & 0x7f) | remote_meter);
-	switch (reel_mux)
+	int data = ((state->mmtr_data & 0x7f) | state->remote_meter);
+	switch (state->reel_mux)
 	{
 		case STANDARD_REEL:
 		// Change nothing
@@ -573,7 +652,7 @@ static void update_meters(void)
 	{
 		MechMtr_update(meter, (data & (1 << meter)));
 	}
-	if (reel_mux == STANDARD_REEL)
+	if (state->reel_mux == STANDARD_REEL)
 	{
 		for (meter = 4; meter < 7; meter ++)
 		{
@@ -583,7 +662,7 @@ static void update_meters(void)
 }
 
 /* called if board is reset */
-static void mpu4_stepper_reset(void)
+static void mpu4_stepper_reset(mpu4_state *state)
 {
 	int pattern = 0,reel;
 	for (reel = 0; reel < 6; reel++)
@@ -591,28 +670,29 @@ static void mpu4_stepper_reset(void)
 		stepper_reset_position(reel);
 		if (stepper_optic_state(reel)) pattern |= 1<<reel;
 	}
-	optic_pattern = pattern;
+	state->optic_pattern = pattern;
 }
 
 
 static MACHINE_RESET( mpu4 )
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	ROC10937_reset(0);	/* reset display1 */
 
-	mpu4_stepper_reset();
+	mpu4_stepper_reset(state);
 
-	lamp_strobe    = 0;
-	lamp_strobe2   = 0;
-	lamp_data      = 0;
+	state->lamp_strobe    = 0;
+	state->lamp_strobe2   = 0;
+	state->lamp_data      = 0;
 
-	IC23GC    = 0;
-	IC23GB    = 0;
-	IC23GA    = 0;
-	IC23G1    = 1;
-	IC23G2A   = 0;
-	IC23G2B   = 0;
+	state->IC23GC    = 0;
+	state->IC23GB    = 0;
+	state->IC23GA    = 0;
+	state->IC23G1    = 1;
+	state->IC23G2A   = 0;
+	state->IC23G2B   = 0;
 
-	prot_col  = 0;
+	state->prot_col  = 0;
 
 /* init rom bank, some games don't set this */
 	{
@@ -630,6 +710,7 @@ static MACHINE_RESET( mpu4 )
 /* 6809 IRQ handler */
 static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	device_t *pia3 = device->machine->device("pia_ic3");
 	device_t *pia4 = device->machine->device("pia_ic4");
 	device_t *pia5 = device->machine->device("pia_ic5");
@@ -647,7 +728,7 @@ static WRITE_LINE_DEVICE_HANDLER( cpu0_irq )
 						 pia6821_get_irq_a(pia8) | pia6821_get_irq_b(pia8) |
 						 ptm6840_get_irq(ptm2);
 
-	if (!link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
+	if (!drvstate->link7a_connected) //7B = IRQ, 7A = FIRQ, both = NMI
 	{
 		cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 		LOG(("6809 int%d \n", combined_state));
@@ -717,31 +798,34 @@ static const ptm6840_interface ptm_ic2_intf =
 /* IC3, lamp data lines + alpha numeric display */
 static WRITE8_DEVICE_HANDLER( pia_ic3_porta_w )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", device->machine->describe_context(),data));
 
-	if(ic23_active)
+	if(state->ic23_active)
 	{
-		lamp_strobe = data;
+		state->lamp_strobe = data;
 	}
 }
 
 
 static WRITE8_DEVICE_HANDLER( pia_ic3_portb_w )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	LOG_IC3(("%s: IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", device->machine->describe_context(),data));
 
-	if(ic23_active)
+	if(state->ic23_active)
 	{
-		lamp_strobe2 = data;
+		state->lamp_strobe2 = data;
 	}
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	LOG_IC3(("%s: IC3 PIA Write CA2 (alpha data), %02X\n", device->machine->describe_context(),state));
 
-	alpha_data_line = state;
+	drvstate->alpha_data_line = state;
 	ROC10937_draw_16seg(0);
 }
 
@@ -779,29 +863,29 @@ IC23 is a 74LS138 1-of-8 Decoder
 
 It is used as a multiplexer for the LEDs, lamp selects and inputs.*/
 
-static void ic23_update(void)
+static void ic23_update(mpu4_state *state)
 {
-	if (!IC23G2A)
+	if (!state->IC23G2A)
 	{
-		if (!IC23G2B)
+		if (!state->IC23G2B)
 		{
-			if (IC23G1)
+			if (state->IC23G1)
 			{
-				if ( IC23GA ) input_strobe |= 0x01;
-				else          input_strobe &= ~0x01;
+				if ( state->IC23GA ) state->input_strobe |= 0x01;
+				else          state->input_strobe &= ~0x01;
 
-				if ( IC23GB ) input_strobe |= 0x02;
-				else          input_strobe &= ~0x02;
+				if ( state->IC23GB ) state->input_strobe |= 0x02;
+				else          state->input_strobe &= ~0x02;
 
-				if ( IC23GC ) input_strobe |= 0x04;
-				else          input_strobe &= ~0x04;
+				if ( state->IC23GC ) state->input_strobe |= 0x04;
+				else          state->input_strobe &= ~0x04;
 			}
 		}
 	}
 	else
-	if ((IC23G2A)||(IC23G2B))
+	if ((state->IC23G2A)||(state->IC23G2B))
 	{
-		input_strobe = 0x00;
+		state->input_strobe = 0x00;
 	}
 }
 
@@ -814,22 +898,22 @@ IC24 is a 74LS122 pulse generator
 CLEAR and B2 are tied high and A1 and A2 tied low, meaning any pulse
 on B1 will give a low pulse on the output pin.
 */
-static void ic24_output(int data)
+static void ic24_output(mpu4_state *state, int data)
 {
-	IC23G2A = data;
-	ic23_update();
+	state->IC23G2A = data;
+	ic23_update(state);
 }
 
 
-static void ic24_setup(void)
+static void ic24_setup(mpu4_state *state)
 {
-	if (IC23GA)
+	if (state->IC23GA)
 	{
 		double duration = TIME_OF_74LS123((220*1000),(0.1*0.000001));
 		{
-			ic23_active=1;
-			ic24_output(0);
-			ic24_timer->adjust(attotime::from_double(duration));
+			state->ic23_active=1;
+			ic24_output(state, 0);
+			state->ic24_timer->adjust(attotime::from_double(duration));
 		}
 	}
 }
@@ -837,109 +921,115 @@ static void ic24_setup(void)
 
 static TIMER_CALLBACK( ic24_timeout )
 {
-	ic23_active=0;
-	ic24_output(1);
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->ic23_active=0;
+	ic24_output(state, 1);
 }
 
 
 /* IC4, 7 seg leds, 50Hz timer reel sensors, current sensors */
 static WRITE8_DEVICE_HANDLER( pia_ic4_porta_w )
 {
-	if(ic23_active)
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	if(state->ic23_active)
 	{
-		if (((lamp_extender == NO_EXTENDER)||(lamp_extender == SMALL_CARD)||(lamp_extender == LARGE_CARD_C))&& (led_extender == NO_EXTENDER))
-		led_segs[input_strobe] = data;
+		if (((state->lamp_extender == NO_EXTENDER)||(state->lamp_extender == SMALL_CARD)||(state->lamp_extender == LARGE_CARD_C))&& (state->led_extender == NO_EXTENDER))
+		state->led_segs[state->input_strobe] = data;
 	}
 }
 
 static WRITE8_DEVICE_HANDLER( pia_ic4_portb_w )
 {
-	if (reel_mux)
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	if (state->reel_mux)
 	{
 		/* A write here connects one reel (and only one)
         to the optic test circuit. This allows 8 reels
         to be supported instead of 4. */
-		if (reel_mux == SEVEN_REEL)
+		if (state->reel_mux == SEVEN_REEL)
 		{
-			active_reel= reel_mux_table7[(data >> 4) & 0x07];
+			state->active_reel= reel_mux_table7[(data >> 4) & 0x07];
 		}
 		else
-		active_reel= reel_mux_table[(data >> 4) & 0x07];
+		state->active_reel= reel_mux_table[(data >> 4) & 0x07];
 	}
 }
 
 
 static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 {
-	if ( serial_data )
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	if ( state->serial_data )
 	{
-		ic4_input_b |=  0x80;
+		state->ic4_input_b |=  0x80;
 		pia6821_cb1_w(device, 1);
 	}
 	else
 	{
-		ic4_input_b &= ~0x80;
+		state->ic4_input_b &= ~0x80;
 		pia6821_cb1_w(device, 0);
 	}
 
-	if (!reel_mux)
+	if (!state->reel_mux)
 	{
-		if ( optic_pattern & 0x01 ) ic4_input_b |=  0x40; /* reel A tab */
-		else                        ic4_input_b &= ~0x40;
+		if ( state->optic_pattern & 0x01 ) state->ic4_input_b |=  0x40; /* reel A tab */
+		else                        state->ic4_input_b &= ~0x40;
 
-		if ( optic_pattern & 0x02 ) ic4_input_b |=  0x20; /* reel B tab */
-		else                        ic4_input_b &= ~0x20;
+		if ( state->optic_pattern & 0x02 ) state->ic4_input_b |=  0x20; /* reel B tab */
+		else                        state->ic4_input_b &= ~0x20;
 
-		if ( optic_pattern & 0x04 ) ic4_input_b |=  0x10; /* reel C tab */
-		else                        ic4_input_b &= ~0x10;
+		if ( state->optic_pattern & 0x04 ) state->ic4_input_b |=  0x10; /* reel C tab */
+		else                        state->ic4_input_b &= ~0x10;
 
-		if ( optic_pattern & 0x08 ) ic4_input_b |=  0x08; /* reel D tab */
-		else                        ic4_input_b &= ~0x08;
+		if ( state->optic_pattern & 0x08 ) state->ic4_input_b |=  0x08; /* reel D tab */
+		else                        state->ic4_input_b &= ~0x08;
 
 	}
 	else
 	{
-		if (stepper_optic_state(active_reel))
+		if (stepper_optic_state(state->active_reel))
 		{
-			ic4_input_b |=  0x08;
+			state->ic4_input_b |=  0x08;
 		}
 		else
 		{
-			ic4_input_b &= ~0x08;
+			state->ic4_input_b &= ~0x08;
 		}
 	}
-	if ( signal_50hz )			ic4_input_b |=  0x04; /* 50 Hz */
-	else	                    ic4_input_b &= ~0x04;
+	if ( state->signal_50hz )			state->ic4_input_b |=  0x04; /* 50 Hz */
+	else	                    state->ic4_input_b &= ~0x04;
 
-	if (ic4_input_b & 0x02)
+	if (state->ic4_input_b & 0x02)
 	{
-		ic4_input_b &= ~0x02;
+		state->ic4_input_b &= ~0x02;
 	}
 	else
 	{
-		ic4_input_b |= 0x02; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
+		state->ic4_input_b |= 0x02; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
 	}
 	#ifdef UNUSED_FUNCTION
-	if ( lamp_undercurrent ) ic4_input_b |= 0x01;
+	if ( lamp_undercurrent ) state->ic4_input_b |= 0x01;
 	#endif
 
-	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",device->machine->describe_context(),ic4_input_b));
-	return ic4_input_b;
+	LOG_IC3(("%s: IC4 PIA Read of Port B %x\n",device->machine->describe_context(),state->ic4_input_b));
+	return state->ic4_input_b;
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic4_ca2_w )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", device->machine->describe_context(),state));
 
-	IC23GB = state;
-	ic23_update();
+	drvstate->IC23GB = state;
+	ic23_update(drvstate);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic4_cb2_w )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	LOG_IC3(("%s: IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", device->machine->describe_context(),state));
-	reel_flag=state;
+	drvstate->reel_flag=state;
 }
 static const pia6821_interface pia_ic4_intf =
 {
@@ -960,73 +1050,75 @@ static const pia6821_interface pia_ic4_intf =
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
 static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 {
-	if (lamp_extender == LARGE_CARD_A)
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	if (state->lamp_extender == LARGE_CARD_A)
 	{
-		if (lamp_sense && ic23_active)
+		if (state->lamp_sense && state->ic23_active)
 		{
-			aux1_input |= 0x40;
+			state->aux1_input |= 0x40;
 		}
 		else
 		{
-			aux1_input &= ~0x40; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
+			state->aux1_input &= ~0x40; //Pulse the overcurrent line with every read to show the CPU each lamp has lit
 		}
 	}
-	if (hopper == HOPPER_NONDUART_A)
+	if (state->hopper == HOPPER_NONDUART_A)
 	{
 /*      if (hopper1_active)
         {
-            aux1_input |= 0x04;
+            state->aux1_input |= 0x04;
         }
         else
         {
-            aux1_input &= ~0x04;
+            state->aux1_input &= ~0x04;
         }*/
 	}
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine->describe_context()));
 
-	return input_port_read(device->machine, "AUX1")|aux1_input;
+	return input_port_read(device->machine, "AUX1")|state->aux1_input;
 }
 
 static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	device_t *pia_ic4 = device->machine->device("pia_ic5");
-	if (hopper == HOPPER_NONDUART_A)
+	if (state->hopper == HOPPER_NONDUART_A)
 	{
 		//hopper1_drive_sensor(data&0x10);
 	}
-	switch (lamp_extender)
+	switch (state->lamp_extender)
 	{
 	case NO_EXTENDER:
-		if (led_extender == CARD_B)
+		if (state->led_extender == CARD_B)
 		{
-			led_write_latch(data & 0x1f, pia6821_get_output_a(pia_ic4),input_strobe);
+			led_write_latch(state, data & 0x1f, pia6821_get_output_a(pia_ic4),state->input_strobe);
 		}
-		else if ((led_extender != CARD_A)||(led_extender != NO_EXTENDER))
+		else if ((state->led_extender != CARD_A)||(state->led_extender != NO_EXTENDER))
 		{
-			led_segs[(input_strobe+8)] = data;
+			state->led_segs[(state->input_strobe+8)] = data;
 		}
 		break;
 	case SMALL_CARD:
-		if(ic23_active)
+		if(state->ic23_active)
 		{
-			lamp_extend_small(data);
+			lamp_extend_small(state, data);
 		}
 		break;
 	case LARGE_CARD_A:
-		lamp_extend_largea(data,input_strobe,ic23_active);
+		lamp_extend_largea(state,data,state->input_strobe,state->ic23_active);
 		break;
 	case LARGE_CARD_B:
-		lamp_extend_largebc(data,input_strobe,ic23_active);
-		if ((ic23_active) && card_live)
+		lamp_extend_largebc(state,data,state->input_strobe,state->ic23_active);
+		if ((state->ic23_active) && state->card_live)
 		{
-			led_segs[(8*(last_b7 >>7))+input_strobe] = (~data);
+			state->led_segs[(8*(state->last_b7 >>7))+state->input_strobe] = (~data);
 		}
 		break;
 	case LARGE_CARD_C:
-		lamp_extend_largebc(data,input_strobe,ic23_active);
+		lamp_extend_largebc(state,data,state->input_strobe,state->ic23_active);
 		break;
 	}
-	if (reel_mux == SIX_REEL_5TO8)
+	if (state->reel_mux == SIX_REEL_5TO8)
 	{
 		stepper_update(4, data&0x0F);
 		stepper_update(5, (data >> 4)&0x0F);
@@ -1034,7 +1126,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 		awp_draw_reel(5);
 	}
 	else
-	if (reel_mux == SEVEN_REEL)
+	if (state->reel_mux == SEVEN_REEL)
 	{
 		stepper_update(1, data&0x0F);
 		stepper_update(2, (data >> 4)&0x0F);
@@ -1046,28 +1138,30 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 
 static WRITE8_DEVICE_HANDLER( pia_ic5_portb_w )
 {
-	if (hopper == HOPPER_NONDUART_B)
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	if (state->hopper == HOPPER_NONDUART_B)
 	{
 		//hopper1_drive_motor(data &0x01)
 		//hopper1_drive_sensor(data &0x08)
 	}
-	if (led_extender == CARD_A)
+	if (state->led_extender == CARD_A)
 	{
-		// led_write_latch(data & 0x07, pia_get_output_a(pia_ic4),input_strobe)
+		// led_write_latch(state, data & 0x07, pia_get_output_a(pia_ic4),state->input_strobe)
 	}
 }
 static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	device_t *pia_ic5 = device->machine->device("pia_ic5");
-	if (hopper == HOPPER_NONDUART_B)
+	if (state->hopper == HOPPER_NONDUART_B)
 	{/*
         if (hopper1_active)
         {
-            aux2_input |= 0x08;
+            state->aux2_input |= 0x08;
         }
         else
         {
-            aux2_input &= ~0x08;
+            state->aux2_input &= ~0x08;
         }*/
 	}
 
@@ -1076,14 +1170,15 @@ static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 	coin_lockout_w(device->machine, 1, (pia6821_get_output_b(pia_ic5) & 0x02) );
 	coin_lockout_w(device->machine, 2, (pia6821_get_output_b(pia_ic5) & 0x04) );
 	coin_lockout_w(device->machine, 3, (pia6821_get_output_b(pia_ic5) & 0x08) );
-	return input_port_read(device->machine, "AUX2") | aux2_input;
+	return input_port_read(device->machine, "AUX2") | state->aux2_input;
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic5_ca2_w )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	LOG(("%s: IC5 PIA Write CA2 (Serial Tx) %2x\n",device->machine->describe_context(),state));
-	serial_data = state;
+	drvstate->serial_data = state;
 }
 
 
@@ -1112,15 +1207,16 @@ BDIR BC1       |
 /* PSG function selected */
 static void update_ay(device_t *device)
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	if (!pia6821_get_output_cb2(device))
 	{
-		switch (ay8913_address)
+		switch (state->ay8913_address)
 		{
 			case 0x00:
 			{
 				/* Inactive */
 				break;
-		    }
+			}
 			case 0x01:
 			{	/* CA2 = 1 CB2 = 0? : Read from selected PSG register and make the register data available to Port A */
 				device_t *pia_ic6 = device->machine->device("pia_ic6");
@@ -1179,9 +1275,10 @@ static const pia6821_interface pia_ic5_intf =
 /* IC6, Reel A and B and AY registers (MODs below 4 only) */
 static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	LOG(("%s: IC6 PIA Port B Set to %2x (Reel A and B)\n", device->machine->describe_context(),data));
 
-	if (reel_mux == SEVEN_REEL)
+	if (state->reel_mux == SEVEN_REEL)
 	{
 		stepper_update(3, data&0x0F);
 		stepper_update(4, (data >> 4)&0x0F);
@@ -1196,35 +1293,37 @@ static WRITE8_DEVICE_HANDLER( pia_ic6_portb_w )
 		awp_draw_reel(1);
 	}
 
-	if (reel_flag && (reel_mux == STANDARD_REEL))
+	if (state->reel_flag && (state->reel_mux == STANDARD_REEL))
 	{
-		if ( stepper_optic_state(0) ) optic_pattern |=  0x01;
-		else                          optic_pattern &= ~0x01;
+		if ( stepper_optic_state(0) ) state->optic_pattern |=  0x01;
+		else                          state->optic_pattern &= ~0x01;
 
-		if ( stepper_optic_state(1) ) optic_pattern |=  0x02;
-		else                          optic_pattern &= ~0x02;
+		if ( stepper_optic_state(1) ) state->optic_pattern |=  0x02;
+		else                          state->optic_pattern &= ~0x02;
 	}
 }
 
 
 static WRITE8_DEVICE_HANDLER( pia_ic6_porta_w )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	LOG(("%s: IC6 PIA Write A %2x\n", device->machine->describe_context(),data));
-	if (mod_number <4)
+	if (state->mod_number <4)
 	{
-		ay_data = data;
-	    update_ay(device);
+		state->ay_data = data;
+		update_ay(device);
 	}
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic6_ca2_w )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	LOG(("%s: IC6 PIA write CA2 %2x (AY8913 BC1)\n", device->machine->describe_context(),state));
-	if (mod_number <4)
+	if (drvstate->mod_number <4)
 	{
-		if ( state ) ay8913_address |=  0x01;
-		else         ay8913_address &= ~0x01;
+		if ( state ) drvstate->ay8913_address |=  0x01;
+		else         drvstate->ay8913_address &= ~0x01;
 		update_ay(device);
 	}
 }
@@ -1232,11 +1331,12 @@ static WRITE_LINE_DEVICE_HANDLER( pia_ic6_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic6_cb2_w )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	LOG(("%s: IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", device->machine->describe_context(),state));
-	if (mod_number <4)
+	if (drvstate->mod_number <4)
 	{
-		if ( state ) ay8913_address |=  0x02;
-		else         ay8913_address &= ~0x02;
+		if ( state ) drvstate->ay8913_address |=  0x02;
+		else         drvstate->ay8913_address &= ~0x02;
 		update_ay(device);
 	}
 }
@@ -1262,8 +1362,9 @@ static const pia6821_interface pia_ic6_intf =
 /* IC7 Reel C and D, mechanical meters/Reel E and F, input strobe bit A */
 static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	LOG(("%s: IC7 PIA Port A Set to %2x (Reel C and D)\n", device->machine->describe_context(),data));
-	if (reel_mux == SEVEN_REEL)
+	if (state->reel_mux == SEVEN_REEL)
 	{
 		stepper_update(5, data&0x0F);
 		stepper_update(6, (data >> 4)&0x0F);
@@ -1278,27 +1379,28 @@ static WRITE8_DEVICE_HANDLER( pia_ic7_porta_w )
 		awp_draw_reel(3);
 	}
 
-	if (reel_flag && (reel_mux == STANDARD_REEL))
+	if (state->reel_flag && (state->reel_mux == STANDARD_REEL))
 	{
-		if ( stepper_optic_state(2) ) optic_pattern |=  0x04;
-		else                          optic_pattern &= ~0x04;
-		if ( stepper_optic_state(3) ) optic_pattern |=  0x08;
-		else                          optic_pattern &= ~0x08;
+		if ( stepper_optic_state(2) ) state->optic_pattern |=  0x04;
+		else                          state->optic_pattern &= ~0x04;
+		if ( stepper_optic_state(3) ) state->optic_pattern |=  0x08;
+		else                          state->optic_pattern &= ~0x08;
 	}
 }
 
 static WRITE8_DEVICE_HANDLER( pia_ic7_portb_w )
 {
-	if (hopper == HOPPER_DUART_A)
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	if (state->hopper == HOPPER_DUART_A)
 	{
 		//duart write data
 	}
-	else if (hopper == HOPPER_NONDUART_A)
+	else if (state->hopper == HOPPER_NONDUART_A)
 	{
 		//hoppr1_drive_motor(data & 0x10);
 	}
 
-    mmtr_data = data;
+    state->mmtr_data = data;
 }
 
 static READ8_DEVICE_HANDLER( pia_ic7_portb_r )
@@ -1338,16 +1440,18 @@ all eight meters are driven from this port, giving the 8 line driver chip
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic7_ca2_w )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	LOG(("%s: IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", device->machine->describe_context(),state));
 
-	IC23GA = state;
-	ic24_setup();
-	ic23_update();
+	drvstate->IC23GA = state;
+	ic24_setup(drvstate);
+	ic23_update(drvstate);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic7_cb2_w )
 {
-	remote_meter = state?0x80:0x00;
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	drvstate->remote_meter = state?0x80:0x00;
 }
 
 static const pia6821_interface pia_ic7_intf =
@@ -1370,6 +1474,7 @@ static const pia6821_interface pia_ic7_intf =
 /* IC8, Inputs, TRIACS, alpha clock */
 static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 {
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
 	device_t *pia_ic5 = device->machine->device("pia_ic5");
 
@@ -1378,17 +1483,18 @@ static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
 	pia6821_cb1_w(pia_ic5, (input_port_read(device->machine, "AUX2") & 0x80));
-	return input_port_read(device->machine, portnames[input_strobe]);
+	return input_port_read(device->machine, portnames[state->input_strobe]);
 }
 
 
 static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 {
-	if (hopper == HOPPER_DUART_B)
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	if (state->hopper == HOPPER_DUART_B)
 	{
 //      duart.drive_sensor(data & 0x04, data & 0x01, 0, 0);
 	}
-	else if (hopper == HOPPER_DUART_C)
+	else if (state->hopper == HOPPER_DUART_C)
 	{
 //      duart.drive_sensor(data & 0x04, data & 0x01, data & 0x04, data & 0x02);
 	}
@@ -1402,22 +1508,24 @@ static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_ca2_w )
 {
-	LOG_IC8(("%s: IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", device->machine->describe_context(), state & 0xFF));
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
+	LOG_IC8(("%s: IC8 PIA write CA2 (drvstate->input_strobe bit 2 / LED C) %02X\n", device->machine->describe_context(), state & 0xFF));
 
-	IC23GC = state;
-	ic23_update();
+	drvstate->IC23GC = state;
+	ic23_update(drvstate);
 }
 
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_cb2_w )
 {
+	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
 	LOG_IC8(("%s: IC8 PIA write CB2 (alpha clock) %02X\n", device->machine->describe_context(), state & 0xFF));
 
-	if ( !alpha_clock && (state) )
+	if ( !drvstate->alpha_clock && (state) )
 	{
-		ROC10937_shift_data(0, alpha_data_line&0x01?0:1);
+		ROC10937_shift_data(0, drvstate->alpha_data_line&0x01?0:1);
 	}
-	alpha_clock = state;
+	drvstate->alpha_clock = state;
 	ROC10937_draw_16seg(0);
 }
 
@@ -1449,11 +1557,12 @@ static WRITE8_DEVICE_HANDLER( pia_gb_porta_w )
 
 static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 {
-	int changed = expansion_latch^data;
+	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	int changed = state->expansion_latch^data;
 
 	LOG_SS(("%s: GAMEBOARD: PIA Port A Set to %2x\n", device->machine->describe_context(),data));
 
-	expansion_latch = data;
+	state->expansion_latch = data;
 
 	if ( changed & 0x20)
 	{ // digital volume clock line changed
@@ -1461,15 +1570,15 @@ static WRITE8_DEVICE_HANDLER( pia_gb_portb_w )
 		{ // changed from high to low,
 			if ( !(data & 0x10) )
 			{
-				if ( global_volume < 31 ) global_volume++; //steps unknown
+				if ( state->global_volume < 31 ) state->global_volume++; //steps unknown
 			}
 			else
 			{
-				if ( global_volume > 0  ) global_volume--;
+				if ( state->global_volume > 0  ) state->global_volume--;
 			}
 
 			{
-//              float percent = (32-global_volume)/32.0; //volume_override?1.0:(32-global_volume)/32.0;
+//              float percent = (32-state->global_volume)/32.0; //volume_override?1.0:(32-state->global_volume)/32.0;
 //              LOG(("GAMEBOARD: OKI volume %f \n",percent));
 			}
 		}
@@ -1922,7 +2031,8 @@ static const stepper_interface barcrest_opto1_interface =
 /* Common configurations */
 static void mpu4_config_common(running_machine *machine)
 {
-	ic24_timer = machine->scheduler().timer_alloc(FUNC(ic24_timeout));
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->ic24_timer = machine->scheduler().timer_alloc(FUNC(ic24_timeout));
 }
 
 static void mpu4_config_common_reels(running_machine *machine,int reels)
@@ -1938,10 +2048,11 @@ static void mpu4_config_common_reels(running_machine *machine,int reels)
 
 static MACHINE_START( mpu4mod2 )
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	mpu4_config_common(machine);
 
-	link7a_connected=0;
-	mod_number=2;
+	state->link7a_connected=0;
+	state->mod_number=2;
 
 	/* setup 8 mechanical meters */
 	MechMtr_config(machine,8);
@@ -1952,9 +2063,10 @@ static MACHINE_START( mpu4mod2 )
 
 static MACHINE_START( mpu4dutch )
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	mpu4_config_common(machine);
 
-	link7a_connected=0;
+	state->link7a_connected=0;
 
 // setup 8 mechanical meters ////////////////////////////////////////////
 	MechMtr_config(machine,8);
@@ -1965,10 +2077,11 @@ static MACHINE_START( mpu4dutch )
 
 static MACHINE_START( mpu4mod4 )
 {
+	mpu4_state *state = machine->driver_data<mpu4_state>();
 	mpu4_config_common(machine);
 
-	link7a_connected=0;
-	mod_number=4;
+	state->link7a_connected=0;
+	state->mod_number=4;
 
 // setup 8 mechanical meters ////////////////////////////////////////////
 	MechMtr_config(machine,8);
@@ -2003,10 +2116,11 @@ there are again fixed call values.
 
 static WRITE8_HANDLER( characteriser_w )
 {
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
 	int x;
 	int call=data;
 	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(space->cpu),offset,data));
-	if (!mpu4_current_chr_table)
+	if (!state->current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
 
 	if (offset == 0)
@@ -2014,16 +2128,16 @@ static WRITE8_HANDLER( characteriser_w )
 		{
 			if (call == 0)
 			{
-				prot_col = 0;
+				state->prot_col = 0;
 			}
 			else
 			{
-				for (x = prot_col; x < 64; x++)
+				for (x = state->prot_col; x < 64; x++)
 				{
-					if	(mpu4_current_chr_table[(x)].call == call)
+					if	(state->current_chr_table[(x)].call == call)
 					{
-						prot_col = x;
-						LOG_CHR(("Characteriser find column %02X\n",prot_col));
+						state->prot_col = x;
+						LOG_CHR(("Characteriser find column %02X\n",state->prot_col));
 						break;
 					}
 				}
@@ -2037,50 +2151,51 @@ static WRITE8_HANDLER( characteriser_w )
 		// Rather than the search strategy, we can map the calls directly here. Note that they are hex versions of the square number series
 		{
 			case 0x00:
-			lamp_col = 0;
+			state->lamp_col = 0;
 			break;
 			case 0x01:
-			lamp_col = 1;
+			state->lamp_col = 1;
 			break;
 			case 0x04:
-			lamp_col = 2;
+			state->lamp_col = 2;
 			break;
 			case 0x09:
-			lamp_col = 3;
+			state->lamp_col = 3;
 			break;
 			case 0x10:
-			lamp_col = 4;
+			state->lamp_col = 4;
 			break;
 			case 0x19:
-			lamp_col = 5;
+			state->lamp_col = 5;
 			break;
 			case 0x24:
-			lamp_col = 6;
+			state->lamp_col = 6;
 			break;
 			case 0x31:
-			lamp_col = 7;
+			state->lamp_col = 7;
 			break;
 		}
-		LOG_CHR(("Characteriser find 2 column %02X\n",lamp_col));
+		LOG_CHR(("Characteriser find 2 column %02X\n",state->lamp_col));
 	}
 }
 
 
 static READ8_HANDLER( characteriser_r )
 {
-	if (!mpu4_current_chr_table)
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	if (!state->current_chr_table)
 		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	if (offset == 0)
 	{
-		LOG_CHR(("Characteriser read data %02X \n",mpu4_current_chr_table[prot_col].response));
-		return mpu4_current_chr_table[prot_col].response;
+		LOG_CHR(("Characteriser read data %02X \n",state->current_chr_table[state->prot_col].response));
+		return state->current_chr_table[state->prot_col].response;
 	}
 	if (offset == 3)
 	{
-		LOG_CHR(("Characteriser read data off 3 %02X \n",mpu4_current_chr_table[lamp_col+64].response));
-		return mpu4_current_chr_table[lamp_col+64].response;
+		LOG_CHR(("Characteriser read data off 3 %02X \n",state->current_chr_table[state->lamp_col+64].response));
+		return state->current_chr_table[state->lamp_col+64].response;
 	}
 	return 0;
 }
@@ -2135,7 +2250,8 @@ static const mpu4_chr_table oldtmr_data[72] = {
 
 static DRIVER_INIT (m_oldtmr)
 {
-	reel_mux=SIX_REEL_1TO8;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->reel_mux=SIX_REEL_1TO8;
 
 	stepper_config(machine, 0, &barcrest_opto1_interface);
 	stepper_config(machine, 1, &barcrest_opto1_interface);
@@ -2145,39 +2261,43 @@ static DRIVER_INIT (m_oldtmr)
 	stepper_config(machine, 5, &barcrest_opto1_interface);
 
 	awp_reel_setup();
-	mpu4_current_chr_table = oldtmr_data;
+	state->current_chr_table = oldtmr_data;
 }
 
 static DRIVER_INIT (m_ccelbr)
 {
-	reel_mux=STANDARD_REEL;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->reel_mux=STANDARD_REEL;
 	// setup 4 default 96 half step reels ///////////////////////////////////
 	mpu4_config_common_reels(machine,4);
 
-	mpu4_current_chr_table = ccelbr_data;
+	state->current_chr_table = ccelbr_data;
 }
 
 static DRIVER_INIT (m_gmball)
 {
-	reel_mux=STANDARD_REEL;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->reel_mux=STANDARD_REEL;
 	// setup 4 default 96 half step reels ///////////////////////////////////
 	mpu4_config_common_reels(machine,4);
 
-	mpu4_current_chr_table = gmball_data;
+	state->current_chr_table = gmball_data;
 }
 
 static DRIVER_INIT (m_grtecp)
 {
-	reel_mux=FIVE_REEL_5TO8;
-	lamp_extender=SMALL_CARD;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->reel_mux=FIVE_REEL_5TO8;
+	state->lamp_extender=SMALL_CARD;
 	// setup 5 default 96 half step reels with the mux board
 	mpu4_config_common_reels(machine,5);
-	mpu4_current_chr_table = grtecp_data;
+	state->current_chr_table = grtecp_data;
 }
 
 static DRIVER_INIT (mpu4tst2)
 {
-	reel_mux=STANDARD_REEL;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->reel_mux=STANDARD_REEL;
 	// setup 5 default 96 half step reels with the mux board
 	mpu4_config_common_reels(machine,4);
 
@@ -2185,29 +2305,32 @@ static DRIVER_INIT (mpu4tst2)
 
 static DRIVER_INIT (mpu4utst)
 {
-	reel_mux=STANDARD_REEL;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->reel_mux=STANDARD_REEL;
 	// setup 4 default 96 half step reels ///////////////////////////////////
 	mpu4_config_common_reels(machine,4);
 }
 
 static DRIVER_INIT (connect4)
 {
-	led_lamp=1;
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->led_lamp=1;
 }
 
 /* generate a 50 Hz signal (based on an RC time) */
 static TIMER_DEVICE_CALLBACK( gen_50hz )
 {
+	mpu4_state *state = timer.machine->driver_data<mpu4_state>();
 	/* Although reported as a '50Hz' signal, the fact that both rising and
     falling edges of the pulse are used means the timer actually gives a 100Hz
     oscillating signal.*/
-	signal_50hz = signal_50hz?0:1;
-	update_lamps();
-	pia6821_ca1_w(timer.machine->device("pia_ic4"), signal_50hz);	/* signal is connected to IC4 CA1 */
+	state->signal_50hz = state->signal_50hz?0:1;
+	update_lamps(state);
+	pia6821_ca1_w(timer.machine->device("pia_ic4"), state->signal_50hz);	/* signal is connected to IC4 CA1 */
 
-	if (signal_50hz)
+	if (state->signal_50hz)
 	{
-		update_meters();
+		update_meters(state);
 	}
 
 }
@@ -2319,7 +2442,7 @@ static const ay8910_interface ay8910_config =
 
 
 /* machine driver for MOD 2 board */
-static MACHINE_CONFIG_START( mpu4mod2, driver_device )
+static MACHINE_CONFIG_START( mpu4mod2, mpu4_state )
 
 	MCFG_MACHINE_START(mpu4mod2)
 	MCFG_MACHINE_RESET(mpu4)

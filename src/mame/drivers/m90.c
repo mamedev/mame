@@ -35,18 +35,18 @@ Notes:
 #include "sound/2151intf.h"
 #include "includes/m90.h"
 
-static UINT32 bankaddress;
 
 /***************************************************************************/
 
 static void set_m90_bank(running_machine *machine)
 {
+	m90_state *state = machine->driver_data<m90_state>();
 	UINT8 *rom = machine->region("user1")->base();
 
 	if (!rom)
 		popmessage("bankswitch with no banked ROM!");
 	else
-		memory_set_bankptr(machine, "bank1",rom + bankaddress);
+		memory_set_bankptr(machine, "bank1",rom + state->bankaddress);
 }
 
 /***************************************************************************/
@@ -64,9 +64,10 @@ static WRITE16_HANDLER( m90_coincounter_w )
 
 static WRITE16_HANDLER( quizf1_bankswitch_w )
 {
+	m90_state *state = space->machine->driver_data<m90_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		bankaddress = 0x10000 * (data & 0x0f);
+		state->bankaddress = 0x10000 * (data & 0x0f);
 		set_m90_bank(space->machine);
 	}
 }
@@ -84,7 +85,7 @@ static ADDRESS_MAP_START( m90_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")	/* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE_MEMBER(m90_state, video_data)
 	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -93,7 +94,7 @@ static ADDRESS_MAP_START( dynablsb_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE_MEMBER(m90_state, video_data)
 	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -102,7 +103,7 @@ static ADDRESS_MAP_START( bomblord_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE(&m90_video_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE_MEMBER(m90_state, video_data)
 	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -695,7 +696,7 @@ static INTERRUPT_GEN( bomblord_interrupt )
 
 
 /* Basic hardware -- no decryption table is setup for CPU */
-static MACHINE_CONFIG_START( m90, driver_device )
+static MACHINE_CONFIG_START( m90, m90_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V35,XTAL_32MHz/2)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
@@ -1144,10 +1145,11 @@ static STATE_POSTLOAD( quizf1_postload )
 
 static DRIVER_INIT( quizf1 )
 {
-	bankaddress = 0;
+	m90_state *state = machine->driver_data<m90_state>();
+	state->bankaddress = 0;
 	set_m90_bank(machine);
 
-	state_save_register_global(machine, bankaddress);
+	state_save_register_global(machine, state->bankaddress);
 	machine->state().register_postload(quizf1_postload, NULL);
 }
 

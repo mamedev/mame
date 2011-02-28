@@ -95,12 +95,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	shootout_state *state = machine->driver_data<shootout_state>();
 	UINT8 *spriteram = state->spriteram;
-	static int bFlicker;
 	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source = spriteram+127*4;
 	int count;
 
-	bFlicker = !bFlicker;
+	state->bFlicker = !state->bFlicker;
 
 	for( count=0; count<128; count++ )
 	{
@@ -115,7 +114,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
             -------x    enable
         */
 		if ( attributes & 0x01 ){ /* visible */
-			if( bFlicker || (attributes&0x02)==0 ){
+			if( state->bFlicker || (attributes&0x02)==0 ){
 				int priority_mask = (attributes&0x08)?0x2:0;
 				int sx = (240 - source[2])&0xff;
 				int sy = (240 - source[0])&0xff;

@@ -16,10 +16,48 @@
 #define VICTORY_VBSTART					(0x100)
 
 
-/*----------- defined in video/victory.c -----------*/
+/* microcode state */
+struct micro_t
+{
+	UINT16		i;
+	UINT16		pc;
+	UINT8		r,g,b;
+	UINT8		x,xp,y,yp;
+	UINT8		cmd,cmdlo;
+	emu_timer *	timer;
+	UINT8		timer_active;
+	attotime	endtime;
+};
 
-extern UINT8 *victory_videoram;
-extern UINT8 *victory_charram;
+class victory_state : public driver_device
+{
+public:
+	victory_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	UINT8 *charram;
+	UINT16 paletteram[0x40];
+	UINT8 *bgbitmap;
+	UINT8 *fgbitmap;
+	UINT8 *rram;
+	UINT8 *gram;
+	UINT8 *bram;
+	UINT8 vblank_irq;
+	UINT8 fgcoll;
+	UINT8 fgcollx;
+	UINT8 fgcolly;
+	UINT8 bgcoll;
+	UINT8 bgcollx;
+	UINT8 bgcolly;
+	UINT8 scrollx;
+	UINT8 scrolly;
+	UINT8 video_control;
+	struct micro_t micro;
+};
+
+
+/*----------- defined in video/victory.c -----------*/
 
 VIDEO_START( victory );
 SCREEN_UPDATE( victory );
