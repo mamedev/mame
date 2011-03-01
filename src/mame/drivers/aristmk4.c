@@ -816,28 +816,6 @@ ADDRESS_MAP_END
 
 /*
 
-Wild One and Golden Poker need to check the value in the CURSOR register of the crtc prior to starting but
-CURSOR appears to be unconnected on the Mark IV schematic so its unclear how this update is implimented.
-
-I suspect it to be connected to the CPU IRQ and the value in crtc: 0xf read every VBLANK until it reaches 0xff
-
-        Wild One below. Golden Poker has the same routine.
-
-        'maincpu' (9137):M6845 reg 0x0f = 0x00
-
-        907D    BITA $1800  ; crtc reg 0xf
-        9080    BNE  $907D  ; branches 907d if value is not zero.
-        9082    BITA $1800
-        9085    BEQ  $9082  ; branches to 9082 until value is 0xff
-        9087    LDA  #$40
-
-Using mc6845_update and cursor update callback causes the "Invalid MC6845 screen parameters - display disabled"
-so a work around is required.
-
-*/
-
-/*
-
 Poker card style games seem to have different address mapping
 
 The graphics rom is mapped from 0x4000 - 0x4ffff
