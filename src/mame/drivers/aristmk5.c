@@ -264,19 +264,14 @@ static MACHINE_RESET( aristmk5 )
 		UINT8 *PRG;// = machine->region("prg_code")->base();
 		int i;
 		UINT8 op_mode;
+		static const char *const rom_region[] = { "set_chip_4.04", "set_chip_4.4", "game_prg", "game_prg" };
 
 		op_mode = input_port_read(machine, "ROM_LOAD");
 
-		if(op_mode == 0)
-			PRG = machine->region("set_chip_4.04")->base();
-		else if(op_mode == 1)
-			PRG = machine->region("set_chip_4.4")->base();
-		else
-			PRG = machine->region("game_prg")->base();
+		PRG = machine->region(rom_region[op_mode & 3])->base();
 
 		for(i=0;i<0x300000;i++)
 			ROM[i] = PRG[i];
-
 	}
 }
 
