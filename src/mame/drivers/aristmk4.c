@@ -143,6 +143,10 @@
 
         9.When DIP SW7 is set to off/off, speed is dramatically reduced.
 
+		10. rewrite video emulation by using custom drawing code.
+
+		11. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
+
         ***************** POKER GAMES ************************************************************************
 
         Wild One & Golden Poker have a problem where the second branch condition is always true, see assebler below for
@@ -158,6 +162,11 @@
 
         Bug in the 6845 crtc core ? Seems like some kind of logic there not working.
 
+        EDIT: it's a vblank check, BITA opcode checks bit 5 in A register and compares it with the contents of 0x1800 (that is vblank in
+        mc6845_status_r). Checking if a bit goes low then high it usually means that is moaning for a vblank. ;-)
+        But now there is a new question: what kind of mc6845 clone this HW uses? It's clearly not standard mc6845, since that version doesn't
+        support vblank reading. The vblank bit can be read only on C6545-1, R6545-1, SY6545-1 and SY6845E subvariants, so it all lies to
+        those. -AS
 
 ***********************************************************************************************************************************************/
 
@@ -178,8 +187,6 @@
 #include "machine/nvram.h"
 
 UINT8 crtc_cursor_index = 0;
-UINT8 crtc_cursor[2] = {0x00,0xff};
-UINT8 crtc_select = 0;
 UINT8 crtc_reg = 0;
 
 class aristmk4_state : public driver_device
@@ -782,7 +789,7 @@ static READ8_HANDLER(mk4_printer_r)
 static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_status_r, mc6845_address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
 	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
@@ -829,30 +836,6 @@ so a work around is required.
 
 */
 
-READ8_DEVICE_HANDLER( aristmk4_crtc_r )
-{
-
-    // just give the cursor values expected 0x00 & 0xff. Otherwise 0x00 is always read
-    // and game will not start
-
-    if(crtc_reg == 0x0f) // work around
-	   return crtc_cursor[crtc_cursor_index++%2];
-	else
-	   return mc6845_register_r(device, 0);
-}
-
-WRITE8_DEVICE_HANDLER( aristmk4_crtc_w )
-{
-    if(crtc_select == 0)
-    {
-        crtc_reg = data;
-        mc6845_address_w(device, 0, data);
-    }
-	else
-        mc6845_register_w(device, 0, data);
-    crtc_select ^= 1;
-}
-
 /*
 
 Poker card style games seem to have different address mapping
@@ -868,8 +851,8 @@ The U87 personality rom is not required, therefore game rom code mapping is from
 static ADDRESS_MAP_START( aristmk4_poker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", aristmk4_crtc_r, aristmk4_crtc_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", aristmk4_crtc_r, aristmk4_crtc_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_status_r, mc6845_address_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
 	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM  // graphics rom map
@@ -1560,7 +1543,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf1 )
 	MCFG_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MCFG_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
-	MCFG_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", C6545_1, MAIN_CLOCK/8, mc6845_intf) // TODO: type is unknown
 	MCFG_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
