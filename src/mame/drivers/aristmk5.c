@@ -291,7 +291,7 @@ static const i2cmem_interface i2cmem_interface =
 #endif
 
 static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
-	MCFG_CPU_ADD("maincpu", ARM, 10000000) // ?
+	MCFG_CPU_ADD("maincpu", ARM, 12000000) // ?
 	MCFG_CPU_PROGRAM_MAP(aristmk5_map)
 
 	MCFG_MACHINE_START( aristmk5 )
@@ -303,13 +303,13 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MCFG_SCREEN_SIZE(1280, 1024) //TODO: proper max size?
-	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 1024-1)
-	MCFG_SCREEN_UPDATE(archimds_vidc)
+	MCFG_SCREEN_SIZE(640, 400) //TODO: proper max size?
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
 
 	MCFG_PALETTE_LENGTH(0x200)
 
 	MCFG_VIDEO_START(archimds_vidc)
+	MCFG_SCREEN_UPDATE(archimds_vidc)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("dac0", DAC, 0)
@@ -358,10 +358,10 @@ ROM_END
 
 ROM_START( reelrock )
 	ARISTOCRAT_MK5_BIOS
-	ROM_LOAD32_WORD( "reelrock.u7",  0x200000, 0x80000, CRC(b60af34f) SHA1(1143380b765db234b3871c0fe04736472fde7de4) )
-	ROM_LOAD32_WORD( "reelrock.u11", 0x200002, 0x80000, CRC(57e341d0) SHA1(9b0d50763bb74ca5fe404c9cd526633721cf6677) )
-	ROM_LOAD32_WORD( "reelrock.u8",  0x300000, 0x80000, CRC(57eec667) SHA1(5f3888d75f48b6148f451d7ebb7f99e1a0939f3c) )
-	ROM_LOAD32_WORD( "reelrock.u12", 0x300002, 0x80000, CRC(4ac20679) SHA1(0ac732ffe6a33806e4a06e87ec875a3e1314e06b) )
+	ROM_LOAD32_WORD( "0100779v.u7",  0x200000, 0x80000, CRC(b60af34f) SHA1(1143380b765db234b3871c0fe04736472fde7de4) )
+	ROM_LOAD32_WORD( "0100779v.u11", 0x200002, 0x80000, CRC(57e341d0) SHA1(9b0d50763bb74ca5fe404c9cd526633721cf6677) )
+	ROM_LOAD32_WORD( "0100779v.u8",  0x300000, 0x80000, CRC(57eec667) SHA1(5f3888d75f48b6148f451d7ebb7f99e1a0939f3c) )
+	ROM_LOAD32_WORD( "0100779v.u12", 0x300002, 0x80000, CRC(4ac20679) SHA1(0ac732ffe6a33806e4a06e87ec875a3e1314e06b) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -372,10 +372,10 @@ ROM_END
 
 ROM_START( indiandr )
 	ARISTOCRAT_MK5_BIOS
-	ROM_LOAD32_WORD( "indiandr.u7",  0x200000, 0x80000, CRC(0c924a3e) SHA1(499b4ae601e53173e3ba5f400a40e5ae7bbaa043) )
-	ROM_LOAD32_WORD( "indiandr.u11", 0x200002, 0x80000, CRC(e371dc0f) SHA1(a01ab7fb63a19c144f2c465ecdfc042695124bdf) )
-	ROM_LOAD32_WORD( "indiandr.u8",  0x300000, 0x80000, CRC(1c6bfb47) SHA1(7f751cb499a6185a0ab64eeec511583ceeee6ee8) )
-	ROM_LOAD32_WORD( "indiandr.u12", 0x300002, 0x80000, CRC(4bbe67f6) SHA1(928f88387da66697f1de54f086531f600f80a15e) )
+	ROM_LOAD32_WORD( "0100845v.u7",  0x200000, 0x80000, CRC(0c924a3e) SHA1(499b4ae601e53173e3ba5f400a40e5ae7bbaa043) )
+	ROM_LOAD32_WORD( "0100845v.u11", 0x200002, 0x80000, CRC(e371dc0f) SHA1(a01ab7fb63a19c144f2c465ecdfc042695124bdf) )
+	ROM_LOAD32_WORD( "0100845v.u8",  0x300000, 0x80000, CRC(1c6bfb47) SHA1(7f751cb499a6185a0ab64eeec511583ceeee6ee8) )
+	ROM_LOAD32_WORD( "0100845v.u12", 0x300002, 0x80000, CRC(4bbe67f6) SHA1(928f88387da66697f1de54f086531f600f80a15e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -440,8 +440,8 @@ ROM_END
 
 ROM_START( swthrt2v )
 	ARISTOCRAT_MK5_BIOS
-	ROM_LOAD32_WORD( "swthrt2v.u7",  0x200000, 0x80000, CRC(f51b2faa) SHA1(dbcfdbee92af5f89a8a2611bbc687ee0cc907642) )
-	ROM_LOAD32_WORD( "swthrt2v.u11", 0x200002, 0x80000, CRC(bd7ead91) SHA1(9f775428a4aa0b0a8ee17aed9be620edc2020c5e) )
+	ROM_LOAD32_WORD( "01j01986.u7",  0x200000, 0x80000, CRC(f51b2faa) SHA1(dbcfdbee92af5f89a8a2611bbc687ee0cc907642) )
+	ROM_LOAD32_WORD( "01j01986.u11", 0x200002, 0x80000, CRC(bd7ead91) SHA1(9f775428a4aa0b0a8ee17aed9be620edc2020c5e) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -464,12 +464,12 @@ ROM_END
 
 ROM_START( margmgc )
 	ARISTOCRAT_MK5_BIOS
-	ROM_LOAD32_WORD( "margmgc.u7",  0x200000, 0x80000, CRC(eee7ebaf) SHA1(bad0c08578877f84325c07d51c6ed76c40b70720) )
-	ROM_LOAD32_WORD( "margmgc.u11", 0x200002, 0x80000, CRC(4901a166) SHA1(8afe6f08b4ac5c17744dff73939c4bc93124fdf1) )
-	ROM_LOAD32_WORD( "margmgc.u8",  0x300000, 0x80000, CRC(b0d78efe) SHA1(bc8b345290f4d31c6553f1e2700bc8324b4eeeac) )
-	ROM_LOAD32_WORD( "margmgc.u12", 0x300002, 0x80000, CRC(90ff59a8) SHA1(c9e342db2b5e8c3f45efa8496bc369385046e920) )
-	ROM_LOAD32_WORD( "margmgc.u9",  0x400000, 0x80000, CRC(1f0ca910) SHA1(be7a2f395eae09a29faf99ba34551fbc38f20fdb) )
-	ROM_LOAD32_WORD( "margmgc.u13", 0x400002, 0x80000, CRC(3f702945) SHA1(a6c9a848d059c1e564fdc5a65bf8c9600853edfa) )
+	ROM_LOAD32_WORD( "01j00101.u7",  0x200000, 0x80000, CRC(eee7ebaf) SHA1(bad0c08578877f84325c07d51c6ed76c40b70720) )
+	ROM_LOAD32_WORD( "01j00101.u11", 0x200002, 0x80000, CRC(4901a166) SHA1(8afe6f08b4ac5c17744dff73939c4bc93124fdf1) )
+	ROM_LOAD32_WORD( "01j00101.u8",  0x300000, 0x80000, CRC(b0d78efe) SHA1(bc8b345290f4d31c6553f1e2700bc8324b4eeeac) )
+	ROM_LOAD32_WORD( "01j00101.u12", 0x300002, 0x80000, CRC(90ff59a8) SHA1(c9e342db2b5e8c3f45efa8496bc369385046e920) )
+	ROM_LOAD32_WORD( "01j00101.u9",  0x400000, 0x80000, CRC(1f0ca910) SHA1(be7a2f395eae09a29faf99ba34551fbc38f20fdb) )
+	ROM_LOAD32_WORD( "01j00101.u13", 0x400002, 0x80000, CRC(3f702945) SHA1(a6c9a848d059c1e564fdc5a65bf8c9600853edfa) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -480,10 +480,10 @@ ROM_END
 
 ROM_START( adonis )
 	ARISTOCRAT_MK5_BIOS
-	ROM_LOAD32_WORD( "adonis.u7",  0x200000, 0x80000, CRC(ab386ab0) SHA1(56c5baea4272866a9fe18bdc371a49f155251f86) )
-	ROM_LOAD32_WORD( "adonis.u11", 0x200002, 0x80000, CRC(ce8c8449) SHA1(9894f0286f27147dcc437e4406870fe695a6f61a) )
-	ROM_LOAD32_WORD( "adonis.u8",  0x300000, 0x80000, CRC(99097a82) SHA1(a08214ab4781b06b46fc3be5c48288e373230ef4) )
-	ROM_LOAD32_WORD( "adonis.u12", 0x300002, 0x80000, CRC(443a7b6d) SHA1(c19a1c50fb8774826a1e12adacba8bbfce320891) )
+	ROM_LOAD32_WORD( "0200751v.u7",  0x200000, 0x80000, CRC(ab386ab0) SHA1(56c5baea4272866a9fe18bdc371a49f155251f86) )
+	ROM_LOAD32_WORD( "0200751v.u11", 0x200002, 0x80000, CRC(ce8c8449) SHA1(9894f0286f27147dcc437e4406870fe695a6f61a) )
+	ROM_LOAD32_WORD( "0200751v.u8",  0x300000, 0x80000, CRC(99097a82) SHA1(a08214ab4781b06b46fc3be5c48288e373230ef4) )
+	ROM_LOAD32_WORD( "0200751v.u12", 0x300002, 0x80000, CRC(443a7b6d) SHA1(c19a1c50fb8774826a1e12adacba8bbfce320891) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -494,10 +494,10 @@ ROM_END
 
 ROM_START( dmdtouch )
 	ARISTOCRAT_MK5_BIOS
-	ROM_LOAD32_WORD( "dmdtouch.u7",  0x200000, 0x80000, CRC(71b19365) SHA1(5a8ba1806af544d33e9acbcbbc0555805b4074e6) )
-	ROM_LOAD32_WORD( "dmdtouch.u11", 0x200002, 0x80000, CRC(3d836342) SHA1(b015a4ba998b39ed86cdb6247c9c7f1365641b59) )
-	ROM_LOAD32_WORD( "dmdtouch.u8",  0x300000, 0x80000, CRC(971bbf63) SHA1(082f81115209c7089c76fb207248da3c347a080b) )
-	ROM_LOAD32_WORD( "dmdtouch.u12", 0x300002, 0x80000, CRC(9e0d08e2) SHA1(38b10f7c37f1cefe9271549073dc0a4fed409aec) )
+	ROM_LOAD32_WORD( "0400433v.u7",  0x200000, 0x80000, CRC(71b19365) SHA1(5a8ba1806af544d33e9acbcbbc0555805b4074e6) )
+	ROM_LOAD32_WORD( "0400433v.u11", 0x200002, 0x80000, CRC(3d836342) SHA1(b015a4ba998b39ed86cdb6247c9c7f1365641b59) )
+	ROM_LOAD32_WORD( "0400433v.u8",  0x300000, 0x80000, CRC(971bbf63) SHA1(082f81115209c7089c76fb207248da3c347a080b) )
+	ROM_LOAD32_WORD( "0400433v.u12", 0x300002, 0x80000, CRC(9e0d08e2) SHA1(38b10f7c37f1cefe9271549073dc0a4fed409aec) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -509,8 +509,8 @@ ROM_END
 ROM_START( magicmsk )
 	ARISTOCRAT_MK5_BIOS
 	ROM_LOAD32_WORD( "magicmsk.u7",  0x200000, 0x80000, CRC(17317eb9) SHA1(3ddb8d61f23461c3194af534928164550208bbee) )
-	ROM_LOAD32_WORD( "magicmsk.u11", 0x200002, 0x80000, CRC(23aefb5a) SHA1(ba4488754794f75f53b9c81b74b6ccd992c64acc) )
-	ROM_LOAD32_WORD( "magicmsk.u8",  0x300000, 0x80000, BAD_DUMP CRC(971bbf63) SHA1(082f81115209c7089c76fb207248da3c347a080b) ) //same as dmdtouch u8 ROM
+	ROM_LOAD32_WORD( "magicmsk.u11", 0x200002, 0x80000, CRC(42af4b3f) SHA1(5d88951f77782ff3861b6550ace076662a0b45aa) )
+	ROM_LOAD32_WORD( "magicmsk.u8",  0x300000, 0x80000, CRC(23aefb5a) SHA1(ba4488754794f75f53b9c81b74b6ccd992c64acc) )
 	ROM_LOAD32_WORD( "magicmsk.u12", 0x300002, 0x80000, CRC(6829a7bf) SHA1(97eed83763d0ec5e753d6ad194e906b1307c4940) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
@@ -522,12 +522,12 @@ ROM_END
 
 ROM_START( geishanz )
 	ARISTOCRAT_MK5_BIOS
-	ROM_LOAD32_WORD( "0101408.u7",  0x200000, 0x80000, CRC(ebdde248) SHA1(83f4f4deb5c6f5b33ae066d50e043a24cb0cbfe0) )
-	ROM_LOAD32_WORD( "0101408.u11", 0x200002, 0x80000, CRC(2f9e7cd4) SHA1(e9498879c9ca66740856c00fda0416f5d9f7c823) )
-	ROM_LOAD32_WORD( "0101408.u8",  0x300000, 0x80000, CRC(87e41b1b) SHA1(029687aeaed701e0f4b8da9d1d60a5a0a9445518) )
-	ROM_LOAD32_WORD( "0101408.u12", 0x300002, 0x80000, CRC(255f2368) SHA1(eb955452e1ed8d9d4f30f3372d7321f01d3654d3) )
-	ROM_LOAD32_WORD( "0101408.u9",  0x400000, 0x80000, CRC(5f161953) SHA1(d07353d006811813b94cb022857f49c4906fd87b) )
-	ROM_LOAD32_WORD( "0101408.u13", 0x400002, 0x80000, CRC(5ef6323e) SHA1(82a720d814ca06c6d286c59bbf325d9a1034375a) )
+	ROM_LOAD32_WORD( "0101408v.u7",  0x200000, 0x80000, CRC(ebdde248) SHA1(83f4f4deb5c6f5b33ae066d50e043a24cb0cbfe0) )
+	ROM_LOAD32_WORD( "0101408v.u11", 0x200002, 0x80000, CRC(2f9e7cd4) SHA1(e9498879c9ca66740856c00fda0416f5d9f7c823) )
+	ROM_LOAD32_WORD( "0101408v.u8",  0x300000, 0x80000, CRC(87e41b1b) SHA1(029687aeaed701e0f4b8da9d1d60a5a0a9445518) )
+	ROM_LOAD32_WORD( "0101408v.u12", 0x300002, 0x80000, CRC(255f2368) SHA1(eb955452e1ed8d9d4f30f3372d7321f01d3654d3) )
+	ROM_LOAD32_WORD( "0101408v.u9",  0x400000, 0x80000, CRC(5f161953) SHA1(d07353d006811813b94cb022857f49c4906fd87b) )
+	ROM_LOAD32_WORD( "0101408v.u13", 0x400002, 0x80000, CRC(5ef6323e) SHA1(82a720d814ca06c6d286c59bbf325d9a1034375a) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -538,8 +538,8 @@ ROM_END
 
 ROM_START( wtiger )
 	ARISTOCRAT_MK5_BIOS
-	ROM_LOAD32_WORD( "u7.bin",  0x200000, 0x80000, CRC(752e54c5) SHA1(9317544a7cf2d9bf29347d31fe72331fc3d018ef) )
-	ROM_LOAD32_WORD( "u11.bin", 0x200002, 0x80000, CRC(38e888b1) SHA1(acc857eb2be19140bbb58d70583e08f24807b9f2) )
+	ROM_LOAD32_WORD( "0200954v.u7",  0x200000, 0x80000, CRC(752e54c5) SHA1(9317544a7cf2d9bf29347d31fe72331fc3d018ef) )
+	ROM_LOAD32_WORD( "0200954v.u11", 0x200002, 0x80000, CRC(38e888b1) SHA1(acc857eb2be19140bbb58d70583e08f24807b9f2) )
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
@@ -548,19 +548,19 @@ ROM_START( wtiger )
 	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
-GAME( 1995, aristmk5, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "MK-V System", GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 1995, aristmk5, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "MKV System", GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
-GAME( 1995, swthrt2v, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (C - 07/09/95, Venezuela version)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1995, enchfrst, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (E - 23/06/95, Local)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1996, dolphntr, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 1.24.4.0)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1996, dolphtra, dolphntr, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 3)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1997, goldprmd, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (B - 13-05-97, USA)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1997, qotn,     aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (B - 13-05-97, NSW/ACT)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1997, dmdtouch, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (E - 30-06-97, Local)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1998, adonis,   aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Adonis (A - 25-05-98, NSW/ACT)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1998, reelrock, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98, Local)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 1998, indiandr, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (B - 15/12/98, Local)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 2000, magicmsk, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Magic Mask (A - 09/05/2000, Export))", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 2000, margmgc,  aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (A - 07/07/2000, NSW/ACT)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 2001, geishanz, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Geisha (A - 05/03/01, New Zealand)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
-GAME( 2001, wtiger,   aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "White Tiger", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1995, enchfrst, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (E - 23/06/95, Local)",                 GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0400122V
+GAME( 1995, swthrt2v, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (C - 07/09/95, Venezuela)",              GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 01J01986
+GAME( 1996, dolphntr, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, old version)",  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0100424V
+GAME( 1996, dolphtra, dolphntr, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, new version)",  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0200424V
+GAME( 1997, goldprmd, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (B - 13/05/97, USA)",                    GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// no info
+GAME( 1997, qotn,     aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (B - 13/05/97, NSW/ACT)",              GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0200439V
+GAME( 1997, dmdtouch, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (E - 30/06/97, Local)",                    GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0400433V
+GAME( 1998, adonis,   aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Adonis (A - 25/05/98, NSW/ACT)",                         GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0200751V
+GAME( 1998, reelrock, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98, Local)",                  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0100779V
+GAME( 1998, indiandr, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (B - 15/12/98, Local)",                  GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0100845V
+GAME( 1999, wtiger,   aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "White Tiger Classic (B - 08/07/99, NSW/ACT)",            GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0200954V
+GAME( 2000, magicmsk, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Magic Mask (A - 09/05/2000, Export)",                    GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// no info
+GAME( 2000, margmgc,  aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (A - 07/07/2000, NSW/ACT)",              GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 01J00101
+GAME( 2001, geishanz, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Geisha (A - 05/03/01, New Zealand)",                     GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )	// 0101408V

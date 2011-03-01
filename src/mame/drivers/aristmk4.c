@@ -1,12 +1,18 @@
 /*
         Driver: aristmk4
-
-        Manufacturer: Aristocrat Leisure Industries
+        
+        Manufacturer: Aristocrat Leisure Industries ( aka Ainsworth Nominees P.L. )
         Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
         Driver by Palindrome & FraSher
-
+        
+		----------------------------------------------------------------------
+		Manual Init procedure for these (most sets)
+		----------------------------------------------------------------------
+		just key in, both the jackpot and audit keys, press z,x,c at the same time, and key out and it should fire up 
+		
+		
         Technical Notes:
-
+        
         68B09EP Motorola Processor
         R6545AP for CRT video controller
         UPD43256BCZ-70LL for 32kb of static ram used for 3 way electronic meters / 3 way memory
@@ -16,79 +22,111 @@
         2 x WF19054 = AY3-8910 sound chips driven by the 6522 VIA
         1 x PML 2852 ( programmable logic ) used as address decoder.
         1 x PML 2852 programmed as a PIA
-
-
+        
         PIA provides output signals to six mechanical meters.
         It also provides the real time clock DS1287 to the CPU.
-
+        
         VIA drives the programmable sound generators and generates
         a timing interrupt to the CPU (M6809_FIRQ_LINE)
-
+        
         The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
         The remaining 4 bits are connected to other hardware, read via the VIA.
-
+        
         The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
         The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
-
-        *************************************************************************************************************
-
+     
         27/04/10 - FrasheR
         2 x Sound Chips connected to the 6522 VIA.
-
-
+        
         16/05/10 - FrasheR
         Fixed VIA for good. 5010 - 501F.
         Hooked up push button inputs - FrasheR
         Hooked up ports for the PML 2852 U3 - FrasheR
-
+        
         16/05/10 - Palindrome
         Lamp outputs and layout added - Palindrome
-        NVRAM backup - Palindrome
-
+        NVRAM backup - Palindrome 
+        
         20/05/10 - Palindrome
         Connected SW7 for BGCOLOUR map select
         Added LK13. 3Mhz or 1.5 Mhz CPU speed select
         Added sound sample for mechanical meter pulse ( aristmk4.zip  ).
-
+        
         30/5/10 - Palindrome
         Now using mc146818 rtc driver instead of rtc_get_reg.
-
-        19/8/10 - Roberto Fresca.
-        Added 3 Bags Full - 5VXFC790 (Victorian).
-        Set is now parent. Replaced the bad dumped GFX from NZ set with the new ones,
-        since they match 4 of 6 bitplanes. The PROM at U71 is also marked for Fantasy Fortune,
-        so maybe is the correct one for this game.
-
-        1/9/10 - Frasher
-        Cashcade workaround for topgear
-
-        The mc146818 emulation has issues and is not working correctly.
-
+        
+        The mc146818 driver has issues and is not working correctly. 
+        MESS developers are looking at it.
+        
         - day of week is incorrect
         - day of month is incorrect ( code is using day instead of mday ).
         - hours are not showing up correct in PM and 12 hour mode
         - rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data )
+        
+        9/7/2010 - Palindrome        
+        Robot Test added
+        Default Jackpot key re-assigned to 'I'
+        Work around for topgear & cashcade games
+        Improved coininput - force CBOPT1 to detect passing coin
+        Added new game Golden Poker ( Aristocrat version ) [ bad dump ]
+        Added new game Gone Troppo
+        Added new game Wild One
+        Misc improvements
+        
+        12/12/2010 - Palindrome and Heihachi_73
+        Updated source to 0.140u2 standards
+        Disabled real time clock to stop games from hanging. This causes a graphics glitch on the month display but makes the games more reliable in audit mode.
+        Fixed ROM names
+        Added new game Arctic Wins
+        Added new game Caribbean Gold 2 (missing 2 gfx roms, still boots)
+        Added new game Clockwise (program ROM nodump, all other roms fine)
+        Added new game Fortune Hunter (2 sets)
+
+        Gone Troppo requires DIP SW7 to be set to off/off or else the second screen will be broken. This is possibly true to the original machine.
 
         TODO:
         1.Create layouts for each game  ( each game is currently using the generic aristmk4.lay for now ).
         - Games may have different button configuration requirements ( ie.. 9 or 5 lines and different bet values )
+        - Top gear and Gone Troppo have no BET play buttons, only PLAY 1 - 5 lines and a MAX BET option. These games are just standard 5 line games with no multipliers.
+        - Video poker and Keno button panels needed.
+        
+        2.Extend the driver to use the keno keyboard input for keno games (no MK2.5/MKIV Keno games dumped yet as of 28/02/2010).
+        
+        3.arcwins, eforest, fhunter, fhuntera and cgold2 do not work (these US-based games require note acceptor and printer support).
+        - fhunter, fhuntera and cgold2 won't enter audit mode for some reason.
 
-        2.Extend the driver to use the keno keyboard input for keno games.
+        4.ROMs need redumping for the following games:
+        - White Tiger has bad graphics ROMs.
+        - Clockwise needs its program ROM redumped, original dump was 32K of 0xFF's. Graphics and video/sound ROM are OK.
+        - Correct PROMs needed for Top Gear (2CM33), Clockwise (2CM18) and Golden Poker (unknown).
+        
+        5.Add note acceptor support
+        
+        6.Provide complete cashcade emulation 
+        
+        7.Look into what the hopper probe signal is for.
+        
+        8.Investigate issues with the Poker style games as described below.
 
-        3.Eforest does not work.
-
-        4.Add note acceptor support
-
-        5.Robot test
-
-        6.Provide complete cashcade emulation
-
-        7.Look into cashbox photo-optic fault issues ( reproduced in robo test )
-
-        8.Look into what the hopper probe signal is for.
-
-
- ***********************************************************************************************************************************************/
+        9.When DIP SW7 is set to off/off, speed is dramatically reduced.
+    
+        ***************** POKER GAMES ************************************************************************
+        
+        Wild One & Golden Poker have a problem where the second branch condition is always true, see assebler below for
+        example of Wild One.
+            
+        907D    BITA $1800  ( crtc )
+        9080    BNE  $907D  ; is zero
+        9082    BITA $1800
+        9085    BEQ  $9082  ; branches to 9082 indefinately, value is always zero.
+        9087    LDA  #$40
+        
+        If the PC ( program counter ) is set to 9087 then the game runs.
+        
+        Bug in the 6845 crtc core ? Seems like some kind of logic there not working.
+        
+    
+***********************************************************************************************************************************************/
 
 #define MAIN_CLOCK	XTAL_12MHz
 
@@ -106,6 +144,10 @@
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
 #include "machine/nvram.h"
 
+UINT8 crtc_cursor_index = 0;
+UINT8 crtc_cursor[2] = {0x00,0xff};
+UINT8 crtc_select = 0;
+UINT8 crtc_reg = 0;
 
 class aristmk4_state : public driver_device
 {
@@ -165,17 +207,17 @@ INLINE void uBackgroundColour(running_machine *machine)
                                                              // OE enabled on both shapes
              break;
         case 0x01:
-             // unselect U22 via SW7 . OE on U22 is low.
+             // unselect U22 via SW7. OE on U22 is low.
              memset(&state->shapeRomPtr[0x4000],0xff,0x2000);               // fill unused space with 0xff
              memcpy(&state->shapeRomPtr[0xa000],&state->shapeRom[0xa000], 0x2000); // restore defaults here
              break;
         case 0x02:
-             // unselect U47 via SW7 . OE on U47 is low.
+             // unselect U47 via SW7. OE on U47 is low.
              memcpy(&state->shapeRomPtr[0x4000],&state->shapeRom[0x4000], 0x2000);
              memset(&state->shapeRomPtr[0xa000],0xff,0x2000);
              break;
         case 0x03:
-             // unselect U47 & u22 via SW7. both output enable low.
+             // unselect U47 & U22 via SW7. Both output enable low.
              memset(&state->shapeRomPtr[0x4000],0xff,0x2000);
              memset(&state->shapeRomPtr[0xa000],0xff,0x2000);
              break;
@@ -307,7 +349,10 @@ PORTB - MECHANICAL METERS
 
 static READ8_HANDLER(mkiv_pia_ina)
 {
-    return space->machine->device<mc146818_device>("rtc")->read(*space,1);
+     /* uncomment this code once RTC is fixed */
+
+    //return space->machine->device<mc146818_device>("rtc")->read(*space,1);
+    return 0;       // OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
 //output a
@@ -729,6 +774,92 @@ static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END
 
+/*
+
+Wild One and Golden Poker need to check the value in the CURSOR register of the crtc prior to starting but
+CURSOR appears to be unconnected on the Mark IV schematic so its unclear how this update is implimented.
+
+I suspect it to be connected to the CPU IRQ and the value in crtc: 0xf read every VBLANK until it reaches 0xff
+
+        Wild One below. Golden Poker has the same routine.
+
+        'maincpu' (9137):M6845 reg 0x0f = 0x00
+
+        907D    BITA $1800  ; crtc reg 0xf 
+        9080    BNE  $907D  ; branches 907d if value is not zero.
+        9082    BITA $1800  
+        9085    BEQ  $9082  ; branches to 9082 until value is 0xff
+        9087    LDA  #$40
+
+Using mc6845_update and cursor update callback causes the "Invalid MC6845 screen parameters - display disabled"
+so a work around is required.
+
+*/
+
+READ8_DEVICE_HANDLER( aristmk4_crtc_r )
+{
+
+    // just give the cursor values expected 0x00 & 0xff. Otherwise 0x00 is always read
+    // and game will not start
+    
+    if(crtc_reg == 0x0f) // work around
+	   return crtc_cursor[crtc_cursor_index++%2]; 
+	else
+	   return mc6845_register_r(device, 0);
+}
+
+WRITE8_DEVICE_HANDLER( aristmk4_crtc_w )
+{
+    if(crtc_select == 0)
+    {
+        crtc_reg = data;
+        mc6845_address_w(device, 0, data);
+    }
+	else
+        mc6845_register_w(device, 0, data);
+    crtc_select ^= 1;
+}
+
+/* 
+
+Poker card style games seem to have different address mapping
+
+The graphics rom is mapped from 0x4000 - 0x4ffff
+
+The U87 personality rom is not required, therefore game rom code mapping is from 0x8000-0xffff
+
+
+*/
+
+
+static ADDRESS_MAP_START( aristmk4_poker_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, mkiv_vram) // video ram -  chips U49 / U50
+	AM_RANGE(0x0800, 0x17ff) AM_RAM
+	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", aristmk4_crtc_r, aristmk4_crtc_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", aristmk4_crtc_r, aristmk4_crtc_w)
+	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
+	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
+	AM_RANGE(0x6000, 0x7fff) AM_ROM  // graphics rom map
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
+
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
+	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
+	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("5003")
+	AM_RANGE(0x5005, 0x5005) AM_READ(ldsw)
+	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
+	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
+	AM_RANGE(0x500f, 0x500f) AM_READ_PORT("500f")
+	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE_MODERN("via6522_0",via6522_device,read,write)
+	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
+	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
+	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
+	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0",pia6821_r,pia6821_w)  // RTC data - PORT A , mechanical meters - PORTB ??
+	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
+	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
+	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START(aristmk4)
 
     /***********************************************************************************************************/
@@ -736,7 +867,8 @@ static INPUT_PORTS_START(aristmk4)
     PORT_START("via_port_b")
     PORT_DIPNAME( 0x40, 0x40, "HOPCO1" )
     PORT_DIPSETTING(    0x40, DEF_STR( On ) ) PORT_DIPLOCATION("AY:3")
-    PORT_DIPNAME( 0x80, 0x80, "CBOPT1" )
+    PORT_DIPNAME( 0x80, 0x00, "CBOPT1" )
+    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x80, DEF_STR( On ) ) PORT_DIPLOCATION("AY:4")
 
 	/************************************************************************************************************
@@ -777,8 +909,8 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DSWDT") PORT_TOGGLE PORT_CODE(KEYCODE_M) // main door switch
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("JKPTSW") PORT_TOGGLE PORT_CODE(KEYCODE_J) // jackpot reset switch
-	PORT_DIPNAME( 0x08, 0x00, "HOPHI1") // hopper 1 full
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("JKPTSW") PORT_TOGGLE PORT_CODE(KEYCODE_I) // jackpot reset switch
+	PORT_DIPNAME( 0x08, 0x08, "HOPHI1") // hopper 1 full
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("5003:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, "OPTA2") // coin in a2
@@ -810,35 +942,35 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPNAME( 0x10, 0x00, "5300-5")
 	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "5300-6")
-	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:6")
+	PORT_DIPNAME( 0x20, 0x20, "5300-6")
+	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:6") // bill validator d/c , U.S must be on
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "5300-7")
 	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "5300-8")
-	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:8") // mechanical meter
+	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5300:8") // mechanical meters, must be on
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("500d")
+    PORT_START("500d")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_T) // 5 credits per line
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10 CREDITS PER LINE") PORT_CODE(KEYCODE_Y) // 10 credits per line
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_Q)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESERVE") PORT_CODE(KEYCODE_A) // reserve
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESERVE") PORT_CODE(KEYCODE_A) // reserve 
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("GAMBLE") PORT_CODE(KEYCODE_U) // auto gamble & gamble
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TAKE WIN") PORT_CODE(KEYCODE_J)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_U)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_I)
-
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7 UNUSED") PORT_CODE(KEYCODE_I)
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
+    
     PORT_START("500e")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 CREDIT PER LINE") PORT_CODE(KEYCODE_W) // 1 credit per line
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1") PORT_CODE(KEYCODE_S)
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1 LINE/RED") PORT_CODE(KEYCODE_S)
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2 CREDITS PER LINE") PORT_CODE(KEYCODE_E) // 2 credits per line
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 9") PORT_CODE(KEYCODE_H)
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 9 LINES/BLACK") PORT_CODE(KEYCODE_H)
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3 CREDITS PER LINE") PORT_CODE(KEYCODE_R) // 3 credits per line
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 7") PORT_CODE(KEYCODE_G)
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5") PORT_CODE(KEYCODE_F)
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3") PORT_CODE(KEYCODE_D)
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 7 LINES") PORT_CODE(KEYCODE_G)
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5 LINES") PORT_CODE(KEYCODE_F)
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3 LINES") PORT_CODE(KEYCODE_D)
 
     PORT_START("500f")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_1)
@@ -902,10 +1034,11 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0X00, DEF_STR( Off ) ) PORT_DIPLOCATION("5201:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-
-
 	PORT_START("insertcoin")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Insert Credit")
+
+    PORT_START("powerfail")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_L) 
 
 	/************************************************************************************************************
 
@@ -1045,9 +1178,119 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(3bagflvt)
+	PORT_INCLUDE(aristmk4)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("MAX BET") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("AUTO PLAY") PORT_CODE(KEYCODE_J)
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1 LINE") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 9 LINES") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 7 LINES") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5 LINES") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3 LINES") PORT_CODE(KEYCODE_D)
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(3bagflnz)
+	PORT_INCLUDE(3bagflvt)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 CREDITS PER LINE") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5 UNUSED") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6 UNUSED") PORT_CODE(KEYCODE_J)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(eforestb)
+	PORT_INCLUDE(aristmk4)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 CREDITS PER LINE") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_Y)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(kgbird)
+	PORT_INCLUDE(aristmk4)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("4 CREDITS PER LINE") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_Y)
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5 LINES/BLACK") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 4 LINES") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3 LINES") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 2 LINES") PORT_CODE(KEYCODE_D)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(topgear)
+	PORT_INCLUDE(aristmk4)
+
+    PORT_MODIFY("500d")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1 UNUSED") PORT_CODE(KEYCODE_T)
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-2 UNUSED") PORT_CODE(KEYCODE_Y)
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_Q)
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SERVICE") PORT_CODE(KEYCODE_A)
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5 UNUSED") PORT_CODE(KEYCODE_U)
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6 UNUSED") PORT_CODE(KEYCODE_J)
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7 UNUSED") PORT_CODE(KEYCODE_I)
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
+    
+    PORT_MODIFY("500e")
+    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1 UNUSED") PORT_CODE(KEYCODE_W)
+    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1 LINE") PORT_CODE(KEYCODE_S)
+    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("MAX BET") PORT_CODE(KEYCODE_E)
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 5 LINES") PORT_CODE(KEYCODE_H)
+    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5 UNUSED") PORT_CODE(KEYCODE_R)
+    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 4 LINES") PORT_CODE(KEYCODE_G)
+    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 3 LINES") PORT_CODE(KEYCODE_F)
+    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 2 LINES") PORT_CODE(KEYCODE_D)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(wildone)
+	PORT_INCLUDE(aristmk4)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SERVICE") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("GAMBLE") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET 2/HOLD 2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET 3/HOLD 3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5 UNUSED") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6 UNUSED") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7 UNUSED") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_W) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BLACK") PORT_CODE(KEYCODE_S) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RED") PORT_CODE(KEYCODE_E) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET 1/HOLD 1") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HIGH 5/HOLD 5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BIG 5/HOLD 4") PORT_CODE(KEYCODE_G) // no bet 4 button
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TAKE WIN") PORT_CODE(KEYCODE_F) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DRAW") PORT_CODE(KEYCODE_D)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(gldnpkr)
+	PORT_INCLUDE(wildone)
+
+	PORT_MODIFY("500d")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1 UNUSED") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 3") PORT_CODE(KEYCODE_A)
+
+	PORT_MODIFY("500e")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET") PORT_CODE(KEYCODE_S) 
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SERVICE") PORT_CODE(KEYCODE_E) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 1/RED") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 5/BLACK") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 4") PORT_CODE(KEYCODE_G)
+INPUT_PORTS_END
 
 static const gfx_layout layout8x8x6 =
 {
@@ -1227,74 +1470,110 @@ static MACHINE_RESET( aristmk4 )
 
 }
 
+static TIMER_DEVICE_CALLBACK( aristmk4_pf )
+{
+    /*
+    IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.
+    This event is recorded in NVRAM to facilitate the Robot Test.
+    
+    Would be ideal to use this in our add_exit_callback instead of using a timer but it doesn't seem to 
+    save the power down state in nvram . Is there a cleaner way to do this ?
+    
+    To enter the robot test
+    
+    1. Open the main door
+    2. Trigger powerfail / NMI by presing L for at least 1 second, the game will freeze.
+    3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
+    
+    Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI  ( ie.. hold down L for at least 1 second ) 
+    
+    */
+    
+    if(input_port_read(timer.machine, "powerfail")) // send NMI signal if L pressed
+    {
+        cputag_set_input_line( timer.machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE );
+    }
+}
+
+
 
 static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz (goldenc needs a bit faster for some reason)
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	
 	MCFG_MACHINE_START(aristmk4)
-    MCFG_MACHINE_RESET(aristmk4 )
+	MCFG_MACHINE_RESET(aristmk4 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_TIMER_ADD_PERIODIC("power_fail", aristmk4_pf,attotime::from_hz(1)) // not real but required to simulate power failure to access robot test. How else can we do this ?
 
-    /* video hardware */
+	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)	/* from the crtc registers... updated by crtc */
-	MCFG_SCREEN_UPDATE(aristmk4)
 
 	MCFG_GFXDECODE(aristmk4)
 	MCFG_PALETTE_LENGTH(512)
 	MCFG_PALETTE_INIT(aristmk4)
 
 	MCFG_VIDEO_START(aristmk4)
+	MCFG_SCREEN_UPDATE(aristmk4)
 
 	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf1 )
 	MCFG_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MCFG_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
-    MCFG_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)
-    MCFG_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
+	MCFG_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)
+	MCFG_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
 
-    MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-    // the Mark IV has X 2 AY8910 sound chips which are tied to the VIA
-    MCFG_SOUND_ADD("ay1", AY8910 , MAIN_CLOCK/8)
-    MCFG_SOUND_CONFIG(ay8910_config1)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	// the Mark IV has X 2 AY8910 sound chips which are tied to the VIA
+	MCFG_SOUND_ADD("ay1", AY8910 , MAIN_CLOCK/8)
+	MCFG_SOUND_CONFIG(ay8910_config1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-    MCFG_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
-    MCFG_SOUND_CONFIG(ay8910_config2)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
+	MCFG_SOUND_CONFIG(ay8910_config2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-    MCFG_SOUND_ADD("samples", SAMPLES, 0)
-    MCFG_SOUND_CONFIG(meter_samples_interface)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(meter_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+
+MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( aristmk4_poker, aristmk4 )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 ROM_START( 3bagflvt )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("3_bag_full_video_sound.u59",  0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59",  0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("5vxfc790_3_bag_full_1-2.u87", 0x06000, 0x2000, CRC(79ee932f) SHA1(de85de107310315b69bd7564f1921c7501b679b2)) // game code
-	ROM_LOAD("5vxfc790_3_bag_full_2-2.u86", 0x08000, 0x8000, CRC(b6185f3b) SHA1(db642d7b1d1fd93483642bae518eb99a3e99aec9)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("5vxfc790.u87", 0x06000, 0x2000, CRC(79ee932f) SHA1(de85de107310315b69bd7564f1921c7501b679b2)) // game code
+	ROM_LOAD("5vxfc790.u86", 0x08000, 0x8000, CRC(b6185f3b) SHA1(db642d7b1d1fd93483642bae518eb99a3e99aec9))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("1vlsh224_3_bag_full_1-6.u20", 0x00000, 0x2000, CRC(b02d4ce8) SHA1(eace41f870bfbc253124efd72f1c7d6021f2e99f)) // gfx
-	ROM_LOAD("1vlsh224_3_bag_full_3-6.u21", 0x02000, 0x2000, CRC(06218c95) SHA1(cbda8e50fd4e9c8a3c51a006921a85d4bfaa6f78))
-	ROM_LOAD("1vlsh224_3_bag_full_5-6.u22", 0x04000, 0x2000, CRC(191e73f1) SHA1(e6d510b155f9cd3427a70346e5ff28969309be4e))
-	ROM_LOAD("1vlsh224_3_bag_full_2-6.u45", 0x06000, 0x2000, CRC(054c55cb) SHA1(3df1893095f867220f3d6a52a40bcdffbfc8b529))
-	ROM_LOAD("1vlsh224_3_bag_full_4-6.u46", 0x08000, 0x2000, CRC(f33970b3) SHA1(8814a4d29383545c7c48e5b44f16a53e38b67fc3))
-	ROM_LOAD("1vlsh224_3_bag_full_6-6.u47", 0x0a000, 0x2000, CRC(609ecf9e) SHA1(9d819bb71f62eb4dd1b3d71748e87c7d77e2afe6))
+	ROM_LOAD("1vlsh224.u20", 0x00000, 0x2000, CRC(b02d4ce8) SHA1(eace41f870bfbc253124efd72f1c7d6021f2e99f)) // gfx
+	ROM_LOAD("1vlsh224.u21", 0x02000, 0x2000, CRC(06218c95) SHA1(cbda8e50fd4e9c8a3c51a006921a85d4bfaa6f78))
+	ROM_LOAD("1vlsh224.u22", 0x04000, 0x2000, CRC(191e73f1) SHA1(e6d510b155f9cd3427a70346e5ff28969309be4e))
+	ROM_LOAD("1vlsh224.u45", 0x06000, 0x2000, CRC(054c55cb) SHA1(3df1893095f867220f3d6a52a40bcdffbfc8b529))
+	ROM_LOAD("1vlsh224.u46", 0x08000, 0x2000, CRC(f33970b3) SHA1(8814a4d29383545c7c48e5b44f16a53e38b67fc3))
+	ROM_LOAD("1vlsh224.u47", 0x0a000, 0x2000, CRC(609ecf9e) SHA1(9d819bb71f62eb4dd1b3d71748e87c7d77e2afe6))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
@@ -1305,377 +1584,574 @@ ROM_START( 3bagflnz )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59",  0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(ba97a469) SHA1(fee56fe7116d1f1aab2b0f2526101d4eb87f0bf1)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(c632c7c7) SHA1(f3090d037f71a0cf099bb55abbc509cf95f0cbba)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("3vxfc5345.u87", 0x06000, 0x2000, CRC(ba97a469) SHA1(fee56fe7116d1f1aab2b0f2526101d4eb87f0bf1)) // game code
+	ROM_LOAD("3vxfc5345.u86", 0x08000, 0x8000, CRC(c632c7c7) SHA1(f3090d037f71a0cf099bb55abbc509cf95f0cbba))
 
-	/* SHAPE EPROMS */
-	ROM_REGION(0xc000, "tile_gfx", 0 )	/* GFX from parent set. They match 4 of 6 bitplanes */
-	ROM_LOAD("1vlsh224_3_bag_full_1-6.u20", 0x00000, 0x2000, CRC(b02d4ce8) SHA1(eace41f870bfbc253124efd72f1c7d6021f2e99f)) // gfx
-	ROM_LOAD("1vlsh224_3_bag_full_3-6.u21", 0x02000, 0x2000, CRC(06218c95) SHA1(cbda8e50fd4e9c8a3c51a006921a85d4bfaa6f78))
-	ROM_LOAD("1vlsh224_3_bag_full_5-6.u22", 0x04000, 0x2000, CRC(191e73f1) SHA1(e6d510b155f9cd3427a70346e5ff28969309be4e))
-	ROM_LOAD("1vlsh224_3_bag_full_2-6.u45", 0x06000, 0x2000, CRC(054c55cb) SHA1(3df1893095f867220f3d6a52a40bcdffbfc8b529))
-	ROM_LOAD("1vlsh224_3_bag_full_4-6.u46", 0x08000, 0x2000, CRC(f33970b3) SHA1(8814a4d29383545c7c48e5b44f16a53e38b67fc3))
-	ROM_LOAD("1vlsh224_3_bag_full_6-6.u47", 0x0a000, 0x2000, CRC(609ecf9e) SHA1(9d819bb71f62eb4dd1b3d71748e87c7d77e2afe6))
+	/* SHAPE EPROMs */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("1vlsh224.u20", 0x00000, 0x2000, CRC(b02d4ce8) SHA1(eace41f870bfbc253124efd72f1c7d6021f2e99f)) // gfx
+	ROM_LOAD("1vlsh224.u21", 0x02000, 0x2000, CRC(06218c95) SHA1(cbda8e50fd4e9c8a3c51a006921a85d4bfaa6f78))
+	ROM_LOAD("1vlsh224.u22", 0x04000, 0x2000, CRC(191e73f1) SHA1(e6d510b155f9cd3427a70346e5ff28969309be4e))
+	ROM_LOAD("1vlsh224.u45", 0x06000, 0x2000, CRC(054c55cb) SHA1(3df1893095f867220f3d6a52a40bcdffbfc8b529))
+	ROM_LOAD("1vlsh224.u46", 0x08000, 0x2000, CRC(f33970b3) SHA1(8814a4d29383545c7c48e5b44f16a53e38b67fc3))
+	ROM_LOAD("1vlsh224.u47", 0x0a000, 0x2000, CRC(609ecf9e) SHA1(9d819bb71f62eb4dd1b3d71748e87c7d77e2afe6))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
 ROM_END
 
 ROM_START( blkrhino )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(7aed16f5) SHA1(0229387e352da8e7278e5bc5c61079742d05d900)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(4739f0f0) SHA1(231b6ad26b6b5d413dbd0a23257e86814978449b)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("3vxfc5344.u87", 0x06000, 0x2000, CRC(7aed16f5) SHA1(0229387e352da8e7278e5bc5c61079742d05d900)) // game code
+	ROM_LOAD("3vxfc5344.u86", 0x08000, 0x8000, CRC(4739f0f0) SHA1(231b6ad26b6b5d413dbd0a23257e86814978449b))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(0559fe98) SHA1(2ffb7b3ce3b7ba3bd846cae514b66b1c1a3be91f)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(c0b94f7b) SHA1(8fc3bc53c532407b77682e5e9ac6a625081d22a3))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(2f4f0fe5) SHA1(b6c75bd3b6281a2de7bfea8162c39d58b0e8fa32))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(e483b4cd) SHA1(1cb3f77e7d470d7dcd8e50a0f59298d5546e8b58))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(4a0ce91d) SHA1(e2f853c69fb256870c9809cdfbba2b40b47a0004))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(b265276e) SHA1(8fc0b7a0c12549b4138c51eb91b74f13282909dd))
+	ROM_LOAD("1vlsh236.u20", 0x00000, 0x2000, CRC(0559fe98) SHA1(2ffb7b3ce3b7ba3bd846cae514b66b1c1a3be91f)) // gfx
+	ROM_LOAD("1vlsh236.u21", 0x02000, 0x2000, CRC(c0b94f7b) SHA1(8fc3bc53c532407b77682e5e9ac6a625081d22a3))
+	ROM_LOAD("1vlsh236.u22", 0x04000, 0x2000, CRC(2f4f0fe5) SHA1(b6c75bd3b6281a2de7bfea8162c39d58b0e8fa32))
+	ROM_LOAD("1vlsh236.u45", 0x06000, 0x2000, CRC(e483b4cd) SHA1(1cb3f77e7d470d7dcd8e50a0f59298d5546e8b58))
+	ROM_LOAD("1vlsh236.u46", 0x08000, 0x2000, CRC(4a0ce91d) SHA1(e2f853c69fb256870c9809cdfbba2b40b47a0004))
+	ROM_LOAD("1vlsh236.u47", 0x0a000, 0x2000, CRC(b265276e) SHA1(8fc0b7a0c12549b4138c51eb91b74f13282909dd))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( coralr2 )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(f51e541b) SHA1(00f5b9019cdae77d4b5745156b92343d22ad3a6e)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(d8d27f65) SHA1(19aec2a29e9d3ecbd8ecfd74ae60cfbf197d2faa)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("1vxfc5472.u87", 0x06000, 0x2000, CRC(f51e541b) SHA1(00f5b9019cdae77d4b5745156b92343d22ad3a6e)) // game code
+	ROM_LOAD("1vxfc5472.u86", 0x08000, 0x8000, CRC(d8d27f65) SHA1(19aec2a29e9d3ecbd8ecfd74ae60cfbf197d2faa))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(5156f5ec) SHA1(8b4d0699b4477531d513e21f549fcc0ee6ea82ee)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(bf27732a) SHA1(9383dfc37c5c3ad0d628f2134f010e977e25ef39))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(a563c2fa) SHA1(10dab35515e2d8332d114a5f103343403334a65f))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(73814767) SHA1(91c77d7b634bd8a5c32e0ceeb54a8bbeedfe8130))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(e13ec0ed) SHA1(80d5ef2d980a8fe1f2bb28b512022518ffc82de1))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(30e88bb4) SHA1(dfcd21c6fc50123dfcc0e60429948c650a6de625))
+	ROM_LOAD("1vlsh385.u20", 0x00000, 0x2000, CRC(5156f5ec) SHA1(8b4d0699b4477531d513e21f549fcc0ee6ea82ee)) // gfx
+	ROM_LOAD("1vlsh385.u21", 0x02000, 0x2000, CRC(bf27732a) SHA1(9383dfc37c5c3ad0d628f2134f010e977e25ef39))
+	ROM_LOAD("1vlsh385.u22", 0x04000, 0x2000, CRC(a563c2fa) SHA1(10dab35515e2d8332d114a5f103343403334a65f))
+	ROM_LOAD("1vlsh385.u45", 0x06000, 0x2000, CRC(73814767) SHA1(91c77d7b634bd8a5c32e0ceeb54a8bbeedfe8130))
+	ROM_LOAD("1vlsh385.u46", 0x08000, 0x2000, CRC(e13ec0ed) SHA1(80d5ef2d980a8fe1f2bb28b512022518ffc82de1))
+	ROM_LOAD("1vlsh385.u47", 0x0a000, 0x2000, CRC(30e88bb4) SHA1(dfcd21c6fc50123dfcc0e60429948c650a6de625))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( eforest )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(b2f79725) SHA1(66842130b49276bda91e211514af0ab074d2c283)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(547207f3) SHA1(aedae50abb4cffa0434abfe606a11fbbba037197)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("12xf528902.u87", 0x06000, 0x2000, CRC(b2f79725) SHA1(66842130b49276bda91e211514af0ab074d2c283)) // game code
+	ROM_LOAD("12xf528902.u86", 0x08000, 0x8000, CRC(547207f3) SHA1(aedae50abb4cffa0434abfe606a11fbbba037197))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(00446ff1) SHA1(e37e2782669667efab07ab3cd4e2c9f87770add5)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(75670af6) SHA1(c6ce3dcc9e46ebdee65220cc0e0c8b43ee786ec0))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(531378f3) SHA1(7ce52ccfb38c8078eeb77e43cff8e426bd8d4d0f))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(e4dd4c72) SHA1(caeb1f754bcb7304b9a61786fb818eea7714808f))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(75ad8e3f) SHA1(87812850f08f8ad3057d0e5a2a20ad8acba01a26))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(af9f9869) SHA1(1dac81470889a5fc5b58f3ad0c8dfa1369a800e8))
+	ROM_LOAD("1vlsh230.u20", 0x00000, 0x2000, CRC(00446ff1) SHA1(e37e2782669667efab07ab3cd4e2c9f87770add5)) // gfx
+	ROM_LOAD("1vlsh230.u21", 0x02000, 0x2000, CRC(75670af6) SHA1(c6ce3dcc9e46ebdee65220cc0e0c8b43ee786ec0))
+	ROM_LOAD("1vlsh230.u22", 0x04000, 0x2000, CRC(531378f3) SHA1(7ce52ccfb38c8078eeb77e43cff8e426bd8d4d0f))
+	ROM_LOAD("1vlsh230.u45", 0x06000, 0x2000, CRC(e4dd4c72) SHA1(caeb1f754bcb7304b9a61786fb818eea7714808f))
+	ROM_LOAD("1vlsh230.u46", 0x08000, 0x2000, CRC(75ad8e3f) SHA1(87812850f08f8ad3057d0e5a2a20ad8acba01a26))
+	ROM_LOAD("1vlsh230.u47", 0x0a000, 0x2000, CRC(af9f9869) SHA1(1dac81470889a5fc5b58f3ad0c8dfa1369a800e8))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( eforesta )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("a_u87.bin", 0x06000, 0x2000, CRC(03c2890f) SHA1(10d479b7ccece813676ad815a96169bbf259c49d)) // game code
-	ROM_LOAD("a_u86.bin", 0x08000, 0x8000, CRC(36125194) SHA1(dc681dc60b25893ca3ee101f6813c22b914771f5)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("4vxfc818.u87", 0x06000, 0x2000, CRC(03c2890f) SHA1(10d479b7ccece813676ad815a96169bbf259c49d)) // game code
+	ROM_LOAD("4vxfc818.u86", 0x08000, 0x8000, CRC(36125194) SHA1(dc681dc60b25893ca3ee101f6813c22b914771f5))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(00446ff1) SHA1(e37e2782669667efab07ab3cd4e2c9f87770add5)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(75670af6) SHA1(c6ce3dcc9e46ebdee65220cc0e0c8b43ee786ec0))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(531378f3) SHA1(7ce52ccfb38c8078eeb77e43cff8e426bd8d4d0f))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(e4dd4c72) SHA1(caeb1f754bcb7304b9a61786fb818eea7714808f))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(75ad8e3f) SHA1(87812850f08f8ad3057d0e5a2a20ad8acba01a26))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(af9f9869) SHA1(1dac81470889a5fc5b58f3ad0c8dfa1369a800e8))
+	ROM_LOAD("1vlsh230.u20", 0x00000, 0x2000, CRC(00446ff1) SHA1(e37e2782669667efab07ab3cd4e2c9f87770add5)) // gfx
+	ROM_LOAD("1vlsh230.u21", 0x02000, 0x2000, CRC(75670af6) SHA1(c6ce3dcc9e46ebdee65220cc0e0c8b43ee786ec0))
+	ROM_LOAD("1vlsh230.u22", 0x04000, 0x2000, CRC(531378f3) SHA1(7ce52ccfb38c8078eeb77e43cff8e426bd8d4d0f))
+	ROM_LOAD("1vlsh230.u45", 0x06000, 0x2000, CRC(e4dd4c72) SHA1(caeb1f754bcb7304b9a61786fb818eea7714808f))
+	ROM_LOAD("1vlsh230.u46", 0x08000, 0x2000, CRC(75ad8e3f) SHA1(87812850f08f8ad3057d0e5a2a20ad8acba01a26))
+	ROM_LOAD("1vlsh230.u47", 0x0a000, 0x2000, CRC(af9f9869) SHA1(1dac81470889a5fc5b58f3ad0c8dfa1369a800e8))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( eforestb )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(49b9c5ef) SHA1(bd1761f41ddb3f19b6b923de77743a2b5ec078e1)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(a3eb0c09) SHA1(5a0947f2f36a87dffe4041fbaebaabb1c694bafe)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("3vxfc5343.u87", 0x06000, 0x2000, CRC(49b9c5ef) SHA1(bd1761f41ddb3f19b6b923de77743a2b5ec078e1)) // game code
+	ROM_LOAD("3vxfc5343.u86", 0x08000, 0x8000, CRC(a3eb0c09) SHA1(5a0947f2f36a87dffe4041fbaebaabb1c694bafe))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(bf3a23b0) SHA1(00405e0c0ac03ecffba1077bacf61265cca72130)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(ba171964) SHA1(7d43559965f467f07419f77d07d7d34ae60d2e90))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(531378f3) SHA1(7ce52ccfb38c8078eeb77e43cff8e426bd8d4d0f))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(e4dd4c72) SHA1(caeb1f754bcb7304b9a61786fb818eea7714808f))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(a3ca69b0) SHA1(c4bdd8afbb4d076f07d4a14a7e7ac8907a0cb7ec))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(af9f9869) SHA1(1dac81470889a5fc5b58f3ad0c8dfa1369a800e8))
+	ROM_LOAD("1vlsh230_a.u20", 0x00000, 0x2000, CRC(bf3a23b0) SHA1(00405e0c0ac03ecffba1077bacf61265cca72130)) // gfx
+	ROM_LOAD("1vlsh230_a.u21", 0x02000, 0x2000, CRC(ba171964) SHA1(7d43559965f467f07419f77d07d7d34ae60d2e90))
+	ROM_LOAD("1vlsh230.u22", 0x04000, 0x2000, CRC(531378f3) SHA1(7ce52ccfb38c8078eeb77e43cff8e426bd8d4d0f))
+	ROM_LOAD("1vlsh230.u45", 0x06000, 0x2000, CRC(e4dd4c72) SHA1(caeb1f754bcb7304b9a61786fb818eea7714808f))
+	ROM_LOAD("1vlsh230_a.u46", 0x08000, 0x2000, CRC(a3ca69b0) SHA1(c4bdd8afbb4d076f07d4a14a7e7ac8907a0cb7ec))
+	ROM_LOAD("1vlsh230.u47", 0x0a000, 0x2000, CRC(af9f9869) SHA1(1dac81470889a5fc5b58f3ad0c8dfa1369a800e8))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( goldenc )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(11b569f7) SHA1(270e1be6bf2a75400af174ceb65436bb6a381a62)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(9714b080) SHA1(41c7d840f600ddff31794ebe949f89c89bd4f2ad)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("1vxfc5462.u87", 0x06000, 0x2000, CRC(11b569f7) SHA1(270e1be6bf2a75400af174ceb65436bb6a381a62)) // game code
+	ROM_LOAD("1vxfc5462.u86", 0x08000, 0x8000, CRC(9714b080) SHA1(41c7d840f600ddff31794ebe949f89c89bd4f2ad))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(d4b18412) SHA1(a42a06dbfc55730b27b3857646bfa34ae0e3cb32)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(80e22d51) SHA1(5e187070d300209e31f603aa561011e17d4305d2))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(1f84ed74) SHA1(df2af247972d6540fd4aac31b51f3aa44248061c))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(9d267ef1) SHA1(3781e63552036dc7613b21704a4456ddfb67433f))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(a3ca369e) SHA1(e3076c9f3017991b93214bebf7f5227d995eeda1))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(844fa43b) SHA1(b8ef6cc2aca955f41b15cd8e3c281eee4b611e80))
+	ROM_LOAD("1vlsh231.u20", 0x00000, 0x2000, CRC(d4b18412) SHA1(a42a06dbfc55730b27b3857646bfa34ae0e3cb32)) // gfx
+	ROM_LOAD("1vlsh231.u21", 0x02000, 0x2000, CRC(80e22d51) SHA1(5e187070d300209e31f603aa561011e17d4305d2))
+	ROM_LOAD("1vlsh231.u22", 0x04000, 0x2000, CRC(1f84ed74) SHA1(df2af247972d6540fd4aac31b51f3aa44248061c))
+	ROM_LOAD("1vlsh231.u45", 0x06000, 0x2000, CRC(9d267ef1) SHA1(3781e63552036dc7613b21704a4456ddfb67433f))
+	ROM_LOAD("1vlsh231.u46", 0x08000, 0x2000, CRC(a3ca369e) SHA1(e3076c9f3017991b93214bebf7f5227d995eeda1))
+	ROM_LOAD("1vlsh231.u47", 0x0a000, 0x2000, CRC(844fa43b) SHA1(b8ef6cc2aca955f41b15cd8e3c281eee4b611e80))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( swtht2nz )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(ae10c63f) SHA1(80e5aca4dec7d2503bf7be81ed8b761ebbe4c174)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(053e71f0) SHA1(4a45bd11b53347be90402cea7bd94a648d6b8129)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("1vxfc5461.u87", 0x06000, 0x2000, CRC(ae10c63f) SHA1(80e5aca4dec7d2503bf7be81ed8b761ebbe4c174)) // game code
+	ROM_LOAD("1vxfc5461.u86", 0x08000, 0x8000, CRC(053e71f0) SHA1(4a45bd11b53347be90402cea7bd94a648d6b8129))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", ROMREGION_ERASEFF)
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(1e38dfc3) SHA1(40a75fc35ebd49ea9c21cb42c30a2aba988c3139)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(77caf3fa) SHA1(559898ccffffd8f59c555722dea75600c823997f))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(76babc55) SHA1(0902497ad2222490a690fe77feacc350d2997403))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(da9514b5) SHA1(d63562095cec463864dfd2c580aa93f45adef853))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(4d03c73f) SHA1(7ae629a90feb87019cc01ecef804c5ba28861f00))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(c51e37bb) SHA1(8f3d9b61926fe21089559736b3458fe3b84618f2))
+	ROM_LOAD("1vlsh237.u20", 0x00000, 0x2000, CRC(1e38dfc3) SHA1(40a75fc35ebd49ea9c21cb42c30a2aba988c3139)) // gfx
+	ROM_LOAD("1vlsh237.u21", 0x02000, 0x2000, CRC(77caf3fa) SHA1(559898ccffffd8f59c555722dea75600c823997f))
+	ROM_LOAD("1vlsh237.u22", 0x04000, 0x2000, CRC(76babc55) SHA1(0902497ad2222490a690fe77feacc350d2997403))
+	ROM_LOAD("1vlsh237.u45", 0x06000, 0x2000, CRC(da9514b5) SHA1(d63562095cec463864dfd2c580aa93f45adef853))
+	ROM_LOAD("1vlsh237.u46", 0x08000, 0x2000, CRC(4d03c73f) SHA1(7ae629a90feb87019cc01ecef804c5ba28861f00))
+	ROM_LOAD("1vlsh237.u47", 0x0a000, 0x2000, CRC(c51e37bb) SHA1(8f3d9b61926fe21089559736b3458fe3b84618f2))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( kgbird )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(5e7c1762) SHA1(2e80be06c7737aca304d46f3c3f1efd24c570cfd)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(3450c544) SHA1(f8883ce3b4bd9073ec6bc985f4666b46f17de092)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("4vxfc5341_10c.u87", 0x06000, 0x2000, CRC(5e7c1762) SHA1(2e80be06c7737aca304d46f3c3f1efd24c570cfd)) // game code
+	ROM_LOAD("4vxfc5341.u86", 0x08000, 0x8000, CRC(3450c544) SHA1(f8883ce3b4bd9073ec6bc985f4666b46f17de092))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(df737d57) SHA1(2ec7efe55938ee11376d12d51516c4094ad3fc01)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(8e9a65d9) SHA1(e305b8d75b9666377498abf3e2801033effb969b))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(5614ee55) SHA1(3eb3872aa8d2b8c2bd798fd46cc715c64bf35714))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(cf496cf2) SHA1(cf097835b5f3d5a656ff84063c54d6b1d40703cd))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(e155c8d4) SHA1(9c50152dd420d545a88eaea98c2dd2ef49cf056a))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(f91b66ba) SHA1(4f5d0f0562c6a6029ad6d76507091a159983d6f4))
+	ROM_LOAD("1vlsh159.u20", 0x00000, 0x2000, CRC(df737d57) SHA1(2ec7efe55938ee11376d12d51516c4094ad3fc01)) // gfx
+	ROM_LOAD("1vlsh159.u21", 0x02000, 0x2000, CRC(8e9a65d9) SHA1(e305b8d75b9666377498abf3e2801033effb969b))
+	ROM_LOAD("1vlsh159.u22", 0x04000, 0x2000, CRC(5614ee55) SHA1(3eb3872aa8d2b8c2bd798fd46cc715c64bf35714))
+	ROM_LOAD("1vlsh159.u45", 0x06000, 0x2000, CRC(cf496cf2) SHA1(cf097835b5f3d5a656ff84063c54d6b1d40703cd))
+	ROM_LOAD("1vlsh159.u46", 0x08000, 0x2000, CRC(e155c8d4) SHA1(9c50152dd420d545a88eaea98c2dd2ef49cf056a))
+	ROM_LOAD("1vlsh159.u47", 0x0a000, 0x2000, CRC(f91b66ba) SHA1(4f5d0f0562c6a6029ad6d76507091a159983d6f4))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
+	ROM_LOAD("1cm29.u71", 0x0000, 0x0200, CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
 ROM_END
 
 ROM_START( kgbirda )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(21c05874) SHA1(9ddcd34817bc6f88cb2a94374e492d29dd56fb9a)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(3450c544) SHA1(f8883ce3b4bd9073ec6bc985f4666b46f17de092)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("4vxfc5341.u87", 0x06000, 0x2000, CRC(21c05874) SHA1(9ddcd34817bc6f88cb2a94374e492d29dd56fb9a)) // game code
+	ROM_LOAD("4vxfc5341.u86", 0x08000, 0x8000, CRC(3450c544) SHA1(f8883ce3b4bd9073ec6bc985f4666b46f17de092))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(df737d57) SHA1(2ec7efe55938ee11376d12d51516c4094ad3fc01)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(8e9a65d9) SHA1(e305b8d75b9666377498abf3e2801033effb969b))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(5614ee55) SHA1(3eb3872aa8d2b8c2bd798fd46cc715c64bf35714))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(cf496cf2) SHA1(cf097835b5f3d5a656ff84063c54d6b1d40703cd))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(e155c8d4) SHA1(9c50152dd420d545a88eaea98c2dd2ef49cf056a))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(f91b66ba) SHA1(4f5d0f0562c6a6029ad6d76507091a159983d6f4))
+	ROM_LOAD("1vlsh159.u20", 0x00000, 0x2000, CRC(df737d57) SHA1(2ec7efe55938ee11376d12d51516c4094ad3fc01)) // gfx
+	ROM_LOAD("1vlsh159.u21", 0x02000, 0x2000, CRC(8e9a65d9) SHA1(e305b8d75b9666377498abf3e2801033effb969b))
+	ROM_LOAD("1vlsh159.u22", 0x04000, 0x2000, CRC(5614ee55) SHA1(3eb3872aa8d2b8c2bd798fd46cc715c64bf35714))
+	ROM_LOAD("1vlsh159.u45", 0x06000, 0x2000, CRC(cf496cf2) SHA1(cf097835b5f3d5a656ff84063c54d6b1d40703cd))
+	ROM_LOAD("1vlsh159.u46", 0x08000, 0x2000, CRC(e155c8d4) SHA1(9c50152dd420d545a88eaea98c2dd2ef49cf056a))
+	ROM_LOAD("1vlsh159.u47", 0x0a000, 0x2000, CRC(f91b66ba) SHA1(4f5d0f0562c6a6029ad6d76507091a159983d6f4))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
+	ROM_LOAD("1cm29.u71", 0x0000, 0x0200, CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
 ROM_END
 
 ROM_START( phantomp )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(84e8eeb5) SHA1(95dcbae79b42463480fb3dd2594570070ba1a3ef)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(a6aa3d6f) SHA1(64d97c52355d5d0faebe1ee704f6ad46cc90f0f1)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("4vxfc5431.u87", 0x06000, 0x2000, CRC(84e8eeb5) SHA1(95dcbae79b42463480fb3dd2594570070ba1a3ef)) // game code
+	ROM_LOAD("4vxfc5431.u86", 0x08000, 0x8000, CRC(a6aa3d6f) SHA1(64d97c52355d5d0faebe1ee704f6ad46cc90f0f1))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(0f73cf57) SHA1(f99aa9671297d8cefeff86e642af5ea3e7f6f6fb)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(2449d69e) SHA1(181d7d093dce1acc332255cab5d56a9043bcab47))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(5cb0f179) SHA1(041f7baa5a36f544a98832753ff54ca5238f12c5))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(75f94143) SHA1(aac2b0bee1a0d83b25c6fd21f00803209b621543))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(6ead5ffc) SHA1(1611d5e2dd5ea06525b6079577a45e713a8065d5))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(c1fb4f23) SHA1(6c9a4e52bd0312c9b49f91a1f563fecd87e5bb82))
+	ROM_LOAD("1vlsh266.u20", 0x00000, 0x2000, CRC(0f73cf57) SHA1(f99aa9671297d8cefeff86e642af5ea3e7f6f6fb)) // gfx
+	ROM_LOAD("1vlsh266.u21", 0x02000, 0x2000, CRC(2449d69e) SHA1(181d7d093dce1acc332255cab5d56a9043bcab47))
+	ROM_LOAD("1vlsh266.u22", 0x04000, 0x2000, CRC(5cb0f179) SHA1(041f7baa5a36f544a98832753ff54ca5238f12c5))
+	ROM_LOAD("1vlsh266.u45", 0x06000, 0x2000, CRC(75f94143) SHA1(aac2b0bee1a0d83b25c6fd21f00803209b621543))
+	ROM_LOAD("1vlsh266.u46", 0x08000, 0x2000, CRC(6ead5ffc) SHA1(1611d5e2dd5ea06525b6079577a45e713a8065d5))
+	ROM_LOAD("1vlsh266.u47", 0x0a000, 0x2000, CRC(c1fb4f23) SHA1(6c9a4e52bd0312c9b49f91a1f563fecd87e5bb82))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( topgear )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(5628f477) SHA1(8517905b4d4174fea79e2e3ed38c80fcc6506c6a)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(d5afa54e) SHA1(4268c0ddb9beab68348ba520d47bea64b875d8a7)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("4vxfc969.u87", 0x06000, 0x2000, CRC(5628f477) SHA1(8517905b4d4174fea79e2e3ed38c80fcc6506c6a)) // game code
+	ROM_LOAD("4vxfc969.u86", 0x08000, 0x8000, CRC(d5afa54e) SHA1(4268c0ddb9beab68348ba520d47bea64b875d8a7))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(e3163956) SHA1(b3b55be33fad96858dc683860d72c81ed02b3d97)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(9ce936cb) SHA1(cca6ec0190a61cb0b52fbe1b11fb678f5e0960df))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(972f091a) SHA1(b94a04e9503fb6f1a687c854076cfc9629ed7b6a))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(27fd4204) SHA1(0d082a4297a384c992188dd43be0ecb706117c13))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(186f3e3b) SHA1(57f82a79a3d24090f33f5525207d6697e954cdf5))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(dc7d2dab) SHA1(16d223f28b377fafb478d6124fc0eb6d7dd7d591))
+	ROM_LOAD("1vlsh154.u20", 0x00000, 0x2000, CRC(e3163956) SHA1(b3b55be33fad96858dc683860d72c81ed02b3d97)) // gfx
+	ROM_LOAD("1vlsh154.u21", 0x02000, 0x2000, CRC(9ce936cb) SHA1(cca6ec0190a61cb0b52fbe1b11fb678f5e0960df))
+	ROM_LOAD("1vlsh154.u22", 0x04000, 0x2000, CRC(972f091a) SHA1(b94a04e9503fb6f1a687c854076cfc9629ed7b6a))
+	ROM_LOAD("1vlsh154.u45", 0x06000, 0x2000, CRC(27fd4204) SHA1(0d082a4297a384c992188dd43be0ecb706117c13))
+	ROM_LOAD("1vlsh154.u46", 0x08000, 0x2000, CRC(186f3e3b) SHA1(57f82a79a3d24090f33f5525207d6697e954cdf5))
+	ROM_LOAD("1vlsh154.u47", 0x0a000, 0x2000, CRC(dc7d2dab) SHA1(16d223f28b377fafb478d6124fc0eb6d7dd7d591))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("1cm29.u71", 0x0000, 0x0200, CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67)) // Using 1CM29 PROM until topgear's 2CM33 PROM is dumped
 ROM_END
 
 ROM_START( wtigernz )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(9492b242) SHA1(26bb14cba8e8c3cdbcb4b4903da9592b0a1f8cb3)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(f639ef56) SHA1(5d49deee95df29cd4f5c69fea01bb752aaf2ce99)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("3vxfc5342.u87", 0x06000, 0x2000, CRC(9492b242) SHA1(26bb14cba8e8c3cdbcb4b4903da9592b0a1f8cb3)) // game code
+	ROM_LOAD("3vxfc5342.u86", 0x08000, 0x8000, CRC(f639ef56) SHA1(5d49deee95df29cd4f5c69fea01bb752aaf2ce99))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(08624625) SHA1(3c052220b171f8ef009484f0ea38074b538f542b)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(4bce2fa1) SHA1(8c25cd51ea61a4a9ff1238d1617e38b2cd298c53))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(da141f20) SHA1(e0ebeeff2e085a30032d29748f5aa6116428aaa8))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(13783f87) SHA1(662f6afdd027c3d139d7dfcd45a4a2a5a2bf2101))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(7dfd06ec) SHA1(51fbc3d24e270edb8de432a99ca28695e42e72a6))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(177a45ea) SHA1(6b044f88c79de571a007fb71ff2f99587babe474))
+	ROM_LOAD("1vlsh157.u20", 0x00000, 0x2000, BAD_DUMP CRC(08624625) SHA1(3c052220b171f8ef009484f0ea38074b538f542b)) // gfx
+	ROM_LOAD("1vlsh157.u21", 0x02000, 0x2000, BAD_DUMP CRC(4bce2fa1) SHA1(8c25cd51ea61a4a9ff1238d1617e38b2cd298c53))
+	ROM_LOAD("1vlsh157.u22", 0x04000, 0x2000, BAD_DUMP CRC(da141f20) SHA1(e0ebeeff2e085a30032d29748f5aa6116428aaa8))
+	ROM_LOAD("1vlsh157.u45", 0x06000, 0x2000, BAD_DUMP CRC(13783f87) SHA1(662f6afdd027c3d139d7dfcd45a4a2a5a2bf2101))
+	ROM_LOAD("1vlsh157.u46", 0x08000, 0x2000, BAD_DUMP CRC(7dfd06ec) SHA1(51fbc3d24e270edb8de432a99ca28695e42e72a6))
+	ROM_LOAD("1vlsh157.u47", 0x0a000, 0x2000, BAD_DUMP CRC(177a45ea) SHA1(6b044f88c79de571a007fb71ff2f99587babe474))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
 ROM_START( ffortune )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(45047c35) SHA1(4af572a23bca33a360c4711f24fb113167f90447)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(9a8b0eae) SHA1(ffd0419566c2352e3d750040405a760bd75c87d5)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("1vxfc5460.u87", 0x06000, 0x2000, CRC(45047c35) SHA1(4af572a23bca33a360c4711f24fb113167f90447)) // game code
+	ROM_LOAD("1vxfc5460.u86", 0x08000, 0x8000, CRC(9a8b0eae) SHA1(ffd0419566c2352e3d750040405a760bd75c87d5))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(f8bad3c2) SHA1(c3cffeaa34c9c7e8127f69cd1dcbc9d56bd32ed9)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(7caba194) SHA1(b0f3f4464ba6a89b572c257b87939457d4f0b2d4))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(195967f0) SHA1(f76ba3c4e8b12d480ab1e4c1147bd7971ce8d688))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(dc44c3ab) SHA1(74f6230798832f321f7c53c161eac6c552689113))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(b0a04c83) SHA1(57247867db6417c525c4c3cdcc409523037e00fd))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(cd24ee39) SHA1(12798e14f7f6308e130da824ffc7c577a36cef04))
+	ROM_LOAD("1vlsh228.u20", 0x00000, 0x2000, CRC(f8bad3c2) SHA1(c3cffeaa34c9c7e8127f69cd1dcbc9d56bd32ed9)) // gfx
+	ROM_LOAD("1vlsh228.u21", 0x02000, 0x2000, CRC(7caba194) SHA1(b0f3f4464ba6a89b572c257b87939457d4f0b2d4))
+	ROM_LOAD("1vlsh228.u22", 0x04000, 0x2000, CRC(195967f0) SHA1(f76ba3c4e8b12d480ab1e4c1147bd7971ce8d688))
+	ROM_LOAD("1vlsh228.u45", 0x06000, 0x2000, CRC(dc44c3ab) SHA1(74f6230798832f321f7c53c161eac6c552689113))
+	ROM_LOAD("1vlsh228.u46", 0x08000, 0x2000, CRC(b0a04c83) SHA1(57247867db6417c525c4c3cdcc409523037e00fd))
+	ROM_LOAD("1vlsh228.u47", 0x0a000, 0x2000, CRC(cd24ee39) SHA1(12798e14f7f6308e130da824ffc7c577a36cef04))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
 ROM_END
 
 ROM_START( autmoon )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
 	 /* VIDEO AND SOUND EPROM */
-	ROM_LOAD("u59.bin", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
 
-	 /* GAME EPROMS */
-	ROM_LOAD("u87.bin", 0x06000, 0x2000, CRC(30ca1eed) SHA1(540635a8b94c14aefa1d8404226d9e1046776111)) // game code
-	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(8153a60b) SHA1(54b8a0467645161d827bf8cb9fbceb0d00f9639f)) // game code
+	 /* GAME EPROMs */
+	ROM_LOAD("1vxfc5488.u87", 0x06000, 0x2000, CRC(30ca1eed) SHA1(540635a8b94c14aefa1d8404226d9e1046776111)) // game code
+	ROM_LOAD("1vxfc5488.u86", 0x08000, 0x8000, CRC(8153a60b) SHA1(54b8a0467645161d827bf8cb9fbceb0d00f9639f))
 
-	/* SHAPE EPROMS */
+	/* SHAPE EPROMs */
 	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, CRC(fcbbc62e) SHA1(794a7d974e67183468a77a6a81a6f05e0569e229)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, CRC(9e6f940e) SHA1(1ad9e7c6231a8d16e868a79d313efccbd1ff58ee))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, CRC(1a2ff3a9) SHA1(bddfc3eedcdf9237a31a4b42d062e986beafed39))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, CRC(c8d29af8) SHA1(e35f67d6708b26c93617c967aa50c629f7019788))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, CRC(fa126a77) SHA1(31d6096c58653a45176b6373835f83c8f2c46f80))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, CRC(50307da0) SHA1(6418a51cf915b37fa11f47d000e4229dacf95951))
+	ROM_LOAD("1vxfc5488.u20", 0x00000, 0x2000, CRC(fcbbc62e) SHA1(794a7d974e67183468a77a6a81a6f05e0569e229)) // gfx
+	ROM_LOAD("1vxfc5488.u21", 0x02000, 0x2000, CRC(9e6f940e) SHA1(1ad9e7c6231a8d16e868a79d313efccbd1ff58ee))
+	ROM_LOAD("1vxfc5488.u22", 0x04000, 0x2000, CRC(1a2ff3a9) SHA1(bddfc3eedcdf9237a31a4b42d062e986beafed39))
+	ROM_LOAD("1vxfc5488.u45", 0x06000, 0x2000, CRC(c8d29af8) SHA1(e35f67d6708b26c93617c967aa50c629f7019788))
+	ROM_LOAD("1vxfc5488.u46", 0x08000, 0x2000, CRC(fa126a77) SHA1(31d6096c58653a45176b6373835f83c8f2c46f80))
+	ROM_LOAD("1vxfc5488.u47", 0x0a000, 0x2000, CRC(50307da0) SHA1(6418a51cf915b37fa11f47d000e4229dacf95951))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
-	ROM_LOAD("u71.bin", 0x0000, 0x0200,  CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f))
 ROM_END
 
+ROM_START( gtroppo )
 
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("3vas003.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406)) // sound and video rom
 
-GAMEL( 1994, eforest,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902",              GAME_NOT_WORKING, layout_aristmk4)
-GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 4VXFC818",                0,                layout_aristmk4 )
-GAMEL( 1996, eforestb, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 3VXFC5343 (New Zealand)", 0,                layout_aristmk4 )
-GAMEL( 1994, 3bagflvt, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "3 Bags Full - 5VXFC790 (Victorian)",         0,                layout_aristmk4 )
-GAMEL( 1994, 3bagflnz, 3bagflvt, aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "3 Bags Full - 3VXFC5345 (New Zealand)",      0,                layout_aristmk4 )
-GAMEL( 1996, blkrhino, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Black Rhino - 3VXFC5344 (New Zealand)",      0,                layout_aristmk4 )
-GAMEL( 1996, kgbird,   0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 87.98%)", 0,                layout_aristmk4 )
-GAMEL( 1996, kgbirda,  kgbird,   aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 91.97%)", 0,                layout_aristmk4 )
-GAMEL( 1998, swtht2nz, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Sweet Hearts II - 1VXFC5461 (New Zealand)",  0,                layout_aristmk4 )
-GAMEL( 1996, goldenc,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Golden Canaries - 1VXFC5462",                0,                layout_aristmk4 )
-GAMEL( 1996, topgear,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Top Gear - 4VXFC969",                        GAME_NOT_WORKING, layout_aristmk4 )
-GAMEL( 1996, wtigernz, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "White Tiger - 3VXFC5342 (New Zealand)",      0,                layout_aristmk4 )
-GAMEL( 1998, phantomp, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Phantom Pays - 4VXFC5431 (New Zealand)",     0,                layout_aristmk4 )
-GAMEL( 2000, coralr2,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Coral Riches II - 1VXFC5472 (New Zealand)",  0,                layout_aristmk4 )
-GAMEL( 1999, ffortune, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Fantasy Fortune",                            0,                layout_aristmk4 )
-GAMEL( 1999, autmoon,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Autumn Moon",                                0,                layout_aristmk4 )
+	 /* GAME EPROMs */
+	ROM_LOAD("1vxec542.lu9", 0x08000, 0x8000, CRC(09654256) SHA1(234cb74cac92a715f8913b740e69afa57b9b39e8)) // game code
+
+	/* SHAPE EPROMs */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("1vxec542.u8", 0x00000, 0x2000, CRC(28ccc30d) SHA1(30f8c44c0b830c81734f515724ba02bb253a956b)) // gfx
+	ROM_LOAD("1vxec542.u10", 0x02000, 0x2000, CRC(fe3cb62a) SHA1(e7e879520b02b50fc0ff8b2c63ae16605cd61f9b))
+	ROM_LOAD("1vxec542.u12", 0x04000, 0x2000, CRC(62208b7f) SHA1(c36e6c8ffd05a429251ff39853c0981ec6688a91))
+	ROM_LOAD("1vxec542.u9", 0x06000, 0x2000, CRC(79ab593b) SHA1(87408022093542f10890fca027a097cd15dd8039))
+	ROM_LOAD("1vxec542.u11", 0x08000, 0x2000, CRC(87ed6fab) SHA1(72428b66d6186dea3bd1f9cfe215341e6b29b3c2))
+	ROM_LOAD("1vxec542.u13", 0x0a000, 0x2000, CRC(673a129d) SHA1(cb1ae12e43993bfe399595a8778888eb5a264ec1))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("gtroppo.u40", 0x0000, 0x0200, CRC(918cb0ab) SHA1(2ec37abae2ecae2f0f525daf6fafd03789fca20b))
+ROM_END
+
+ROM_START( clkwise )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("3vas003.u7", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406)) // sound and video rom
+
+	 /* GAME EPROMs */
+	ROM_LOAD("1vxec534.lu9", 0x08000, 0x8000, NO_DUMP) // game code, non-existent
+
+	/* SHAPE EPROMs */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("1vlsh101.u8", 0x00000, 0x2000, CRC(424c1e0e) SHA1(168baaa92dd08b58738b491c24b2534d30b770e9)) // gfx
+	ROM_LOAD("1vlsh101.u10", 0x02000, 0x2000, CRC(64792c3a) SHA1(15aa1463c93ed45ca227766e639ff643f1c23f33))
+	ROM_LOAD("1vlsh101.u12", 0x04000, 0x2000, CRC(a31bd619) SHA1(60296cf1fa35337076809e827375166340917f01))
+	ROM_LOAD("1vlsh101.u9", 0x06000, 0x2000, CRC(59348a2a) SHA1(84c99db54bd75cf9414f306959e7b2c3d7bf9715))
+	ROM_LOAD("1vlsh101.u11", 0x08000, 0x2000, CRC(362867bb) SHA1(aba3a74b3bf2a96d8bda4deacada56c5d531bcb4))
+	ROM_LOAD("1vlsh101.u13", 0x0a000, 0x2000, CRC(649fbc77) SHA1(22bd81b39279dc393bd791e2e1a2999215581e2b))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("gtroppo.u40", 0x0000, 0x0200, BAD_DUMP CRC(918cb0ab) SHA1(2ec37abae2ecae2f0f525daf6fafd03789fca20b)) // Using gtroppo's PROM until clkwise's 2CM1B (2CM18?) PROM is dumped
+ROM_END
+
+ROM_START( cgold2 )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMs */
+	ROM_LOAD("3xf5182h04.u87", 0x06000, 0x2000, CRC(070a02b2) SHA1(872621275e51c5dca371861a9b9f3038f0dbc8aa)) // game code
+	ROM_LOAD("3xf5182h04.u86", 0x08000, 0x8000, CRC(5ac1d424) SHA1(42bb8b5eb163a04054621bbcba5cf8203a661baf))
+
+	/* SHAPE EPROMs */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("3xf5182.u20", 0x00000, 0x2000, NO_DUMP) // gfx
+	ROM_LOAD("3xf5182.u21", 0x02000, 0x2000, CRC(8bf50f7c) SHA1(17705de695d43fa4fa6f1e7afc5c19ecf6f75e35))
+	ROM_LOAD("3xf5182.u22", 0x04000, 0x2000, CRC(ec08e24b) SHA1(9dce6952e92c8d10a1722ec0a394b93be6bc7cea))
+	ROM_LOAD("3xf5182.u45", 0x06000, 0x2000, NO_DUMP)
+	ROM_LOAD("3xf5182.u46", 0x08000, 0x2000, CRC(9580c2c2) SHA1(8a010fb9e349c066e1af53ed9aa659dbf7dbf17e))
+	ROM_LOAD("3xf5182.u47", 0x0a000, 0x2000, CRC(f3cb845a) SHA1(288f7fe991bb60194a9ef9e8c9b2b18ebbd3b49c))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("2cm34.u71", 0x0000, 0x0200, BAD_DUMP CRC(75814247) SHA1(9d123dadba3b5a1fd1c7f0100b255c4dd4f7e04f)) // Using 2CM34 PROM until cgold2's PROM is dumped
+ROM_END
+
+ROM_START( fhunter )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMs */
+	ROM_LOAD("2xf5196i01.u87", 0x06000, 0x2000, CRC(f9e6b760) SHA1(af7f16727e84ba8f07400f7f02302862e02d1af4)) // game code
+	ROM_LOAD("2xf5196i01.u86", 0x08000, 0x8000, CRC(6971ccee) SHA1(1292cfa8125cbaec3bcd9d136cb385a3574bfa4a))
+
+	/* SHAPE EPROMs */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("2xf5196.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // gfx
+	ROM_LOAD("2xf5196.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb))
+	ROM_LOAD("2xf5196.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa))
+	ROM_LOAD("2xf5196.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414))
+	ROM_LOAD("2xf5196.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250))
+	ROM_LOAD("2xf5196.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
+ROM_END
+
+ROM_START( fhuntera )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMs */
+	ROM_LOAD("2xf5196i02.u87", 0x06000, 0x2000, CRC(4b532a14) SHA1(98d1753ad1d0d041f81a535947ed501d0eb1d85c)) // game code
+	ROM_LOAD("2xf5196i01.u86", 0x08000, 0x8000, CRC(6971ccee) SHA1(1292cfa8125cbaec3bcd9d136cb385a3574bfa4a))
+
+	/* SHAPE EPROMs */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("2xf5196.u20", 0x00000, 0x2000, CRC(96c81134) SHA1(e5e75e8b4897ee7cd9c27b0546fe4006cf384cba)) // gfx
+	ROM_LOAD("2xf5196.u21", 0x02000, 0x2000, CRC(ad7bc6a0) SHA1(145e9a094212841e8a684136ea813bd1bea070fb))
+	ROM_LOAD("2xf5196.u22", 0x04000, 0x2000, CRC(450d47bb) SHA1(219a0eeca3989da8cec68405466c9a20f2ee9bfa))
+	ROM_LOAD("2xf5196.u45", 0x06000, 0x2000, CRC(560b2417) SHA1(1ed26ceaff87150d2f0115825f952348e34e0414))
+	ROM_LOAD("2xf5196.u46", 0x08000, 0x2000, CRC(7704c13f) SHA1(4cfca6ee9e2e543714e8bf0c6de4d9e9406ce250))
+	ROM_LOAD("2xf5196.u47", 0x0a000, 0x2000, CRC(a9e6da98) SHA1(3b7d8920d3ef4ae17a55d2e1968318eb3c70264d))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
+ROM_END
+
+ROM_START( arcwins )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("2vas004.u59", 0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMs */
+	ROM_LOAD("4xf5227h03.u87", 0x06000, 0x2000, CRC(eec47dcf) SHA1(9d9d56310fc2c69c56aee961d1881328e3aa32d2)) // game code
+	ROM_LOAD("4xf5227h03.u86", 0x08000, 0x8000, CRC(4e2b955a) SHA1(66202e1c7fe52f706c809d6aa8aa649b54dca4d2))
+
+	/* SHAPE EPROMs */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("4xf5227.u20", 0x00000, 0x2000, CRC(f0438b40) SHA1(cead72e988e8973d95312d62ffd45cb51c982551)) // gfx
+	ROM_LOAD("4xf5227.u21", 0x02000, 0x2000, CRC(0e4c817c) SHA1(dc142d4cf5227496d1e6b82368a8fa186b6372c7))
+	ROM_LOAD("4xf5227.u22", 0x04000, 0x2000, CRC(fef65b79) SHA1(38562221ff0513ab973ac96a6ff1e70f0d4e6436))
+	ROM_LOAD("4xf5227.u45", 0x06000, 0x2000, CRC(bf7bf9e2) SHA1(32cc8428281f57280ba7aeb7b9a30c51b3a5bec8))
+	ROM_LOAD("4xf5227.u46", 0x08000, 0x2000, CRC(c4b2ec7c) SHA1(db0bef392e83a1fb9b1d2255b36a3ec12e73ee1c))
+	ROM_LOAD("4xf5227.u47", 0x0a000, 0x2000, CRC(6608d05a) SHA1(7a4014d4dbc8ec6b3dcf14df5a5149696c7ce45e))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("1cm29.u71", 0x0000, 0x0200, CRC(ef25f5cc) SHA1(51d12f4b8b8712cbd18ec97ec04e1340cd85fc67))
+ROM_END
+
+/* Video poker games */
+
+ROM_START( wildone )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("3vas003.u59", 0x06000, 0x2000, CRC(fe7d0ea4) SHA1(3f3f4809534065c33eca2cfff0d1d2a3e3992406)) // sound and video rom
+
+	  /* GAME EPROMS */
+	ROM_LOAD("4vxec5357.u86", 0x08000, 0x8000, CRC(ad0311b6) SHA1(182efb32556c36f2b6a0fddecc991bc3b0e21dc5)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("8vlsh007.u20", 0x00000, 0x2000, CRC(ff776acb) SHA1(d08a42e72ee639e4303dad3045038c2634d6fba9)) // gfx
+	ROM_LOAD("8vlsh007.u21", 0x02000, 0x2000, CRC(a55dec6f) SHA1(ed19a6d979f6831185d6548c1f12724d3a714854))
+	ROM_LOAD("8vlsh007.u22", 0x04000, 0x2000, CRC(6fba7bf3) SHA1(c94ccfb80b51bd1df3da831a7789114b12ac01af))
+	ROM_LOAD("8vlsh007.u45", 0x06000, 0x2000, CRC(01c6d826) SHA1(d03dd9843e6666eb4cc90c3fae4de019a1b1611f))
+	ROM_LOAD("8vlsh007.u46", 0x08000, 0x2000, CRC(a3bc50dc) SHA1(8cfa4a3415e060be89eb4727eaddb3d64d5f87cb))
+	ROM_LOAD("8vlsh007.u47", 0x0a000, 0x2000, CRC(2ba003ea) SHA1(9e4dff2f5d3645ab918b3cc766ca6f5689fc517e))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("2cm07.u71", 0x0000, 0x0200,  CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744))
+ROM_END
+
+ROM_START( gldnpkr )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("vidsnd.u7", 0x06000, 0x2000, CRC(568bd63f) SHA1(128b0b085c8b97d1c90baeab4886c522c0bc9a0e)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("8vxec037.lu9", 0x08000, 0x8000, CRC(a75276b1) SHA1(13950bd26c5f0a26f0dee5938eeee0c16a3119df)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("8vxec037.u8",  0x00000, 0x2000, CRC(9ebed6c9) SHA1(75741b2f00f6eb1830bf1c5a013fb83e0f0a97b8)) // gfx
+	ROM_LOAD("8vxec037.u10", 0x02000, 0x2000, CRC(20b58fda) SHA1(9a3441c18f93a6d97637e1b78fd7537b174575fd))
+	ROM_LOAD("8vxec037.u12", 0x04000, 0x2000, CRC(edaa713a) SHA1(61996281ff8e29af058934ee6197bef253c706e6))
+	ROM_LOAD("8vxec037.u9",  0x06000, 0x2000, CRC(d5788ddc) SHA1(f307c179a49d23a0144dfdea69fa4e65c6821032))
+	ROM_LOAD("8vxec037.u11", 0x08000, 0x2000, CRC(e056af8c) SHA1(1ff67c5aed19219a65c1562a971e9968a7e78fad))
+	ROM_LOAD("8vxec037.u13", 0x0a000, 0x2000, CRC(d97876cd) SHA1(23f8b1632c19f2f0a6918a6e4aa987c0feda5cd4))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("2cm07.u40", 0x0000, 0x0200,  CRC(1e3f402a) SHA1(f38da1ad6607df38add10c69febf7f5f8cd21744)) // Using 2CM07 until a correct PROM is confirmed
+ROM_END
+
+GAMEL( 1996, eforest,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",              GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
+GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",               0,                layout_aristmk4 ) // 10c, $1 = 10 credits
+GAMEL( 1996, eforestb, eforest,  aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)",      0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 1996, 3bagflvt, 0,        aristmk4, 3bagflvt, aristmk4, ROT0, "Aristocrat", "3 Bags Full (5VXFC790, Victoria)",               0,                layout_aristmk4 ) // 5c, $1 = 20 credits
+GAMEL( 1996, 3bagflnz, 3bagflvt, aristmk4, 3bagflnz, aristmk4, ROT0, "Aristocrat", "3 Bags Full (3VXFC5345, New Zealand)",           0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 1996, blkrhino, 0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Black Rhino (3VXFC5344, New Zealand)",           0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 1996, kgbird,   0,        aristmk4, kgbird,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 87.98%)",     0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 1996, kgbirda,  kgbird,   aristmk4, kgbird,   aristmk4, ROT0, "Aristocrat", "K.G. Bird (4VXFC5341, New Zealand, 91.97%)",     0,                layout_aristmk4 ) // 10c, $2 = 20 credits
+GAMEL( 1998, swtht2nz, 0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Sweet Hearts II (1VXFC5461, New Zealand)",       0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 1996, goldenc,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Golden Canaries (1VXFC5462, New Zealand)",       0,                layout_aristmk4 ) // 2c, $2 = 100 credits
+GAMEL( 1996, topgear,  0,        aristmk4, topgear,  aristmk4, ROT0, "Aristocrat", "Top Gear (4VXFC969, NSW)",                       0,                layout_aristmk4 ) // 10c, 1 coin = 1 credit
+GAMEL( 1996, wtigernz, 0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "White Tiger (3VXFC5342, New Zealand)",           0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 1998, phantomp, 0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Phantom Pays (4VXFC5431, New Zealand)",          0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 2000, coralr2,  0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Coral Riches II (1VXFC5472, New Zealand)",       0,                layout_aristmk4 ) // 2c, $2 = 100 credits
+GAMEL( 1998, ffortune, 0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Fantasy Fortune (1VXFC5460, New Zealand)",       0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 1999, autmoon,  0,        aristmk4, eforestb, aristmk4, ROT0, "Aristocrat", "Autumn Moon (1VXFC5488, New Zealand)",           0,                layout_aristmk4 ) // 5c, $2 = 40 credits
+GAMEL( 1986, gtroppo,  0,        aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Gone Troppo (1VXEC542, NSW)",       0,                layout_aristmk4 ) // possibly 20c, 1 coin = 1 credit
+GAMEL( 1986, clkwise,  0,        aristmk4, topgear,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Clockwise (1VXEC534, New Zealand)", GAME_NOT_WORKING, layout_aristmk4 ) // 20c, 1 coin = 1 credit
+GAMEL( 1995, cgold2,   0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Caribbean Gold II (3XF5182H04, US)",             GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
+GAMEL( 1996, fhunter,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I01, US)",                GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
+GAMEL( 1996, fhuntera, fhunter,  aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Fortune Hunter (2XF5196I02, US)",                GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
+GAMEL( 1996, arcwins,  0,        aristmk4, aristmk4, aristmk4, ROT0, "Aristocrat", "Arctic Wins (4XF5227H03, US)",                   GAME_NOT_WORKING, layout_aristmk4 ) // multiple denominations
+GAMEL( 1997, wildone,  0,  aristmk4_poker, wildone,  aristmk4, ROT0, "Aristocrat", "Wild One (4VXEC5357, New Zealand)",              0,                layout_aristmk4 ) // 20c, $2 = 10 credits, video poker
+GAMEL( 1986, gldnpkr,  0,  aristmk4_poker, gldnpkr,  aristmk4, ROT0, "Ainsworth Nominees P.L.", "Golden Poker (8VXEC037, NSW)",      0,                layout_aristmk4 ) // possibly 20c, 1 coin = 1 credit, video poker
+

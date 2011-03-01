@@ -9965,22 +9965,30 @@ Other Sun games
 	DRIVER( caswin )	/* (c) 1985 */
 
 	/* Aristocrat Mk4 hardware */
+	DRIVER( gtroppo )	/* (c) 1986 Ainsworth Nominees P.L. */
+	DRIVER( clkwise )	/* (c) 1986 Ainsworth Nominees P.L. */
+	DRIVER( gldnpkr )	/* (c) 1986 Ainsworth Nominees P.L. */
 	DRIVER( 3bagflvt )	/* (c) 1994 */
 	DRIVER( 3bagflnz )	/* (c) 1994 */
-	DRIVER( blkrhino )	/* (c) 1996 */
-	DRIVER( coralr2 )	/* (c) 2002 */
 	DRIVER( eforest )	/* (c) 1994 */
 	DRIVER( eforesta )	/* (c) 1995 */
 	DRIVER( eforestb )	/* (c) 1996 */
+	DRIVER( cgold2 )	/* (c) 1995 */
+	DRIVER( blkrhino )	/* (c) 1996 */
 	DRIVER( goldenc )	/* (c) 1996 */
 	DRIVER( kgbird )	/* (c) 1996 */
 	DRIVER( kgbirda )	/* (c) 1996 */
-	DRIVER( phantomp )	/* (c) 1998 */
-	DRIVER( swtht2nz )	/* (c) 1998 */
 	DRIVER( topgear )	/* (c) 1996 */
 	DRIVER( wtigernz )	/* (c) 1996 */
-	DRIVER( autmoon )	/* (c) 1999 */
+	DRIVER( fhunter )	/* (c) 1996 */
+	DRIVER( fhuntera )	/* (c) 1996 */
+	DRIVER( arcwins )	/* (c) 1996 */
+	DRIVER( wildone )	/* (c) 1997 */
+	DRIVER( phantomp )	/* (c) 1998 */
+	DRIVER( swtht2nz )	/* (c) 1998 */
 	DRIVER( ffortune )	/* (c) 1998 */
+	DRIVER( autmoon )	/* (c) 1999 */
+	DRIVER( coralr2 )	/* (c) 2002 */
 
 	/* Aristocrat Mk5 hardware */
 	DRIVER( aristmk5 )	/* (c) 1995 */
