@@ -1,18 +1,51 @@
 /*
         Driver: aristmk4
-        
+
         Manufacturer: Aristocrat Leisure Industries ( aka Ainsworth Nominees P.L. )
         Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
         Driver by Palindrome & FraSher
-        
-		----------------------------------------------------------------------
-		Manual Init procedure for these (most sets)
-		----------------------------------------------------------------------
-		just key in, both the jackpot and audit keys, press z,x,c at the same time, and key out and it should fire up 
-		
-		
+
+		***************** INITIALISATION *********************************************************************
+
+		Method 1 :
+		* Key in with the Jackpot Key followed by the Audit Key
+		* Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+		* A value (displayed below) will appear next to RF/AMT on the right of the screen
+		* Key out both the Jackpot and Audit Keys
+
+		This method works with the following games:
+		3bagflnz 200
+		3bagflvt 200
+		autmoon  200
+		blkrhino 200
+		coralr2  200
+		eforesta 200
+		eforestb 200
+		ffortune 200
+		gldnpkr  400
+		goldenc  200
+		gtroppo  500
+		kgbird   200
+		kgbirda  200
+		phantomp 200
+		swtht2nz 200
+		wildone  200
+		wtigernz 200
+
+		Method 2 :
+		* Key in with the Jackpot Key followed by the Audit Key
+		* Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+		* This will enter the cashcade screen and increment $100 to the maximum
+		* Press PLAY 2 LINES [BET 2 is erroneously displayed on the screen] to increment the minimum cashcade value by $5
+			(optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment the $5 to start with above or the game won't initialise)
+		* A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible until you key out and back in again with the Audit Key)
+		* Key out both the Jackpot and Audit Keys
+
+		This method works with the following games:
+		topgear  500
+
         Technical Notes:
-        
+
         68B09EP Motorola Processor
         R6545AP for CRT video controller
         UPD43256BCZ-70LL for 32kb of static ram used for 3 way electronic meters / 3 way memory
@@ -22,48 +55,48 @@
         2 x WF19054 = AY3-8910 sound chips driven by the 6522 VIA
         1 x PML 2852 ( programmable logic ) used as address decoder.
         1 x PML 2852 programmed as a PIA
-        
+
         PIA provides output signals to six mechanical meters.
         It also provides the real time clock DS1287 to the CPU.
-        
+
         VIA drives the programmable sound generators and generates
         a timing interrupt to the CPU (M6809_FIRQ_LINE)
-        
+
         The VIA uses Port A to write to the D0-D7 on the AY8910s. Port B hooks first 4 bits up to BC1/BC2/BDIR and A9 on AY1 and A8 on AY2
         The remaining 4 bits are connected to other hardware, read via the VIA.
-        
+
         The AY8910 named ay1 has writes on PORT B to the ZN434 DA convertor.
         The AY8910 named ay2 has writes to lamps and the light tower on Port A and B. these are implemented via the layout
-     
+
         27/04/10 - FrasheR
         2 x Sound Chips connected to the 6522 VIA.
-        
+
         16/05/10 - FrasheR
         Fixed VIA for good. 5010 - 501F.
         Hooked up push button inputs - FrasheR
         Hooked up ports for the PML 2852 U3 - FrasheR
-        
+
         16/05/10 - Palindrome
         Lamp outputs and layout added - Palindrome
-        NVRAM backup - Palindrome 
-        
+        NVRAM backup - Palindrome
+
         20/05/10 - Palindrome
         Connected SW7 for BGCOLOUR map select
         Added LK13. 3Mhz or 1.5 Mhz CPU speed select
         Added sound sample for mechanical meter pulse ( aristmk4.zip  ).
-        
+
         30/5/10 - Palindrome
         Now using mc146818 rtc driver instead of rtc_get_reg.
-        
-        The mc146818 driver has issues and is not working correctly. 
+
+        The mc146818 driver has issues and is not working correctly.
         MESS developers are looking at it.
-        
+
         - day of week is incorrect
         - day of month is incorrect ( code is using day instead of mday ).
         - hours are not showing up correct in PM and 12 hour mode
         - rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data )
-        
-        9/7/2010 - Palindrome        
+
+        9/7/2010 - Palindrome
         Robot Test added
         Default Jackpot key re-assigned to 'I'
         Work around for topgear & cashcade games
@@ -72,7 +105,7 @@
         Added new game Gone Troppo
         Added new game Wild One
         Misc improvements
-        
+
         12/12/2010 - Palindrome and Heihachi_73
         Updated source to 0.140u2 standards
         Disabled real time clock to stop games from hanging. This causes a graphics glitch on the month display but makes the games more reliable in audit mode.
@@ -89,9 +122,9 @@
         - Games may have different button configuration requirements ( ie.. 9 or 5 lines and different bet values )
         - Top gear and Gone Troppo have no BET play buttons, only PLAY 1 - 5 lines and a MAX BET option. These games are just standard 5 line games with no multipliers.
         - Video poker and Keno button panels needed.
-        
+
         2.Extend the driver to use the keno keyboard input for keno games (no MK2.5/MKIV Keno games dumped yet as of 28/02/2010).
-        
+
         3.arcwins, eforest, fhunter, fhuntera and cgold2 do not work (these US-based games require note acceptor and printer support).
         - fhunter, fhuntera and cgold2 won't enter audit mode for some reason.
 
@@ -99,33 +132,33 @@
         - White Tiger has bad graphics ROMs.
         - Clockwise needs its program ROM redumped, original dump was 32K of 0xFF's. Graphics and video/sound ROM are OK.
         - Correct PROMs needed for Top Gear (2CM33), Clockwise (2CM18) and Golden Poker (unknown).
-        
+
         5.Add note acceptor support
-        
-        6.Provide complete cashcade emulation 
-        
+
+        6.Provide complete cashcade emulation
+
         7.Look into what the hopper probe signal is for.
-        
+
         8.Investigate issues with the Poker style games as described below.
 
         9.When DIP SW7 is set to off/off, speed is dramatically reduced.
-    
+
         ***************** POKER GAMES ************************************************************************
-        
+
         Wild One & Golden Poker have a problem where the second branch condition is always true, see assebler below for
         example of Wild One.
-            
+
         907D    BITA $1800  ( crtc )
         9080    BNE  $907D  ; is zero
         9082    BITA $1800
         9085    BEQ  $9082  ; branches to 9082 indefinately, value is always zero.
         9087    LDA  #$40
-        
+
         If the PC ( program counter ) is set to 9087 then the game runs.
-        
+
         Bug in the 6845 crtc core ? Seems like some kind of logic there not working.
-        
-    
+
+
 ***********************************************************************************************************************************************/
 
 #define MAIN_CLOCK	XTAL_12MHz
@@ -785,9 +818,9 @@ I suspect it to be connected to the CPU IRQ and the value in crtc: 0xf read ever
 
         'maincpu' (9137):M6845 reg 0x0f = 0x00
 
-        907D    BITA $1800  ; crtc reg 0xf 
+        907D    BITA $1800  ; crtc reg 0xf
         9080    BNE  $907D  ; branches 907d if value is not zero.
-        9082    BITA $1800  
+        9082    BITA $1800
         9085    BEQ  $9082  ; branches to 9082 until value is 0xff
         9087    LDA  #$40
 
@@ -801,9 +834,9 @@ READ8_DEVICE_HANDLER( aristmk4_crtc_r )
 
     // just give the cursor values expected 0x00 & 0xff. Otherwise 0x00 is always read
     // and game will not start
-    
+
     if(crtc_reg == 0x0f) // work around
-	   return crtc_cursor[crtc_cursor_index++%2]; 
+	   return crtc_cursor[crtc_cursor_index++%2];
 	else
 	   return mc6845_register_r(device, 0);
 }
@@ -820,7 +853,7 @@ WRITE8_DEVICE_HANDLER( aristmk4_crtc_w )
     crtc_select ^= 1;
 }
 
-/* 
+/*
 
 Poker card style games seem to have different address mapping
 
@@ -956,12 +989,12 @@ static INPUT_PORTS_START(aristmk4)
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("5 CREDITS PER LINE") PORT_CODE(KEYCODE_T) // 5 credits per line
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("10 CREDITS PER LINE") PORT_CODE(KEYCODE_Y) // 10 credits per line
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_Q)
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESERVE") PORT_CODE(KEYCODE_A) // reserve 
+    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RESERVE") PORT_CODE(KEYCODE_A) // reserve
     PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("GAMBLE") PORT_CODE(KEYCODE_U) // auto gamble & gamble
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TAKE WIN") PORT_CODE(KEYCODE_J)
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7 UNUSED") PORT_CODE(KEYCODE_I)
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
-    
+
     PORT_START("500e")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 CREDIT PER LINE") PORT_CODE(KEYCODE_W) // 1 credit per line
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1 LINE/RED") PORT_CODE(KEYCODE_S)
@@ -1038,7 +1071,7 @@ static INPUT_PORTS_START(aristmk4)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Insert Credit")
 
     PORT_START("powerfail")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_L) 
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Power Fail / Shutdown") PORT_CODE(KEYCODE_L)
 
 	/************************************************************************************************************
 
@@ -1240,7 +1273,7 @@ static INPUT_PORTS_START(topgear)
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6 UNUSED") PORT_CODE(KEYCODE_J)
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7 UNUSED") PORT_CODE(KEYCODE_I)
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
-    
+
     PORT_MODIFY("500e")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1 UNUSED") PORT_CODE(KEYCODE_W)
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("PLAY 1 LINE") PORT_CODE(KEYCODE_S)
@@ -1266,13 +1299,13 @@ static INPUT_PORTS_START(wildone)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8 UNUSED") PORT_CODE(KEYCODE_O)
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_W) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BLACK") PORT_CODE(KEYCODE_S) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RED") PORT_CODE(KEYCODE_E) 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("COLLECT") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BLACK") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("RED") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET 1/HOLD 1") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HIGH 5/HOLD 5") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BIG 5/HOLD 4") PORT_CODE(KEYCODE_G) // no bet 4 button
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TAKE WIN") PORT_CODE(KEYCODE_F) 
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TAKE WIN") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("DRAW") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
@@ -1285,8 +1318,8 @@ static INPUT_PORTS_START(gldnpkr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 3") PORT_CODE(KEYCODE_A)
 
 	PORT_MODIFY("500e")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET") PORT_CODE(KEYCODE_S) 
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SERVICE") PORT_CODE(KEYCODE_E) 
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("BET") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("SERVICE") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 1/RED") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 5/BLACK") PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("HOLD 4") PORT_CODE(KEYCODE_G)
@@ -1475,20 +1508,20 @@ static TIMER_DEVICE_CALLBACK( aristmk4_pf )
     /*
     IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.
     This event is recorded in NVRAM to facilitate the Robot Test.
-    
-    Would be ideal to use this in our add_exit_callback instead of using a timer but it doesn't seem to 
+
+    Would be ideal to use this in our add_exit_callback instead of using a timer but it doesn't seem to
     save the power down state in nvram . Is there a cleaner way to do this ?
-    
+
     To enter the robot test
-    
+
     1. Open the main door
     2. Trigger powerfail / NMI by presing L for at least 1 second, the game will freeze.
     3. Press F3 ( reset ) whilst holding down robot/hopper test button ( Z )
-    
-    Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI  ( ie.. hold down L for at least 1 second ) 
-    
+
+    Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI  ( ie.. hold down L for at least 1 second )
+
     */
-    
+
     if(input_port_read(timer.machine, "powerfail")) // send NMI signal if L pressed
     {
         cputag_set_input_line( timer.machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE );
@@ -1503,7 +1536,7 @@ static MACHINE_CONFIG_START( aristmk4, aristmk4_state )
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
-	
+
 	MCFG_MACHINE_START(aristmk4)
 	MCFG_MACHINE_RESET(aristmk4 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
