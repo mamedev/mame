@@ -33,6 +33,16 @@ enum
 	M68K_CPU_TYPE_SCC68070
 };
 
+// function codes
+enum
+{
+	M68K_FC_USER_DATA = 1,
+	M68K_FC_USER_PROGRAM = 2,
+	M68K_FC_SUPERVISOR_DATA = 5,
+	M68K_FC_SUPERVISOR_PROGRAM = 6,
+	M68K_FC_INTERRUPT = 7
+};
+
 /* HMMU enable types for use with m68k_set_hmmu_enable() */
 #define M68K_HMMU_DISABLE	0	/* no translation */
 #define M68K_HMMU_ENABLE_II	1	/* Mac II style fixed translation */
@@ -102,6 +112,6 @@ void m68k_set_reset_callback(device_t *device, m68k_reset_func callback);
 void m68k_set_cmpild_callback(device_t *device, m68k_cmpild_func callback);
 void m68k_set_rte_callback(device_t *device, m68k_rte_func callback);
 void m68k_set_tas_callback(device_t *device, m68k_tas_func callback);
-bool m68k_is_in_supervisor_mode(device_t *device);
+UINT16 m68k_get_fc(device_t *device);
 
 #endif /* __M68000_H__ */
