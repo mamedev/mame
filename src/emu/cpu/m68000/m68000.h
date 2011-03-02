@@ -102,5 +102,6 @@ void m68k_set_reset_callback(device_t *device, m68k_reset_func callback);
 void m68k_set_cmpild_callback(device_t *device, m68k_cmpild_func callback);
 void m68k_set_rte_callback(device_t *device, m68k_rte_func callback);
 void m68k_set_tas_callback(device_t *device, m68k_tas_func callback);
+bool m68k_is_in_supervisor_mode(device_t *device);
 
 #endif /* __M68000_H__ */

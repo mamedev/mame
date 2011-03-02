@@ -1513,6 +1513,12 @@ void m68k_set_tas_callback(device_t *device, m68k_tas_func callback)
 	m68k->tas_instr_callback = callback;
 }
 
+bool m68k_is_in_supervisor_mode(device_t *device)
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+	return m68k->s_flag;
+}
+
 
 /****************************************************************************
  * State definition
