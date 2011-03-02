@@ -1613,6 +1613,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/coinmvga.o \
 	$(DRIVERS)/comebaby.o \
 	$(DRIVERS)/coolpool.o \
+	$(DRIVERS)/corona.o \
 	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
 	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
@@ -1839,6 +1840,8 @@ $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
 						$(LAYOUT)/crash.lh
 
 $(DRIVERS)/copsnrob.o:	$(LAYOUT)/copsnrob.lh
+
+$(DRIVERS)/corona.o:	$(LAYOUT)/re800.lh
 
 $(DRIVERS)/darius.o:	$(LAYOUT)/darius.lh
 
