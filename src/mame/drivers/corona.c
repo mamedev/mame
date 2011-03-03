@@ -331,7 +331,6 @@ static WRITE8_HANDLER( blitter_y_w )
 static WRITE8_HANDLER( blitter_unk_w )
 {
 	blitter_unk_reg = data;
-	printf("%02x\n",blitter_unk_reg);
 }
 
 static WRITE8_HANDLER( blitter_x_w )
@@ -403,9 +402,11 @@ static VIDEO_START(winner)
 static SCREEN_UPDATE(winner)
 {
 	int x, y;
+
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
 			*BITMAP_ADDR16(bitmap, y, x) = videobuf[y * 512 + x];
+
 	return 0;
 }
 
@@ -417,8 +418,15 @@ static SCREEN_UPDATE(winner)
 static WRITE8_HANDLER( sound_latch_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "soundcpu", 0, ASSERT_LINE);
 }
+
+static READ8_HANDLER( sound_latch_r )
+{
+	cputag_set_input_line(space->machine, "soundcpu", 0, CLEAR_LINE);
+	return soundlatch_r(space, 0);
+}
+
 
 static WRITE8_HANDLER( ball_w )
 {
@@ -514,7 +522,8 @@ static ADDRESS_MAP_START( winner81_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x75, 0x75) AM_READ(blitter_status_r)
 	AM_RANGE(0x76, 0x76) AM_WRITE(blitter_aux_w)
 
-	AM_RANGE(0xd8, 0xd8) AM_WRITE(sound_latch_w)
+	AM_RANGE(0xd8, 0xd8) AM_WRITENOP
+	AM_RANGE(0xdf, 0xdf) AM_WRITE(sound_latch_w)
 
 	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("DSW2")
@@ -527,13 +536,13 @@ static ADDRESS_MAP_START( winner81_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(  winner81_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(  winner81_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
@@ -564,7 +573,7 @@ static ADDRESS_MAP_START( winner82_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
 	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
 
-	AM_RANGE(0xef9, 0xf9) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW1")
 
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN0")
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN1")
@@ -576,13 +585,13 @@ static ADDRESS_MAP_START( winner82_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
@@ -636,13 +645,13 @@ static ADDRESS_MAP_START( re800_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( re800_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( re800_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
@@ -1072,6 +1081,7 @@ static MACHINE_CONFIG_START( winner81, driver_device )
 	MCFG_CPU_ADD("soundcpu", Z80, WC_MAIN_XTAL/10)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_sound_map)
 	MCFG_CPU_IO_MAP(winner81_sound_cpu_io_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,120) //unknown timing
 
 //	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1105,6 +1115,7 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_CPU_ADD("soundcpu", Z80, WC_MAIN_XTAL/10)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)
 	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,120) //unknown timing
 
 //	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1138,6 +1149,7 @@ static MACHINE_CONFIG_START( re800, driver_device )
 	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz. but seems a bit low */
 	MCFG_CPU_PROGRAM_MAP(re800_sound_map)
 	MCFG_CPU_IO_MAP(re800_sound_cpu_io_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,120) //unknown timing
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1182,6 +1194,10 @@ MACHINE_CONFIG_END
 
   All ICs are scratched to avoid the recognizement.
 
+  Note:
+  4_2732_80e0.bin is identical to son_2716_4070.bin,
+  for whatever reason on this set
+
 ***************************************************/
 
 ROM_START(winner81)
@@ -1193,6 +1209,7 @@ ROM_START(winner81)
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD("son_2716_4070.bin",	0x0000, 0x0800, CRC(547068a8) SHA1(fe0e1272feb0196b14554d7c3cb043212508bfbc) )
+	ROM_RELOAD(                     0x0800, 0x0800 ) //reads here during horse race
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "corona_82s123.bin",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
@@ -1207,6 +1224,7 @@ ROM_START(winner82)
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )	/* need confirmation if it's the same */
 	ROM_LOAD("son_2716_4070.bin",	0x0000, 0x0800, BAD_DUMP CRC(547068a8) SHA1(fe0e1272feb0196b14554d7c3cb043212508bfbc) )
+	ROM_RELOAD(                     0x0800, 0x0800 ) //reads here during horse race
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "corona_82s123.bin",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
@@ -1233,6 +1251,7 @@ ROM_START(re800ea)
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD("re800snd.16",	0x0000, 0x0800, CRC(54d312fa) SHA1(6ed31f091362f7baa59afef91410fe946894e2ee) )
+	ROM_RELOAD(                     0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
@@ -1244,6 +1263,7 @@ ROM_START(re800v1)
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD("re800snd.16",	0x0000, 0x0800, CRC(54d312fa) SHA1(6ed31f091362f7baa59afef91410fe946894e2ee) )
+	ROM_RELOAD(             0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
@@ -1255,6 +1275,7 @@ ROM_START(re800v3)
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD("re800snd.16",	0x0000, 0x0800, CRC(54d312fa) SHA1(6ed31f091362f7baa59afef91410fe946894e2ee) )
+	ROM_RELOAD(             0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
@@ -1264,14 +1285,7 @@ ROM_END
 /******************************************
 *               Driver Init               *
 ******************************************/
-static DRIVER_INIT( re800 )
-{
-/* loop waiting for a write at 0x801a, thing that never happens */
-	UINT8 *rom = machine->region("maincpu")->base();
 
-	rom[0x208f] = 0x00;
-	rom[0x2090] = 0x00;
-};
 
 
 /******************************************
@@ -1282,5 +1296,5 @@ static DRIVER_INIT( re800 )
 GAME(  1981, winner81, 0,        winner81, winner,   0,        ROT0,   "Corona Co.,LTD.",          "Winners Circle (81)",                 GAME_NOT_WORKING )
 GAME(  1982, winner82, 0,        winner82, winner82, 0,        ROT0,   "Corona Co.,LTD.",          "Winners Circle (82)",                 GAME_NOT_WORKING )
 GAMEL( 1991, re800ea,  0,        re800,    re800,    0,        ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 1991, re800v1,  0,        re800,    re800,    re800,    ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
+GAMEL( 1991, re800v1,  0,        re800,    re800,    0,        ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
 GAMEL( 1991, re800v3,  0,        re800,    re800v3,  0,        ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
