@@ -273,7 +273,6 @@ public:
 	}
 };
 
-static timer_device* scanline_timer;
 
 static READ16_HANDLER( wheelfir_status_r )
 {
@@ -757,10 +756,8 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 }
 
 
-static MACHINE_RESET(wheelfir)
+static MACHINE_RESET( wheelfir )
 {
-
-	scanline_timer = machine->device<timer_device>("scan_timer");
 }
 
 static MACHINE_START( wheelfir )

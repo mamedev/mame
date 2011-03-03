@@ -91,6 +91,16 @@ public:
 	/* devices */
 	device_t *maincpu;
 	device_t *subcpu;
+
+#if 0
+	int dbg_info;
+	int dbg_gfx_e;
+	int dbg_clr_e;
+	int dbg_vbank;
+	int dbg_lookup;
+
+	int planes_enabled[4];
+#endif
 };
 
 
@@ -130,6 +140,16 @@ static PALETTE_INIT( mazerbla )
 static VIDEO_START( mazerbla )
 {
 	mazerbla_state *state = machine->driver_data<mazerbla_state>();
+
+#if 0
+	state->planes_enabled[0] = state->planes_enabled[1] = state->planes_enabled[2] = state->planes_enabled[3] = 1;
+	state->dbg_info = 1;
+	state->dbg_gfx_e = 1;
+	state->dbg_clr_e = 0;
+	state->dbg_vbank = 1;
+	state->dbg_lookup = 4;
+#endif
+
 	state->tmpbitmaps[0] = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmpbitmaps[1] = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmpbitmaps[2] = machine->primary_screen->alloc_compatible_bitmap();
@@ -142,17 +162,11 @@ static VIDEO_START( mazerbla )
 }
 
 #ifdef UNUSED_DEFINITION
-static int dbg_info = 1;
-static int dbg_gfx_e = 1;
-static int dbg_clr_e = 0;
-static int dbg_vbank = 1;
-static int dbg_lookup = 4;	//4= off
-
-static int planes_enabled[4] = {1,1,1,1}; //all enabled
 
 SCREEN_UPDATE( test_vcu )
 {
 	mazerbla_state *state = screen->machine->driver_data<mazerbla_state>();
+	int *planes_enabled = state->planes_enabled;
 	char buf[128];
 
 	UINT32 color_base = 0;
@@ -197,27 +211,27 @@ SCREEN_UPDATE( test_vcu )
 		planes_enabled[3] ^= 1;
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_I))	/* show/hide debug info */
-		dbg_info = !dbg_info;
+		state->dbg_info = !state->dbg_info;
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_G))	/* enable gfx area handling */
-		dbg_gfx_e = !dbg_gfx_e;
+		state->dbg_gfx_e = !state->dbg_gfx_e;
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_C))	/* enable color area handling */
-		dbg_clr_e = !dbg_clr_e;
+		state->dbg_clr_e = !state->dbg_clr_e;
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_V))	/* draw only when vbank==dbg_vbank */
-		dbg_vbank ^= 1;
+		state->dbg_vbank ^= 1;
 
 	if (input_code_pressed_once(screen->machine, KEYCODE_L))	/* showlookup ram */
-		dbg_lookup = (dbg_lookup + 1) % 5;	//0,1,2,3, 4-off
+		state->dbg_lookup = (state->dbg_lookup + 1) % 5;	//0,1,2,3, 4-off
 
 
-	if (dbg_info)
+	if (state->dbg_info)
 	{
 		sprintf(buf,"I-info, G-gfx, C-color, V-vbank, 1-4 enable planes");
 		ui_draw_text(buf, 10, 0 * ui_get_line_height(*screen->machine));
 
-		sprintf(buf,"g:%1i c:%1i v:%1i vbk=%1i  planes=%1i%1i%1i%1i  ", dbg_gfx_e&1, dbg_clr_e&1, dbg_vbank, vbank&1,
+		sprintf(buf,"g:%1i c:%1i v:%1i vbk=%1i  planes=%1i%1i%1i%1i  ", state->dbg_gfx_e&1, state->dbg_clr_e&1, state->dbg_vbank, vbank&1,
 			planes_enabled[0],
 			planes_enabled[1],
 			planes_enabled[2],
@@ -225,9 +239,9 @@ SCREEN_UPDATE( test_vcu )
 
 		ui_draw_text(buf, 10, 1 * ui_get_line_height(*screen->machine));
 
-		if (dbg_lookup!=4)
+		if (state->dbg_lookup!=4)
 		{
-			int lookup_offs = (dbg_lookup)*256; //=0,1,2,3*256
+			int lookup_offs = (state->dbg_lookup)*256; //=0,1,2,3*256
 			int y, x;
 
 			for (y = 0; y < 16; y++)
@@ -413,9 +427,9 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 		case 0x0e:
 		case 0x0d:
 		case 0x0c:
-//      if (dbg_gfx_e)
+//      if (state->dbg_gfx_e)
 //      {
-//          if (state->vbank == dbg_vbank)
+//          if (state->vbank == state->dbg_vbank)
 		{
 			for (y = 0; y <= state->pix_ysize; y++)
 			{
@@ -456,9 +470,9 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 		case 0x0a:/* verified - 1bpp */
 		case 0x09:/* verified - 1bpp: gun crosshair */
 		case 0x08:/* */
-//      if (dbg_gfx_e)
+//      if (state->dbg_gfx_e)
 //      {
-//          if (state->vbank == dbg_vbank)
+//          if (state->vbank == state->dbg_vbank)
 		{
 
 			for (y = 0; y <= state->pix_ysize; y++)
@@ -484,9 +498,9 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 		case 0x03:
 		case 0x01:
 		case 0x00:
-//      if (dbg_gfx_e)
+//      if (state->dbg_gfx_e)
 //      {
-//          if (state->vbank == dbg_vbank)
+//          if (state->vbank == state->dbg_vbank)
 		{
 			for (y = 0; y <= state->pix_ysize; y++)
 			{
@@ -565,7 +579,7 @@ static READ8_HANDLER( vcu_set_clr_addr_r )
 		case 0x03:
 		/* ... this may proove that there is really only one area and that
            the draw command/palette selector is done via the 'mode' only ... */
-		//if (dbg_clr_e)
+		//if (state->dbg_clr_e)
 		{
 			offs = state->vcu_gfx_addr;
 

@@ -1,14 +1,31 @@
+class wc90_state : public driver_device
+{
+public:
+	wc90_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *fgvideoram;
+	UINT8 *bgvideoram;
+	UINT8 *txvideoram;
+	UINT8 *scroll0xlo;
+	UINT8 *scroll0xhi;
+	UINT8 *scroll1xlo;
+	UINT8 *scroll1xhi;
+	UINT8 *scroll2xlo;
+	UINT8 *scroll2xhi;
+	UINT8 *scroll0ylo;
+	UINT8 *scroll0yhi;
+	UINT8 *scroll1ylo;
+	UINT8 *scroll1yhi;
+	UINT8 *scroll2ylo;
+	UINT8 *scroll2yhi;
+	tilemap_t *tx_tilemap;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
+};
+
+
 /*----------- defined in video/wc90.c -----------*/
-
-extern UINT8 *wc90_fgvideoram,*wc90_bgvideoram,*wc90_txvideoram;
-
-extern UINT8 *wc90_scroll0xlo, *wc90_scroll0xhi;
-extern UINT8 *wc90_scroll1xlo, *wc90_scroll1xhi;
-extern UINT8 *wc90_scroll2xlo, *wc90_scroll2xhi;
-
-extern UINT8 *wc90_scroll0ylo, *wc90_scroll0yhi;
-extern UINT8 *wc90_scroll1ylo, *wc90_scroll1yhi;
-extern UINT8 *wc90_scroll2ylo, *wc90_scroll2yhi;
 
 VIDEO_START( wc90 );
 VIDEO_START( wc90t );

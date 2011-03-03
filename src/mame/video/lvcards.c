@@ -9,9 +9,6 @@
 #include "emu.h"
 #include "includes/lvcards.h"
 
-UINT8 *lvcards_videoram;
-UINT8 *lvcards_colorram;
-static tilemap_t *bg_tilemap;
 
 PALETTE_INIT( ponttehk )
 {
@@ -85,20 +82,23 @@ PALETTE_INIT( lvcards ) //Ever so slightly different, but different enough.
 
 WRITE8_HANDLER( lvcards_videoram_w )
 {
-	lvcards_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	lvcards_state *state = space->machine->driver_data<lvcards_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( lvcards_colorram_w )
 {
-	lvcards_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	lvcards_state *state = space->machine->driver_data<lvcards_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = lvcards_colorram[tile_index];
-	int code = lvcards_videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
+	lvcards_state *state = machine->driver_data<lvcards_state>();
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);
 	int color = attr & 0x0f;
 	int flags = (attr & 0x40) ? TILE_FLIPX : 0;
 
@@ -107,12 +107,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( lvcards )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	lvcards_state *state = machine->driver_data<lvcards_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 }
 
 SCREEN_UPDATE( lvcards )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	lvcards_state *state = screen->machine->driver_data<lvcards_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }

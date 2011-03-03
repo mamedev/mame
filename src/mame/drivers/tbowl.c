@@ -19,9 +19,6 @@ Might be some priority glitches
 #include "rendlay.h"
 #include "includes/tbowl.h"
 
-static int adpcm_pos[2],adpcm_end[2];
-static int adpcm_data[2];
-static UINT8 *shared_ram;
 
 static WRITE8_HANDLER( tbowl_coin_counter_w )
 {
@@ -62,12 +59,14 @@ static WRITE8_HANDLER( tbowlc_bankswitch_w )
 
 static READ8_HANDLER( shared_r )
 {
-	return shared_ram[offset];
+	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	return state->shared_ram[offset];
 }
 
 static WRITE8_HANDLER( shared_w )
 {
-	shared_ram[offset] = data;
+	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	state->shared_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( tbowl_sound_command_w )
@@ -91,12 +90,12 @@ static WRITE8_HANDLER( tbowl_sound_command_w )
 static ADDRESS_MAP_START( 6206B_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(tbowl_bg2videoram_w) AM_BASE(&tbowl_bg2videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_BASE(&tbowl_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_BASE(&tbowl_txvideoram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(tbowl_bg2videoram_w) AM_BASE_MEMBER(tbowl_state, bg2videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_BASE_MEMBER(tbowl_state, bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_BASE_MEMBER(tbowl_state, txvideoram)
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_BASE(&shared_ram) /* check */
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_BASE_MEMBER(tbowl_state, shared_ram) /* check */
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE(tbowlb_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("P2")
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
@@ -133,7 +132,7 @@ static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READONLY
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
-	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_BASE(&tbowl_spriteram)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_BASE_MEMBER(tbowl_state, spriteram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram) // 2x palettes, one for each monitor?
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)
@@ -148,14 +147,16 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tbowl_adpcm_start_w )
 {
+	tbowl_state *state = space->machine->driver_data<tbowl_state>();
 	device_t *adpcm = space->machine->device((offset & 1) ? "msm2" : "msm1");
-	adpcm_pos[offset & 1] = data << 8;
+	state->adpcm_pos[offset & 1] = data << 8;
 	msm5205_reset_w(adpcm,0);
 }
 
 static WRITE8_HANDLER( tbowl_adpcm_end_w )
 {
-	adpcm_end[offset & 1] = (data + 1) << 8;
+	tbowl_state *state = space->machine->driver_data<tbowl_state>();
+	state->adpcm_end[offset & 1] = (data + 1) << 8;
 }
 
 static WRITE8_HANDLER( tbowl_adpcm_vol_w )
@@ -166,21 +167,22 @@ static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 
 static void tbowl_adpcm_int(device_t *device)
 {
+	tbowl_state *state = device->machine->driver_data<tbowl_state>();
 	int num = (strcmp(device->tag(), "msm1") == 0) ? 0 : 1;
-	if (adpcm_pos[num] >= adpcm_end[num] ||
-				adpcm_pos[num] >= device->machine->region("adpcm")->bytes()/2)
+	if (state->adpcm_pos[num] >= state->adpcm_end[num] ||
+				state->adpcm_pos[num] >= device->machine->region("adpcm")->bytes()/2)
 		msm5205_reset_w(device,1);
-	else if (adpcm_data[num] != -1)
+	else if (state->adpcm_data[num] != -1)
 	{
-		msm5205_data_w(device,adpcm_data[num] & 0x0f);
-		adpcm_data[num] = -1;
+		msm5205_data_w(device,state->adpcm_data[num] & 0x0f);
+		state->adpcm_data[num] = -1;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine->region("adpcm")->base() + 0x10000 * num;
 
-		adpcm_data[num] = ROM[adpcm_pos[num]++];
-		msm5205_data_w(device,adpcm_data[num] >> 4);
+		state->adpcm_data[num] = ROM[state->adpcm_pos[num]++];
+		msm5205_data_w(device,state->adpcm_data[num] >> 4);
 	}
 }
 
@@ -457,12 +459,13 @@ The game is displayed on 2 monitors
 
 static MACHINE_RESET( tbowl )
 {
-	adpcm_pos[0] = adpcm_pos[1] = 0;
-	adpcm_end[0] = adpcm_end[1] = 0;
-	adpcm_data[0] = adpcm_data[1] = -1;
+	tbowl_state *state = machine->driver_data<tbowl_state>();
+	state->adpcm_pos[0] = state->adpcm_pos[1] = 0;
+	state->adpcm_end[0] = state->adpcm_end[1] = 0;
+	state->adpcm_data[0] = state->adpcm_data[1] = -1;
 }
 
-static MACHINE_CONFIG_START( tbowl, driver_device )
+static MACHINE_CONFIG_START( tbowl, tbowl_state )
 
 	/* CPU on Board '6206B' */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */

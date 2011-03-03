@@ -110,6 +110,7 @@ INLINE int scanline_to_vcount(int scanline)
 
 static TIMER_DEVICE_CALLBACK( vball_scanline )
 {
+	vball_state *state = timer.machine->driver_data<vball_state>();
 	int scanline = param;
 	int screen_height = timer.machine->primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
@@ -136,7 +137,7 @@ static TIMER_DEVICE_CALLBACK( vball_scanline )
 	/* Save the scroll x register value */
 	if (scanline < 256)
 	{
-		vb_scrollx[255 - scanline] = (vb_scrollx_hi + vb_scrollx_lo + 4);
+		state->vb_scrollx[255 - scanline] = (state->vb_scrollx_hi + state->vb_scrollx_lo + 4);
 	}
 }
 
@@ -161,15 +162,16 @@ static WRITE8_HANDLER( vball_irq_ack_w )
 */
 static WRITE8_HANDLER( vb_bankswitch_w )
 {
+	vball_state *state = space->machine->driver_data<vball_state>();
 	UINT8 *RAM = space->machine->region("maincpu")->base();
 	memory_set_bankptr(space->machine, "bank1", &RAM[0x10000 + (0x4000 * (data & 1))]);
 
-	if (vball_gfxset != ((data  & 0x20) ^ 0x20))
+	if (state->gfxset != ((data  & 0x20) ^ 0x20))
 	{
-		vball_gfxset = (data  & 0x20) ^ 0x20;
-			vb_mark_all_dirty();
+		state->gfxset = (data  & 0x20) ^ 0x20;
+			vb_mark_all_dirty(space->machine);
 	}
-	vb_scrolly_hi = (data & 0x40) << 2;
+	state->vb_scrolly_hi = (data & 0x40) << 2;
 }
 
 /* The sound system comes all but verbatim from Double Dragon */
@@ -191,17 +193,19 @@ static WRITE8_HANDLER( cpu_sound_command_w )
 */
 static WRITE8_HANDLER( vb_scrollx_hi_w )
 {
+	vball_state *state = space->machine->driver_data<vball_state>();
 	flip_screen_set(space->machine, ~data&1);
-	vb_scrollx_hi = (data & 0x02) << 7;
+	state->vb_scrollx_hi = (data & 0x02) << 7;
 	vb_bgprombank_w(space->machine, (data >> 2) & 0x07);
 	vb_spprombank_w(space->machine, (data >> 5) & 0x07);
-	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(space->cpu), vb_scrollx_hi);
+	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(space->cpu), state->vb_scrollx_hi);
 }
 
 static WRITE8_HANDLER(vb_scrollx_lo_w)
 {
-	vb_scrollx_lo = data;
-	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(space->cpu), vb_scrollx_lo);
+	vball_state *state = space->machine->driver_data<vball_state>();
+	state->vb_scrollx_lo = data;
+	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(space->cpu), state->vb_scrollx_lo);
 }
 
 
@@ -221,9 +225,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x100a, 0x100b) AM_WRITE(vball_irq_ack_w)	/* is there a scanline counter here? */
 	AM_RANGE(0x100c, 0x100c) AM_WRITE(vb_scrollx_lo_w)
 	AM_RANGE(0x100d, 0x100d) AM_WRITE(cpu_sound_command_w)
-	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_BASE(&vb_scrolly_lo)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(vb_videoram_w) AM_BASE(&vb_videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(vb_attrib_w) AM_BASE(&vb_attribram)
+	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_BASE_MEMBER(vball_state, vb_scrolly_lo)
+	AM_RANGE(0x2000, 0x2fff) AM_WRITE(vb_videoram_w) AM_BASE_MEMBER(vball_state, vb_videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_WRITE(vb_attrib_w) AM_BASE_MEMBER(vball_state, vb_attribram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -415,7 +419,7 @@ static const ym2151_interface ym2151_config =
 };
 
 
-static MACHINE_CONFIG_START( vball, driver_device )
+static MACHINE_CONFIG_START( vball, vball_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* 2 MHz - measured by guru but it makes the game far far too slow ?! */

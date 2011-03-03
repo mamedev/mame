@@ -95,7 +95,6 @@ Noted added by ClawGrip 28-Mar-2008:
 #define YM2203_CLOCK XTAL_20MHz/16
 #define MSM5205_CLOCK XTAL_384kHz
 
-static int msm5205next;
 
 static WRITE8_HANDLER( wc90b_bankswitch_w )
 {
@@ -135,25 +134,26 @@ static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	msm5205next = data;
+	wc90b_state *state = space->machine->driver_data<wc90b_state>();
+	state->msm5205next = data;
 }
 
 
 static ADDRESS_MAP_START( wc90b_map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_BASE(&wc90b_fgvideoram)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_BASE(&wc90b_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_BASE(&wc90b_txvideoram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_BASE_MEMBER(wc90b_state, fgvideoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_BASE_MEMBER(wc90b_state, bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_BASE_MEMBER(wc90b_state, txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(wc90b_sound_command_w)
-	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_BASE(&wc90b_scroll1y)
-	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_BASE(&wc90b_scroll1x)
-	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_BASE(&wc90b_scroll2y)
-	AM_RANGE(0xfd0a, 0xfd0a) AM_WRITEONLY AM_BASE(&wc90b_scroll2x)
-	AM_RANGE(0xfd0e, 0xfd0e) AM_WRITEONLY AM_BASE(&wc90b_scroll_x_lo)
+	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, scroll1y)
+	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, scroll1x)
+	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, scroll2y)
+	AM_RANGE(0xfd0a, 0xfd0a) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, scroll2x)
+	AM_RANGE(0xfd0e, 0xfd0e) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, scroll_x_lo)
 	AM_RANGE(0xfd00, 0xfd00) AM_READ_PORT("P1")
 	AM_RANGE(0xfd02, 0xfd02) AM_READ_PORT("P2")
 	AM_RANGE(0xfd06, 0xfd06) AM_READ_PORT("DSW1")
@@ -342,16 +342,16 @@ static const ym2203_interface ym2203_config =
 
 static void adpcm_int(device_t *device)
 {
-	static int toggle = 0;
+	wc90b_state *state = device->machine->driver_data<wc90b_state>();
 
-	toggle ^= 1;
-	if(toggle)
+	state->toggle ^= 1;
+	if(state->toggle)
 	{
-		msm5205_data_w(device, (msm5205next & 0xf0) >> 4);
+		msm5205_data_w(device, (state->msm5205next & 0xf0) >> 4);
 		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		msm5205_data_w(device, (msm5205next & 0x0f) >> 0);
+		msm5205_data_w(device, (state->msm5205next & 0x0f) >> 0);
 }
 
 static const msm5205_interface msm5205_config =
@@ -360,7 +360,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S96_4B	/* 4KHz 4-bit */
 };
 
-static MACHINE_CONFIG_START( wc90b, driver_device )
+static MACHINE_CONFIG_START( wc90b, wc90b_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)

@@ -68,10 +68,10 @@ static WRITE16_HANDLER ( wwfwfest_irq_ack_w );
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(wwfwfest_fg0_videoram_w) AM_BASE(&wwfwfest_fg0_videoram)	/* FG0 Ram - 4 bytes per tile */
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(wwfwfest_fg0_videoram_w) AM_BASE_MEMBER(wwfwfest_state, fg0_videoram)	/* FG0 Ram - 4 bytes per tile */
 	AM_RANGE(0x0c2000, 0x0c3fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)						/* SPR Ram */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfwfest_bg0_videoram_w) AM_BASE(&wwfwfest_bg0_videoram)	/* BG0 Ram - 4 bytes per tile */
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(wwfwfest_bg1_videoram_w) AM_BASE(&wwfwfest_bg1_videoram)	/* BG1 Ram - 2 bytes per tile */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfwfest_bg0_videoram_w) AM_BASE_MEMBER(wwfwfest_state, bg0_videoram)	/* BG0 Ram - 4 bytes per tile */
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(wwfwfest_bg1_videoram_w) AM_BASE_MEMBER(wwfwfest_state, bg1_videoram)	/* BG1 Ram - 2 bytes per tile */
 	AM_RANGE(0x100000, 0x100007) AM_WRITE(wwfwfest_scroll_write)
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(wwfwfest_flipscreen_w)
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(wwfwfest_irq_ack_w)
@@ -133,25 +133,27 @@ static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
 
 static WRITE16_HANDLER( wwfwfest_1410_write )
 {
-	wwfwfest_pri = data;
+	wwfwfest_state *state = space->machine->driver_data<wwfwfest_state>();
+	state->pri = data;
 }
 
 /*- Scroll Control -*/
 
 static WRITE16_HANDLER( wwfwfest_scroll_write )
 {
+	wwfwfest_state *state = space->machine->driver_data<wwfwfest_state>();
 	switch (offset) {
 		case 0x00:
-			wwfwfest_bg0_scrollx = data;
+			state->bg0_scrollx = data;
 			break;
 		case 0x01:
-			wwfwfest_bg0_scrolly = data;
+			state->bg0_scrolly = data;
 			break;
 		case 0x02:
-			wwfwfest_bg1_scrollx = data;
+			state->bg1_scrollx = data;
 			break;
 		case 0x03:
-			wwfwfest_bg1_scrolly = data;
+			state->bg1_scrolly = data;
 			break;
 	}
 }
@@ -390,7 +392,7 @@ static SCREEN_EOF( wwfwfest )
  Machine Driver(s)
 *******************************************************************************/
 
-static MACHINE_CONFIG_START( wwfwfest, driver_device )
+static MACHINE_CONFIG_START( wwfwfest, wwfwfest_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)	/* 24 crystal, 12 rated chip */

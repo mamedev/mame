@@ -4,15 +4,6 @@
 #include "includes/spdodgeb.h"
 
 
-UINT8 *spdodgeb_videoram;
-
-static int tile_palbank;
-static int sprite_palbank;
-
-static tilemap_t *bg_tilemap;
-
-
-
 PALETTE_INIT( spdodgeb )
 {
 	int i;
@@ -62,12 +53,13 @@ static TILEMAP_MAPPER( background_scan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 code = spdodgeb_videoram[tile_index];
-	UINT8 attr = spdodgeb_videoram[tile_index + 0x800];
+	spdodgeb_state *state = machine->driver_data<spdodgeb_state>();
+	UINT8 code = state->videoram[tile_index];
+	UINT8 attr = state->videoram[tile_index + 0x800];
 	SET_TILE_INFO(
 			0,
 			code + ((attr & 0x1f) << 8),
-			((attr & 0xe0) >> 5) + 8 * tile_palbank,
+			((attr & 0xe0) >> 5) + 8 * state->tile_palbank,
 			0);
 }
 
@@ -80,7 +72,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( spdodgeb )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan,8,8,64,32);
+	spdodgeb_state *state = machine->driver_data<spdodgeb_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan,8,8,64,32);
 }
 
 
@@ -90,7 +83,6 @@ VIDEO_START( spdodgeb )
 
 ***************************************************************************/
 
-static int lastscroll;
 
 INTERRUPT_GEN( spdodgeb_interrupt )
 {
@@ -111,11 +103,13 @@ INTERRUPT_GEN( spdodgeb_interrupt )
 
 WRITE8_HANDLER( spdodgeb_scrollx_lo_w )
 {
-	lastscroll = (lastscroll & 0x100) | data;
+	spdodgeb_state *state = space->machine->driver_data<spdodgeb_state>();
+	state->lastscroll = (state->lastscroll & 0x100) | data;
 }
 
 WRITE8_HANDLER( spdodgeb_ctrl_w )
 {
+	spdodgeb_state *state = space->machine->driver_data<spdodgeb_state>();
 	UINT8 *rom = space->machine->region("maincpu")->base();
 
 	/* bit 0 = flip screen */
@@ -125,23 +119,24 @@ WRITE8_HANDLER( spdodgeb_ctrl_w )
 	memory_set_bankptr(space->machine, "bank1",rom + 0x10000 + 0x4000 * ((~data & 0x02) >> 1));
 
 	/* bit 2 = scroll high bit */
-	lastscroll = (lastscroll & 0x0ff) | ((data & 0x04) << 6);
+	state->lastscroll = (state->lastscroll & 0x0ff) | ((data & 0x04) << 6);
 
 	/* bit 3 = to mcu?? */
 
 	/* bits 4-7 = palette bank select */
-	if (tile_palbank != ((data & 0x30) >> 4))
+	if (state->tile_palbank != ((data & 0x30) >> 4))
 	{
-		tile_palbank = ((data & 0x30) >> 4);
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		state->tile_palbank = ((data & 0x30) >> 4);
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
-	sprite_palbank = (data & 0xc0) >> 6;
+	state->sprite_palbank = (data & 0xc0) >> 6;
 }
 
 WRITE8_HANDLER( spdodgeb_videoram_w )
 {
-	spdodgeb_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
+	spdodgeb_state *state = space->machine->driver_data<spdodgeb_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x7ff);
 }
 
 
@@ -154,10 +149,11 @@ WRITE8_HANDLER( spdodgeb_videoram_w )
 
 #define DRAW_SPRITE( order, sx, sy ) drawgfx_transpen( bitmap, \
 					cliprect,gfx, \
-					(which+order),color+ 8 * sprite_palbank,flipx,flipy,sx,sy,0);
+					(which+order),color+ 8 * state->sprite_palbank,flipx,flipy,sx,sy,0);
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	spdodgeb_state *state = machine->driver_data<spdodgeb_state>();
 	UINT8 *spriteram = machine->generic.spriteram.u8;
 	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *src;
@@ -215,8 +211,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( spdodgeb )
 {
-	tilemap_set_scrollx(bg_tilemap,0,lastscroll+5);
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	spdodgeb_state *state = screen->machine->driver_data<spdodgeb_state>();
+	tilemap_set_scrollx(state->bg_tilemap,0,state->lastscroll+5);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;
 }

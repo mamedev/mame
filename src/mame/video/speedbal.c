@@ -9,15 +9,12 @@
 #include "emu.h"
 #include "includes/speedbal.h"
 
-UINT8 *speedbal_background_videoram;
-UINT8 *speedbal_foreground_videoram;
-
-static tilemap_t *bg_tilemap, *fg_tilemap;
 
 static TILE_GET_INFO( get_tile_info_bg )
 {
-	int code = speedbal_background_videoram[tile_index*2] + ((speedbal_background_videoram[tile_index*2+1] & 0x30) << 4);
-	int color = speedbal_background_videoram[tile_index*2+1] & 0x0f;
+	speedbal_state *state = machine->driver_data<speedbal_state>();
+	int code = state->background_videoram[tile_index*2] + ((state->background_videoram[tile_index*2+1] & 0x30) << 4);
+	int color = state->background_videoram[tile_index*2+1] & 0x0f;
 
 	SET_TILE_INFO(1, code, color, 0);
 	tileinfo->group = (color == 8);
@@ -25,8 +22,9 @@ static TILE_GET_INFO( get_tile_info_bg )
 
 static TILE_GET_INFO( get_tile_info_fg )
 {
-	int code = speedbal_foreground_videoram[tile_index*2] + ((speedbal_foreground_videoram[tile_index*2+1] & 0x30) << 4);
-	int color = speedbal_foreground_videoram[tile_index*2+1] & 0x0f;
+	speedbal_state *state = machine->driver_data<speedbal_state>();
+	int code = state->foreground_videoram[tile_index*2] + ((state->foreground_videoram[tile_index*2+1] & 0x30) << 4);
+	int color = state->foreground_videoram[tile_index*2+1] & 0x0f;
 
 	SET_TILE_INFO(0, code, color, 0);
 	tileinfo->group = (color == 9);
@@ -40,14 +38,15 @@ static TILE_GET_INFO( get_tile_info_fg )
 
 VIDEO_START( speedbal )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols_flip_x,  16, 16, 16, 16);
-	fg_tilemap = tilemap_create(machine, get_tile_info_fg, tilemap_scan_cols_flip_x,   8,  8, 32, 32);
+	speedbal_state *state = machine->driver_data<speedbal_state>();
+	state->bg_tilemap = tilemap_create(machine, get_tile_info_bg, tilemap_scan_cols_flip_x,  16, 16, 16, 16);
+	state->fg_tilemap = tilemap_create(machine, get_tile_info_fg, tilemap_scan_cols_flip_x,   8,  8, 32, 32);
 
-	tilemap_set_transmask(bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
-	tilemap_set_transmask(bg_tilemap,1,0x00f7,0x0000); /* split type 1 has pen 0-2, 4-7 transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap,0,0xffff,0x0000); /* split type 0 is totally transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap,1,0x00f7,0x0000); /* split type 1 has pen 0-2, 4-7 transparent in front half */
 
-	tilemap_set_transmask(fg_tilemap,0,0xffff,0x0001); /* split type 0 is totally transparent in front half and has pen 0 transparent in back half */
-	tilemap_set_transmask(fg_tilemap,1,0x0001,0x0001); /* split type 1 has pen 0 transparent in front and back half */
+	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001); /* split type 0 is totally transparent in front half and has pen 0 transparent in back half */
+	tilemap_set_transmask(state->fg_tilemap,1,0x0001,0x0001); /* split type 1 has pen 0 transparent in front and back half */
 }
 
 
@@ -60,8 +59,9 @@ VIDEO_START( speedbal )
 
 WRITE8_HANDLER( speedbal_foreground_videoram_w )
 {
-	speedbal_foreground_videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset>>1);
+	speedbal_state *state = space->machine->driver_data<speedbal_state>();
+	state->foreground_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset>>1);
 }
 
 /*************************************
@@ -72,8 +72,9 @@ WRITE8_HANDLER( speedbal_foreground_videoram_w )
 
 WRITE8_HANDLER( speedbal_background_videoram_w )
 {
-	speedbal_background_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset>>1);
+	speedbal_state *state = space->machine->driver_data<speedbal_state>();
+	state->background_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset>>1);
 }
 
 
@@ -127,10 +128,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( speedbal )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	speedbal_state *state = screen->machine->driver_data<speedbal_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

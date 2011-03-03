@@ -61,63 +61,72 @@ Dip sw.2
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 
-static UINT16 littlerb_vdp_address_low;
-static UINT16 littlerb_vdp_address_high;
-static UINT16 littlerb_vdp_writemode;
-static UINT32 littlerb_write_address;
 
+class littlerb_state : public driver_device
+{
+public:
+	littlerb_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-static UINT16* littlerb_region4;
-
-static UINT8 paldac[3][0x80];
-
-static int paldac_select = 0;
-static int paldac_offset = 0;
-
+	UINT16 vdp_address_low;
+	UINT16 vdp_address_high;
+	UINT16 vdp_writemode;
+	UINT32 write_address;
+	UINT16* region4;
+	UINT8 paldac[3][0x80];
+	int paldac_select;
+	int paldac_offset;
+	int type2_writes;
+	UINT32 lasttype2pc;
+};
 
 
 WRITE16_HANDLER( region4_w )
 {
-	COMBINE_DATA(&littlerb_region4[offset]);
+	littlerb_state *state = space->machine->driver_data<littlerb_state>();
+	COMBINE_DATA(&state->region4[offset]);
 }
 
 WRITE16_HANDLER(palette_offset_w)
 {
+	littlerb_state *state = space->machine->driver_data<littlerb_state>();
 	//printf("palette offset set to %04x\n",data);
-	paldac_offset = data;
-	paldac_select = 0;
-	paldac_offset&=0x7f;
+	state->paldac_offset = data;
+	state->paldac_select = 0;
+	state->paldac_offset&=0x7f;
 
 }
 
 WRITE16_HANDLER( palette_data_w )
 {
+	littlerb_state *state = space->machine->driver_data<littlerb_state>();
 	//printf("palette write %04x\n",data);
 
-	paldac[paldac_select][paldac_offset] = data;
-	paldac_select++;
-	if (paldac_select==3)
+	state->paldac[state->paldac_select][state->paldac_offset] = data;
+	state->paldac_select++;
+	if (state->paldac_select==3)
 	{
 		int r,g,b;
 
-		r = paldac[0][paldac_offset];
-		g = paldac[1][paldac_offset];
-		b = paldac[2][paldac_offset];
+		r = state->paldac[0][state->paldac_offset];
+		g = state->paldac[1][state->paldac_offset];
+		b = state->paldac[2][state->paldac_offset];
 
-		palette_set_color(space->machine,paldac_offset,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine,state->paldac_offset,MAKE_RGB(r,g,b));
 
-		paldac_select = 0;
-		paldac_offset++;
-		paldac_offset&=0x7f;
+		state->paldac_select = 0;
+		state->paldac_offset++;
+		state->paldac_offset&=0x7f;
 	}
 }
 
 WRITE16_HANDLER( palette_reset_w )
 {
+	littlerb_state *state = space->machine->driver_data<littlerb_state>();
 //  printf("palette reset write %04x\n",data);
 
-	paldac_select = 0;
-	paldac_offset = 0;
+	state->paldac_select = 0;
+	state->paldac_offset = 0;
 
 }
 
@@ -135,7 +144,7 @@ static ADDRESS_MAP_START( littlerb_vdp_map8, 0, 16 )
 	AM_RANGE(0x0ff80000, 0x0fffffff) AM_RAM_WRITE(region4_w)
 
 
-	AM_RANGE(0x1ff80000, 0x1fffffff)  AM_RAM_WRITE(region4_w) AM_BASE(&littlerb_region4)
+	AM_RANGE(0x1ff80000, 0x1fffffff)  AM_RAM_WRITE(region4_w) AM_BASE_MEMBER(littlerb_state, region4)
 ADDRESS_MAP_END
 
 
@@ -201,10 +210,11 @@ const device_type LITTLERBVDP = littlerb_vdp_device_config::static_alloc_device_
 /* end VDP device to give us our own memory map */
 
 
-static void littlerb_recalc_regs(void)
+static void littlerb_recalc_regs(running_machine *machine)
 {
-	littlerb_vdp_address_low = littlerb_write_address&0xffff;
-	littlerb_vdp_address_high = (littlerb_write_address>>16)&0xffff;
+	littlerb_state *state = machine->driver_data<littlerb_state>();
+	state->vdp_address_low = state->write_address&0xffff;
+	state->vdp_address_high = (state->write_address>>16)&0xffff;
 }
 
 
@@ -212,7 +222,8 @@ static void littlerb_recalc_regs(void)
 
 static void littlerb_data_write(running_machine *machine, UINT16 data, UINT16 mem_mask)
 {
-	UINT32 addr = littlerb_write_address>>4; // is this right? should we shift?
+	littlerb_state *state = machine->driver_data<littlerb_state>();
+	UINT32 addr = state->write_address>>4; // is this right? should we shift?
 	address_space *vdp_space = machine->device<littlerb_vdp_device>("littlerbvdp")->space();
 
 
@@ -220,58 +231,59 @@ static void littlerb_data_write(running_machine *machine, UINT16 data, UINT16 me
 
 
 	// e000 / 2000 are used for palette writes, which should go to a RAMDAC, so probably mean no auto inc.
-	if ((littlerb_vdp_writemode!=0xe000) && (littlerb_vdp_writemode!=0x2000)) littlerb_write_address+=0x10;
-	littlerb_recalc_regs();
+	if ((state->vdp_writemode!=0xe000) && (state->vdp_writemode!=0x2000)) state->write_address+=0x10;
+	littlerb_recalc_regs(machine);
 
 }
 
 
 
 
-static void littlerb_recalc_address(void)
+static void littlerb_recalc_address(running_machine *machine)
 {
-	littlerb_write_address = littlerb_vdp_address_low | littlerb_vdp_address_high<<16;
+	littlerb_state *state = machine->driver_data<littlerb_state>();
+	state->write_address = state->vdp_address_low | state->vdp_address_high<<16;
 }
 
 static READ16_HANDLER( littlerb_vdp_r )
 {
+	littlerb_state *state = space->machine->driver_data<littlerb_state>();
 	logerror("%06x littlerb_vdp_r offs %04x mask %04x\n", cpu_get_pc(space->cpu), offset, mem_mask);
 
 	switch (offset)
 	{
 		case 0:
-		return littlerb_vdp_address_low;
+		return state->vdp_address_low;
 
 		case 1:
-		return littlerb_vdp_address_high;
+		return state->vdp_address_high;
 
 		case 2:
 		return 0; // data read? -- startup check expects 0 for something..
 
 		case 3:
-		return littlerb_vdp_writemode;
+		return state->vdp_writemode;
 	}
 
 	return -1;
 }
 
 #define LOG_VDP 0
-static int type2_writes = 0;
-static UINT32 lasttype2pc = 0;
 static WRITE16_HANDLER( littlerb_vdp_w )
 {
+	littlerb_state *state = space->machine->driver_data<littlerb_state>();
 
 	if (offset!=2)
 	{
-		if (type2_writes)
+		if (state->type2_writes)
 		{
-			if (type2_writes>2)
+			if (state->type2_writes>2)
 			{
 				if (LOG_VDP) logerror("******************************* BIG WRITE OCCURRED BEFORE THIS!!! ****************************\n");
 			}
 
-			if (LOG_VDP) logerror("~%06x previously wrote %08x data bytes\n", lasttype2pc, type2_writes*2);
-			type2_writes = 0;
+			if (LOG_VDP) logerror("~%06x previously wrote %08x data bytes\n", state->lasttype2pc, state->type2_writes*2);
+			state->type2_writes = 0;
 		}
 
 		if (LOG_VDP) logerror("%06x littlerb_vdp_w offs %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
@@ -280,13 +292,13 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 	{
 		if (mem_mask==0xffff)
 		{
-			if (type2_writes==0)
+			if (state->type2_writes==0)
 			{
 				if (LOG_VDP) logerror("data write started %06x %04x data %04x mask %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 			}
 
-			type2_writes++;
-			lasttype2pc = cpu_get_pc(space->cpu);
+			state->type2_writes++;
+			state->lasttype2pc = cpu_get_pc(space->cpu);
 		}
 		else
 		{
@@ -298,13 +310,13 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 	switch (offset)
 	{
 		case 0:
-		littlerb_vdp_address_low = data;
-		littlerb_recalc_address();
+		state->vdp_address_low = data;
+		littlerb_recalc_address(space->machine);
 		break;
 
 		case 1:
-		littlerb_vdp_address_high = data;
-		littlerb_recalc_address();
+		state->vdp_address_high = data;
+		littlerb_recalc_address(space->machine);
 		break;
 
 
@@ -314,7 +326,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 
 		case 3:
 		logerror("WRITE MODE CHANGED TO %04x\n",data);
-		littlerb_vdp_writemode = data;
+		state->vdp_writemode = data;
 		break;
 
 	}
@@ -419,9 +431,10 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
+static void draw_sprite(running_machine *machine, bitmap_t *bitmap, int xsize,int ysize, int offset, int xpos, int ypos, int pal )
 {
-	UINT16* spritegfx = littlerb_region4;
+	littlerb_state *state = machine->driver_data<littlerb_state>();
+	UINT16* spritegfx = state->region4;
 	int x,y;
 	//int pal = 1;
 
@@ -459,10 +472,11 @@ static void draw_sprite(bitmap_t *bitmap, int xsize,int ysize, int offset, int x
 /* sprite format / offset could be completely wrong, this is just based on our (currently incorrect) vram access */
 static SCREEN_UPDATE(littlerb)
 {
+	littlerb_state *state = screen->machine->driver_data<littlerb_state>();
 	int x,y,offs, code;
 	int xsize,ysize;
 	int pal;
-	UINT16* spriteregion = &littlerb_region4[0x400];
+	UINT16* spriteregion = &state->region4[0x400];
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	//printf("frame\n");
 	/* the spriteram format is something like this .. */
@@ -482,7 +496,7 @@ static SCREEN_UPDATE(littlerb)
 
 		//if (code!=0) printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
 
-		draw_sprite(bitmap,xsize,ysize,code,x-8,y-16, pal);
+		draw_sprite(screen->machine,bitmap,xsize,ysize,code,x-8,y-16, pal);
 	}
 
 	return 0;
@@ -494,7 +508,7 @@ static INTERRUPT_GEN( littlerb )
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( littlerb, driver_device )
+static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(littlerb_main)
 	MCFG_CPU_VBLANK_INT("screen", littlerb)

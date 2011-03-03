@@ -109,7 +109,7 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 static ADDRESS_MAP_START( speedspn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)	/* RAM COLOUR */
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(speedspn_attram_w) AM_BASE(&speedspn_attram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(speedspn_attram_w) AM_BASE_MEMBER(speedspn_state, attram)
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(speedspn_vidram_r,speedspn_vidram_w)	/* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xa800, 0xafff) AM_RAM
@@ -267,7 +267,7 @@ GFXDECODE_END
 /*** MACHINE DRIVER **********************************************************/
 
 
-static MACHINE_CONFIG_START( speedspn, driver_device )
+static MACHINE_CONFIG_START( speedspn, speedspn_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */

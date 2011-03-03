@@ -12,12 +12,6 @@ Video hardware driver by Uki
 #include "includes/strnskil.h"
 
 
-UINT8 *strnskil_xscroll;
-static UINT8 strnskil_scrl_ctrl;
-
-static tilemap_t *bg_tilemap;
-
-
 PALETTE_INIT( strnskil )
 {
 	int i;
@@ -52,12 +46,13 @@ WRITE8_HANDLER( strnskil_videoram_w )
 	strnskil_state *state = space->machine->driver_data<strnskil_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 WRITE8_HANDLER( strnskil_scrl_ctrl_w )
 {
-	strnskil_scrl_ctrl = data >> 5;
+	strnskil_state *state = space->machine->driver_data<strnskil_state>();
+	state->scrl_ctrl = data >> 5;
 
 	if (flip_screen_get(space->machine) != (data & 0x08))
 	{
@@ -79,10 +74,11 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( strnskil )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
+	strnskil_state *state = machine->driver_data<strnskil_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols,
 		 8, 8, 32, 32);
 
-	tilemap_set_scroll_rows(bg_tilemap, 32);
+	tilemap_set_scroll_rows(state->bg_tilemap, 32);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -128,26 +124,27 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( strnskil )
 {
+	strnskil_state *state = screen->machine->driver_data<strnskil_state>();
 	int row;
 	const UINT8 *usr1 = screen->machine->region("user1")->base();
 
 	for (row = 0; row < 32; row++)
 	{
-		if (strnskil_scrl_ctrl != 0x07)
+		if (state->scrl_ctrl != 0x07)
 		{
-			switch (usr1[strnskil_scrl_ctrl * 32 + row])
+			switch (usr1[state->scrl_ctrl * 32 + row])
 			{
 			case 2:
-				tilemap_set_scrollx(bg_tilemap, row, -~strnskil_xscroll[1]);
+				tilemap_set_scrollx(state->bg_tilemap, row, -~state->xscroll[1]);
 				break;
 			case 4:
-				tilemap_set_scrollx(bg_tilemap, row, -~strnskil_xscroll[0]);
+				tilemap_set_scrollx(state->bg_tilemap, row, -~state->xscroll[0]);
 				break;
 			}
 		}
 	}
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

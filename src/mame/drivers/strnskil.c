@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( strnskil_map1, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xd808, 0xd808) AM_WRITE(strnskil_scrl_ctrl_w)
 	AM_RANGE(0xd809, 0xd809) AM_WRITENOP /* coin counter? */
-	AM_RANGE(0xd80a, 0xd80b) AM_WRITEONLY AM_BASE(&strnskil_xscroll)
+	AM_RANGE(0xd80a, 0xd80b) AM_WRITEONLY AM_BASE_MEMBER(strnskil_state, xscroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( strnskil_map2, ADDRESS_SPACE_PROGRAM, 8 )

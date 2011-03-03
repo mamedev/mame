@@ -109,25 +109,6 @@ $8000 - $ffff   ROM
 #include "sound/okim6295.h"
 #include "includes/renegade.h"
 
-static UINT8 bank;
-static int mcu_sim;
-
-/* MCU */
-static int from_main;
-static int from_mcu;
-static int main_sent;
-static int mcu_sent;
-static UINT8 ddr_a, ddr_b, ddr_c;
-static UINT8 port_a_out, port_b_out, port_c_out;
-static UINT8 port_a_in, port_b_in, port_c_in;
-
-/* MCU simulation (Kunio Kun) */
-#define MCU_BUFFER_MAX 6
-static UINT8 mcu_buffer[MCU_BUFFER_MAX];
-static UINT8 mcu_input_size;
-static UINT8 mcu_output_byte;
-static INT8 mcu_key;
-
 
 /********************************************************************************************/
 
@@ -232,9 +213,6 @@ static WRITE8_HANDLER( sound_w )
 **  (and enemy health??)
 */
 
-static int mcu_checksum;
-static const UINT8 *mcu_encrypt_table;
-static int mcu_encrypt_table_len;
 
 static const UINT8 kuniokun_xor_table[0x2a] =
 {
@@ -248,8 +226,9 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 
 static void setbank(running_machine *machine)
 {
+	renegade_state *state = machine->driver_data<renegade_state>();
 	UINT8 *RAM = machine->region("maincpu")->base();
-	memory_set_bankptr(machine, "bank1", &RAM[bank ? 0x10000 : 0x4000]);
+	memory_set_bankptr(machine, "bank1", &RAM[state->bank ? 0x10000 : 0x4000]);
 }
 
 static STATE_POSTLOAD( renegade_postload )
@@ -259,26 +238,29 @@ static STATE_POSTLOAD( renegade_postload )
 
 static MACHINE_START( renegade )
 {
-	state_save_register_global_array(machine, mcu_buffer);
-	state_save_register_global(machine, mcu_input_size);
-	state_save_register_global(machine, mcu_output_byte);
-	state_save_register_global(machine, mcu_key);
+	renegade_state *state = machine->driver_data<renegade_state>();
+	state_save_register_global_array(machine, state->mcu_buffer);
+	state_save_register_global(machine, state->mcu_input_size);
+	state_save_register_global(machine, state->mcu_output_byte);
+	state_save_register_global(machine, state->mcu_key);
 
-	state_save_register_global(machine, bank);
+	state_save_register_global(machine, state->bank);
 	machine->state().register_postload(renegade_postload, NULL);
 }
 
 static DRIVER_INIT( renegade )
 {
-	mcu_sim = FALSE;
+	renegade_state *state = machine->driver_data<renegade_state>();
+	state->mcu_sim = FALSE;
 }
 
 static DRIVER_INIT( kuniokun )
 {
-	mcu_sim = TRUE;
-	mcu_checksum = 0x85;
-	mcu_encrypt_table = kuniokun_xor_table;
-	mcu_encrypt_table_len = 0x2a;
+	renegade_state *state = machine->driver_data<renegade_state>();
+	state->mcu_sim = TRUE;
+	state->mcu_checksum = 0x85;
+	state->mcu_encrypt_table = kuniokun_xor_table;
+	state->mcu_encrypt_table_len = 0x2a;
 
 	machine->device<cpu_device>("mcu")->suspend(SUSPEND_REASON_DISABLE, 1);
 }
@@ -301,69 +283,78 @@ static DRIVER_INIT( kuniokunb )
 
 READ8_HANDLER( renegade_68705_port_a_r )
 {
-	return (port_a_out & ddr_a) | (port_a_in & ~ddr_a);
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( renegade_68705_port_a_w )
 {
-	port_a_out = data;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->port_a_out = data;
 }
 
 WRITE8_HANDLER( renegade_68705_ddr_a_w )
 {
-	ddr_a = data;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->ddr_a = data;
 }
 
 READ8_HANDLER( renegade_68705_port_b_r )
 {
-	return (port_b_out & ddr_b) | (port_b_in & ~ddr_b);
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 WRITE8_HANDLER( renegade_68705_port_b_w )
 {
-	if ((ddr_b & 0x02) && (~data & 0x02) && (port_b_out & 0x02))
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	if ((state->ddr_b & 0x02) && (~data & 0x02) && (state->port_b_out & 0x02))
 	{
-		port_a_in = from_main;
+		state->port_a_in = state->from_main;
 
-		if (main_sent)
+		if (state->main_sent)
 			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 
-		main_sent = 0;
+		state->main_sent = 0;
 	}
-	if ((ddr_b & 0x04) && (data & 0x04) && (~port_b_out & 0x04))
+	if ((state->ddr_b & 0x04) && (data & 0x04) && (~state->port_b_out & 0x04))
 	{
-		from_mcu = port_a_out;
-		mcu_sent = 1;
+		state->from_mcu = state->port_a_out;
+		state->mcu_sent = 1;
 	}
 
-	port_b_out = data;
+	state->port_b_out = data;
 }
 
 WRITE8_HANDLER( renegade_68705_ddr_b_w )
 {
-	ddr_b = data;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->ddr_b = data;
 }
 
 
 READ8_HANDLER( renegade_68705_port_c_r )
 {
-	port_c_in = 0;
-	if (main_sent)
-		port_c_in |= 0x01;
-	if (!mcu_sent)
-		port_c_in |= 0x02;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->port_c_in = 0;
+	if (state->main_sent)
+		state->port_c_in |= 0x01;
+	if (!state->mcu_sent)
+		state->port_c_in |= 0x02;
 
-	return (port_c_out & ddr_c) | (port_c_in & ~ddr_c);
+	return (state->port_c_out & state->ddr_c) | (state->port_c_in & ~state->ddr_c);
 }
 
 WRITE8_HANDLER( renegade_68705_port_c_w )
 {
-	port_c_out = data;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->port_c_out = data;
 }
 
 WRITE8_HANDLER( renegade_68705_ddr_c_w )
 {
-	ddr_c = data;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->ddr_c = data;
 }
 
 
@@ -375,11 +366,12 @@ WRITE8_HANDLER( renegade_68705_ddr_c_w )
 
 static READ8_HANDLER( mcu_reset_r )
 {
-	if (mcu_sim == TRUE)
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	if (state->mcu_sim == TRUE)
 	{
-		mcu_key = -1;
-		mcu_input_size = 0;
-		mcu_output_byte = 0;
+		state->mcu_key = -1;
+		state->mcu_input_size = 0;
+		state->mcu_output_byte = 0;
 	}
 	else
 	{
@@ -390,49 +382,50 @@ static READ8_HANDLER( mcu_reset_r )
 
 static WRITE8_HANDLER( mcu_w )
 {
-	if (mcu_sim == TRUE)
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	if (state->mcu_sim == TRUE)
 	{
-		mcu_output_byte = 0;
+		state->mcu_output_byte = 0;
 
-		if (mcu_key < 0)
+		if (state->mcu_key < 0)
 		{
-			mcu_key = 0;
-			mcu_input_size = 1;
-			mcu_buffer[0] = data;
+			state->mcu_key = 0;
+			state->mcu_input_size = 1;
+			state->mcu_buffer[0] = data;
 		}
 		else
 		{
-			data ^= mcu_encrypt_table[mcu_key++];
-			if (mcu_key == mcu_encrypt_table_len)
-				mcu_key = 0;
-			if (mcu_input_size < MCU_BUFFER_MAX)
-				mcu_buffer[mcu_input_size++] = data;
+			data ^= state->mcu_encrypt_table[state->mcu_key++];
+			if (state->mcu_key == state->mcu_encrypt_table_len)
+				state->mcu_key = 0;
+			if (state->mcu_input_size < MCU_BUFFER_MAX)
+				state->mcu_buffer[state->mcu_input_size++] = data;
 		}
 	}
 	else
 	{
-		from_main = data;
-		main_sent = 1;
+		state->from_main = data;
+		state->main_sent = 1;
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 	}
 }
 
-static void mcu_process_command(void)
+static void mcu_process_command(renegade_state *state)
 {
-	mcu_input_size = 0;
-	mcu_output_byte = 0;
+	state->mcu_input_size = 0;
+	state->mcu_output_byte = 0;
 
-	switch (mcu_buffer[0])
+	switch (state->mcu_buffer[0])
 	{
 	/* 0x0d: stop MCU when ROM check fails */
 
 	case 0x10:
-		mcu_buffer[0] = mcu_checksum;
+		state->mcu_buffer[0] = state->mcu_checksum;
 		break;
 
 	case 0x26: /* sound code -> sound command */
 		{
-			int sound_code = mcu_buffer[1];
+			int sound_code = state->mcu_buffer[1];
 			static const UINT8 sound_command_table[256] =
 			{
 				0xa0, 0xa1, 0xa2, 0x80, 0x81, 0x82, 0x83, 0x84,
@@ -468,27 +461,27 @@ static void mcu_process_command(void)
 				0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0xff, 0xff, 0xff,
 				0xef, 0xef, 0xcf, 0x8f, 0x8f, 0x0f, 0x0f, 0x0f
 			};
-			mcu_buffer[0] = 1;
-			mcu_buffer[1] = sound_command_table[sound_code];
+			state->mcu_buffer[0] = 1;
+			state->mcu_buffer[1] = sound_command_table[sound_code];
 		}
 		break;
 
 	case 0x33: /* joy bits -> joy dir */
 		{
-			int joy_bits = mcu_buffer[2];
+			int joy_bits = state->mcu_buffer[2];
 			static const UINT8 joy_table[0x10] =
 			{
 				0, 3, 7, 0, 1, 2, 8, 0, 5, 4, 6, 0, 0, 0, 0, 0
 			};
-			mcu_buffer[0] = 1;
-			mcu_buffer[1] = joy_table[joy_bits & 0xf];
+			state->mcu_buffer[0] = 1;
+			state->mcu_buffer[1] = joy_table[joy_bits & 0xf];
 		}
 		break;
 
 	case 0x44: /* 0x44, 0xff, DSW2, stage# -> difficulty */
 		{
-			int difficulty = mcu_buffer[2] & 0x3;
-			int stage = mcu_buffer[3];
+			int difficulty = state->mcu_buffer[2] & 0x3;
+			int stage = state->mcu_buffer[3];
 			static const UINT8 difficulty_table[4] = { 5, 3, 1, 2 };
 			int result = difficulty_table[difficulty];
 
@@ -498,38 +491,38 @@ static void mcu_process_command(void)
 			if (result > 0x21)
 				result += 0xc0;
 
-			mcu_buffer[0] = 1;
-			mcu_buffer[1] = result;
+			state->mcu_buffer[0] = 1;
+			state->mcu_buffer[1] = result;
 		}
 		break;
 
 	case 0x55: /* 0x55, 0x00, 0x00, 0x00, DSW2 -> timer */
 		{
-			int difficulty = mcu_buffer[4] & 0x3;
+			int difficulty = state->mcu_buffer[4] & 0x3;
 			static const UINT16 table[4] =
 			{
 				0x4001, 0x5001, 0x1502, 0x0002
 			};
 
-			mcu_buffer[0] = 3;
-			mcu_buffer[2] = table[difficulty] >> 8;
-			mcu_buffer[3] = table[difficulty] & 0xff;
+			state->mcu_buffer[0] = 3;
+			state->mcu_buffer[2] = table[difficulty] >> 8;
+			state->mcu_buffer[3] = table[difficulty] & 0xff;
 		}
 		break;
 
 	case 0x41: /* 0x41, 0x00, 0x00, stage# -> ? */
 		{
-//          int stage = mcu_buffer[3];
-			mcu_buffer[0] = 2;
-			mcu_buffer[1] = 0x20;
-			mcu_buffer[2] = 0x78;
+//          int stage = state->mcu_buffer[3];
+			state->mcu_buffer[0] = 2;
+			state->mcu_buffer[1] = 0x20;
+			state->mcu_buffer[2] = 0x78;
 		}
 		break;
 
 	case 0x40: /* 0x40, 0x00, difficulty, enemy_type -> enemy health */
 		{
-			int difficulty = mcu_buffer[2];
-			int enemy_type = mcu_buffer[3];
+			int difficulty = state->mcu_buffer[2];
+			int enemy_type = state->mcu_buffer[3];
 			int health;
 
 			if (enemy_type <= 4)
@@ -545,15 +538,15 @@ static void mcu_process_command(void)
 					health = 0x20;	/* max 0x20 */
 			}
 			logerror("e_type:0x%02x diff:0x%02x -> 0x%02x\n", enemy_type, difficulty, health);
-			mcu_buffer[0] = 1;
-			mcu_buffer[1] = health;
+			state->mcu_buffer[0] = 1;
+			state->mcu_buffer[1] = health;
 		}
 		break;
 
 	case 0x42: /* 0x42, 0x00, stage#, character# -> enemy_type */
 		{
-			int stage = mcu_buffer[2] & 0x3;
-			int indx = mcu_buffer[3];
+			int stage = state->mcu_buffer[2] & 0x3;
+			int indx = state->mcu_buffer[3];
 			int enemy_type=0;
 
 			static const int table[] =
@@ -571,51 +564,53 @@ static void mcu_process_command(void)
 
 			enemy_type = table[offset];
 
-			mcu_buffer[0] = 1;
-			mcu_buffer[1] = enemy_type;
+			state->mcu_buffer[0] = 1;
+			state->mcu_buffer[1] = enemy_type;
 		}
 		break;
 
 	default:
-		logerror("unknown MCU command: %02x\n", mcu_buffer[0]);
+		logerror("unknown MCU command: %02x\n", state->mcu_buffer[0]);
 		break;
 	}
 }
 
 static READ8_HANDLER( mcu_r )
 {
-	if (mcu_sim == TRUE)
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	if (state->mcu_sim == TRUE)
 	{
 		int result = 1;
 
-		if (mcu_input_size)
-			mcu_process_command();
+		if (state->mcu_input_size)
+			mcu_process_command(state);
 
-		if (mcu_output_byte < MCU_BUFFER_MAX)
-			result = mcu_buffer[mcu_output_byte++];
+		if (state->mcu_output_byte < MCU_BUFFER_MAX)
+			result = state->mcu_buffer[state->mcu_output_byte++];
 
 		return result;
 	}
 	else
 	{
-		mcu_sent = 0;
-		return from_mcu;
+		state->mcu_sent = 0;
+		return state->from_mcu;
 	}
 }
 
 static CUSTOM_INPUT( mcu_status_r )
 {
+	renegade_state *state = field->port->machine->driver_data<renegade_state>();
 	UINT8 res = 0;
 
-	if (mcu_sim == TRUE)
+	if (state->mcu_sim == TRUE)
 	{
 		res = 1;
 	}
 	else
 	{
-		if (!main_sent)
+		if (!state->main_sent)
 			res |= 0x01;
-		if (!mcu_sent)
+		if (!state->mcu_sent)
 			res |= 0x02;
 	}
 
@@ -626,28 +621,28 @@ static CUSTOM_INPUT( mcu_status_r )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	if ((data & 1) != bank)
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	if ((data & 1) != state->bank)
 	{
-		bank = data & 1;
+		state->bank = data & 1;
 		setbank(space->machine);
 	}
 }
 
 static INTERRUPT_GEN( renegade_interrupt )
 {
-/*
-    static int coin;
-    int port = input_port_read(machine, "IN1") & 0xc0;
-    if (port != 0xc0)
-    {
-        if (coin == 0)
-        {
-            coin = 1;
-            return irq0_line_hold();
-        }
-    }
-    else coin = 0;
-*/
+#if 0
+	int port = input_port_read(machine, "IN1") & 0xc0;
+	if (port != 0xc0)
+	{
+		if (state->coin == 0)
+		{
+			state->coin = 1;
+			return irq0_line_hold();
+		}
+	}
+	else state->coin = 0;
+#endif
 
 	if (cpu_getiloops(device))
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -665,7 +660,7 @@ static WRITE8_HANDLER( renegade_coin_counter_w )
 
 static ADDRESS_MAP_START( renegade_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(renegade_videoram2_w) AM_BASE(&renegade_videoram2)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(renegade_videoram2_w) AM_BASE_MEMBER(renegade_state, videoram2)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(renegade_videoram_w) AM_BASE_MEMBER(renegade_state, videoram)
 	AM_RANGE(0x3000, 0x30ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
@@ -912,7 +907,8 @@ static const ym3526_interface ym3526_config =
 
 static MACHINE_RESET( renegade )
 {
-	bank = 0;
+	renegade_state *state = machine->driver_data<renegade_state>();
+	state->bank = 0;
 	setbank(machine);
 }
 

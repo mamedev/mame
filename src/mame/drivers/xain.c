@@ -148,16 +148,6 @@ Updates by Bryan McPhail, 12/12/2004:
 #define MCU_CLOCK			MASTER_CLOCK / 4
 #define PIXEL_CLOCK			MASTER_CLOCK / 2
 
-static int vblank;
-
-/* MCU */
-static int from_main;
-static int from_mcu;
-static UINT8 ddr_a, ddr_b, ddr_c;
-static UINT8 port_a_out, port_b_out, port_c_out;
-static UINT8 port_a_in, port_b_in, port_c_in;
-static int _mcu_ready;
-static int _mcu_accept;
 
 /*
     Based on the Solar Warrior schematics, vertical timing counts as follows:
@@ -185,6 +175,7 @@ INLINE int scanline_to_vcount(int scanline)
 
 static TIMER_DEVICE_CALLBACK( xain_scanline )
 {
+	xain_state *state = timer.machine->driver_data<xain_state>();
 	int scanline = param;
 	int screen_height = timer.machine->primary_screen->height();
 	int vcount_old = scanline_to_vcount((scanline == 0) ? screen_height - 1 : scanline - 1);
@@ -211,17 +202,18 @@ static TIMER_DEVICE_CALLBACK( xain_scanline )
 	/* VBLANK input bit is held high from scanlines 248-255 */
 	if (vcount >= 248-1)	// -1 is a hack - see notes above
 	{
-		vblank = 1;
+		state->vblank = 1;
 	}
 	else
 	{
-		vblank = 0;
+		state->vblank = 0;
 	}
 }
 
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
-	xain_pri = data & 0x7;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->pri = data & 0x7;
 	memory_set_bank(space->machine, "bank1", (data >> 3) & 1);
 }
 
@@ -267,14 +259,16 @@ static WRITE8_HANDLER( xain_irqB_clear_w )
 
 static READ8_HANDLER( xain_68705_r )
 {
-	_mcu_ready = 1;
-	return from_mcu;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->_mcu_ready = 1;
+	return state->from_mcu;
 }
 
 static WRITE8_HANDLER( xain_68705_w )
 {
-	from_main = data;
-	_mcu_accept = 0;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->from_main = data;
+	state->_mcu_accept = 0;
 
 	if (space->machine->device("mcu") != NULL)
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
@@ -282,7 +276,8 @@ static WRITE8_HANDLER( xain_68705_w )
 
 static CUSTOM_INPUT( xain_vblank_r )
 {
-	return vblank;
+	xain_state *state = field->port->machine->driver_data<xain_state>();
+	return state->vblank;
 }
 
 
@@ -294,83 +289,93 @@ static CUSTOM_INPUT( xain_vblank_r )
 
 READ8_HANDLER( xain_68705_port_a_r )
 {
-	return (port_a_out & ddr_a) | (port_a_in & ~ddr_a);
+	xain_state *state = space->machine->driver_data<xain_state>();
+	return (state->port_a_out & state->ddr_a) | (state->port_a_in & ~state->ddr_a);
 }
 
 WRITE8_HANDLER( xain_68705_port_a_w )
 {
-	port_a_out = data;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->port_a_out = data;
 }
 
 WRITE8_HANDLER( xain_68705_ddr_a_w )
 {
-	ddr_a = data;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->ddr_a = data;
 }
 
 READ8_HANDLER( xain_68705_port_b_r )
 {
-	return (port_b_out & ddr_b) | (port_b_in & ~ddr_b);
+	xain_state *state = space->machine->driver_data<xain_state>();
+	return (state->port_b_out & state->ddr_b) | (state->port_b_in & ~state->ddr_b);
 }
 
 WRITE8_HANDLER( xain_68705_port_b_w )
 {
-	if ((ddr_b & 0x02) && (~data & 0x02))
+	xain_state *state = space->machine->driver_data<xain_state>();
+	if ((state->ddr_b & 0x02) && (~data & 0x02))
 	{
-		port_a_in = from_main;
+		state->port_a_in = state->from_main;
 	}
 	/* Rising edge of PB1 */
-	else if ((ddr_b & 0x02) && (~port_b_out & 0x02) && (data & 0x02))
+	else if ((state->ddr_b & 0x02) && (~state->port_b_out & 0x02) && (data & 0x02))
 	{
-		_mcu_accept = 1;
+		state->_mcu_accept = 1;
 		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 	}
 
 	/* Rising edge of PB2 */
-	if ((ddr_b & 0x04) && (~port_b_out & 0x04) && (data & 0x04))
+	if ((state->ddr_b & 0x04) && (~state->port_b_out & 0x04) && (data & 0x04))
 	{
-		_mcu_ready = 0;
-		from_mcu = port_a_out;
+		state->_mcu_ready = 0;
+		state->from_mcu = state->port_a_out;
 	}
 
-	port_b_out = data;
+	state->port_b_out = data;
 }
 
 WRITE8_HANDLER( xain_68705_ddr_b_w )
 {
-	ddr_b = data;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->ddr_b = data;
 }
 
 READ8_HANDLER( xain_68705_port_c_r )
 {
-	port_c_in = 0;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->port_c_in = 0;
 
-	if (!_mcu_accept)
-		port_c_in |= 0x01;
-	if (_mcu_ready)
-		port_c_in |= 0x02;
+	if (!state->_mcu_accept)
+		state->port_c_in |= 0x01;
+	if (state->_mcu_ready)
+		state->port_c_in |= 0x02;
 
-	return (port_c_out & ddr_c) | (port_c_in & ~ddr_c);
+	return (state->port_c_out & state->ddr_c) | (state->port_c_in & ~state->ddr_c);
 }
 
 WRITE8_HANDLER( xain_68705_port_c_w )
 {
-	port_c_out = data;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->port_c_out = data;
 }
 
 WRITE8_HANDLER( xain_68705_ddr_c_w )
 {
-	ddr_c = data;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->ddr_c = data;
 }
 
 static CUSTOM_INPUT( mcu_status_r )
 {
+	xain_state *state = field->port->machine->driver_data<xain_state>();
 	UINT8 res = 0;
 
 	if (field->port->machine->device("mcu") != NULL)
 	{
-		if (_mcu_ready == 1)
+		if (state->_mcu_ready == 1)
 			res |= 0x01;
-		if (_mcu_accept == 1)
+		if (state->_mcu_accept == 1)
 			res |= 0x02;
 	}
 	else
@@ -383,8 +388,9 @@ static CUSTOM_INPUT( mcu_status_r )
 
 READ8_HANDLER( mcu_comm_reset_r )
 {
-	_mcu_ready = 1;
-	_mcu_accept = 1;
+	xain_state *state = space->machine->driver_data<xain_state>();
+	state->_mcu_ready = 1;
+	state->_mcu_accept = 1;
 
 	if (space->machine->device("mcu") != NULL)
 		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
@@ -395,9 +401,9 @@ READ8_HANDLER( mcu_comm_reset_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(xain_charram_w) AM_BASE(&xain_charram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(xain_bgram1_w) AM_BASE(&xain_bgram1)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(xain_bgram0_w) AM_BASE(&xain_bgram0)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(xain_charram_w) AM_BASE_MEMBER(xain_state, charram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(xain_bgram1_w) AM_BASE_MEMBER(xain_state, bgram1)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(xain_bgram0_w) AM_BASE_MEMBER(xain_state, bgram0)
 	AM_RANGE(0x3800, 0x397f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("P1")
 	AM_RANGE(0x3a00, 0x3a01) AM_WRITE(xain_scrollxP1_w)
@@ -583,7 +589,7 @@ static MACHINE_START( xsleena )
 	memory_set_bank(machine, "bank2", 0);
 }
 
-static MACHINE_CONFIG_START( xsleena, driver_device )
+static MACHINE_CONFIG_START( xsleena, xain_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CPU_CLOCK)

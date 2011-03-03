@@ -1,7 +1,18 @@
-/*----------- defined in video/tagteam.c -----------*/
+class tagteam_state : public driver_device
+{
+public:
+	tagteam_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *tagteam_videoram;
-extern UINT8 *tagteam_colorram;
+	int coin;
+	UINT8 *videoram;
+	UINT8 *colorram;
+	int palettebank;
+	tilemap_t *bg_tilemap;
+};
+
+
+/*----------- defined in video/tagteam.c -----------*/
 
 WRITE8_HANDLER( tagteam_videoram_w );
 WRITE8_HANDLER( tagteam_colorram_w );

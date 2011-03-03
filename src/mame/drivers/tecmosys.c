@@ -190,95 +190,77 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 #include "sound/262intf.h"
 #include "sound/ymz280b.h"
 
-static UINT16* tecmosys_spriteram;
-static UINT16* tilemap_paletteram16;
-static UINT16* bg2tilemap_ram;
-static UINT16* bg1tilemap_ram;
-static UINT16* bg0tilemap_ram;
-static UINT16* fgtilemap_ram;
-static UINT16* bg0tilemap_lineram;
-static UINT16* bg1tilemap_lineram;
-static UINT16* bg2tilemap_lineram;
 
-static UINT16* tecmosys_a80000regs;
-static UINT16* tecmosys_b00000regs;
-
-static UINT16* tecmosys_c00000regs;
-static UINT16* tecmosys_c80000regs;
-static UINT16* tecmosys_880000regs;
-static int tecmosys_spritelist;
-
-static bitmap_t *sprite_bitmap;
-static bitmap_t *tmp_tilemap_composebitmap;
-static bitmap_t *tmp_tilemap_renderbitmap;
-
-
-static tilemap_t *bg0tilemap;
 static TILE_GET_INFO( get_bg0tile_info )
 {
+	tecmosys_state *state = machine->driver_data<tecmosys_state>();
 
 	SET_TILE_INFO(
 			1,
-			bg0tilemap_ram[2*tile_index+1],
-			(bg0tilemap_ram[2*tile_index]&0x3f),
-			TILE_FLIPYX((bg0tilemap_ram[2*tile_index]&0xc0)>>6));
+			state->bg0tilemap_ram[2*tile_index+1],
+			(state->bg0tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((state->bg0tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
 static WRITE16_HANDLER( bg0_tilemap_w )
 {
-	COMBINE_DATA(&bg0tilemap_ram[offset]);
-	tilemap_mark_tile_dirty(bg0tilemap,offset/2);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->bg0tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(state->bg0tilemap,offset/2);
 }
 
-static tilemap_t *bg1tilemap;
 static TILE_GET_INFO( get_bg1tile_info )
 {
+	tecmosys_state *state = machine->driver_data<tecmosys_state>();
 
 	SET_TILE_INFO(
 			2,
-			bg1tilemap_ram[2*tile_index+1],
-			(bg1tilemap_ram[2*tile_index]&0x3f),
-			TILE_FLIPYX((bg1tilemap_ram[2*tile_index]&0xc0)>>6));
+			state->bg1tilemap_ram[2*tile_index+1],
+			(state->bg1tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((state->bg1tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
 static WRITE16_HANDLER( bg1_tilemap_w )
 {
-	COMBINE_DATA(&bg1tilemap_ram[offset]);
-	tilemap_mark_tile_dirty(bg1tilemap,offset/2);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->bg1tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(state->bg1tilemap,offset/2);
 }
 
-static tilemap_t *bg2tilemap;
 static TILE_GET_INFO( get_bg2tile_info )
 {
+	tecmosys_state *state = machine->driver_data<tecmosys_state>();
 
 	SET_TILE_INFO(
 			3,
-			bg2tilemap_ram[2*tile_index+1],
-			(bg2tilemap_ram[2*tile_index]&0x3f),
-			TILE_FLIPYX((bg2tilemap_ram[2*tile_index]&0xc0)>>6));
+			state->bg2tilemap_ram[2*tile_index+1],
+			(state->bg2tilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((state->bg2tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
 static WRITE16_HANDLER( bg2_tilemap_w )
 {
-	COMBINE_DATA(&bg2tilemap_ram[offset]);
-	tilemap_mark_tile_dirty(bg2tilemap,offset/2);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->bg2tilemap_ram[offset]);
+	tilemap_mark_tile_dirty(state->bg2tilemap,offset/2);
 }
 
-static tilemap_t *txt_tilemap;
 static TILE_GET_INFO( get_tile_info )
 {
+	tecmosys_state *state = machine->driver_data<tecmosys_state>();
 
 	SET_TILE_INFO(
 			0,
-			fgtilemap_ram[2*tile_index+1],
-			(fgtilemap_ram[2*tile_index]&0x3f),
-			TILE_FLIPYX((fgtilemap_ram[2*tile_index]&0xc0)>>6));
+			state->fgtilemap_ram[2*tile_index+1],
+			(state->fgtilemap_ram[2*tile_index]&0x3f),
+			TILE_FLIPYX((state->fgtilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
 static WRITE16_HANDLER( fg_tilemap_w )
 {
-	COMBINE_DATA(&fgtilemap_ram[offset]);
-	tilemap_mark_tile_dirty(txt_tilemap,offset/2);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->fgtilemap_ram[offset]);
+	tilemap_mark_tile_dirty(state->txt_tilemap,offset/2);
 }
 
 
@@ -314,7 +296,8 @@ static WRITE16_HANDLER( sound_w )
 
 static WRITE16_HANDLER( unk880000_w )
 {
-	COMBINE_DATA(&tecmosys_880000regs[offset]);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->_880000regs[offset]);
 
 	switch( offset )
 	{
@@ -325,7 +308,7 @@ static WRITE16_HANDLER( unk880000_w )
 			break; // global y scroll for sprites
 
 		case 0x08/2:
-			tecmosys_spritelist = data & 0x3; // which of the 4 spritelists to use (buffering)
+			state->spritelist = data & 0x3; // which of the 4 spritelists to use (buffering)
 			break;
 
 		case 0x22/2:
@@ -341,9 +324,10 @@ static WRITE16_HANDLER( unk880000_w )
 
 static READ16_HANDLER( unk880000_r )
 {
-	//UINT16 ret = tecmosys_880000regs[offset];
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	//UINT16 ret = state->_880000regs[offset];
 
-	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(space->cpu), tecmosys_880000regs[offset] );
+	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(space->cpu), state->_880000regs[offset] );
 
 	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
 
@@ -384,25 +368,29 @@ INLINE void set_color_555(running_machine *machine, pen_t color, int rshift, int
 
 static WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
 {
-	COMBINE_DATA(&tilemap_paletteram16[offset]);
-	set_color_555(space->machine, offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->tilemap_paletteram16[offset]);
+	set_color_555(space->machine, offset+0x4000, 5, 10, 0, state->tilemap_paletteram16[offset]);
 }
 
 static WRITE16_HANDLER( bg0_tilemap_lineram_w )
 {
-	COMBINE_DATA(&bg0tilemap_lineram[offset]);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->bg0tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg0 lineram %04x %04x",offset,data);
 }
 
 static WRITE16_HANDLER( bg1_tilemap_lineram_w )
 {
-	COMBINE_DATA(&bg1tilemap_lineram[offset]);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->bg1tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg1 lineram %04x %04x",offset,data);
 }
 
 static WRITE16_HANDLER( bg2_tilemap_lineram_w )
 {
-	COMBINE_DATA(&bg2tilemap_lineram[offset]);
+	tecmosys_state *state = space->machine->driver_data<tecmosys_state>();
+	COMBINE_DATA(&state->bg2tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg2 lineram %04x %04x",offset,data);
 }
 
@@ -411,32 +399,32 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // work ram
 	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(bg0_tilemap_w) AM_BASE(&bg0tilemap_ram) // bg0 ram
-	AM_RANGE(0x301000, 0x3013ff) AM_RAM_WRITE(bg0_tilemap_lineram_w) AM_BASE(&bg0tilemap_lineram)// bg0 linescroll? (guess)
+	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(bg0_tilemap_w) AM_BASE_MEMBER(tecmosys_state, bg0tilemap_ram) // bg0 ram
+	AM_RANGE(0x301000, 0x3013ff) AM_RAM_WRITE(bg0_tilemap_lineram_w) AM_BASE_MEMBER(tecmosys_state, bg0tilemap_lineram)// bg0 linescroll? (guess)
 
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(bg1_tilemap_w) AM_BASE(&bg1tilemap_ram) // bg1 ram
-	AM_RANGE(0x401000, 0x4013ff) AM_RAM_WRITE(bg1_tilemap_lineram_w) AM_BASE(&bg1tilemap_lineram)// bg1 linescroll? (guess)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(bg1_tilemap_w) AM_BASE_MEMBER(tecmosys_state, bg1tilemap_ram) // bg1 ram
+	AM_RANGE(0x401000, 0x4013ff) AM_RAM_WRITE(bg1_tilemap_lineram_w) AM_BASE_MEMBER(tecmosys_state, bg1tilemap_lineram)// bg1 linescroll? (guess)
 
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(bg2_tilemap_w) AM_BASE(&bg2tilemap_ram) // bg2 ram
-	AM_RANGE(0x501000, 0x5013ff) AM_RAM_WRITE(bg2_tilemap_lineram_w) AM_BASE(&bg2tilemap_lineram) // bg2 linescroll? (guess)
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(bg2_tilemap_w) AM_BASE_MEMBER(tecmosys_state, bg2tilemap_ram) // bg2 ram
+	AM_RANGE(0x501000, 0x5013ff) AM_RAM_WRITE(bg2_tilemap_lineram_w) AM_BASE_MEMBER(tecmosys_state, bg2tilemap_lineram) // bg2 linescroll? (guess)
 
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_BASE(&fgtilemap_ram) // fix ram
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(&tecmosys_spriteram) // obj ram
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_BASE_MEMBER(tecmosys_state, fgtilemap_ram) // fix ram
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(tecmosys_state, spriteram) // obj ram
 	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // AM_WRITEONLY // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
 	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
-	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&tilemap_paletteram16)
+	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_MEMBER(tecmosys_state, tilemap_paletteram16)
 
-	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w ) AM_BASE(&tecmosys_880000regs)	// 10 byte dta@88000c, 880022=watchdog?
+	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w ) AM_BASE_MEMBER(tecmosys_state, _880000regs)	// 10 byte dta@88000c, 880022=watchdog?
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("eeprom", eeprom_w	)
-	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_BASE(&tecmosys_a80000regs)	// a80000-3 scroll? a80004 inverted ? 3 : 0
-	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_BASE(&tecmosys_b00000regs)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
+	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_BASE_MEMBER(tecmosys_state, a80000regs)	// a80000-3 scroll? a80004 inverted ? 3 : 0
+	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_BASE_MEMBER(tecmosys_state, b00000regs)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
 	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(tecmosys_prot_status_r, tecmosys_prot_status_w)
-	AM_RANGE(0xc00000, 0xc00005) AM_WRITEONLY AM_BASE(&tecmosys_c00000regs)	// c00000-3 scroll? c00004 inverted ? 13 : 10
-	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_BASE(&tecmosys_c80000regs)	// c80000-3 scrool? c80004 inverted ? 3 : 0
+	AM_RANGE(0xc00000, 0xc00005) AM_WRITEONLY AM_BASE_MEMBER(tecmosys_state, c00000regs)	// c00000-3 scroll? c00004 inverted ? 13 : 10
+	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_BASE_MEMBER(tecmosys_state, c80000regs)	// c80000-3 scrool? c80004 inverted ? 3 : 0
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
 	AM_RANGE(0xd80000, 0xd80001) AM_DEVREAD("eeprom", eeprom_r)
@@ -557,39 +545,41 @@ ADDRESS_MAP_END
 
 static VIDEO_START(deroon)
 {
-	sprite_bitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
-	bitmap_fill(sprite_bitmap, NULL, 0x4000);
+	tecmosys_state *state = machine->driver_data<tecmosys_state>();
+	state->sprite_bitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
+	bitmap_fill(state->sprite_bitmap, NULL, 0x4000);
 
-	tmp_tilemap_composebitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
-	tmp_tilemap_renderbitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
+	state->tmp_tilemap_composebitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
+	state->tmp_tilemap_renderbitmap = auto_bitmap_alloc(machine,320,240,BITMAP_FORMAT_INDEXED16);
 
-	bitmap_fill(tmp_tilemap_composebitmap, NULL, 0x0000);
-	bitmap_fill(tmp_tilemap_renderbitmap, NULL, 0x0000);
+	bitmap_fill(state->tmp_tilemap_composebitmap, NULL, 0x0000);
+	bitmap_fill(state->tmp_tilemap_renderbitmap, NULL, 0x0000);
 
 
-	txt_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
-	tilemap_set_transparent_pen(txt_tilemap,0);
+	state->txt_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
+	tilemap_set_transparent_pen(state->txt_tilemap,0);
 
-	bg0tilemap = tilemap_create(machine, get_bg0tile_info,tilemap_scan_rows,16,16,32,32);
-	tilemap_set_transparent_pen(bg0tilemap,0);
+	state->bg0tilemap = tilemap_create(machine, get_bg0tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(state->bg0tilemap,0);
 
-	bg1tilemap = tilemap_create(machine, get_bg1tile_info,tilemap_scan_rows,16,16,32,32);
-	tilemap_set_transparent_pen(bg1tilemap,0);
+	state->bg1tilemap = tilemap_create(machine, get_bg1tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(state->bg1tilemap,0);
 
-	bg2tilemap = tilemap_create(machine, get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
-	tilemap_set_transparent_pen(bg2tilemap,0);
+	state->bg2tilemap = tilemap_create(machine, get_bg2tile_info,tilemap_scan_rows,16,16,32,32);
+	tilemap_set_transparent_pen(state->bg2tilemap,0);
 
 }
 
 static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t *bitmap, UINT16 extrax, UINT16 extray )
 {
+	tecmosys_state *state = machine->driver_data<tecmosys_state>();
 	UINT8 *gfxsrc    = machine->region       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
-	bitmap_fill(sprite_bitmap, NULL, 0x0000);
+	bitmap_fill(state->sprite_bitmap, NULL, 0x0000);
 	/* there are multiple spritelists in here, to allow for buffering */
-	for (i=(tecmosys_spritelist*0x4000)/2;i<((tecmosys_spritelist+1)*0x4000)/2;i+=8)
+	for (i=(state->spritelist*0x4000)/2;i<((state->spritelist+1)*0x4000)/2;i+=8)
 	{
 		int xcnt,ycnt;
 		int drawx, drawy;
@@ -604,8 +594,8 @@ static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t
 		int priority;
 		int zoomx, zoomy;
 
-		x = tecmosys_spriteram[i+0]+386;
-		y = (tecmosys_spriteram[i+1]+1);
+		x = state->spriteram[i+0]+386;
+		y = (state->spriteram[i+1]+1);
 
 		x-= extrax;
 		y-= extray;
@@ -616,28 +606,28 @@ static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t
 		if (x&0x200) x-=0x400;
 		if (y&0x100) y-=0x200;
 
-		address =  tecmosys_spriteram[i+5]| ((tecmosys_spriteram[i+4]&0x000f)<<16);
+		address =  state->spriteram[i+5]| ((state->spriteram[i+4]&0x000f)<<16);
 
 		address<<=8;
 
-		flipx = (tecmosys_spriteram[i+4]&0x0040)>>6;
-		flipy = (tecmosys_spriteram[i+4]&0x0080)>>7; // used by some move effects in tkdensho
+		flipx = (state->spriteram[i+4]&0x0040)>>6;
+		flipy = (state->spriteram[i+4]&0x0080)>>7; // used by some move effects in tkdensho
 
 
-		zoomx = (tecmosys_spriteram[i+2] & 0x0fff)>>0; // zoom?
-		zoomy = (tecmosys_spriteram[i+3] & 0x0fff)>>0; // zoom?
+		zoomx = (state->spriteram[i+2] & 0x0fff)>>0; // zoom?
+		zoomy = (state->spriteram[i+3] & 0x0fff)>>0; // zoom?
 
 		if ((!zoomx) || (!zoomy)) continue;
 
-		ysize =  ((tecmosys_spriteram[i+6] & 0x00ff))*16;
-		xsize =  (((tecmosys_spriteram[i+6] & 0xff00)>>8))*16;
+		ysize =  ((state->spriteram[i+6] & 0x00ff))*16;
+		xsize =  (((state->spriteram[i+6] & 0xff00)>>8))*16;
 
-		colour =  ((tecmosys_spriteram[i+4] & 0x3f00))>>8;
+		colour =  ((state->spriteram[i+4] & 0x3f00))>>8;
 
-		priority = ((tecmosys_spriteram[i+4] & 0x0030))>>4;
+		priority = ((state->spriteram[i+4] & 0x0030))>>4;
 
 
-		if (tecmosys_spriteram[i+4] & 0x8000) continue;
+		if (state->spriteram[i+4] & 0x8000) continue;
 
 		for (ycnt = 0; ycnt < ysize; ycnt++)
 		{
@@ -660,7 +650,7 @@ static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t
 				{
 					UINT8 data;
 
-					dstptr = BITMAP_ADDR16(sprite_bitmap, drawy, drawx);
+					dstptr = BITMAP_ADDR16(state->sprite_bitmap, drawy, drawx);
 
 
 					data =  (gfxsrc[address]);
@@ -679,15 +669,15 @@ static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t
 	}
 }
 
-static void tecmosys_tilemap_copy_to_compose(UINT16 pri)
+static void tecmosys_tilemap_copy_to_compose(tecmosys_state *state, UINT16 pri)
 {
 	int y,x;
 	UINT16 *srcptr;
 	UINT16 *dstptr;
 	for (y=0;y<240;y++)
 	{
-		srcptr = BITMAP_ADDR16(tmp_tilemap_renderbitmap, y, 0);
-		dstptr = BITMAP_ADDR16(tmp_tilemap_composebitmap, y, 0);
+		srcptr = BITMAP_ADDR16(state->tmp_tilemap_renderbitmap, y, 0);
+		dstptr = BITMAP_ADDR16(state->tmp_tilemap_composebitmap, y, 0);
 		for (x=0;x<320;x++)
 		{
 			if ((srcptr[x]&0xf)!=0x0)
@@ -698,6 +688,7 @@ static void tecmosys_tilemap_copy_to_compose(UINT16 pri)
 
 static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 {
+	tecmosys_state *state = machine->driver_data<tecmosys_state>();
 	const pen_t *paldata = machine->pens;
 	int y,x;
 	UINT16 *srcptr;
@@ -708,8 +699,8 @@ static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 	for (y=0;y<240;y++)
 	{
 
-		srcptr = BITMAP_ADDR16(tmp_tilemap_composebitmap, y, 0);
-		srcptr2 = BITMAP_ADDR16(sprite_bitmap, y, 0);
+		srcptr = BITMAP_ADDR16(state->tmp_tilemap_composebitmap, y, 0);
+		srcptr2 = BITMAP_ADDR16(state->sprite_bitmap, y, 0);
 
 
 		dstptr = BITMAP_ADDR32(bitmap, y, 0);
@@ -724,7 +715,7 @@ static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 			pri = srcptr[x] & 0xc000;
 			pri2 = srcptr2[x] & 0xc000;
 
-			penvalue = tilemap_paletteram16[srcptr[x]&0x7ff];
+			penvalue = state->tilemap_paletteram16[srcptr[x]&0x7ff];
 			colour =   paldata[(srcptr[x]&0x7ff) | 0x4000];
 
 			if (srcptr2[x]&0x3fff)
@@ -734,7 +725,7 @@ static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 			}
 			else
 			{
-				penvalue2 = tilemap_paletteram16[srcptr[x]&0x7ff];
+				penvalue2 = state->tilemap_paletteram16[srcptr[x]&0x7ff];
 				colour2 =   paldata[(srcptr[x]&0x7ff) | 0x4000];
 			}
 
@@ -770,60 +761,61 @@ static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 
 static SCREEN_UPDATE(deroon)
 {
+	tecmosys_state *state = screen->machine->driver_data<tecmosys_state>();
 
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x4000]);
 
 
-	tilemap_set_scrolly( bg0tilemap, 0, tecmosys_c80000regs[1]+16);
-	tilemap_set_scrollx( bg0tilemap, 0, tecmosys_c80000regs[0]+104);
+	tilemap_set_scrolly( state->bg0tilemap, 0, state->c80000regs[1]+16);
+	tilemap_set_scrollx( state->bg0tilemap, 0, state->c80000regs[0]+104);
 
-	tilemap_set_scrolly( bg1tilemap, 0, tecmosys_a80000regs[1]+17);
-	tilemap_set_scrollx( bg1tilemap, 0, tecmosys_a80000regs[0]+106);
+	tilemap_set_scrolly( state->bg1tilemap, 0, state->a80000regs[1]+17);
+	tilemap_set_scrollx( state->bg1tilemap, 0, state->a80000regs[0]+106);
 
-	tilemap_set_scrolly( bg2tilemap, 0, tecmosys_b00000regs[1]+17);
-	tilemap_set_scrollx( bg2tilemap, 0, tecmosys_b00000regs[0]+106);
+	tilemap_set_scrolly( state->bg2tilemap, 0, state->b00000regs[1]+17);
+	tilemap_set_scrollx( state->bg2tilemap, 0, state->b00000regs[0]+106);
 
-	bitmap_fill(tmp_tilemap_composebitmap,cliprect,0);
+	bitmap_fill(state->tmp_tilemap_composebitmap,cliprect,0);
 
-	bitmap_fill(tmp_tilemap_renderbitmap,cliprect,0);
-	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg0tilemap,0,0);
-	tecmosys_tilemap_copy_to_compose(0x0000);
+	bitmap_fill(state->tmp_tilemap_renderbitmap,cliprect,0);
+	tilemap_draw(state->tmp_tilemap_renderbitmap,cliprect,state->bg0tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(state, 0x0000);
 
-	bitmap_fill(tmp_tilemap_renderbitmap,cliprect,0);
-	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg1tilemap,0,0);
-	tecmosys_tilemap_copy_to_compose(0x4000);
+	bitmap_fill(state->tmp_tilemap_renderbitmap,cliprect,0);
+	tilemap_draw(state->tmp_tilemap_renderbitmap,cliprect,state->bg1tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(state, 0x4000);
 
-	bitmap_fill(tmp_tilemap_renderbitmap,cliprect,0);
-	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg2tilemap,0,0);
-	tecmosys_tilemap_copy_to_compose(0x8000);
+	bitmap_fill(state->tmp_tilemap_renderbitmap,cliprect,0);
+	tilemap_draw(state->tmp_tilemap_renderbitmap,cliprect,state->bg2tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(state, 0x8000);
 
-	bitmap_fill(tmp_tilemap_renderbitmap,cliprect,0);
-	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,txt_tilemap,0,0);
-	tecmosys_tilemap_copy_to_compose(0xc000);
+	bitmap_fill(state->tmp_tilemap_renderbitmap,cliprect,0);
+	tilemap_draw(state->tmp_tilemap_renderbitmap,cliprect,state->txt_tilemap,0,0);
+	tecmosys_tilemap_copy_to_compose(state, 0xc000);
 
 
 	tecmosys_do_final_mix(screen->machine, bitmap);
 
 /*
     popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x  | %04x %04x %04x %04x",
-        tecmosys_880000regs[0x0],  tecmosys_880000regs[0x1],  tecmosys_880000regs[0x2],  tecmosys_880000regs[0x3],
-        tecmosys_880000regs[0x4],  tecmosys_880000regs[0x5],  tecmosys_880000regs[0x6],  tecmosys_880000regs[0x7],
-        tecmosys_880000regs[0x8],  tecmosys_880000regs[0x9],  tecmosys_880000regs[0xa],  tecmosys_880000regs[0xb],
-        tecmosys_880000regs[0xc],  tecmosys_880000regs[0xd],  tecmosys_880000regs[0xe],  tecmosys_880000regs[0xf],
-        tecmosys_880000regs[0x10], tecmosys_880000regs[0x11], tecmosys_880000regs[0x12], tecmosys_880000regs[0x13],
-        tecmosys_880000regs[0x14], tecmosys_880000regs[0x15], tecmosys_880000regs[0x16], tecmosys_880000regs[0x17]);
+        state->_880000regs[0x0],  state->_880000regs[0x1],  state->_880000regs[0x2],  state->_880000regs[0x3],
+        state->_880000regs[0x4],  state->_880000regs[0x5],  state->_880000regs[0x6],  state->_880000regs[0x7],
+        state->_880000regs[0x8],  state->_880000regs[0x9],  state->_880000regs[0xa],  state->_880000regs[0xb],
+        state->_880000regs[0xc],  state->_880000regs[0xd],  state->_880000regs[0xe],  state->_880000regs[0xf],
+        state->_880000regs[0x10], state->_880000regs[0x11], state->_880000regs[0x12], state->_880000regs[0x13],
+        state->_880000regs[0x14], state->_880000regs[0x15], state->_880000regs[0x16], state->_880000regs[0x17]);
 */
 
 //  popmessage("%04x %04x %04x | %04x %04x %04x",
-//    tecmosys_c00000regs[0],     tecmosys_c00000regs[1],     tecmosys_c00000regs[2],
-//    tecmosys_c80000regs[0],     tecmosys_c80000regs[1],     tecmosys_c80000regs[2]);
+//    state->c00000regs[0],     state->c00000regs[1],     state->c00000regs[2],
+//    state->c80000regs[0],     state->c80000regs[1],     state->c80000regs[2]);
 
 //  popmessage("%04x %04x %04x | %04x %04x %04x",
-//    tecmosys_b00000regs[0],     tecmosys_b00000regs[1],     tecmosys_b00000regs[2],
-//    tecmosys_a80000regs[0],     tecmosys_a80000regs[1],     tecmosys_a80000regs[2]);
+//    state->b00000regs[0],     state->b00000regs[1],     state->b00000regs[2],
+//    state->a80000regs[0],     state->a80000regs[1],     state->a80000regs[2]);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
-	tecmosys_render_sprites_to_bitmap(screen->machine, bitmap, tecmosys_880000regs[0x0], tecmosys_880000regs[0x1]);
+	tecmosys_render_sprites_to_bitmap(screen->machine, bitmap, state->_880000regs[0x0], state->_880000regs[0x1]);
 
 
 	return 0;
@@ -876,7 +868,7 @@ static const ymf262_interface tecmosys_ymf262_interface =
 };
 
 
-static MACHINE_CONFIG_START( deroon, driver_device )
+static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)

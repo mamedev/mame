@@ -1,7 +1,17 @@
-/*----------- defined in video/speedbal.c -----------*/
+class speedbal_state : public driver_device
+{
+public:
+	speedbal_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *speedbal_background_videoram;
-extern UINT8 *speedbal_foreground_videoram;
+	UINT8 *background_videoram;
+	UINT8 *foreground_videoram;
+	tilemap_t *bg_tilemap;
+	tilemap_t *fg_tilemap;
+};
+
+
+/*----------- defined in video/speedbal.c -----------*/
 
 VIDEO_START( speedbal );
 SCREEN_UPDATE( speedbal );

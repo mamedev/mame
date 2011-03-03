@@ -79,6 +79,8 @@ public:
 	int dest;
 	int hi, sx, sx1, dsx, sy, sy1, dsy, sp, sr;
 	int x, y, w, h;
+	unsigned base;
+	int view_roms;
 
 	/* misc */
 	UINT16 c00006;
@@ -116,19 +118,17 @@ static SCREEN_UPDATE( lastfght )
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
 	int x, y, count = 0;
-	static unsigned base = 0;
-	static int view_roms = 0;
 	UINT8 *gfxdata = screen->machine->region("gfx1")->base();
 	UINT8 data;
 
-	if (input_code_pressed_once(screen->machine, KEYCODE_ENTER))	view_roms ^= 1;
-	if (view_roms)
+	if (input_code_pressed_once(screen->machine, KEYCODE_ENTER))	state->view_roms ^= 1;
+	if (state->view_roms)
 	{
-		if (input_code_pressed_once(screen->machine, KEYCODE_PGDN))	base += 512 * 256;
-		if (input_code_pressed_once(screen->machine, KEYCODE_PGUP))	base -= 512 * 256;
-		base %= screen->machine->region("gfx1")->bytes();
+		if (input_code_pressed_once(screen->machine, KEYCODE_PGDN))	state->base += 512 * 256;
+		if (input_code_pressed_once(screen->machine, KEYCODE_PGUP))	state->base -= 512 * 256;
+		state->base %= screen->machine->region("gfx1")->bytes();
 
-		count = base;
+		count = state->base;
 
 		bitmap_fill(bitmap, cliprect , get_black_pen(screen->machine));
 		for (y = 0 ; y < 256; y++)
@@ -140,7 +140,7 @@ static SCREEN_UPDATE( lastfght )
 				count++;
 			}
 		}
-		popmessage("%x", base);
+		popmessage("%x", state->base);
 		return 0;
 	}
 #endif

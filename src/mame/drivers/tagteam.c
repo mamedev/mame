@@ -48,8 +48,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(tagteam_mirrorvideoram_r, tagteam_mirrorvideoram_w)
 	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(tagteam_mirrorcolorram_r, tagteam_mirrorcolorram_w)
 	AM_RANGE(0x4800, 0x4fff) AM_READONLY
-	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tagteam_videoram_w) AM_BASE(&tagteam_videoram)
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(tagteam_colorram_w) AM_BASE(&tagteam_colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tagteam_videoram_w) AM_BASE_MEMBER(tagteam_state, videoram)
+	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(tagteam_colorram_w) AM_BASE_MEMBER(tagteam_state, colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -66,20 +66,20 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( tagteam_interrupt )
 {
-	static int coin;
+	tagteam_state *state = device->machine->driver_data<tagteam_state>();
 	int port;
 
 	port = input_port_read(device->machine, "P1") & 0xc0;
 
 	if (port != 0xc0)    /* Coin */
 	{
-		if (coin == 0)
+		if (state->coin == 0)
 		{
-			coin = 1;
+			state->coin = 1;
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
-	else coin = 0;
+	else state->coin = 0;
 }
 
 static INPUT_PORTS_START( bigprowr )
@@ -211,7 +211,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( tagteam, driver_device )
+static MACHINE_CONFIG_START( tagteam, tagteam_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ?? */

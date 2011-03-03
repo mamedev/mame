@@ -46,11 +46,11 @@ static WRITE16_HANDLER( tecmo16_sound_command_w )
 static ADDRESS_MAP_START( fstarfrc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* Main RAM */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_BASE(&tecmo16_charram)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(tecmo16_videoram_w) AM_BASE(&tecmo16_videoram)
-	AM_RANGE(0x120800, 0x120fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_BASE(&tecmo16_colorram)
-	AM_RANGE(0x121000, 0x1217ff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_BASE(&tecmo16_videoram2)
-	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_BASE(&tecmo16_colorram2)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_BASE_MEMBER(tecmo16_state, charram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(tecmo16_videoram_w) AM_BASE_MEMBER(tecmo16_state, videoram)
+	AM_RANGE(0x120800, 0x120fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_BASE_MEMBER(tecmo16_state, colorram)
+	AM_RANGE(0x121000, 0x1217ff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_BASE_MEMBER(tecmo16_state, videoram2)
+	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_BASE_MEMBER(tecmo16_state, colorram2)
 	AM_RANGE(0x122000, 0x127fff) AM_RAM	/* work area */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -69,11 +69,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ginkun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* Main RAM */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_BASE(&tecmo16_charram)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(tecmo16_videoram_w) AM_BASE(&tecmo16_videoram)
-	AM_RANGE(0x121000, 0x121fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_BASE(&tecmo16_colorram)
-	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_BASE(&tecmo16_videoram2)
-	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_BASE(&tecmo16_colorram2)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_BASE_MEMBER(tecmo16_state, charram)
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(tecmo16_videoram_w) AM_BASE_MEMBER(tecmo16_state, videoram)
+	AM_RANGE(0x121000, 0x121fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_BASE_MEMBER(tecmo16_state, colorram)
+	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_BASE_MEMBER(tecmo16_state, videoram2)
+	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_BASE_MEMBER(tecmo16_state, colorram2)
 	AM_RANGE(0x124000, 0x124fff) AM_RAM	/* extra RAM for Riot */
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -373,7 +373,7 @@ static const ym2151_interface ym2151_config =
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( fstarfrc, driver_device )
+static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)			/* 12MHz */

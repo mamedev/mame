@@ -113,7 +113,7 @@ Hollywood Action
 #ifdef UNUSED_FUNCTION
 
 //static int kickgoal_sound;
-//static int state->melody;
+//static int kickgoal_melody;
 //static int kickgoal_snd_bank;
 
 static void kickgoal_play(okim6295_device *oki, int melody, int data)

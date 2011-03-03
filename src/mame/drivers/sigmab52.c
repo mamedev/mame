@@ -132,6 +132,18 @@
 #include "video/hd63484.h"
 
 
+class sigmab52_state : public driver_device
+{
+public:
+	sigmab52_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int latch;
+	unsigned int acrtc_data;
+};
+
+
+
 
 /*************************
 *     Video Hardware     *
@@ -224,32 +236,31 @@ static PALETTE_INIT( jwildb52 )
 
 static WRITE8_HANDLER(acrtc_w)
 {
-	static int latch=0;
-	static unsigned int acrtc_data=0;
+	sigmab52_state *state = space->machine->driver_data<sigmab52_state>();
 	device_t *hd63484 = space->machine->device("hd63484");
 	if(!offset)
 	{
 		//address select
 		hd63484_address_w(hd63484, 0, data, 0x00ff);
-		latch = 0;
+		state->latch = 0;
 	}
 	else
 	{
-		if(!latch)
+		if(!state->latch)
 		{
-			acrtc_data = data;
+			state->acrtc_data = data;
 
 		}
 
 		else
 		{
-			acrtc_data <<= 8;
-			acrtc_data |= data;
+			state->acrtc_data <<= 8;
+			state->acrtc_data |= data;
 
-			hd63484_data_w(hd63484, 0, acrtc_data, 0xffff);
+			hd63484_data_w(hd63484, 0, state->acrtc_data, 0xffff);
 		}
 
-		latch ^= 1;
+		state->latch ^= 1;
 	}
 }
 
@@ -564,7 +575,7 @@ static const hd63484_interface jwildb52_hd63484_intf = { 1 };
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jwildb52, driver_device )
+static MACHINE_CONFIG_START( jwildb52, sigmab52_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)	/* 2 MHz */

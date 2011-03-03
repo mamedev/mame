@@ -104,39 +104,40 @@ static WRITE8_HANDLER( sub_cpu_halt_w )
 }
 
 
-
-static int track0[2],track1[2];
-
 static READ8_HANDLER( tehkanwc_track_0_r )
 {
+	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
 	int joy;
 
 	joy = input_port_read(space->machine, "FAKE") >> (2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read(space->machine, offset ? "P1Y" : "P1X") - track0[offset];
+	return input_port_read(space->machine, offset ? "P1Y" : "P1X") - state->track0[offset];
 }
 
 static READ8_HANDLER( tehkanwc_track_1_r )
 {
+	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
 	int joy;
 
 	joy = input_port_read(space->machine, "FAKE") >> (4 + 2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read(space->machine, offset ? "P2Y" : "P2X") - track1[offset];
+	return input_port_read(space->machine, offset ? "P2Y" : "P2X") - state->track1[offset];
 }
 
 static WRITE8_HANDLER( tehkanwc_track_0_reset_w )
 {
+	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
 	/* reset the trackball counters */
-	track0[offset] = input_port_read(space->machine, offset ? "P1Y" : "P1X") + data;
+	state->track0[offset] = input_port_read(space->machine, offset ? "P1Y" : "P1X") + data;
 }
 
 static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 {
+	tehkanwc_state *state = space->machine->driver_data<tehkanwc_state>();
 	/* reset the trackball counters */
-	track1[offset] = input_port_read(space->machine, offset ? "P2Y" : "P2X") + data;
+	state->track1[offset] = input_port_read(space->machine, offset ? "P2Y" : "P2X") + data;
 }
 
 
@@ -164,26 +165,29 @@ static WRITE8_HANDLER( sound_answer_w )
 
 /* Emulate MSM sound samples with counters */
 
-static int msm_data_offs;
 
 static READ8_DEVICE_HANDLER( tehkanwc_portA_r )
 {
-	return msm_data_offs & 0xff;
+	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	return state->msm_data_offs & 0xff;
 }
 
 static READ8_DEVICE_HANDLER( tehkanwc_portB_r )
 {
-	return (msm_data_offs >> 8) & 0xff;
+	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	return (state->msm_data_offs >> 8) & 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( tehkanwc_portA_w )
 {
-	msm_data_offs = (msm_data_offs & 0xff00) | data;
+	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	state->msm_data_offs = (state->msm_data_offs & 0xff00) | data;
 }
 
 static WRITE8_DEVICE_HANDLER( tehkanwc_portB_w )
 {
-	msm_data_offs = (msm_data_offs & 0x00ff) | (data << 8);
+	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
+	state->msm_data_offs = (state->msm_data_offs & 0x00ff) | (data << 8);
 }
 
 static WRITE8_DEVICE_HANDLER( msm_reset_w )
@@ -193,20 +197,20 @@ static WRITE8_DEVICE_HANDLER( msm_reset_w )
 
 static void tehkanwc_adpcm_int(device_t *device)
 {
-	static int toggle;
+	tehkanwc_state *state = device->machine->driver_data<tehkanwc_state>();
 
 	UINT8 *SAMPLES = device->machine->region("adpcm")->base();
-	int msm_data = SAMPLES[msm_data_offs & 0x7fff];
+	int msm_data = SAMPLES[state->msm_data_offs & 0x7fff];
 
-	if (toggle == 0)
+	if (state->toggle == 0)
 		msm5205_data_w(device,(msm_data >> 4) & 0x0f);
 	else
 	{
 		msm5205_data_w(device,msm_data & 0x0f);
-		msm_data_offs++;
+		state->msm_data_offs++;
 	}
 
-	toggle ^= 1;
+	state->toggle ^= 1;
 }
 
 /* End of MSM with counters emulation */
@@ -217,11 +221,11 @@ static ADDRESS_MAP_START( main_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE("share2") AM_BASE(&tehkanwc_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE("share3") AM_BASE(&tehkanwc_colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE("share2") AM_BASE_MEMBER(tehkanwc_state, videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE("share3") AM_BASE_MEMBER(tehkanwc_state, colorram)
 	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("share5") /* unused part of the palette RAM, I think? Gridiron uses it */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE("share6") AM_BASE(&tehkanwc_videoram2)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE("share6") AM_BASE_MEMBER(tehkanwc_state, videoram2)
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("share7") AM_BASE_SIZE_GENERIC(spriteram) /* sprites */
 	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
 	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
@@ -640,7 +644,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8KHz               */
 };
 
-static MACHINE_CONFIG_START( tehkanwc, driver_device )
+static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/4)	/* 18.432000 / 4 */

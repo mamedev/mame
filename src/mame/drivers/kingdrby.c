@@ -72,10 +72,28 @@ sg1_b.e1       4096     0x92ef3c13      D2732D
 #include "sound/2203intf.h"
 #include "machine/nvram.h"
 
+
+class kingdrby_state : public driver_device
+{
+public:
+	kingdrby_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 sound_cmd;
+	UINT8 *vram;
+	UINT8 *attr;
+	tilemap_t *sc0_tilemap;
+	tilemap_t *sc0w_tilemap;
+	tilemap_t *sc1_tilemap;
+	UINT8 p1_hopper;
+	UINT8 p2_hopper;
+	UINT8 mux_data;
+};
+
+
 #define CLK_1	XTAL_20MHz
 #define CLK_2	XTAL_3_579545MHz
 
-static UINT8 sound_cmd;
 
 /*************************************
  *
@@ -83,8 +101,6 @@ static UINT8 sound_cmd;
  *
  *************************************/
 
-static UINT8 *kingdrby_vram,*kingdrby_attr;
-static tilemap_t *sc0_tilemap,*sc0w_tilemap,*sc1_tilemap;
 
 /*
 tile
@@ -98,8 +114,9 @@ xxxx ---- basic color?
 
 static TILE_GET_INFO( get_sc0_tile_info )
 {
-	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
-	int color = (kingdrby_attr[tile_index] & 0x06)>>1;
+	kingdrby_state *state = machine->driver_data<kingdrby_state>();
+	int tile = state->vram[tile_index] | state->attr[tile_index]<<8;
+	int color = (state->attr[tile_index] & 0x06)>>1;
 
 	tile&=0x1ff;
 
@@ -112,8 +129,9 @@ static TILE_GET_INFO( get_sc0_tile_info )
 
 static TILE_GET_INFO( get_sc1_tile_info )
 {
-	int tile = kingdrby_vram[tile_index] | kingdrby_attr[tile_index]<<8;
-	int color = (kingdrby_attr[tile_index] & 0x06)>>1;
+	kingdrby_state *state = machine->driver_data<kingdrby_state>();
+	int tile = state->vram[tile_index] | state->attr[tile_index]<<8;
+	int color = (state->attr[tile_index] & 0x06)>>1;
 
 	tile&=0x1ff;
 	//original 0xc
@@ -126,16 +144,17 @@ static TILE_GET_INFO( get_sc1_tile_info )
 			color|0x40,
 			0);
 
-	tileinfo->category = (kingdrby_attr[tile_index] & 0x08)>>3;
+	tileinfo->category = (state->attr[tile_index] & 0x08)>>3;
 }
 
 static VIDEO_START(kingdrby)
 {
-	sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,24);
-	sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,32,24);
-	sc0w_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
+	kingdrby_state *state = machine->driver_data<kingdrby_state>();
+	state->sc0_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,24);
+	state->sc1_tilemap = tilemap_create(machine, get_sc1_tile_info,tilemap_scan_rows,8,8,32,24);
+	state->sc0w_tilemap = tilemap_create(machine, get_sc0_tile_info,tilemap_scan_rows,8,8,32,32);
 
-	tilemap_set_transparent_pen(sc1_tilemap,0);
+	tilemap_set_transparent_pen(state->sc1_tilemap,0);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -184,13 +203,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE(kingdrby)
 {
+	kingdrby_state *state = screen->machine->driver_data<kingdrby_state>();
 	const rectangle &visarea = screen->visible_area();
 	rectangle clip;
-	tilemap_set_scrollx( sc0_tilemap,0, kingdrby_vram[0x342]);
-	tilemap_set_scrolly( sc0_tilemap,0, kingdrby_vram[0x341]);
-	tilemap_set_scrollx( sc1_tilemap,0, kingdrby_vram[0x342]);
-	tilemap_set_scrolly( sc1_tilemap,0, kingdrby_vram[0x341]);
-	tilemap_set_scrolly( sc0w_tilemap,0, 32);
+	tilemap_set_scrollx( state->sc0_tilemap,0, state->vram[0x342]);
+	tilemap_set_scrolly( state->sc0_tilemap,0, state->vram[0x341]);
+	tilemap_set_scrollx( state->sc1_tilemap,0, state->vram[0x342]);
+	tilemap_set_scrolly( state->sc1_tilemap,0, state->vram[0x341]);
+	tilemap_set_scrolly( state->sc0w_tilemap,0, 32);
 
 	/* maybe it needs two window tilemaps? (one at the top, the other at the bottom)*/
 	clip.min_x = visarea.min_x;
@@ -199,28 +219,30 @@ static SCREEN_UPDATE(kingdrby)
 	clip.max_y = visarea.max_y;
 
 	/*TILEMAP_DRAW_CATEGORY + TILEMAP_DRAW_OPAQUE doesn't suit well?*/
-	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->sc0_tilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,sc1_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
-	tilemap_draw(bitmap,&clip,sc0w_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->sc1_tilemap,TILEMAP_DRAW_CATEGORY(1),0);
+	tilemap_draw(bitmap,&clip,state->sc0w_tilemap,0,0);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( sc0_vram_w )
 {
-	kingdrby_vram[offset] = data;
-	tilemap_mark_tile_dirty(sc0_tilemap,offset);
-	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
-	tilemap_mark_tile_dirty(sc1_tilemap,offset);
+	kingdrby_state *state = space->machine->driver_data<kingdrby_state>();
+	state->vram[offset] = data;
+	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
+	tilemap_mark_tile_dirty(state->sc0w_tilemap,offset);
+	tilemap_mark_tile_dirty(state->sc1_tilemap,offset);
 }
 
 static WRITE8_HANDLER( sc0_attr_w )
 {
-	kingdrby_attr[offset] = data;
-	tilemap_mark_tile_dirty(sc0_tilemap,offset);
-	tilemap_mark_tile_dirty(sc0w_tilemap,offset);
-	tilemap_mark_tile_dirty(sc1_tilemap,offset);
+	kingdrby_state *state = space->machine->driver_data<kingdrby_state>();
+	state->attr[offset] = data;
+	tilemap_mark_tile_dirty(state->sc0_tilemap,offset);
+	tilemap_mark_tile_dirty(state->sc0w_tilemap,offset);
+	tilemap_mark_tile_dirty(state->sc1_tilemap,offset);
 }
 
 /*************************************
@@ -230,40 +252,43 @@ static WRITE8_HANDLER( sc0_attr_w )
  *************************************/
 
 /* hopper I/O */
-static UINT8 p1_hopper,p2_hopper;
 
 static READ8_DEVICE_HANDLER( hopper_io_r )
 {
-	return (input_port_read(device->machine,"HPIO") & 0x3f) | p1_hopper | p2_hopper;
+	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
+	return (input_port_read(device->machine,"HPIO") & 0x3f) | state->p1_hopper | state->p2_hopper;
 }
 
 static WRITE8_DEVICE_HANDLER( hopper_io_w )
 {
-	p1_hopper = (data & 0x8)<<3;
-	p2_hopper = (data & 0x4)<<5;
+	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
+	state->p1_hopper = (data & 0x8)<<3;
+	state->p2_hopper = (data & 0x4)<<5;
 //  printf("%02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_cmd_w )
 {
+	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
 	cputag_set_input_line(device->machine, "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
-	sound_cmd = data;
+	state->sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
 	// soundlatch_w(space,0, data);
 }
 
-static UINT8 mux_data;
 
 /* No idea about what's this (if it's really a mux etc.)*/
 static WRITE8_DEVICE_HANDLER( outport2_w )
 {
+	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
 //  popmessage("PPI1 port C(upper) out: %02X", data);
-	mux_data = data & 0x80;
+	state->mux_data = data & 0x80;
 }
 
 static READ8_DEVICE_HANDLER( input_mux_r )
 {
-	if(mux_data & 0x80)
+	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
+	if(state->mux_data & 0x80)
 		return input_port_read(device->machine,"MUX0");
 	else
 		return input_port_read(device->machine,"MUX1");
@@ -271,8 +296,8 @@ static READ8_DEVICE_HANDLER( input_mux_r )
 
 static READ8_DEVICE_HANDLER( key_matrix_r )
 {
-	static UINT16 p1_val,p2_val;
-	static UINT8 p1_res,p2_res;
+	UINT16 p1_val,p2_val;
+	UINT8 p1_res,p2_res;
 
 	p1_val = input_port_read(device->machine,"KEY_1P");
 	p2_val = input_port_read(device->machine,"KEY_2P");
@@ -323,7 +348,8 @@ static READ8_DEVICE_HANDLER( key_matrix_r )
 
 static READ8_DEVICE_HANDLER( sound_cmd_r )
 {
-	return sound_cmd;
+	kingdrby_state *state = device->machine->driver_data<kingdrby_state>();
+	return state->sound_cmd;
 }
 
 static WRITE8_HANDLER( led_array_w )
@@ -346,8 +372,8 @@ static WRITE8_HANDLER( led_array_w )
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0xc00) AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&kingdrby_vram)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_BASE(&kingdrby_attr)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE_MEMBER(kingdrby_state, vram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_BASE_MEMBER(kingdrby_state, attr)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io_map, ADDRESS_SPACE_IO, 8 )
@@ -966,7 +992,7 @@ static PALETTE_INIT(kingdrbb)
 	}
 }
 
-static MACHINE_CONFIG_START( kingdrby, driver_device )
+static MACHINE_CONFIG_START( kingdrby, kingdrby_state )
 	MCFG_CPU_ADD("master", Z80, CLK_2)
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)

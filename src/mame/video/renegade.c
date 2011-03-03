@@ -7,10 +7,6 @@
 #include "emu.h"
 #include "includes/renegade.h"
 
-UINT8 *renegade_videoram2;
-static INT32 renegade_scrollx;
-static tilemap_t *bg_tilemap;
-static tilemap_t *fg_tilemap;
 
 WRITE8_HANDLER( renegade_videoram_w )
 {
@@ -18,14 +14,15 @@ WRITE8_HANDLER( renegade_videoram_w )
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	offset = offset % (64 * 16);
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( renegade_videoram2_w )
 {
-	renegade_videoram2[offset] = data;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->videoram2[offset] = data;
 	offset = offset % (32 * 32);
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( renegade_flipscreen_w )
@@ -35,12 +32,14 @@ WRITE8_HANDLER( renegade_flipscreen_w )
 
 WRITE8_HANDLER( renegade_scroll0_w )
 {
-	renegade_scrollx = (renegade_scrollx & 0xff00) | data;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->scrollx = (state->scrollx & 0xff00) | data;
 }
 
 WRITE8_HANDLER( renegade_scroll1_w )
 {
-	renegade_scrollx = (renegade_scrollx & 0xff) | (data << 8);
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	state->scrollx = (state->scrollx & 0xff) | (data << 8);
 }
 
 static TILE_GET_INFO( get_bg_tilemap_info )
@@ -58,7 +57,8 @@ static TILE_GET_INFO( get_bg_tilemap_info )
 
 static TILE_GET_INFO( get_fg_tilemap_info )
 {
-	const UINT8 *source = &renegade_videoram2[tile_index];
+	renegade_state *state = machine->driver_data<renegade_state>();
+	const UINT8 *source = &state->videoram2[tile_index];
 	UINT8 attributes = source[0x400];
 	SET_TILE_INFO(
 		0,
@@ -69,13 +69,14 @@ static TILE_GET_INFO( get_fg_tilemap_info )
 
 VIDEO_START( renegade )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tilemap_info, tilemap_scan_rows,      16, 16, 64, 16);
-	fg_tilemap = tilemap_create(machine, get_fg_tilemap_info, tilemap_scan_rows,   8, 8, 32, 32);
+	renegade_state *state = machine->driver_data<renegade_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tilemap_info, tilemap_scan_rows,      16, 16, 64, 16);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tilemap_info, tilemap_scan_rows,   8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap, 0);
-	tilemap_set_scrolldx(bg_tilemap, 256, 0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
+	tilemap_set_scrolldx(state->bg_tilemap, 256, 0);
 
-	state_save_register_global(machine, renegade_scrollx);
+	state_save_register_global(machine, state->scrollx);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -131,9 +132,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( renegade )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, renegade_scrollx);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0 , 0);
+	renegade_state *state = screen->machine->driver_data<renegade_state>();
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0 , 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0 , 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0 , 0);
 	return 0;
 }

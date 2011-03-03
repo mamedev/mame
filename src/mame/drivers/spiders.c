@@ -203,15 +203,6 @@
 #define CRTC_CLOCK				(MAIN_CPU_MASTER_CLOCK / 16)
 
 
-static UINT8 *spiders_ram;
-static UINT8 flipscreen;
-static UINT16 gfx_rom_address;
-static UINT8 gfx_rom_ctrl_mode;
-static UINT8 gfx_rom_ctrl_latch;
-static UINT8 gfx_rom_ctrl_data;
-
-
-
 /*************************************
  *
  *  Prototypes
@@ -409,12 +400,13 @@ static const ttl74123_interface ic60_intf =
 
 static MACHINE_START( spiders )
 {
+	spiders_state *state = machine->driver_data<spiders_state>();
 	/* setup for save states */
-	state_save_register_global(machine, flipscreen);
-	state_save_register_global(machine, gfx_rom_address);
-	state_save_register_global(machine, gfx_rom_ctrl_mode);
-	state_save_register_global(machine, gfx_rom_ctrl_latch);
-	state_save_register_global(machine, gfx_rom_ctrl_data);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->gfx_rom_address);
+	state_save_register_global(machine, state->gfx_rom_ctrl_mode);
+	state_save_register_global(machine, state->gfx_rom_ctrl_latch);
+	state_save_register_global(machine, state->gfx_rom_ctrl_data);
 }
 
 
@@ -425,32 +417,32 @@ static MACHINE_START( spiders )
  *
  *************************************/
 
-#define NUM_PENS	(8)
-
 
 static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
 {
-	flipscreen = state;
+	spiders_state *drvstate = device->machine->driver_data<spiders_state>();
+	drvstate->flipscreen = state;
 }
 
 
 static MC6845_BEGIN_UPDATE( begin_update )
 {
+	spiders_state *state = device->machine->driver_data<spiders_state>();
 	/* create the pens */
 	offs_t i;
-	static pen_t pens[NUM_PENS];
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		state->pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 
-	return pens;
+	return state->pens;
 }
 
 
 static MC6845_UPDATE_ROW( update_row )
 {
+	spiders_state *state = device->machine->driver_data<spiders_state>();
 	UINT8 cx;
 
 	pen_t *pens = (pen_t *)param;
@@ -466,18 +458,18 @@ static MC6845_UPDATE_ROW( update_row )
 					  ((ra << 5) & 0x00e0) |
 					  ((ma << 0) & 0x001f);
 
-		if (flipscreen)
+		if (state->flipscreen)
 			offs = offs ^ 0x3fff;
 
-		data1 = spiders_ram[0x0000 | offs];
-		data2 = spiders_ram[0x4000 | offs];
-		data3 = spiders_ram[0x8000 | offs];
+		data1 = state->ram[0x0000 | offs];
+		data2 = state->ram[0x4000 | offs];
+		data3 = state->ram[0x8000 | offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			UINT8 color;
 
-			if (flipscreen)
+			if (state->flipscreen)
 			{
 				color = ((data3 & 0x80) >> 5) |
 						((data2 & 0x80) >> 6) |
@@ -548,28 +540,30 @@ static SCREEN_UPDATE( spiders )
 
 static WRITE8_DEVICE_HANDLER( gfx_rom_intf_w )
 {
-	gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
-	gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
-	gfx_rom_ctrl_data  = (~data >> 0) & 0x0f;
+	spiders_state *state = device->machine->driver_data<spiders_state>();
+	state->gfx_rom_ctrl_mode  = ( data >> 7) & 0x01;
+	state->gfx_rom_ctrl_latch = ( data >> 4) & 0x03;
+	state->gfx_rom_ctrl_data  = (~data >> 0) & 0x0f;
 }
 
 
 static READ8_DEVICE_HANDLER( gfx_rom_r )
 {
+	spiders_state *state = device->machine->driver_data<spiders_state>();
 	UINT8 ret;
 
-	if (gfx_rom_ctrl_mode)
+	if (state->gfx_rom_ctrl_mode)
 	{
 		UINT8 *rom = device->machine->region("gfx1")->base();
 
-		ret = rom[gfx_rom_address];
+		ret = rom[state->gfx_rom_address];
 
-		gfx_rom_address = gfx_rom_address + 1;
+		state->gfx_rom_address = state->gfx_rom_address + 1;
 	}
 	else
 	{
-		UINT8 shift_count = gfx_rom_ctrl_latch << 2;
-		gfx_rom_address = (gfx_rom_address & ~(0x0f << shift_count)) | (gfx_rom_ctrl_data << shift_count);
+		UINT8 shift_count = state->gfx_rom_ctrl_latch << 2;
+		state->gfx_rom_address = (state->gfx_rom_address & ~(0x0f << shift_count)) | (state->gfx_rom_ctrl_data << shift_count);
 
 		ret = 0;
 	}
@@ -586,7 +580,7 @@ static READ8_DEVICE_HANDLER( gfx_rom_r )
  *************************************/
 
 static ADDRESS_MAP_START( spiders_main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&spiders_ram)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(spiders_state, ram)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_SHARE("nvram")
@@ -706,7 +700,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spiders, driver_device )
+static MACHINE_CONFIG_START( spiders, spiders_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2800000)

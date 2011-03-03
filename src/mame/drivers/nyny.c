@@ -82,6 +82,8 @@
 #define AUDIO_CPU_2_CLOCK			AUDIO_2_MASTER_CLOCK
 
 
+#define NUM_PENS	   8
+
 class nyny_state : public driver_device
 {
 public:
@@ -108,6 +110,7 @@ public:
 	device_t *mc6845;
 	device_t *pia1;
 	device_t *pia2;
+	pen_t pens[NUM_PENS];
 };
 
 
@@ -271,8 +274,6 @@ static const ttl74123_interface ic48_1_config =
  *
  *************************************/
 
-#define NUM_PENS	   8
-
 
 static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
 {
@@ -283,16 +284,16 @@ static WRITE_LINE_DEVICE_HANDLER( flipscreen_w )
 
 static MC6845_BEGIN_UPDATE( begin_update )
 {
+	nyny_state *state = device->machine->driver_data<nyny_state>();
 	/* create the pens */
 	offs_t i;
-	static pen_t pens[NUM_PENS];
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+		state->pens[i] = MAKE_RGB(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
 	}
 
-	return pens;
+	return state->pens;
 }
 
 

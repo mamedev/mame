@@ -51,9 +51,6 @@ f80b      ????
 #include "sound/msm5205.h"
 #include "includes/tecmo.h"
 
-static int adpcm_pos,adpcm_end;
-static int adpcm_data;
-
 
 static WRITE8_HANDLER( tecmo_bankswitch_w )
 {
@@ -73,12 +70,14 @@ static WRITE8_HANDLER( tecmo_sound_command_w )
 
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_start_w )
 {
-	adpcm_pos = data << 8;
+	tecmo_state *state = device->machine->driver_data<tecmo_state>();
+	state->adpcm_pos = data << 8;
 	msm5205_reset_w(device, 0);
 }
 static WRITE8_HANDLER( tecmo_adpcm_end_w )
 {
-	adpcm_end = (data + 1) << 8;
+	tecmo_state *state = space->machine->driver_data<tecmo_state>();
+	state->adpcm_end = (data + 1) << 8;
 }
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
 {
@@ -86,20 +85,21 @@ static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
 }
 static void tecmo_adpcm_int(device_t *device)
 {
-	if (adpcm_pos >= adpcm_end ||
-				adpcm_pos >= device->machine->region("adpcm")->bytes())
+	tecmo_state *state = device->machine->driver_data<tecmo_state>();
+	if (state->adpcm_pos >= state->adpcm_end ||
+				state->adpcm_pos >= device->machine->region("adpcm")->bytes())
 		msm5205_reset_w(device,1);
-	else if (adpcm_data != -1)
+	else if (state->adpcm_data != -1)
 	{
-		msm5205_data_w(device,adpcm_data & 0x0f);
-		adpcm_data = -1;
+		msm5205_data_w(device,state->adpcm_data & 0x0f);
+		state->adpcm_data = -1;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine->region("adpcm")->base();
 
-		adpcm_data = ROM[adpcm_pos++];
-		msm5205_data_w(device,adpcm_data >> 4);
+		state->adpcm_data = ROM[state->adpcm_pos++];
+		msm5205_data_w(device,state->adpcm_data >> 4);
 	}
 }
 
@@ -136,9 +136,9 @@ static READ8_HANDLER( tecmo_dswb_h_r )
 static ADDRESS_MAP_START( rygar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_BASE(&tecmo_txvideoram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_BASE(&tecmo_fgvideoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE(&tecmo_bgvideoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_BASE_MEMBER(tecmo_state, txvideoram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_BASE_MEMBER(tecmo_state, fgvideoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE_MEMBER(tecmo_state, bgvideoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
@@ -164,9 +164,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gemini_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_BASE(&tecmo_txvideoram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_BASE(&tecmo_fgvideoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE(&tecmo_bgvideoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_BASE_MEMBER(tecmo_state, txvideoram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_BASE_MEMBER(tecmo_state, fgvideoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE_MEMBER(tecmo_state, bgvideoram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
@@ -191,9 +191,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( silkworm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE(&tecmo_bgvideoram)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_BASE(&tecmo_fgvideoram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_BASE(&tecmo_txvideoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE_MEMBER(tecmo_state, bgvideoram)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_BASE_MEMBER(tecmo_state, fgvideoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_BASE_MEMBER(tecmo_state, txvideoram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
@@ -657,12 +657,13 @@ static const msm5205_interface msm5205_config =
 
 static MACHINE_RESET( rygar )
 {
-	adpcm_pos = 0;
-	adpcm_end = 0;
-	adpcm_data = -1;
+	tecmo_state *state = machine->driver_data<tecmo_state>();
+	state->adpcm_pos = 0;
+	state->adpcm_end = 0;
+	state->adpcm_data = -1;
 }
 
-static MACHINE_CONFIG_START( rygar, driver_device )
+static MACHINE_CONFIG_START( rygar, tecmo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
@@ -722,7 +723,7 @@ static MACHINE_CONFIG_DERIVED( silkworm, gemini )
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE
-static MACHINE_CONFIG_START( backfirt, driver_device )
+static MACHINE_CONFIG_START( backfirt, tecmo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
@@ -1153,13 +1154,28 @@ ROM_END
    video_type is used to distinguish Rygar, Silkworm and Gemini Wing.
    This is needed because there is a difference in the tile and sprite indexing.
 */
-static DRIVER_INIT( rygar )    { tecmo_video_type = 0; }
-static DRIVER_INIT( silkworm ) { tecmo_video_type = 1; }
-static DRIVER_INIT( gemini )   { tecmo_video_type = 2; }
+static DRIVER_INIT( rygar )
+{
+	tecmo_state *state = machine->driver_data<tecmo_state>();
+	state->video_type = 0;
+}
+
+static DRIVER_INIT( silkworm )
+{
+	tecmo_state *state = machine->driver_data<tecmo_state>();
+	state->video_type = 1;
+}
+
+static DRIVER_INIT( gemini )
+{
+	tecmo_state *state = machine->driver_data<tecmo_state>();
+	state->video_type = 2;
+}
 
 static DRIVER_INIT( backfirt )
 {
-	tecmo_video_type = 2;
+	tecmo_state *state = machine->driver_data<tecmo_state>();
+	state->video_type = 2;
 
 	/* no MSM */
 	memory_nop_write(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0);

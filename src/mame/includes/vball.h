@@ -1,13 +1,24 @@
-/*----------- defined in video/vball.c -----------*/
+class vball_state : public driver_device
+{
+public:
+	vball_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *vb_attribram;
-extern UINT8 *vb_videoram;
-extern UINT8 *vb_scrolly_lo;
-extern int vb_scrollx_hi;
-extern int vb_scrolly_hi;
-extern int vb_scrollx_lo;
-extern int vball_gfxset;
-extern int vb_scrollx[256];
+	UINT8 *vb_attribram;
+	UINT8 *vb_videoram;
+	UINT8 *vb_scrolly_lo;
+	int vb_scrollx_hi;
+	int vb_scrolly_hi;
+	int vb_scrollx_lo;
+	int gfxset;
+	int vb_scrollx[256];
+	int vb_bgprombank;
+	int vb_spprombank;
+	tilemap_t *bg_tilemap;
+};
+
+
+/*----------- defined in video/vball.c -----------*/
 
 VIDEO_START( vb );
 SCREEN_UPDATE( vb );
@@ -15,4 +26,4 @@ void vb_bgprombank_w(running_machine *machine, int bank);
 void vb_spprombank_w(running_machine *machine, int bank);
 WRITE8_HANDLER( vb_attrib_w );
 WRITE8_HANDLER( vb_videoram_w );
-void vb_mark_all_dirty(void);
+void vb_mark_all_dirty(running_machine *machine);

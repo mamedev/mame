@@ -68,8 +68,8 @@ static WRITE8_HANDLER( speedbal_coincounter_w )
 static ADDRESS_MAP_START( main_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdbff) AM_ROM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_BASE(&speedbal_background_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_BASE(&speedbal_foreground_videoram)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_BASE_MEMBER(speedbal_state, background_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_BASE_MEMBER(speedbal_state, foreground_videoram)
 	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -218,7 +218,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( speedbal, driver_device )
+static MACHINE_CONFIG_START( speedbal, speedbal_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ??? */

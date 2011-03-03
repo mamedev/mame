@@ -1,6 +1,18 @@
-/*----------- defined in video/speedspn.c -----------*/
+class speedspn_state : public driver_device
+{
+public:
+	speedspn_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *speedspn_attram;
+	UINT8 *attram;
+	tilemap_t *tilemap;
+	UINT8 display_disable;
+	int bank_vidram;
+	UINT8* vidram;
+};
+
+
+/*----------- defined in video/speedspn.c -----------*/
 
 VIDEO_START( speedspn );
 SCREEN_UPDATE( speedspn );

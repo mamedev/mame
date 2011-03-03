@@ -1,14 +1,26 @@
+class wc90b_state : public driver_device
+{
+public:
+	wc90b_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int msm5205next;
+	int toggle;
+	UINT8 *fgvideoram;
+	UINT8 *bgvideoram;
+	UINT8 *txvideoram;
+	UINT8 *scroll1x;
+	UINT8 *scroll2x;
+	UINT8 *scroll1y;
+	UINT8 *scroll2y;
+	UINT8 *scroll_x_lo;
+	tilemap_t *tx_tilemap;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
+};
+
+
 /*----------- defined in video/wc90b.c -----------*/
-
-extern UINT8 *wc90b_fgvideoram,*wc90b_bgvideoram,*wc90b_txvideoram;
-
-extern UINT8 *wc90b_scroll1x;
-extern UINT8 *wc90b_scroll2x;
-
-extern UINT8 *wc90b_scroll1y;
-extern UINT8 *wc90b_scroll2y;
-
-extern UINT8 *wc90b_scroll_x_lo;
 
 VIDEO_START( wc90b );
 SCREEN_UPDATE( wc90b );
