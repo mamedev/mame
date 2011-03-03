@@ -4780,6 +4780,7 @@ ROM_END
 
 ROM_START( gtrfrk3m )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "949jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(96c21d71) SHA1(871f1f0429154a486e547e182534db1557008dd6) )
@@ -4802,6 +4803,7 @@ ROM_END
 
 ROM_START( gtfrk3ma )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "949jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(96c21d71) SHA1(871f1f0429154a486e547e182534db1557008dd6) )
@@ -4821,6 +4823,7 @@ ROM_END
 
 ROM_START( gtfrk3mb )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0001014, "install_eeprom", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "ge949jaa.u1",  0x000000, 0x001014, BAD_DUMP CRC(61f35ee1) SHA1(0a2b66742364d76ec18647b2761590bd49229625) )
@@ -4834,6 +4837,7 @@ ROM_END
 
 ROM_START( gtrfrk4m )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a24jaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(29e326fe) SHA1(41a600105b08accc9d7ebd2b8ae08c0863758aa0) )
@@ -5180,6 +5184,7 @@ ROM_END
 
 ROM_START( pcnfrk3m )
 	SYS573_BIOS_A
+	SYS573_DIGITAL_ID
 
 	ROM_REGION( 0x0000224, "install_eeprom", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "a23kaa.u1",    0x000000, 0x000224, BAD_DUMP CRC(d71c4b5c) SHA1(3911c5dd933c30e6e44c8cf417bb4c284ecb4b80) )
