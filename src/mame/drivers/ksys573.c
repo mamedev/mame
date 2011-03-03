@@ -3093,13 +3093,6 @@ static MACHINE_CONFIG_DERIVED( konami573x, konami573 )
 	MCFG_X76F041_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( konami573xzi, konami573 )
-	MCFG_X76F041_ADD( "install_eeprom" )
-	MCFG_DS2401_ADD(  "install_id" )
-	MCFG_ZS01_ADD(    "game_eeprom", "game_id" )
-	MCFG_DS2401_ADD(  "game_id" )
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( konami573y, konami573 )
 	MCFG_X76F100_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
@@ -3155,13 +3148,6 @@ static MACHINE_CONFIG_DERIVED( pccard1x, pccard1 )
 	MCFG_X76F041_ADD( "install_eeprom" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pccard1xzi, pccard1 )
-	MCFG_X76F041_ADD( "install_eeprom" )
-	MCFG_DS2401_ADD(  "install_id" )
-	MCFG_ZS01_ADD(    "game_eeprom", "game_id" )
-	MCFG_DS2401_ADD(  "game_id" )
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_DERIVED( pccard1xi, pccard1 )
 	MCFG_X76F041_ADD( "install_eeprom" )
 	MCFG_DS2401_ADD(  "install_id" )
@@ -3169,11 +3155,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pccard1yi, pccard1 )
 	MCFG_X76F100_ADD( "install_eeprom" )
-	MCFG_DS2401_ADD(  "install_id" )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( pccard1zi, pccard1 )
-	MCFG_ZS01_ADD(    "install_eeprom", "install_id" )
 	MCFG_DS2401_ADD(  "install_id" )
 MACHINE_CONFIG_END
 
