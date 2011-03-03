@@ -80,7 +80,6 @@ int audit_images(emu_options &options, const game_driver *gamedrv, const char *v
 						if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 						{
 							anyrequired = TRUE;
-
 							if (allshared && !rom_used_by_parent(gamedrv, hashes, NULL))
 								allshared = FALSE;
 						}
@@ -512,12 +511,15 @@ static int rom_used_by_parent(const game_driver *gamedrv, const hash_collection 
 		for (const rom_source *source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 			for (region = rom_first_region(*source); region; region = rom_next_region(region))
 				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-					if (hash_collection(ROM_GETHASHDATA(rom)) == romhashes)
+				{
+					hash_collection hashes(ROM_GETHASHDATA(rom));
+					if (!hashes.flag(hash_collection::FLAG_NO_DUMP) && hashes == romhashes)
 					{
 						if (parent != NULL)
 							*parent = drv;
 						return TRUE;
 					}
+				}
 	}
 
 	return FALSE;

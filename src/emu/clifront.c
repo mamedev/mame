@@ -209,11 +209,13 @@ int cli_execute(cli_options &options, osd_interface &osd, int argc, char **argv)
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)
 	{
-		fprintf(stderr, "%s\n", fatal.string());
+		astring string(fatal.string());
+		fprintf(stderr, "%s\n", string.trimspace().cstr());
 		result = (fatal.exitcode() != 0) ? fatal.exitcode() : MAMERR_FATALERROR;
 		
-		// for any unknown game, offer some suggestions
-		if (result == MAMERR_NO_SUCH_GAME && strlen(options.system_name()) > 0 && strchr(options.system_name(), '*') == NULL)
+		// if a game was specified, wasn't a wildcard, and our error indicates this was the
+		// reason for failure, offer some suggestions
+		if (result == MAMERR_NO_SUCH_GAME && strlen(options.system_name()) > 0 && strchr(options.system_name(), '*') == NULL && options.system() == NULL)
 			display_suggestions(options.system_name());
 	}
 	catch (emu_exception &)
