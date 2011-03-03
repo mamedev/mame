@@ -5,8 +5,8 @@
 
   Driver written by Roberto Fresca.
   Based on roul driver from Roberto Zandona' & Angelo Salese.
-  
-  
+
+
   Games running in this hardware:
 
   * Winners Circle (81),       1981, Corona Co., LTD.
@@ -14,10 +14,10 @@
   * Ruleta RE-800 (earlier),   1991, Entretenimientos GEMINIS & GENATRON.
   * Ruleta RE-800 (v1.0),      1991, Entretenimientos GEMINIS & GENATRON.
   * Ruleta RE-800 (v3.0),      1992, Entretenimientos GEMINIS & GENATRON.
-  
-  
+
+
   Special thanks to Rob Ragon for his invaluable cooperation.
- 
+
 **************************************************************************
 
   Game Notes:
@@ -259,12 +259,12 @@
 **************************************************************************
 
   TODO:
-  
+
   - Blitter issues... Fix the H/V stuff.
   - Fix the Winners Circle hangs.
   - Inputs/Outputs for Winners Circle.
   - Check the sound CPU connection in Winners Circle sets.
-  
+
 
 **************************************************************************/
 
@@ -280,7 +280,7 @@
 #include "re800.lh"
 #include "machine/nvram.h"
 
-#define VIDEOBUF_SIZE 256*256
+#define VIDEOBUF_SIZE 512*512
 
 static UINT8 blitter_x_reg = 0;
 static UINT8 blitter_y_reg = 0;
@@ -309,11 +309,11 @@ static PALETTE_INIT( winner )
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
 		b = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
-		
+
 		bit0 = (color_prom[0] >> 2) & 0x01;
 		bit1 = (color_prom[0] >> 3) & 0x01;
 		g = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
-		
+
 		bit0 = (color_prom[0] >> 4) & 0x01;
 		bit1 = (color_prom[0] >> 5) & 0x01;
 		r = 0x0e * bit6 + 0x1f * bit7 + 0x43 * bit0 + 0x8f * bit1;
@@ -323,14 +323,20 @@ static PALETTE_INIT( winner )
 	}
 }
 
-static WRITE8_HANDLER( blitter_x_w )
-{
-	blitter_x_reg = data;
-}
-
 static WRITE8_HANDLER( blitter_y_w )
 {
 	blitter_y_reg = data;
+}
+
+static WRITE8_HANDLER( blitter_unk_w )
+{
+	blitter_unk_reg = data;
+	printf("%02x\n",blitter_unk_reg);
+}
+
+static WRITE8_HANDLER( blitter_x_w )
+{
+	blitter_x_reg = data;
 }
 
 static WRITE8_HANDLER( blitter_aux_w )
@@ -338,56 +344,55 @@ static WRITE8_HANDLER( blitter_aux_w )
 	blitter_aux_reg = data;
 }
 
-static WRITE8_HANDLER( blitter_unk_w )
-{
-	blitter_unk_reg = data;
-	logerror("Blitter unk reg: [%02x]\n", blitter_unk_reg);
-}
-
 static READ8_HANDLER( blitter_status_r )
 {
 /* code check bit 6 and/or bit 7 */
-//	return space->machine->rand() & 0x00c0;
-	return 0xc0;
+	//return space->machine->rand() & 0xc0;
+	/*
+		x--- ---- blitter busy
+		-x-- ---- vblank
+	*/
+
+	return 0x80 | ((space->machine->primary_screen->vblank() & 1) << 6);
+}
+
+static void blitter_execute(int x,int y,int color,int width,int flag)
+{
+	int i;
+	int xdir = (flag & 0x10)    ? -1 : 1;
+	int ydir = (!(flag & 0x20)) ? -1 : 1;
+
+	if(width == 0) //ignored
+		return;
+
+	if((flag & 0xc0) == 0) /* square shape / layer clearance */
+	{
+		int xp,yp;
+
+		if(x != 128 || y != 128 || width != 8)
+			printf("%02x %02x %02x %02x %02x\n",x,y,color,width,flag);
+
+		for(yp=0;yp<0x100;yp++)
+			for(xp=0;xp<0x100;xp++)
+				videobuf[(yp & 0x1ff) * 512 + (xp & 0x1ff)] = color;
+	}
+	else /* line shape */
+	{
+		//printf("%02x %02x %02x %02x %02x\n",x,y,color,width,flag);
+
+		for(i=0;i<width;i++)
+		{
+			videobuf[(y & 0x1ff) * 512 + (x & 0x1ff)] = color;
+
+			if(flag & 0x40) { x+=xdir; }
+			if(flag & 0x80) { y+=ydir; }
+		}
+	}
 }
 
 static WRITE8_HANDLER( blitter_trig_wdht_w)
 {
-	int i, j;
-	int width	= data;
-	int y		= blitter_y_reg;
-	int x		= blitter_x_reg;
-	int color	= blitter_aux_reg & 0x0f;
-	int xdirection = 1, ydirection = 1;
-
-	if (blitter_aux_reg & 0x10) ydirection = -1;
-	if (blitter_aux_reg & 0x20) xdirection = -1;
-
-	if (width == 0x00) width = 0x100;
-
-	switch(blitter_aux_reg & 0xc0)
-	{
-		case 0x00: // reg[4] used?
-			for (i = - width / 2; i < width / 2; i++)
-				for (j = - width / 2; j < width / 2; j++)
-					videobuf[(y + j) * 256 + x + i] = color;
-			logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n", blitter_y_reg, blitter_x_reg, width, blitter_aux_reg, blitter_unk_reg);
-			break;
-
-		case 0x40: // vertical line - reg[4] not used
-			for (i = 0; i < width; i++ )
-				videobuf[(y + i * ydirection) * 256 + x] = color;
-			break;
-
-		case 0x80: // horizontal line - reg[4] not used
-			for (i = 0; i < width; i++ )
-				videobuf[y * 256 + x + i * xdirection] = color;
-			break;
-
-		case 0xc0: // diagonal line - reg[4] not used
-			for (i = 0; i < width; i++ )
-				videobuf[(y + i * ydirection) * 256 + x + i * xdirection] = color;
-	}
+	blitter_execute(blitter_x_reg,0x100 - blitter_y_reg,blitter_aux_reg & 0xf,data,blitter_aux_reg & 0xf0);
 }
 
 static VIDEO_START(winner)
@@ -397,10 +402,10 @@ static VIDEO_START(winner)
 
 static SCREEN_UPDATE(winner)
 {
-	int i, j;
-	for (i = 0; i < 256; i++)
-		for (j = 0; j < 256; j++)
-			*BITMAP_ADDR16(bitmap, j, i) = videobuf[j * 256 + i];
+	int x, y;
+	for (y = 0; y < 256; y++)
+		for (x = 0; x < 256; x++)
+			*BITMAP_ADDR16(bitmap, y, x) = videobuf[y * 512 + x];
 	return 0;
 }
 
@@ -408,7 +413,7 @@ static SCREEN_UPDATE(winner)
 /*******************************************
 *           Read & Write Handlers          *
 *******************************************/
- 
+
 static WRITE8_HANDLER( sound_latch_w )
 {
 	soundlatch_w(space, 0, data & 0xff);
@@ -461,7 +466,7 @@ static WRITE8_HANDLER( mux_port_w )
 
 */
 	input_selector = (data ^ 0xff) & 0x3f;	/* Input Selector,  */
-	
+
 	coin_counter_w(space->machine, 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
 	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
 }
@@ -487,7 +492,7 @@ static WRITE8_HANDLER( mux_port_w )
 		   DF (01)
            71 (FF/00)
 		   D8 (00....) --> snd_latch?
-		   
+
   Reads: E8/E9....EA/EB/EC/ED/EE
 
   RAM data is relocated to B800-B8FF
@@ -502,18 +507,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner81_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x70) AM_WRITE(blitter_y_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(blitter_x_w)
 	AM_RANGE(0x71, 0x71) AM_WRITE(blitter_unk_w)
 	AM_RANGE(0x72, 0x72) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0x74, 0x74) AM_WRITE(blitter_x_w)
+	AM_RANGE(0x74, 0x74) AM_WRITE(blitter_y_w)
 	AM_RANGE(0x75, 0x75) AM_READ(blitter_status_r)
 	AM_RANGE(0x76, 0x76) AM_WRITE(blitter_aux_w)
 
 	AM_RANGE(0xd8, 0xd8) AM_WRITE(sound_latch_w)
-	
+
 	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("DSW2")
-	
+
 	AM_RANGE(0xea, 0xea) AM_READ_PORT("IN0")
 	AM_RANGE(0xeb, 0xeb) AM_READ_PORT("IN1")
 	AM_RANGE(0xec, 0xec) AM_READ_PORT("IN2")
@@ -552,15 +557,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_x_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
 	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
 
 	AM_RANGE(0xef9, 0xf9) AM_READ_PORT("DSW1")
-	
+
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN0")
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN1")
 	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN2")
@@ -595,7 +600,7 @@ ADDRESS_MAP_END
   FD       R    muxed port
 
   FE        W   snd_latch... writes 02 on events, 07 when ball.
-				  
+
   Port:
   0 - credits
   1 - clear credits
@@ -616,8 +621,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( re800_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_x_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
@@ -1076,7 +1081,7 @@ static MACHINE_CONFIG_START( winner81, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(winner)
@@ -1109,7 +1114,7 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(winner)
@@ -1142,7 +1147,7 @@ static MACHINE_CONFIG_START( re800, driver_device )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(winner)
@@ -1274,8 +1279,8 @@ static DRIVER_INIT( re800 )
 ******************************************/
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                              FLAGS                                             LAYOUT      */
-GAME(  1981, winner81, 0,        winner81, winner,   0,        ROT270, "Corona Co.,LTD.",          "Winners Circle (81)",                 GAME_NOT_WORKING )
-GAME(  1982, winner82, 0,        winner82, winner82, 0,        ROT270, "Corona Co.,LTD.",          "Winners Circle (82)",                 GAME_NOT_WORKING )
+GAME(  1981, winner81, 0,        winner81, winner,   0,        ROT0,   "Corona Co.,LTD.",          "Winners Circle (81)",                 GAME_NOT_WORKING )
+GAME(  1982, winner82, 0,        winner82, winner82, 0,        ROT0,   "Corona Co.,LTD.",          "Winners Circle (82)",                 GAME_NOT_WORKING )
 GAMEL( 1991, re800ea,  0,        re800,    re800,    0,        ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
 GAMEL( 1991, re800v1,  0,        re800,    re800,    re800,    ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
 GAMEL( 1991, re800v3,  0,        re800,    re800v3,  0,        ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
