@@ -26,6 +26,8 @@
   Winners Circle.
   4-players horse race game.
 
+  Very rare game, due to massive conversions to any kind of roulette soft.
+  
   ------
 
   This game is a milestone. If you ask any old operator about the gambling
@@ -260,8 +262,6 @@
 
   TODO:
 
-  - Blitter issues... Fix the H/V stuff.
-  - Fix the Winners Circle hangs.
   - Inputs/Outputs for Winners Circle.
   - Check the sound CPU connection in Winners Circle sets.
 
@@ -345,7 +345,7 @@ static WRITE8_HANDLER( blitter_aux_w )
 
 static READ8_HANDLER( blitter_status_r )
 {
-/* code check bit 6 and/or bit 7 */
+/* code checks bit 6 and/or bit 7 */
 	//return space->machine->rand() & 0xc0;
 	/*
 		x--- ---- blitter busy
@@ -355,7 +355,7 @@ static READ8_HANDLER( blitter_status_r )
 	return 0x80 | ((space->machine->primary_screen->vblank() & 1) << 6);
 }
 
-static void blitter_execute(int x,int y,int color,int width,int flag)
+static void blitter_execute(int x, int y, int color, int width, int flag)
 {
 	int i;
 	int xdir = (flag & 0x10)    ? -1 : 1;
@@ -366,20 +366,20 @@ static void blitter_execute(int x,int y,int color,int width,int flag)
 
 	if((flag & 0xc0) == 0) /* square shape / layer clearance */
 	{
-		int xp,yp;
+		int xp, yp;
 
 		if(x != 128 || y != 128 || width != 8)
-			printf("%02x %02x %02x %02x %02x\n",x,y,color,width,flag);
+			printf("%02x %02x %02x %02x %02x\n", x, y, color, width, flag);
 
-		for(yp=0;yp<0x100;yp++)
-			for(xp=0;xp<0x100;xp++)
+		for(yp = 0; yp < 0x100; yp++)
+			for(xp = 0; xp < 0x100; xp++)
 				videobuf[(yp & 0x1ff) * 512 + (xp & 0x1ff)] = color;
 	}
 	else /* line shape */
 	{
 		//printf("%02x %02x %02x %02x %02x\n",x,y,color,width,flag);
 
-		for(i=0;i<width;i++)
+		for(i = 0; i < width; i++)
 		{
 			videobuf[(y & 0x1ff) * 512 + (x & 0x1ff)] = color;
 
@@ -391,7 +391,7 @@ static void blitter_execute(int x,int y,int color,int width,int flag)
 
 static WRITE8_HANDLER( blitter_trig_wdht_w)
 {
-	blitter_execute(blitter_x_reg,0x100 - blitter_y_reg,blitter_aux_reg & 0xf,data,blitter_aux_reg & 0xf0);
+	blitter_execute(blitter_x_reg, 0x100 - blitter_y_reg, blitter_aux_reg & 0xf, data, blitter_aux_reg & 0xf0);
 }
 
 static VIDEO_START(winner)
@@ -1093,7 +1093,7 @@ static MACHINE_CONFIG_START( winner81, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(winner)
 
 	MCFG_PALETTE_LENGTH(0x100)
@@ -1127,7 +1127,7 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(winner)
 
 	MCFG_PALETTE_LENGTH(0x100)
@@ -1161,7 +1161,7 @@ static MACHINE_CONFIG_START( re800, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
 	MCFG_SCREEN_UPDATE(winner)
 
 	MCFG_PALETTE_LENGTH(0x100)
@@ -1283,18 +1283,12 @@ ROM_END
 
 
 /******************************************
-*               Driver Init               *
-******************************************/
-
-
-
-/******************************************
 *              Game Drivers               *
 ******************************************/
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                              FLAGS                                             LAYOUT      */
 GAME(  1981, winner81, 0,        winner81, winner,   0,        ROT0,   "Corona Co.,LTD.",          "Winners Circle (81)",                 GAME_NOT_WORKING )
 GAME(  1982, winner82, 0,        winner82, winner82, 0,        ROT0,   "Corona Co.,LTD.",          "Winners Circle (82)",                 GAME_NOT_WORKING )
-GAMEL( 1991, re800ea,  0,        re800,    re800,    0,        ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 1991, re800v1,  0,        re800,    re800,    0,        ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 1991, re800v3,  0,        re800,    re800v3,  0,        ROT0,   "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
+GAMEL( 1991, re800ea,  0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
+GAMEL( 1991, re800v1,  0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
+GAMEL( 1991, re800v3,  0,        re800,    re800v3,  0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS,  layout_re800 )
