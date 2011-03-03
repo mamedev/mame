@@ -1058,7 +1058,7 @@ void screen_device::finalize_burnin()
 
 	// compute the name and create the file
 	emu_file file(m_machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	file_error filerr = file.open(machine->basename(), PATH_SEPARATOR "burnin-", tag());
+	file_error filerr = file.open(machine->basename(), PATH_SEPARATOR "burnin-", tag(), ".png") ;
 	if (filerr == FILERR_NONE)
 	{
 		png_info pnginfo = { 0 };
