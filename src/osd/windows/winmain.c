@@ -285,86 +285,86 @@ static void winui_output_error(void *param, const char *format, va_list argptr);
 //**************************************************************************
 
 // struct definitions
-const options_entry mame_win_options[] =
+const options_entry windows_options::s_option_entries[] =
 {
 	// debugging options
-	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS DEBUGGING OPTIONS" },
-	{ "oslog",                    "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
-	{ "watchdog;wdog",            "0",        0,                 "force the program to terminate if no updates within specified number of seconds" },
-	{ "debugger_font;dfont",      "Lucida Console", 0,           "specifies the font to use for debugging; defaults to Lucida Console" },
-	{ "debugger_font_size;dfontsize", "9",    0,                 "specifies the font size to use for debugging; defaults to 9 pt" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS DEBUGGING OPTIONS" },
+	{ WINOPTION_OSLOG,                                "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
+	{ WINOPTION_WATCHDOG ";wdog",                     "0",        OPTION_INTEGER,    "force the program to terminate if no updates within specified number of seconds" },
+	{ WINOPTION_DEBUGGER_FONT ";dfont",               "Lucida Console", OPTION_STRING,"specifies the font to use for debugging; defaults to Lucida Console" },
+	{ WINOPTION_DEBUGGER_FONT_SIZE ";dfontsize",      "9",        OPTION_FLOAT,      "specifies the font size to use for debugging; defaults to 9 pt" },
 
 	// performance options
-	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
-	{ "priority(-15-1)",          "0",        0,                 "thread priority for the main game thread; range from -15 to 1" },
-	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
-	{ "numprocessors;np",         "auto",     0,				 "number of processors; this overrides the number the system reports" },
-	{ "profile",                  "0",        0,                 "enable profiling, specifying the stack depth to track" },
-	{ "bench",                    "0",        0,                 "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS PERFORMANCE OPTIONS" },
+	{ WINOPTION_PRIORITY "(-15-1)",                   "0",        OPTION_INTEGER,    "thread priority for the main game thread; range from -15 to 1" },
+	{ WINOPTION_MULTITHREADING ";mt",                 "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
+	{ WINOPTION_NUMPROCESSORS ";np",                  "auto",     OPTION_STRING,	 "number of processors; this overrides the number the system reports" },
+	{ WINOPTION_PROFILE,                              "0",        OPTION_INTEGER,    "enable profiling, specifying the stack depth to track" },
+	{ WINOPTION_BENCH,                                "0",        OPTION_INTEGER,    "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
 
 	// video options
-	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
-	{ "video",                    "d3d",      0,                 "video output method: none, gdi, ddraw, or d3d" },
-	{ "numscreens(1-4)",          "1",        0,                 "number of screens to create; usually, you want just one" },
-	{ "window;w",                 "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
-	{ "maximize;max",             "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
-	{ "keepaspect;ka",            "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
-	{ "prescale",                 "1",        0,                 "scale screen rendering by this amount in software" },
-	{ "waitvsync",                "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
-	{ "syncrefresh",              "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
-	{ "menu",           		  "0",        OPTION_BOOLEAN,    "enable menu bar if available by UI implementation" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
+	{ WINOPTION_VIDEO,                                "d3d",      OPTION_STRING,     "video output method: none, gdi, ddraw, or d3d" },
+	{ WINOPTION_NUMSCREENS "(1-4)",                   "1",        OPTION_INTEGER,    "number of screens to create; usually, you want just one" },
+	{ WINOPTION_WINDOW ";w",                          "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
+	{ WINOPTION_MAXIMIZE ";max",                      "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
+	{ WINOPTION_KEEPASPECT ";ka",                     "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
+	{ WINOPTION_PRESCALE,                             "1",        OPTION_INTEGER,    "scale screen rendering by this amount in software" },
+	{ WINOPTION_WAITVSYNC,                            "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
+	{ WINOPTION_SYNCREFRESH,                          "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
+	{ WINOPTION_MENU,           		              "0",        OPTION_BOOLEAN,    "enable menu bar if available by UI implementation" },
 
 	// DirectDraw-specific options
-	{ NULL,                       NULL,       OPTION_HEADER,     "DIRECTDRAW-SPECIFIC OPTIONS" },
-	{ "hwstretch;hws",            "1",        OPTION_BOOLEAN,    "enable hardware stretching" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "DIRECTDRAW-SPECIFIC OPTIONS" },
+	{ WINOPTION_HWSTRETCH ";hws",                     "1",        OPTION_BOOLEAN,    "enable hardware stretching" },
 
 	// Direct3D-specific options
-	{ NULL,                       NULL,       OPTION_HEADER,     "DIRECT3D-SPECIFIC OPTIONS" },
-	{ "d3dversion(8-9)",          "9",        0,                 "specify the preferred Direct3D version (8 or 9)" },
-	{ "filter;d3dfilter;flt",     "1",        OPTION_BOOLEAN,    "enable bilinear filtering on screen output" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "DIRECT3D-SPECIFIC OPTIONS" },
+	{ WINOPTION_D3DVERSION "(8-9)",                   "9",        OPTION_INTEGER,    "specify the preferred Direct3D version (8 or 9)" },
+	{ WINOPTION_FILTER ";d3dfilter;flt",              "1",        OPTION_BOOLEAN,    "enable bilinear filtering on screen output" },
 
 	// per-window options
-	{ NULL,                       NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },
-	{ "screen",                   "auto",     0,                 "explicit name of all screens; 'auto' here will try to make a best guess" },
-	{ "aspect;screen_aspect",     "auto",     0,                 "aspect ratio for all screens; 'auto' here will try to make a best guess" },
-	{ "resolution;r",             "auto",     0,                 "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ "view",                     "auto",     0,                 "preferred view for all screens" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },
+	{ WINOPTION_SCREEN,                               "auto",     OPTION_STRING,     "explicit name of all screens; 'auto' here will try to make a best guess" },
+	{ WINOPTION_ASPECT ";screen_aspect",              "auto",     OPTION_STRING,     "aspect ratio for all screens; 'auto' here will try to make a best guess" },
+	{ WINOPTION_RESOLUTION ";r",                      "auto",     OPTION_STRING,     "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ WINOPTION_VIEW,                                 "auto",     OPTION_STRING,     "preferred view for all screens" },
 
-	{ "screen0",                  "auto",     0,                 "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ "aspect0",                  "auto",     0,                 "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
-	{ "resolution0;r0",           "auto",     0,                 "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ "view0",                    "auto",     0,                 "preferred view for the first screen" },
+	{ WINOPTION_SCREEN "0",                           "auto",     OPTION_STRING,     "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ WINOPTION_ASPECT "0",                           "auto",     OPTION_STRING,     "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
+	{ WINOPTION_RESOLUTION "0;r0",                    "auto",     OPTION_STRING,     "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ WINOPTION_VIEW "0",                             "auto",     OPTION_STRING,     "preferred view for the first screen" },
 
-	{ "screen1",                  "auto",     0,                 "explicit name of the second screen; 'auto' here will try to make a best guess" },
-	{ "aspect1",                  "auto",     0,                 "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
-	{ "resolution1;r1",           "auto",     0,                 "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ "view1",                    "auto",     0,                 "preferred view for the second screen" },
+	{ WINOPTION_SCREEN "1",                           "auto",     OPTION_STRING,     "explicit name of the second screen; 'auto' here will try to make a best guess" },
+	{ WINOPTION_ASPECT "1",                           "auto",     OPTION_STRING,     "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
+	{ WINOPTION_RESOLUTION "1;r1",                    "auto",     OPTION_STRING,     "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ WINOPTION_VIEW "1",                             "auto",     OPTION_STRING,     "preferred view for the second screen" },
 
-	{ "screen2",                  "auto",     0,                 "explicit name of the third screen; 'auto' here will try to make a best guess" },
-	{ "aspect2",                  "auto",     0,                 "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
-	{ "resolution2;r2",           "auto",     0,                 "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ "view2",                    "auto",     0,                 "preferred view for the third screen" },
+	{ WINOPTION_SCREEN "2",                           "auto",     OPTION_STRING,     "explicit name of the third screen; 'auto' here will try to make a best guess" },
+	{ WINOPTION_ASPECT "2",                           "auto",     OPTION_STRING,     "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
+	{ WINOPTION_RESOLUTION "2;r2",                    "auto",     OPTION_STRING,     "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ WINOPTION_VIEW "2",                             "auto",     OPTION_STRING,     "preferred view for the third screen" },
 
-	{ "screen3",                  "auto",     0,                 "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
-	{ "aspect3",                  "auto",     0,                 "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
-	{ "resolution3;r3",           "auto",     0,                 "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ "view3",                    "auto",     0,                 "preferred view for the fourth screen" },
+	{ WINOPTION_SCREEN "3",                           "auto",     OPTION_STRING,     "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
+	{ WINOPTION_ASPECT "3",                           "auto",     OPTION_STRING,     "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
+	{ WINOPTION_RESOLUTION "3;r3",                    "auto",     OPTION_STRING,     "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ WINOPTION_VIEW "3",                             "auto",     OPTION_STRING,     "preferred view for the fourth screen" },
 
 	// full screen options
-	{ NULL,                       NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
-	{ "triplebuffer;tb",          "0",        OPTION_BOOLEAN,    "enable triple buffering" },
-	{ "switchres",                "0",        OPTION_BOOLEAN,    "enable resolution switching" },
-	{ "full_screen_brightness;fsb(0.1-2.0)","1.0",     0,        "brightness value in full screen mode" },
-	{ "full_screen_contrast;fsc(0.1-2.0)", "1.0",      0,        "contrast value in full screen mode" },
-	{ "full_screen_gamma;fsg(0.1-3.0)",    "1.0",      0,        "gamma value in full screen mode" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "FULL SCREEN OPTIONS" },
+	{ WINOPTION_TRIPLEBUFFER ";tb",                   "0",        OPTION_BOOLEAN,    "enable triple buffering" },
+	{ WINOPTION_SWITCHRES,                            "0",        OPTION_BOOLEAN,    "enable resolution switching" },
+	{ WINOPTION_FULLSCREENBRIGHTNESS ";fsb(0.1-2.0)", "1.0",      OPTION_FLOAT,      "brightness value in full screen mode" },
+	{ WINOPTION_FULLLSCREENCONTRAST ";fsc(0.1-2.0)",  "1.0",      OPTION_FLOAT,      "contrast value in full screen mode" },
+	{ WINOPTION_FULLSCREENGAMMA ";fsg(0.1-3.0)",      "1.0",      OPTION_FLOAT,      "gamma value in full screen mode" },
 
 	// sound options
-	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS SOUND OPTIONS" },
-	{ "audio_latency(1-5)",       "2",        0,                 "set audio latency (increase to reduce glitches)" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "WINDOWS SOUND OPTIONS" },
+	{ WINOPTION_AUDIO_LATENCY "(1-5)",                "2",        OPTION_INTEGER,    "set audio latency (increase to reduce glitches)" },
 
 	// input options
-	{ NULL,                       NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
-	{ "dual_lightgun;dual",       "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
+	{ NULL,                                           NULL,       OPTION_HEADER,     "INPUT DEVICE OPTIONS" },
+	{ WINOPTION_DUAL_LIGHTGUN ";dual",                "0",        OPTION_BOOLEAN,    "enable dual lightgun input" },
 
 	{ NULL }
 };
@@ -413,13 +413,24 @@ int main(int argc, char *argv[])
 	// parse config and cmdline options
 	DWORD result = 0;
 	{
+		windows_options options;
 		windows_osd_interface osd;
-		result = cli_execute(argc, argv, osd, mame_win_options);
+		result = cli_execute(options, osd, argc, argv);
 	}
 
 	// free symbols
 	symbols = NULL;
 	return result;
+}
+
+
+//============================================================
+//  windows_options
+//============================================================
+
+windows_options::windows_options()
+{
+	add_entries(s_option_entries);
 }
 
 
@@ -516,35 +527,39 @@ void windows_osd_interface::init(running_machine &machine)
 	osd_interface::init(machine);
 
 	const char *stemp;
+	windows_options &options = downcast<windows_options &>(machine.options());
 
 	// determine if we are benchmarking, and adjust options appropriately
-	int bench = options_get_int(&machine.options(), WINOPTION_BENCH);
+	int bench = options.bench();
+	astring error_string;
 	if (bench > 0)
 	{
-		options_set_bool(&machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_bool(&machine.options(), OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_string(&machine.options(), WINOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
-		options_set_int(&machine.options(), OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(WINOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
+		assert(!error_string);
 	}
 
 	// determine if we are profiling, and adjust options appropriately
-	int profile = options_get_int(&machine.options(), WINOPTION_PROFILE);
+	int profile = options.profile();
 	if (profile > 0)
 	{
-		options_set_bool(&machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_bool(&machine.options(), WINOPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_int(&machine.options(), WINOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(WINOPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(WINOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM, error_string);
+		assert(!error_string);
 	}
 
 	// thread priority
 	if (!(machine.debug_flags & DEBUG_FLAG_OSD_ENABLED))
-		SetThreadPriority(GetCurrentThread(), options_get_int(&machine.options(), WINOPTION_PRIORITY));
+		SetThreadPriority(GetCurrentThread(), options.priority());
 
 	// ensure we get called on the way out
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, osd_exit);
 
 	// get number of processors
-	stemp = options_get_string(&machine.options(), WINOPTION_NUMPROCESSORS);
+	stemp = options.numprocessors();
 
 	osd_num_processors = 0;
 
@@ -573,7 +588,7 @@ void windows_osd_interface::init(running_machine &machine)
 	}
 
 	// hook up the debugger log
-	if (options_get_bool(&machine.options(), WINOPTION_OSLOG))
+	if (options.oslog())
 		machine.add_logerror_callback(output_oslog);
 
 	// crank up the multimedia timer resolution to its max
@@ -587,7 +602,7 @@ void windows_osd_interface::init(running_machine &machine)
 //          mm_task = (*av_set_mm_thread_characteristics)(TEXT("Playback"), &task_index);
 
 	// if a watchdog thread is requested, create one
-	int watchdog = options_get_int(&machine.options(), WINOPTION_WATCHDOG);
+	int watchdog = options.watchdog();
 	if (watchdog != 0)
 	{
 		watchdog_reset_event = CreateEvent(NULL, FALSE, FALSE, NULL);

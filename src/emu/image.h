@@ -25,8 +25,8 @@ void image_postdevice_init(running_machine *machine);
 
 extern struct io_procs image_ioprocs;
 
-void image_battery_load_by_name(core_options &options, const char *filename, void *buffer, int length, int fill);
-void image_battery_save_by_name(core_options &options, const char *filename, const void *buffer, int length);
+void image_battery_load_by_name(emu_options &options, const char *filename, void *buffer, int length, int fill);
+void image_battery_save_by_name(emu_options &options, const char *filename, const void *buffer, int length);
 
 astring *image_info_astring(running_machine *machine, astring *string);
 

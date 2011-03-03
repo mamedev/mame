@@ -1983,8 +1983,8 @@ ROM_START(konamigx)
 	ROM_REGION( 0x400000, "shared", ROMREGION_ERASE00 )
 ROM_END
 
-#define SPR_WOR_DROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPSIZE(2) | ROM_SKIP(5))
-#define SPR_5TH_ROM_LOAD(name,offset,length,crc)	 ROMX_LOAD(name, offset, length, crc, ROM_GROUPSIZE(1) | ROM_SKIP(5))
+#define SPR_WOR_DROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPWORD | ROM_SKIP(5))
+#define SPR_5TH_ROM_LOAD(name,offset,length,crc)	 ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(5))
 
 #define TILE_WORD_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPDWORD | ROM_SKIP(1))
 #define TILE_BYTE_ROM_LOAD(name,offset,length,crc) ROMX_LOAD(name, offset, length, crc, ROM_GROUPBYTE | ROM_SKIP(4))

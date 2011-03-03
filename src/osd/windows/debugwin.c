@@ -427,11 +427,12 @@ void debugwin_init_windows(running_machine &machine)
 
 		if (temp_dc != NULL)
 		{
-			int size = options_get_int(&machine.options(), WINOPTION_DEBUGGER_FONT_SIZE);
+			windows_options &options = downcast<windows_options &>(machine.options());
+			int size = options.debugger_font_size();
 			TCHAR *t_face;
 
 			// create a standard font
-			t_face = tstring_from_utf8(options_get_string(&machine.options(), WINOPTION_DEBUGGER_FONT));
+			t_face = tstring_from_utf8(options.debugger_font());
 			debug_font = CreateFont(-MulDiv(size, GetDeviceCaps(temp_dc, LOGPIXELSY), 72), 0, 0, 0, FW_MEDIUM, FALSE, FALSE, FALSE,
 						ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, FF_DONTCARE, t_face);
 			osd_free(t_face);

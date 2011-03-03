@@ -74,7 +74,7 @@ public:
 	virtual device_t *alloc_device(running_machine &machine) const;
 protected:
 	virtual void device_config_complete();
-	virtual bool device_validity_check(core_options &options, const game_driver &driver) const;
+	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
 	address_space_config		m_space_config;
 };
@@ -117,7 +117,7 @@ void janshi_vdp_device_config::device_config_complete()
 //  m_space_config = address_space_config("janshi_vdp", ENDIANNESS_BIG, 8,  address_bits, 0, *ADDRESS_MAP_NAME(janshi_vdp_map8));
 }
 
-bool janshi_vdp_device_config::device_validity_check(core_options &options, const game_driver &driver) const
+bool janshi_vdp_device_config::device_validity_check(emu_options &options, const game_driver &driver) const
 {
 	bool error = false;
 	return error;

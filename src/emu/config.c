@@ -102,7 +102,7 @@ void config_register(running_machine *machine, const char *nodename, config_call
 
 int config_load_settings(running_machine *machine)
 {
-	const char *controller = options_get_string(&machine->options(), OPTION_CTRLR);
+	const char *controller = machine->options().ctrlr();
 	config_type *type;
 	int loaded = 0;
 
@@ -114,7 +114,7 @@ int config_load_settings(running_machine *machine)
 	if (controller[0] != 0)
 	{
 		/* open the config file */
-		emu_file file(machine->options(), SEARCHPATH_CTRLR, OPEN_FLAG_READ);
+		emu_file file(machine->options().ctrlr_path(), OPEN_FLAG_READ);
 		file_error filerr = file.open(controller, ".cfg");
 
 		if (filerr != FILERR_NONE)
@@ -126,7 +126,7 @@ int config_load_settings(running_machine *machine)
 	}
 
 	/* next load the defaults file */
-	emu_file file(machine->options(), SEARCHPATH_CONFIG, OPEN_FLAG_READ);
+	emu_file file(machine->options().cfg_directory(), OPEN_FLAG_READ);
 	file_error filerr = file.open("default.cfg");
 	if (filerr == FILERR_NONE)
 		config_load_xml(machine, file, CONFIG_TYPE_DEFAULT);
@@ -155,7 +155,7 @@ void config_save_settings(running_machine *machine)
 		(*type->save)(machine, CONFIG_TYPE_INIT, NULL);
 
 	/* save the defaults file */
-	emu_file file(machine->options(), SEARCHPATH_CONFIG, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine->options().cfg_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	file_error filerr = file.open("default.cfg");
 	if (filerr == FILERR_NONE)
 		config_save_xml(machine, file, CONFIG_TYPE_DEFAULT);

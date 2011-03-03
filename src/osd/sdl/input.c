@@ -638,7 +638,7 @@ static void devmap_init(running_machine *machine, device_map_t *devmap, const ch
 		const char *dev_name;
 		sprintf(defname, "%s%d", opt, dev + 1);
 
-		dev_name = options_get_string(&machine->options(), defname);
+		dev_name = machine->options().value(defname);
 		if (dev_name && *dev_name && strcmp(dev_name,SDLOPTVAL_AUTO))
 		{
 			devmap->map[dev].name = remove_spaces(machine, dev_name);
@@ -795,7 +795,7 @@ static void sdlinput_register_mice(running_machine *machine)
 {
 	int index, physical_mouse;
 
-	mouse_enabled = options_get_bool(&machine->options(), OPTION_MOUSE);
+	mouse_enabled = machine->options().mouse();
 
 	devmap_init(machine, &mouse_map, SDLOPTION_MOUSEINDEX, 8, "Mouse mapping");
 
@@ -855,7 +855,7 @@ static void sdlinput_register_mice(running_machine *machine)
 	devinfo = generic_device_alloc(&mouse_list, "System mouse");
 	devinfo->device = input_device_add(machine, DEVICE_CLASS_MOUSE, devinfo->name, devinfo);
 
-	mouse_enabled = options_get_bool(&machine->options(), OPTION_MOUSE);
+	mouse_enabled = machine->options().mouse();
 
 	// add the axes
 	input_device_item_add(devinfo->device, "X", &devinfo->mouse.lX, ITEM_ID_XAXIS, generic_axis_get_state);
@@ -942,10 +942,10 @@ static kt_table * sdlinput_read_keymap(running_machine *machine)
 	char sks[21];
 	char kns[21];
 
-	if (!options_get_bool(&machine->options(), SDLOPTION_KEYMAP))
+	if (!machine->options().bool_value(SDLOPTION_KEYMAP))
 		return sdl_key_trans_table;
 
-	keymap_filename = (char *)options_get_string(&machine->options(), SDLOPTION_KEYMAP_FILE);
+	keymap_filename = (char *)downcast<sdl_options &>(machine->options()).keymap_file();
 	mame_printf_verbose("Keymap: Start reading keymap_file %s\n", keymap_filename);
 
 	keymap_file = fopen(keymap_filename, "r");
@@ -1125,7 +1125,7 @@ void sdlinput_init(running_machine *machine)
 	}
 
 	// get Sixaxis special mode info
-	sixaxis_mode = options_get_bool(&machine->options(), SDLOPTION_SIXAXIS);
+	sixaxis_mode = downcast<sdl_options &>(machine->options()).sixaxis();
 
 	// register the joysticks
 	sdlinput_register_joysticks(machine);
@@ -1602,7 +1602,7 @@ void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
 		{
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
-				uimode = (const char *)options_get_string(&machine().options(), SDLOPTION_UIMODEKEY);
+				uimode = downcast<sdl_options &>(machine().options()).ui_mode_key();
 				if(!strcmp(uimode,"auto")) {
 					#if defined(__APPLE__) && defined(__MACH__)
 					mameid_code = lookup_mame_code("ITEM_ID_INSERT");

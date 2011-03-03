@@ -123,7 +123,7 @@ static void get_min_bounds(sdl_window_info *window, int *window_width, int *wind
 static void get_max_bounds(sdl_window_info *window, int *window_width, int *window_height, int constrain);
 
 static void *complete_create_wt(void *param, int threadid);
-static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view);
+static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *defview, const char *view);
 
 //============================================================
 //  clear the worker_param structure, inline - faster than memset
@@ -206,7 +206,7 @@ int sdlwindow_init(running_machine *machine)
 {
 	mame_printf_verbose("Enter sdlwindow_init\n");
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool(&machine->options(), SDLOPTION_MULTITHREADING);
+	multithreading_enabled = downcast<sdl_options &>(machine->options()).multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = SDL_ThreadID();
@@ -652,7 +652,6 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 {
 	sdl_window_info *window;
 	worker_param *wp = (worker_param *) osd_malloc(sizeof(worker_param));
-	char option[20];
 	int result;
 
 	ASSERT_MAIN_THREAD();
@@ -676,7 +675,8 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 
 	// set the initial maximized state
 	// FIXME: Does not belong here
-	window->startmaximized = options_get_bool(&machine->options(), SDLOPTION_MAXIMIZE);
+	sdl_options &options = downcast<sdl_options &>(machine->options());
+	window->startmaximized = options.maximize();
 
 	if (!window->fullscreen)
 	{
@@ -698,8 +698,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->target = machine->render().target_alloc();
 
 	// set the specific view
-	sprintf(option, SDLOPTION_VIEW("%d"), index);
-	set_starting_view(machine, index, window, options_get_string(&machine->options(), option));
+	set_starting_view(machine, index, window, options.view(), options.view(index));
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -1010,9 +1009,8 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 //  (main thread)
 //============================================================
 
-static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *view)
+static void set_starting_view(running_machine *machine, int index, sdl_window_info *window, const char *defview, const char *view)
 {
-	const char *defview = options_get_string(&machine->options(), SDLOPTION_VIEW( ));
 	int viewindex;
 
 	ASSERT_MAIN_THREAD();

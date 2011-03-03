@@ -95,6 +95,21 @@ const game_driver *driver_get_clone(const game_driver *driver)
 
 
 /*-------------------------------------------------
+    driver_get_searchpath - return a search path
+    for a given driver
+-------------------------------------------------*/
+
+const char *driver_get_searchpath(const game_driver &driver, astring &string)
+{
+	// create the search path consisting of gamedrv[;parent[;...]]
+	string = driver.name;
+	for (const game_driver *parent = driver_get_clone(&driver); parent != NULL; parent = driver_get_clone(parent))
+		string.cat(";").cat(parent->name);
+	return string;
+}
+
+
+/*-------------------------------------------------
     driver_list_get_approx_matches - find the best
     n matches to a driver name.
 -------------------------------------------------*/

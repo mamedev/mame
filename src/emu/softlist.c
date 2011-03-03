@@ -923,7 +923,7 @@ static int software_list_get_count(software_list *swlist)
     parent software, if any
  -------------------------------------------------*/
 
-const char *software_get_clone(core_options &options, char *swlist, const char *swname)
+const char *software_get_clone(emu_options &options, char *swlist, const char *swname)
 {
 	software_list *software_list_ptr = software_list_open(options, swlist, FALSE, NULL);
 	const char *retval = NULL;
@@ -943,7 +943,7 @@ const char *software_get_clone(core_options &options, char *swlist, const char *
     the software
  -------------------------------------------------*/
 
-UINT32 software_get_support(core_options &options, char *swlist, const char *swname)
+UINT32 software_get_support(emu_options &options, char *swlist, const char *swname)
 {
 	software_list *software_list_ptr = software_list_open(options, swlist, FALSE, NULL);
 	UINT32 retval = 0;
@@ -1016,7 +1016,7 @@ done:
     software_list_open
 -------------------------------------------------*/
 
-software_list *software_list_open(core_options &options, const char *listname, int is_preload,
+software_list *software_list_open(emu_options &options, const char *listname, int is_preload,
 	void (*error_proc)(const char *message))
 {
 	software_list *swlist = NULL;
@@ -1039,7 +1039,7 @@ software_list *software_list_open(core_options &options, const char *listname, i
 	swlist->error_proc = error_proc;
 
 	/* open a file */
-	swlist->file = global_alloc(emu_file(options, SEARCHPATH_HASH, OPEN_FLAG_READ));
+	swlist->file = global_alloc(emu_file(options.hash_path(), OPEN_FLAG_READ));
 	filerr = swlist->file->open(listname, ".xml");
 	if (filerr != FILERR_NONE)
 		goto error;

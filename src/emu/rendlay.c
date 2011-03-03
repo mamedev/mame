@@ -611,7 +611,7 @@ layout_element::component::component(running_machine &machine, xml_data_node &co
 		m_dirname = dirname;
 		m_imagefile = xml_get_attribute_string_with_subst(machine, compnode, "file", "");
 		m_alphafile = xml_get_attribute_string_with_subst(machine, compnode, "alphafile", "");
-		m_file = global_alloc(emu_file(machine.options(), OPTION_ARTPATH, OPEN_FLAG_READ));
+		m_file = global_alloc(emu_file(machine.options().art_path(), OPEN_FLAG_READ));
 	}
 
 	// text nodes

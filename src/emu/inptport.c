@@ -2036,7 +2036,7 @@ static astring *get_keyboard_key_name(const input_field_config *field)
 
 static void init_port_state(running_machine *machine)
 {
-	const char *joystick_map_default = options_get_string(&machine->options(), OPTION_JOYSTICK_MAP);
+	const char *joystick_map_default = machine->options().joystick_map();
 	input_port_private *portdata = machine->input_port_data;
 	const input_field_config *field;
 	const input_port_config *port;
@@ -2148,7 +2148,7 @@ static void init_port_state(running_machine *machine)
 static void init_autoselect_devices(running_machine &machine, int type1, int type2, int type3, const char *option, const char *ananame)
 {
 	const ioport_list &portlist = machine.m_portlist;
-	const char *stemp = options_get_string(&machine.options(), option);
+	const char *stemp = machine.options().value(option);
 	input_device_class autoenable = DEVICE_CLASS_KEYBOARD;
 	const char *autostring = "keyboard";
 	const input_field_config *field;
@@ -2871,7 +2871,7 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 	}
 
 	/* skip locked-out coin inputs */
-	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN12 && coin_lockout_get_state(field->port->machine, field->type - IPT_COIN1) && options_get_bool(&field->port->machine->options(), OPTION_COIN_LOCKOUT))
+	if (curstate && field->type >= IPT_COIN1 && field->type <= IPT_COIN12 && coin_lockout_get_state(field->port->machine, field->type - IPT_COIN1) && field->port->machine->options().coin_lockout())
 	{
 		ui_popup_time(3, "Coinlock disabled %s.", input_field_name(field));
 		return FALSE;
@@ -4439,7 +4439,7 @@ static UINT64 playback_read_uint64(running_machine *machine)
 
 static time_t playback_init(running_machine *machine)
 {
-	const char *filename = options_get_string(&machine->options(), OPTION_PLAYBACK);
+	const char *filename = machine->options().playback();
 	input_port_private *portdata = machine->input_port_data;
 	UINT8 header[INP_HEADER_SIZE];
 	time_t basetime;
@@ -4449,7 +4449,7 @@ static time_t playback_init(running_machine *machine)
 		return 0;
 
 	/* open the playback file */
-	portdata->playback_file = auto_alloc(machine, emu_file(machine->options(), SEARCHPATH_INPUTLOG, OPEN_FLAG_READ));
+	portdata->playback_file = auto_alloc(machine, emu_file(machine->options().input_directory(), OPEN_FLAG_READ));
 	file_error filerr = portdata->playback_file->open(filename);
 	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
 
@@ -4637,7 +4637,7 @@ static void record_write_uint64(running_machine *machine, UINT64 data)
 
 static void record_init(running_machine *machine)
 {
-	const char *filename = options_get_string(&machine->options(), OPTION_RECORD);
+	const char *filename = machine->options().record();
 	input_port_private *portdata = machine->input_port_data;
 	UINT8 header[INP_HEADER_SIZE];
 	system_time systime;
@@ -4647,7 +4647,7 @@ static void record_init(running_machine *machine)
 		return;
 
 	/* open the record file  */
-	portdata->record_file = auto_alloc(machine, emu_file(machine->options(), SEARCHPATH_INPUTLOG, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
+	portdata->record_file = auto_alloc(machine, emu_file(machine->options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
 	file_error filerr = portdata->record_file->open(filename);
 	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
 

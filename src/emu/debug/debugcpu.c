@@ -359,7 +359,7 @@ bool debug_comment_save(running_machine *machine)
 		// flush the file
 		if (found_comments)
 		{
-			emu_file file(machine->options(), SEARCHPATH_COMMENT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			emu_file file(machine->options().comment_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = file.open(machine->basename(), ".cmt");
 			if (filerr == FILERR_NONE)
 				xml_file_write(root, file);
@@ -385,7 +385,7 @@ bool debug_comment_save(running_machine *machine)
 bool debug_comment_load(running_machine *machine)
 {
 	// open the file
-	emu_file file(machine->options(), SEARCHPATH_COMMENT, OPEN_FLAG_READ);
+	emu_file file(machine->options().comment_directory(), OPEN_FLAG_READ);
 	file_error filerr = file.open(machine->basename(), ".cmt");
 
 	// if an error, just return false

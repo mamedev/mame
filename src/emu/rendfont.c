@@ -139,7 +139,7 @@ render_font::render_font(render_manager &manager, const char *filename)
 		return;
 
 	// load the raw data instead
-	emu_file ramfile(manager.machine().options(), NULL, OPEN_FLAG_READ);
+	emu_file ramfile(OPEN_FLAG_READ);
 	file_error filerr = ramfile.open_ram(font_uismall, sizeof(font_uismall));
 	if (filerr == FILERR_NONE)
 		load_cached(ramfile, 0);
@@ -412,7 +412,7 @@ float render_font::utf8string_width(float height, float aspect, const char *utf8
 bool render_font::load_cached_bdf(const char *filename)
 {
 	// first try to open the BDF itself
-	emu_file file(manager().machine().options(), SEARCHPATH_FONT, OPEN_FLAG_READ);
+	emu_file file(manager().machine().options().font_path(), OPEN_FLAG_READ);
 	file_error filerr = file.open(filename);
 	if (filerr != FILERR_NONE)
 		return false;
@@ -435,7 +435,7 @@ bool render_font::load_cached_bdf(const char *filename)
 
 	// attempt to open the cached version of the font
 	{
-		emu_file cachefile(manager().machine().options(), SEARCHPATH_FONT, OPEN_FLAG_READ);
+		emu_file cachefile(manager().machine().options().font_path(), OPEN_FLAG_READ);
 		filerr = cachefile.open(cachedname);
 		if (filerr == FILERR_NONE)
 		{
@@ -673,7 +673,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 	mame_printf_warning("Generating cached BDF font...\n");
 
 	// attempt to open the file
-	emu_file file(manager().machine().options(), SEARCHPATH_FONT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	emu_file file(manager().machine().options().font_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 	file_error filerr = file.open(filename);
 	if (filerr != FILERR_NONE)
 		return false;

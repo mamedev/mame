@@ -45,101 +45,11 @@
 
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
-#define MAX_ENTRY_NAMES		4
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-/* forward references */
-typedef struct _options_data options_data;
-
-
-/* range parameter for minimum/maximum values */
-typedef union _options_range_parameter options_range_parameter;
-union _options_range_parameter
-{
-	float					f;
-	int 					i;
-};
-
-
-/* hash table entries */
-typedef struct _options_hash_entry options_hash_entry;
-struct _options_hash_entry
-{
-	options_hash_entry *	next;				/* link to the next entry */
-	astring *				name;				/* name under the current link */
-	options_data *			data;				/* link to associated options_data */
-};
-
-
-/* information about a single entry in the options */
-struct _options_data
-{
-	options_hash_entry		links[MAX_ENTRY_NAMES]; /* array of hash table entries (one per name) */
-	options_data *			next;				/* link to the next data */
-	UINT32					flags;				/* flags from the entry */
-	UINT32					seqid;				/* sequence ID; bumped on each change */
-	int						error_reported;		/* have we reported an error on this option yet? */
-	int						priority;			/* priority of the data set */
-	astring *				data;				/* data for this item */
-	astring *				defdata;			/* default data for this item */
-	const char *			description;		/* description for this item */
-	options_range_type		range_type;			/* the type of range to apply to this item */
-	options_range_parameter	range_minimum;		/* the minimum of the range */
-	options_range_parameter	range_maximum;		/* the maximum of the range */
-	void					(*callback)(core_options *opts, const char *arg);	/* callback to be invoked when parsing */
-};
-
-
-/* structure holding information about a collection of options */
-struct _core_options
-{
-	void (*output[OPTMSG_COUNT])(const char *s);/* output callbacks */
-
-	/* linked list, for sequential iteration */
-	options_data *			datalist;			/* linked list for sequential iteration */
-	options_data **			datalist_nextptr;	/* pointer to pointer to tail entry */
-
-	/* hashtable, for fast lookup */
-	options_hash_entry *	hashtable[101];		/* hash table for fast lookup */
-};
-
-
-/* information about an in-progress options enumeration */
-struct _options_enumerator
-{
-	options_data *			current;
-};
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static options_data *find_entry_data(core_options *opts, const char *string, int is_command_line);
-static void update_data(core_options *opts, options_data *data, const char *newdata, int priority);
-static int parse_option_name(core_options *opts, const char *srcstring, options_data *data);
-
-static void message(core_options *opts, options_message msgtype, const char *format, ...) ATTR_PRINTF(3,4);
-static UINT32 hash_value(core_options *opts, const char *str);
-static void output_printf(void (*output)(const char *s), const char *format, ...) ATTR_PRINTF(2,3);
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-const char *const option_unadorned[MAX_UNADORNED_OPTIONS] =
+const char *const core_options::s_option_unadorned[MAX_UNADORNED_OPTIONS] =
 {
 	"<UNADORNED0>",
 	"<UNADORNED1>",
@@ -161,448 +71,362 @@ const char *const option_unadorned[MAX_UNADORNED_OPTIONS] =
 
 
 
-/***************************************************************************
-    OPTIONS COLLECTION MANAGEMENT
-***************************************************************************/
+//**************************************************************************
+//  CORE OPTIONS ENTRY
+//**************************************************************************
 
-/*-------------------------------------------------
-    options_create - creates a new instance of
-    core options
--------------------------------------------------*/
+//-------------------------------------------------
+//  entry - constructor
+//-------------------------------------------------
 
-core_options *options_create(void (*fail)(const char *message))
+core_options::entry::entry(const options_entry &entrylist)
+	: m_next(NULL),
+	  m_flags(entrylist.flags),
+	  m_seqid(0),
+	  m_error_reported(false),
+	  m_priority(OPTION_PRIORITY_DEFAULT),
+	  m_description(entrylist.description)
 {
-	/* allocate memory for the option block */
-	core_options *opts = (core_options *)malloc(sizeof(*opts));
-	if (opts == NULL)
-		goto error;
-
-	/* and set up the structure */
-	memset(opts, 0, sizeof(*opts));
-	opts->datalist_nextptr = &opts->datalist;
-	return opts;
-
-error:
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    options_free - frees an options object
--------------------------------------------------*/
-
-void options_free(core_options *opts)
-{
-	options_data *data, *next;
-
-	/* loop over data items and free them */
-	for (data = opts->datalist; data != NULL; data = next)
+	// copy in the name(s) as appropriate
+	if (entrylist.name != NULL)
 	{
-		int linknum;
-
-		next = data->next;
-
-		/* free names */
-		for (linknum = 0; linknum < ARRAY_LENGTH(data->links); linknum++)
-			if (data->links[linknum].name != NULL)
-				astring_free(data->links[linknum].name);
-
-		/* free strings */
-		astring_free(data->data);
-		astring_free(data->defdata);
-
-		/* free the data itself */
-		free(data);
+		// first extract any range
+		astring namestr(entrylist.name);
+		int lparen = namestr.chr(0, '(');
+		int dash = namestr.chr(lparen + 1, '-');
+		int rparen = namestr.chr(dash + 1, ')');
+		if (lparen != -1 && dash != -1 && rparen != -1)
+		{
+			m_minimum.cpysubstr(namestr, lparen + 1, dash - (lparen + 1)).trimspace();
+			m_maximum.cpysubstr(namestr, dash + 1, rparen - (dash + 1)).trimspace();
+			namestr.del(lparen, rparen + 1 - lparen);
+		}
+		
+		// then chop up any semicolon-separated names
+		int semi;
+		int nameindex = 0;
+		while ((semi = namestr.chr(0, ';')) != -1 && nameindex < ARRAY_LENGTH(m_name))
+		{
+			m_name[nameindex++].cpysubstr(namestr, 0, semi);
+			namestr.del(0, semi + 1);
+		}
+		
+		// finally add the last item
+		if (nameindex < ARRAY_LENGTH(m_name))
+			m_name[nameindex++] = namestr;
 	}
-
-	/* free the options itself */
-	free(opts);
+	
+	// set the default value
+	if (entrylist.defvalue != NULL)
+		m_defdata = entrylist.defvalue;
+	m_data = m_defdata;
 }
 
 
-/*-------------------------------------------------
-    options_set_output_callback - installs a callback
-    to be invoked when data is outputted in the
-    process of outputting options
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_value - update our data value
+//-------------------------------------------------
 
-void options_set_output_callback(core_options *opts, options_message msgtype, void (*callback)(const char *s))
+void core_options::entry::set_value(const char *newdata, int priority)
 {
-	opts->output[msgtype] = callback;
+	// ignore if we don't have priority
+	if (priority < m_priority)
+		return;
+
+	// set the data and priority, then bump the sequence
+	m_data = newdata;
+	m_priority = priority;
+	m_seqid++;
 }
 
 
-/*-------------------------------------------------
-    options_revert - revert options at or below
-    a certain priority back to their defaults
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_default_value - set the default value of
+//  an option, and reset the current value to it
+//-------------------------------------------------
 
-void options_revert(core_options *opts, int priority)
+void core_options::entry::set_default_value(const char *defvalue)
 {
-	options_data *data;
-
-	/* iterate over options and revert to defaults if below the given priority */
-	for (data = opts->datalist; data != NULL; data = data->next)
-		if (data->priority <= priority)
-		{
-			astring_cpy(data->data, data->defdata);
-			data->priority = OPTION_PRIORITY_DEFAULT;
-		}
-}
-
-/*-------------------------------------------------
-    options_revert_driver_only - revert options
-    that are marked as driver only and are under
-    priority level
--------------------------------------------------*/
-
-void options_revert_driver_only(core_options *opts, int priority)
-{
-	options_data *data;
-
-	/* iterate over options and revert to defaults if below the given priority */
-	for (data = opts->datalist; data != NULL; data = data->next)
-		if ((data->flags & OPTION_DRIVER_ONLY) && (data->priority < priority)) {
-			astring_cpy(data->data, data->defdata);
-			data->priority = OPTION_PRIORITY_DEFAULT;
-		}
-}
-
-/*-------------------------------------------------
-    options_copy - copy options from one core_options
-    to another
--------------------------------------------------*/
-
-int options_copy(core_options *dest_opts, core_options *src_opts)
-{
-	options_data *data;
-
-	/* iterate over options in the destination */
-	for (data = dest_opts->datalist; data != NULL; data = data->next)
-		if (!(data->flags & OPTION_HEADER))
-		{
-			options_data *srcdata = find_entry_data(src_opts, astring_c(data->links[0].name), FALSE);
-
-			/* if the option exists in the source, set it in the destination */
-			if (srcdata != NULL)
-				options_set_string(dest_opts, astring_c(srcdata->links[0].name), astring_c(srcdata->data), srcdata->priority);
-		}
-
-	return TRUE;
+	m_data = defvalue;
+	m_defdata = defvalue;
+	m_priority = OPTION_PRIORITY_DEFAULT;
 }
 
 
-/*-------------------------------------------------
-    options_equal - compare two sets of options
--------------------------------------------------*/
+//-------------------------------------------------
+//  revert - revert back to our default if we are
+//  at or below the given priority
+//-------------------------------------------------
 
-int options_equal(core_options *opts1, core_options *opts2)
+void core_options::entry::revert(int priority)
 {
-	options_data *data;
-
-	/* iterate over options in the first list */
-	for (data = opts1->datalist; data != NULL; data = data->next)
-		if (!(data->flags & OPTION_HEADER))
-		{
-			const char *value1 = options_get_string(opts1, astring_c(data->links[0].name));
-			const char *value2 = options_get_string(opts2, astring_c(data->links[0].name));
-
-			/* if the values differ, return false */
-			if (strcmp(value1, value2) != 0)
-				return FALSE;
-		}
-
-	return TRUE;
-}
-
-
-
-/***************************************************************************
-    OPTION DEFINITIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    options_add_entries - add entries to the
-    current options sets
--------------------------------------------------*/
-
-int options_add_entries(core_options *opts, const options_entry *entrylist, int force)
-{
-	/* loop over entries until we hit a NULL name */
-	for ( ; entrylist->name != NULL || (entrylist->flags & OPTION_HEADER); entrylist++)
+	// if our priority is low enough, revert to the default
+	if (m_priority <= priority)
 	{
-		options_data *match = NULL;
-		int i;
+		m_data = m_defdata;
+		m_priority = OPTION_PRIORITY_DEFAULT;
+	}
+}
 
-		/* allocate a new item */
-		options_data *data = (options_data *)malloc(sizeof(*data));
-		if (data == NULL)
-			return FALSE;
-		memset(data, 0, sizeof(*data));
 
-		/* parse the option name */
-		if (entrylist->name != NULL)
-			parse_option_name(opts, entrylist->name, data);
 
-		/* do we match an existing entry? */
-		for (i = 0; i < ARRAY_LENGTH(data->links) && match == NULL; i++)
-			if (data->links[i].name != NULL)
-				match = find_entry_data(opts, astring_c(data->links[i].name), FALSE);
+//**************************************************************************
+//  CORE OPTIONS
+//**************************************************************************
 
-		/* if so, throw away this entry and replace the data */
-		if ((force == FALSE) && (match != NULL))
+//-------------------------------------------------
+//  core_options - constructor
+//-------------------------------------------------
+
+core_options::core_options()
+	: m_entrylist(NULL),
+	  m_entrylist_tailptr(&m_entrylist)
+{
+}
+
+core_options::core_options(const options_entry *entrylist)
+	: m_entrylist(NULL),
+	  m_entrylist_tailptr(&m_entrylist)
+{
+	add_entries(entrylist);
+}
+
+core_options::core_options(const options_entry *entrylist1, const options_entry *entrylist2)
+	: m_entrylist(NULL),
+	  m_entrylist_tailptr(&m_entrylist)
+{
+	add_entries(entrylist1);
+	add_entries(entrylist2);
+}
+
+core_options::core_options(const options_entry *entrylist1, const options_entry *entrylist2, const options_entry *entrylist3)
+	: m_entrylist(NULL),
+	  m_entrylist_tailptr(&m_entrylist)
+{
+	add_entries(entrylist1);
+	add_entries(entrylist2);
+	add_entries(entrylist3);
+}
+
+core_options::core_options(const core_options &src)
+	: m_entrylist(NULL),
+	  m_entrylist_tailptr(&m_entrylist)
+{
+	copyfrom(src);
+}
+
+
+//-------------------------------------------------
+//  ~core_options - destructor
+//-------------------------------------------------
+
+core_options::~core_options()
+{
+	// delete all entries from the list
+	while (m_entrylist != NULL)
+		remove_entry(*m_entrylist);
+}
+
+
+//-------------------------------------------------
+//  operator= - assignment operator
+//-------------------------------------------------
+
+core_options &core_options::operator=(const core_options &rhs)
+{
+	// ignore self-assignment
+	if (this != &rhs)
+		copyfrom(rhs);
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  operator== - compare two sets of options
+//-------------------------------------------------
+
+bool core_options::operator==(const core_options &rhs)
+{
+	// iterate over options in the first list
+	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
+		if (!curentry->is_header())
 		{
-			/* free what we've allocated so far */
-			for (i = 0; i < ARRAY_LENGTH(data->links); i++)
-				if (data->links[i].name != NULL)
-					astring_free(data->links[i].name);
-			free(data);
-
-			/* use the matching entry as our data */
-			data = match;
+			// if the values differ, return false
+			if (strcmp(curentry->m_data, rhs.value(curentry->name())) != 0)
+				return false;
 		}
 
-		/* otherwise, finish making the new entry */
-		else
+	return true;
+}
+
+
+//-------------------------------------------------
+//  operator!= - compare two sets of options
+//-------------------------------------------------
+
+bool core_options::operator!=(const core_options &rhs)
+{
+	return !operator==(rhs);
+}
+
+
+//-------------------------------------------------
+//  add_entries - add entries to the current 
+//  options sets
+//-------------------------------------------------
+
+void core_options::add_entries(const options_entry *entrylist, bool override_existing)
+{
+	// loop over entries until we hit a NULL name
+	for ( ; entrylist->name != NULL || (entrylist->flags & OPTION_HEADER) != 0; entrylist++)
+	{
+		// allocate a new entry
+		entry *newentry = new entry(*entrylist);
+		if (newentry->name() != NULL)
 		{
-			/* allocate strings */
-			data->data = astring_alloc();
-			data->defdata = astring_alloc();
-
-			/* copy the flags, and set the value equal to the default */
-			data->flags = entrylist->flags;
-			data->description = entrylist->description;
-
-			/* add us to the end of the sequential list */
-			*opts->datalist_nextptr = data;
-			opts->datalist_nextptr = &data->next;
-
-			/* add each name to the appropriate hash table with a link back to us */
-			for (i = 0; i < ARRAY_LENGTH(data->links); i++)
-				if (data->links[i].name != NULL)
+			// see if we match an existing entry
+			entry *existing = m_entrymap.find(newentry->name());
+			if (existing != NULL)
+			{
+				// if we're overriding existing entries, then remove the old one
+				if (override_existing)
+					remove_entry(*existing);
+				
+				// otherwise, just override the default and current values and throw out the new entry
+				else
 				{
-					int hash_entry = hash_value(opts, astring_c(data->links[i].name));
-
-					/* set up link */
-					data->links[i].data = data;
-					data->links[i].next = opts->hashtable[hash_entry];
-					opts->hashtable[hash_entry] = &data->links[i];
+					existing->set_default_value(newentry->value());
+					delete newentry;
+					continue;
 				}
+			}
 		}
-
-		/* copy in the data and default data values */
-		if (entrylist->defvalue != NULL)
-		{
-			astring_cpyc(data->data, entrylist->defvalue);
-			astring_cpyc(data->defdata, entrylist->defvalue);
-		}
-		data->priority = OPTION_PRIORITY_DEFAULT;
+		
+		// add us to the list and maps
+		append_entry(*newentry);
 	}
-	return TRUE;
-}
-
-int options_add_entries(core_options *opts, const options_entry *entrylist)
-{
-	return options_add_entries(opts,entrylist,FALSE);
-}
-
-/*-------------------------------------------------
-    options_set_option_default_value - change the
-    default value of an option
--------------------------------------------------*/
-
-int options_set_option_default_value(core_options *opts, const char *name, const char *defvalue)
-{
-	options_data *data = find_entry_data(opts, name, TRUE);
-
-	/* if we don't have an entry for this, fail */
-	if (data == NULL)
-		return FALSE;
-
-	/* update the data and default data; note that we assume that data == defdata */
-	astring_cpyc(data->data, defvalue);
-	astring_cpyc(data->defdata, defvalue);
-	data->priority = OPTION_PRIORITY_DEFAULT;
-	return TRUE;
 }
 
 
-/*-------------------------------------------------
-    options_set_option_callback - specifies a
-    callback to be invoked when parsing options
--------------------------------------------------*/
+//-------------------------------------------------
+//  set_default_value - change the default value 
+//  of an option
+//-------------------------------------------------
 
-int options_set_option_callback(core_options *opts, const char *name, void (*callback)(core_options *opts, const char *arg))
+void core_options::set_default_value(const char *name, const char *defvalue)
 {
-	options_data *data = find_entry_data(opts, name, TRUE);
-
-	/* if we don't find an entry, fail */
-	if (data == NULL)
-		return FALSE;
-
-	/* set the callback */
-	data->callback = callback;
-	return TRUE;
+	// find the entry and bail if we can't
+	entry *curentry = m_entrymap.find(name);
+	if (curentry == NULL)
+		return;
+	
+	// update the data and default data
+	curentry->set_default_value(defvalue);
 }
 
 
+//-------------------------------------------------
+//  parse_command_line - parse a series of 
+//  command line arguments
+//-------------------------------------------------
 
-/***************************************************************************
-    OPTION DATA EXTRACTION
-***************************************************************************/
-
-/*-------------------------------------------------
-    options_parse_command_line - parse a series
-    of command line arguments
--------------------------------------------------*/
-
-int options_parse_command_line(core_options *opts, int argc, char **argv, int priority, int show_error)
+bool core_options::parse_command_line(int argc, char **argv, int priority, astring &error_string)
 {
+	// reset the errors and the command
+	error_string.reset();
+	m_command.reset();
+
+	// iterate through arguments
 	int unadorned_index = 0;
-	int arg;
-	for (arg = 1; arg < argc; arg++)
+	for (int arg = 1; arg < argc; arg++)
 	{
-		const char *optionname;
-		options_data *data;
-		int is_unadorned;
+		// determine the entry name to search for
+		const char *curarg = argv[arg];
+		bool is_unadorned = (curarg[0] != '-');
+		const char *optionname = is_unadorned ? core_options::unadorned(unadorned_index++) : &curarg[1];
 
-		/* determine the entry name to search for */
-		is_unadorned = (argv[arg][0] != '-');
-		if (!is_unadorned)
-			optionname = &argv[arg][1];
-		else
-			optionname = OPTION_UNADORNED(unadorned_index);
-
-		/* find our entry */
-		data = find_entry_data(opts, optionname, TRUE);
-		if (data == NULL) continue;
-		if ((data->flags & OPTION_COMMAND) != 0) {
-			// in case of any command force show error to TRUE
-			show_error = TRUE;
-			break;
-		}
-	}
-	/* loop over commands, looking for options */
-	for (arg = 1; arg < argc; arg++)
-	{
-		const char *optionname, *newdata;
-		options_data *data;
-		int is_unadorned;
-
-		/* determine the entry name to search for */
-		is_unadorned = (argv[arg][0] != '-');
-		if (!is_unadorned)
-			optionname = &argv[arg][1];
-		else
-			optionname = OPTION_UNADORNED(unadorned_index);
-
-		/* find our entry */
-		data = find_entry_data(opts, optionname, TRUE);
-		if (data == NULL)
+		// find our entry; if not found, indicate invalid option
+		entry *curentry = m_entrymap.find(optionname);
+		if (curentry == NULL)
 		{
-			if (!show_error) continue;
-			message(opts, OPTMSG_ERROR, "Error: unknown option: %s\n", argv[arg]);
-			return 1;
+			error_string.catprintf("Error: unknown option: %s\n", curarg);
+			return false;
+		}
+		
+		// process commands first
+		if (curentry->type() == OPTION_COMMAND)
+		{
+			// can only have one command
+			if (m_command)
+			{
+				error_string.catprintf("Error: multiple commands specified -%s and %s\n", m_command.cstr(), curarg);
+				return false;
+			}
+			m_command = curentry->name();
+			continue;
 		}
 
-		/* if unadorned, we have to bump the count (unless if the option repeats) */
-		if (is_unadorned && !(data->flags & OPTION_REPEATS))
-			unadorned_index++;
-
-		/* get the data for this argument, special casing booleans */
-		if ((data->flags & (OPTION_BOOLEAN | OPTION_COMMAND)) != 0)
-			newdata = (strncmp(&argv[arg][1], "no", 2) == 0) ? "0" : "1";
-		else if (argv[arg][0] != '-')
-			newdata = argv[arg];
+		// get the data for this argument, special casing booleans
+		const char *newdata;
+		if (curentry->type() == OPTION_BOOLEAN)
+			newdata = (strncmp(&curarg[1], "no", 2) == 0) ? "0" : "1";
+		else if (is_unadorned)
+			newdata = curarg;
 		else if (arg + 1 < argc)
 			newdata = argv[++arg];
 		else
 		{
-			message(opts, OPTMSG_ERROR, "Error: option %s expected a parameter\n", argv[arg]);
-			return 1;
+			error_string.catprintf("Error: option %s expected a parameter\n", curarg);
+			return false;
 		}
 
-		/* if the option is deprecated or internal, don't process further */
-		if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL)) != 0)
-			continue;
-
-		/* invoke callback, if present */
-		if (data->callback != NULL)
-			(*data->callback)(opts, newdata);
-
-		/* allocate a new copy of data for this */
-		update_data(opts, data, newdata, priority);
+		// set the new data
+		validate_and_set_data(*curentry, newdata, priority, error_string);
 	}
-	return 0;
+	return true;
 }
 
 
-/*-------------------------------------------------
-    options_force_option_callback - set option value
-    and execute callback call
--------------------------------------------------*/
+//-------------------------------------------------
+//  parse_ini_file - parse a series of entries in 
+//  an INI file
+//-------------------------------------------------
 
-int options_force_option_callback(core_options *opts, const char *optionname, const char *newval, int priority)
+bool core_options::parse_ini_file(core_file &inifile, int priority, int ignore_priority, astring &error_string)
 {
-	options_data *data = find_entry_data(opts, optionname, TRUE);
-	if (data == NULL)
-	{
-		message(opts, OPTMSG_ERROR, "Error: unknown option: %s\n", optionname);
-		return 1;
-	}
-
-	/* invoke callback, if present */
-	if (data->callback != NULL)
-		(*data->callback)(opts, newval);
-
-	/* allocate a new copy of data for this */
-	update_data(opts, data, newval, priority);
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    options_parse_ini_file - parse a series
-    of entries in an INI file
--------------------------------------------------*/
-
-int options_parse_ini_file(core_options *opts, core_file *inifile, int priority, int ignoreprio)
-{
+	// loop over lines in the file
 	char buffer[4096];
-
-	/* loop over data */
-	while (core_fgets(buffer, ARRAY_LENGTH(buffer), inifile) != NULL)
+	while (core_fgets(buffer, ARRAY_LENGTH(buffer), &inifile) != NULL)
 	{
-		char *optionname, *optiondata, *temp;
-		options_data *data;
-		int inquotes = FALSE;
-
-		/* find the name */
+		// find the extent of the name
+		char *optionname;
 		for (optionname = buffer; *optionname != 0; optionname++)
 			if (!isspace((UINT8)*optionname))
 				break;
 
-		/* skip comments */
+		// skip comments
 		if (*optionname == 0 || *optionname == '#')
 			continue;
 
-		/* scan forward to find the first space */
+		// scan forward to find the first space
+		char *temp;
 		for (temp = optionname; *temp != 0; temp++)
 			if (isspace((UINT8)*temp))
 				break;
 
-		/* if we hit the end early, print a warning and continue */
+		// if we hit the end early, print a warning and continue
 		if (*temp == 0)
 		{
-			message(opts, OPTMSG_WARNING, "Warning: invalid line in INI: %s", buffer);
+			error_string.catprintf("Warning: invalid line in INI: %s", buffer);
 			continue;
 		}
 
-		/* NULL-terminate */
+		// NULL-terminate
 		*temp++ = 0;
-		optiondata = temp;
+		char *optiondata = temp;
 
-		/* scan the data, stopping when we hit a comment */
+		// scan the data, stopping when we hit a comment
+		bool inquotes = false;
 		for (temp = optiondata; *temp != 0; temp++)
 		{
 			if (*temp == '"')
@@ -612,645 +436,319 @@ int options_parse_ini_file(core_options *opts, core_file *inifile, int priority,
 		}
 		*temp = 0;
 
-		/* find our entry */
-		data = find_entry_data(opts, optionname, FALSE);
-		if (data == NULL)
+		// find our entry
+		entry *curentry = m_entrymap.find(optionname);
+		if (curentry == NULL)
 		{
-			if (priority >= ignoreprio) message(opts, OPTMSG_WARNING, "Warning: unknown option in INI: %s\n", optionname);
+			if (priority >= ignore_priority)
+				error_string.catprintf("Warning: unknown option in INI: %s\n", optionname);
 			continue;
 		}
-		if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL)) != 0)
-			continue;
 
-		/* allocate a new copy of data for this */
-		update_data(opts, data, optiondata, priority);
+		// set the new data
+		validate_and_set_data(*curentry, optiondata, priority, error_string);
 	}
-	return 0;
+	return true;
 }
 
 
+//-------------------------------------------------
+//  revert - revert options at or below a certain 
+//  priority back to their defaults
+//-------------------------------------------------
 
-/***************************************************************************
-    OPTIONS OUTPUT
-***************************************************************************/
-
-/*-------------------------------------------------
-    options_output_diff_ini_file - output the diff
-    of the current state from a base state to an
-    INI file
--------------------------------------------------*/
-
-void options_output_diff_ini_file(core_options *opts, core_options *baseopts, core_file *inifile)
+void core_options::revert(int priority)
 {
-	options_data *data;
+	// iterate over options and revert to defaults if below the given priority
+	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
+		curentry->revert(priority);
+}
+
+
+//-------------------------------------------------
+//  output_ini - output the options in INI format,
+//  only outputting entries that different from
+//  the optional diff
+//-------------------------------------------------
+
+const char *core_options::output_ini(astring &buffer, const core_options *diff)
+{
+	// INI files are complete, so always start with a blank buffer
+	buffer.reset();
+
+	// loop over all items
 	const char *last_header = NULL;
-	const char *name;
-	const char *value;
-	options_data *basedata;
-
-	/* loop over all items */
-	for (data = opts->datalist; data != NULL; data = data->next)
+	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
 	{
-		/* header: record description */
-		if ((data->flags & OPTION_HEADER) != 0)
-			last_header = data->description;
+		// header: record description
+		if (curentry->is_header())
+			last_header = curentry->description();
 
-		/* otherwise, output entries for all non-deprecated and non-command items (if not in baseopts) */
-		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL | OPTION_COMMAND)) == 0)
+		// otherwise, output entries for all non-command items
+		else if (!curentry->is_command())
 		{
-			/* get name and data of this value */
-			name = astring_c(data->links[0].name);
-			value = astring_c(data->data);
-
-			/* look up counterpart in baseopts, if baseopts is specified */
-			basedata = (baseopts != NULL) ? find_entry_data(baseopts, name, FALSE) : NULL;
-
-			/* is our data different, or not in baseopts? */
-			if ((basedata == NULL) || (strcmp(value, astring_c(basedata->data)) != 0))
+			// look up counterpart in diff, if diff is specified
+			const char *name = curentry->name();
+			const char *value = curentry->value();
+			if (diff == NULL || strcmp(value, diff->value(name)) != 0)
 			{
-				/* output header, if we have one */
+				// output header, if we have one
 				if (last_header != NULL)
 				{
-					core_fprintf(inifile, "\n#\n# %s\n#\n", last_header);
+					buffer.catprintf("\n#\n# %s\n#\n", last_header);
 					last_header = NULL;
 				}
 
-				/* and finally output the data */
+				// and finally output the data
 				if (strchr(value, ' ') != NULL)
-					core_fprintf(inifile, "%-25s \"%s\"\n", name, value);
+					buffer.catprintf("%-25s \"%s\"\n", name, value);
 				else
-					core_fprintf(inifile, "%-25s %s\n", name, value);
+					buffer.catprintf("%-25s %s\n", name, value);
 			}
 		}
 	}
+	return buffer;
 }
 
 
-/*-------------------------------------------------
-    options_output_ini_file - output the current
-    state to an INI file
--------------------------------------------------*/
+//-------------------------------------------------
+//  output_help - output option help to a string
+//-------------------------------------------------
 
-void options_output_ini_file(core_options *opts, core_file *inifile)
+const char *core_options::output_help(astring &buffer)
 {
-	options_output_diff_ini_file(opts, NULL, inifile);
-}
-
-
-/*-------------------------------------------------
-    options_output_ini_file - output the current
-    state to an INI file
--------------------------------------------------*/
-
-void options_output_ini_stdfile(core_options *opts, FILE *inifile)
-{
-	options_data *data;
-
-	/* loop over all items */
-	for (data = opts->datalist; data != NULL; data = data->next)
+	// start empty
+	buffer.reset();
+	
+	// loop over all items
+	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
 	{
-		/* header: just print */
-		if ((data->flags & OPTION_HEADER) != 0)
-			fprintf(inifile, "\n#\n# %s\n#\n", data->description);
+		// header: just print
+		if (curentry->is_header())
+			buffer.catprintf("\n#\n# %s\n#\n", curentry->description());
 
-		/* otherwise, output entries for all non-deprecated and non-command items */
-		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL | OPTION_COMMAND)) == 0)
+		// otherwise, output entries for all non-deprecated items
+		else if (curentry->description() != NULL)
+			buffer.catprintf("-%-20s%s\n", curentry->name(), curentry->description());
+	}
+	return buffer;
+}
+
+
+//-------------------------------------------------
+//  value - return the raw option value
+//-------------------------------------------------
+
+const char *core_options::value(const char *name) const
+{
+	entry *curentry = m_entrymap.find(name);
+	return (curentry != NULL) ? curentry->value() : "";
+}
+
+
+//-------------------------------------------------
+//  seqid - return the seqid for a given option
+//-------------------------------------------------
+
+UINT32 core_options::seqid(const char *name) const
+{
+	entry *curentry = m_entrymap.find(name);
+	return (curentry != NULL) ? curentry->seqid() : 0;
+}
+
+
+//-------------------------------------------------
+//  set_value - set the raw option value
+//-------------------------------------------------
+
+bool core_options::set_value(const char *name, const char *value, int priority, astring &error_string)
+{
+	// find the entry first
+	entry *curentry = m_entrymap.find(name);
+	if (curentry == NULL)
+	{
+		error_string.catprintf("Attempted to set unknown option %s\n", name);
+		return false;
+	}
+	
+	// validate and set the item normally
+	return validate_and_set_data(*curentry, value, priority, error_string);
+}
+
+bool core_options::set_value(const char *name, int value, int priority, astring &error_string)
+{
+	astring tempstr;
+	tempstr.printf("%d", value);
+	return set_value(name, tempstr.cstr(), priority, error_string);
+}
+
+bool core_options::set_value(const char *name, float value, int priority, astring &error_string)
+{
+	astring tempstr;
+	tempstr.printf("%f", value);
+	return set_value(name, tempstr.cstr(), priority, error_string);
+}
+
+
+//-------------------------------------------------
+//  reset - reset the options state, removing
+//  everything
+//-------------------------------------------------
+
+void core_options::reset()
+{
+	// remove all entries from the list
+	while (m_entrylist != NULL)
+		remove_entry(*m_entrylist);
+	
+	// reset the map
+	m_entrymap.reset();
+}
+
+
+//-------------------------------------------------
+//  append_entry - append an entry to our list 
+//  and index it in the map
+//-------------------------------------------------
+
+void core_options::append_entry(core_options::entry &newentry)
+{
+	// append to the list
+	*m_entrylist_tailptr = &newentry;
+	m_entrylist_tailptr = &newentry.m_next;
+
+	// if we have names, add them to the map
+	for (int name = 0; name < ARRAY_LENGTH(newentry.m_name); name++)
+		if (newentry.m_name[name])
+			m_entrymap.add(newentry.m_name[name], &newentry);
+}
+
+
+//-------------------------------------------------
+//  remove_entry - remove an entry from our list 
+//  and map
+//-------------------------------------------------
+
+void core_options::remove_entry(core_options::entry &delentry)
+{
+	// remove us from the list
+	entry *preventry = NULL;
+	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
+		if (curentry == &delentry)
 		{
-			if (astring_chr(data->data, 0, ' ') != -1)
-				fprintf(inifile, "%-25s \"%s\"\n", astring_c(data->links[0].name), astring_c(data->data));
+			// update link from previous to us
+			if (preventry != NULL)
+				preventry->m_next = delentry.m_next;
 			else
-				fprintf(inifile, "%-25s %s\n", astring_c(data->links[0].name), astring_c(data->data));
-		}
-	}
-}
-
-
-/*-------------------------------------------------
-    options_output_help - output option help to
-    a file
--------------------------------------------------*/
-
-void options_output_help(core_options *opts, void (*output)(const char *))
-{
-	options_data *data;
-
-	/* loop over all items */
-	for (data = opts->datalist; data != NULL; data = data->next)
-	{
-		/* header: just print */
-		if ((data->flags & OPTION_HEADER) != 0)
-			output_printf(output, "\n#\n# %s\n#\n", data->description);
-
-		/* otherwise, output entries for all non-deprecated items */
-		else if ((data->flags & (OPTION_DEPRECATED | OPTION_INTERNAL)) == 0 && data->description != NULL)
-			output_printf(output, "-%-20s%s\n", astring_c(data->links[0].name), data->description);
-	}
-}
-
-
-
-/***************************************************************************
-    OPTIONS READING
-***************************************************************************/
-
-/*-------------------------------------------------
-    options_get_string - return data formatted
-    as a string
--------------------------------------------------*/
-
-const char *options_get_string(core_options *opts, const char *name)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	const char *value = "";
-
-	/* error if not found */
-	if (data == NULL)
-		message(opts, OPTMSG_ERROR, "Unexpected option %s queried\n", name);
-
-	/* copy if non-NULL */
-	else
-		value = astring_c(data->data);
-
-	return value;
-}
-
-
-/*-------------------------------------------------
-    options_get_string_priority - return data
-    formatted as a string if priority is equal
-    or better
--------------------------------------------------*/
-
-const char *options_get_string_priority(core_options *opts, const char *name, int priority)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	const char *value = "";
-
-	/* error if not found */
-	if (data == NULL)
-		message(opts, OPTMSG_ERROR, "Unexpected option %s queried\n", name);
-
-	/* copy if non-NULL */
-	else {
-		if (data->priority!=OPTION_PRIORITY_DEFAULT) {
-			if (priority > data->priority) return value;
-		}
-		value = astring_c(data->data);
-	}
-
-	return value;
-}
-
-
-/*-------------------------------------------------
-    options_get_bool - return data formatted as
-    a boolean
--------------------------------------------------*/
-
-int options_get_bool(core_options *opts, const char *name)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	int value = FALSE;
-
-	/* error if not found */
-	if (data == NULL)
-		message(opts, OPTMSG_ERROR, "Unexpected boolean option %s queried\n", name);
-
-	/* also error if we don't have a valid boolean value */
-	else if (sscanf(astring_c(data->data), "%d", &value) != 1 || value < 0 || value > 1)
-	{
-		options_set_string(opts, name, astring_c(data->defdata), 0);
-		sscanf(astring_c(data->data), "%d", &value);
-		if (!data->error_reported)
-		{
-			message(opts, OPTMSG_ERROR, "Illegal boolean value for %s; reverting to %d\n", astring_c(data->links[0].name), value);
-			data->error_reported = TRUE;
-		}
-	}
-	return value;
-}
-
-
-/*-------------------------------------------------
-    options_get_int - return data formatted as
-    an integer
--------------------------------------------------*/
-
-int options_get_int(core_options *opts, const char *name)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	int value = 0;
-
-	/* error if not found */
-	if (data == NULL)
-		message(opts, OPTMSG_ERROR, "Unexpected integer option %s queried\n", name);
-
-	/* also error if we don't have a valid integer value */
-	else if (sscanf(astring_c(data->data), "%d", &value) != 1)
-	{
-		options_set_string(opts, name, astring_c(data->defdata), 0);
-		sscanf(astring_c(data->data), "%d", &value);
-		if (!data->error_reported)
-		{
-			message(opts, OPTMSG_ERROR, "Illegal integer value for %s; reverting to %d\n", astring_c(data->links[0].name), value);
-			data->error_reported = TRUE;
-		}
-	}
-	return value;
-}
-
-
-/*-------------------------------------------------
-    options_get_float - return data formatted as
-    a float
--------------------------------------------------*/
-
-float options_get_float(core_options *opts, const char *name)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	float value = 0;
-
-	/* error if not found */
-	if (data == NULL)
-		message(opts, OPTMSG_ERROR, "Unexpected float option %s queried\n", name);
-
-	/* also error if we don't have a valid floating point value */
-	else if (sscanf(astring_c(data->data), "%f", &value) != 1)
-	{
-		options_set_string(opts, name, astring_c(data->defdata), 0);
-		sscanf(astring_c(data->data), "%f", &value);
-		if (!data->error_reported)
-		{
-			message(opts, OPTMSG_ERROR, "Illegal float value for %s; reverting to %f\n", astring_c(data->links[0].name), (double)value);
-			data->error_reported = TRUE;
-		}
-	}
-	return value;
-}
-
-
-/*-------------------------------------------------
-    options_get_seqid - return the seqid for an
-    entry
--------------------------------------------------*/
-
-UINT32 options_get_seqid(core_options *opts, const char *name)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	return (data == NULL) ? 0 : data->seqid;
-}
-
-
-
-/***************************************************************************
-    OPTIONS SETTING
-***************************************************************************/
-
-/*-------------------------------------------------
-    options_set_string - set a string value
--------------------------------------------------*/
-
-void options_set_string(core_options *opts, const char *name, const char *value, int priority)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	update_data(opts, data, value, priority);
-}
-
-
-/*-------------------------------------------------
-    options_set_bool - set a boolean value
--------------------------------------------------*/
-
-void options_set_bool(core_options *opts, const char *name, int value, int priority)
-{
-	char temp[4];
-	sprintf(temp, "%d", value ? 1 : 0);
-	options_set_string(opts, name, temp, priority);
-}
-
-
-/*-------------------------------------------------
-    options_set_int - set an integer value
--------------------------------------------------*/
-
-void options_set_int(core_options *opts, const char *name, int value, int priority)
-{
-	char temp[20];
-	sprintf(temp, "%d", value);
-	options_set_string(opts, name, temp, priority);
-}
-
-
-/*-------------------------------------------------
-    options_set_float - set a float value
--------------------------------------------------*/
-
-void options_set_float(core_options *opts, const char *name, float value, int priority)
-{
-	char temp[100];
-	sprintf(temp, "%f", value);
-	options_set_string(opts, name, temp, priority);
-}
-
-
-
-/***************************************************************************
-    OPTION DEFINITION QUERIES
-***************************************************************************/
-
-/*-------------------------------------------------
-    options_enumerator_begin - retrieve the range of
-    a float option
--------------------------------------------------*/
-
-options_enumerator *options_enumerator_begin(core_options *opts)
-{
-	options_enumerator *enumerator;
-
-	/* allocate memory for the enumerator */
-	enumerator = (options_enumerator *)malloc(sizeof(*enumerator));
-	if (enumerator == NULL)
-		return NULL;
-
-	/* start at the head of the list */
-	enumerator->current = opts->datalist;
-	return enumerator;
-}
-
-
-
-/*-------------------------------------------------
-    options_enumerator_next - returns the current
-    option and advances the enumerator
--------------------------------------------------*/
-
-const char *options_enumerator_next(options_enumerator *enumerator)
-{
-	astring *option_name = NULL;
-
-	/* be sure to skip over false options */
-	while (option_name == NULL && enumerator->current != NULL)
-	{
-		/* retrieve the current option name and advance the enumerator */
-		option_name = enumerator->current->links[0].name;
-		enumerator->current = enumerator->current->next;
-	}
-	return (option_name != NULL) ? astring_c(option_name) : NULL;
-}
-
-
-
-/*-------------------------------------------------
-    options_enumerator_free - disposes an options
-    enumerator
--------------------------------------------------*/
-
-void options_enumerator_free(options_enumerator *enumerator)
-{
-	free(enumerator);
-}
-
-
-/*-------------------------------------------------
-    options_get_range_type - determine the type
-    of range for a particular option
--------------------------------------------------*/
-
-options_range_type options_get_range_type(core_options *opts, const char *name)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	return data->range_type;
-}
-
-
-/*-------------------------------------------------
-    options_get_range_int - retrieve the range of
-    an integer option
--------------------------------------------------*/
-
-void options_get_range_int(core_options *opts, const char *name, int *minval, int *maxval)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	*minval = data->range_minimum.i;
-	*maxval = data->range_maximum.i;
-}
-
-
-
-/*-------------------------------------------------
-    options_get_range_float - retrieve the range of
-    a float option
--------------------------------------------------*/
-
-void options_get_range_float(core_options *opts, const char *name, float *minval, float *maxval)
-{
-	options_data *data = find_entry_data(opts, name, FALSE);
-	*minval = data->range_minimum.f;
-	*maxval = data->range_maximum.f;
-}
-
-
-
-/***************************************************************************
-    INTERNAL UTILITIES
-***************************************************************************/
-
-/*-------------------------------------------------
-    find_entry_data - locate an entry whose name
-    matches the given string
--------------------------------------------------*/
-
-static options_data *find_entry_data(core_options *opts, const char *string, int is_command_line)
-{
-	int hash_entry = hash_value(opts, string);
-	options_hash_entry *link;
-
-	/* scan all entries */
-	for (link = opts->hashtable[hash_entry]; link != NULL; link = link->next)
-		if (!(link->data->flags & OPTION_HEADER) && link->name != NULL && astring_cmpc(link->name, string) == 0)
-			return link->data;
-
-	/* haven't found it?  if we are prefixed with "no", then try to search for that */
-	if (is_command_line && string[0] == 'n' && string[1] == 'o')
-	{
-		options_data *data = find_entry_data(opts, &string[2], FALSE);
-		if (data != NULL && (data->flags & OPTION_BOOLEAN))
-			return data;
-	}
-
-	/* didn't find it at all */
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    update_data - update the data value for a
-    given entry
--------------------------------------------------*/
-
-static void update_data(core_options *opts, options_data *data, const char *newdata, int priority)
-{
-	const char *dataend = newdata + strlen(newdata) - 1;
-	const char *datastart = newdata;
-	float f;
-	int i;
-
-	/* strip off leading/trailing spaces */
-	while (isspace((UINT8)*datastart) && datastart <= dataend)
-		datastart++;
-	while (isspace((UINT8)*dataend) && datastart <= dataend)
-		dataend--;
-
-	/* strip off quotes */
-	if (datastart != dataend && *datastart == '"' && *dataend == '"')
-		datastart++, dataend--;
-
-	/* check against range */
-	switch (data->range_type)
-	{
-		case OPTION_RANGE_NONE:
-			/* do nothing */
-			break;
-
-		case OPTION_RANGE_INT:
-			/* check against integer range */
-			i = 0;
-			if (sscanf(datastart, "%d", &i) != 1)
+				m_entrylist = delentry.m_next;
+			
+			// if we're the last item, update the next pointer
+			if (delentry.m_next == NULL)
 			{
-				message(opts, OPTMSG_ERROR, "Illegal integer value for %s; keeping value of %s\n", astring_c(data->links[0].name), astring_c(data->data));
-				data->error_reported = TRUE;
-				return;
+				if (preventry != NULL)
+					m_entrylist_tailptr = &preventry->m_next;
+				else
+					m_entrylist_tailptr = &m_entrylist;
 			}
-			if (i < data->range_minimum.i || i > data->range_maximum.i)
+
+			// remove all entries from the map
+			for (int name = 0; name < ARRAY_LENGTH(delentry.m_name); name++)
+				if (delentry.m_name[name])
+					m_entrymap.remove(delentry.m_name[name]);
+			break;
+		}
+}
+
+
+//-------------------------------------------------
+//  copyfrom - copy options from another set
+//-------------------------------------------------
+
+void core_options::copyfrom(const core_options &src)
+{
+	// reset ourselves first
+	reset();
+	
+	// iterate through the src options and make our own
+	for (entry *curentry = src.m_entrylist; curentry != NULL; curentry = curentry->next())
+		append_entry(*new entry(*curentry));
+}
+
+
+//-------------------------------------------------
+//  validate_and_set_data - make sure the data is
+//  of the appropriate type and within range,
+//  then set it
+//-------------------------------------------------
+
+bool core_options::validate_and_set_data(core_options::entry &curentry, const char *newdata, int priority, astring &error_string)
+{
+	// trim any whitespace
+	astring data(newdata);
+	data.trimspace();
+	
+	// trim quotes
+	if (data.chr(0, '"') == 0 && data.rchr(0, '"') == data.len() - 1)
+	{
+		data.del(0, 1);
+		data.del(data.len() - 1, 1);
+	}
+	
+	// validate the type of data and optionally the range
+	float fval;
+	int ival;
+	switch (curentry.type())
+	{
+		// booleans must be 0 or 1
+		case OPTION_BOOLEAN:
+			if (sscanf(data, "%d", &ival) != 1 || ival < 0 || ival > 1)
 			{
-				message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %i and %i); keeping value of %s\n",
-					astring_c(data->links[0].name), data->range_minimum.i, data->range_maximum.i, astring_c(data->data));
-				data->error_reported = TRUE;
-				return;
+				error_string.catprintf("Illegal boolean value for %s: \"%s\"; reverting to %s\n", curentry.name(), data.cstr(), curentry.value());
+				return false;
 			}
 			break;
-
-		case OPTION_RANGE_FLOAT:
-			/* check against float range */
-			f = 0;
-			if (sscanf(datastart, "%f", &f) != 1)
+	
+		// integers must be integral
+		case OPTION_INTEGER:
+			if (sscanf(data, "%d", &ival) != 1)
 			{
-				message(opts, OPTMSG_ERROR, "Illegal float value for %s; keeping value of %s\n", astring_c(data->links[0].name), astring_c(data->data));
-				data->error_reported = TRUE;
-				return;
+				error_string.catprintf("Illegal integer value for %s: \"%s\"; reverting to %s\n", curentry.name(), data.cstr(), curentry.value());
+				return false;
 			}
-			if (f < data->range_minimum.f || f > data->range_maximum.f)
+			if (curentry.has_range() && (ival < atoi(curentry.minimum()) || ival > atoi(curentry.maximum())))
 			{
-				message(opts, OPTMSG_ERROR, "Invalid %s value (must be between %f and %f); keeping value of %s\n",
-					astring_c(data->links[0].name), data->range_minimum.f, data->range_maximum.f, astring_c(data->data));
-				data->error_reported = TRUE;
-				return;
+				error_string.catprintf("Out-of-range integer value for %s: \"%s\" (must be between %s and %s); reverting to %s\n", curentry.name(), data.cstr(), curentry.minimum(), curentry.maximum(), curentry.value());
+				return false;
 			}
 			break;
-	}
-
-	/* ignore if we don't have priority */
-	if (priority < data->priority) {
-		return;
-	}
-	/* allocate a copy of the data */
-	astring_cpych(data->data, datastart, dataend + 1 - datastart);
-	data->priority = priority;
-
-	/* bump the seqid and clear the error reporting */
-	data->seqid++;
-	data->error_reported = FALSE;
-}
-
-
-/*-------------------------------------------------
-    parse_option_name - read data from an option_entry
-    name into an option_data structure
--------------------------------------------------*/
-
-static int parse_option_name(core_options *opts, const char *srcstring, options_data *data)
-{
-	const char *start;
-	const char *end = NULL;
-	int curentry;
-
-	/* start with the original string and loop over entries */
-	start = srcstring;
-	for (curentry = 0; curentry < ARRAY_LENGTH(data->links); curentry++)
-	{
-		/* find the end of this entry and copy the string */
-		for (end = start; *end != 0 && *end != ';' && *end != '('; end++)
-			;
-		data->links[curentry].name = astring_dupch(start, end - start);
-
-		/* if we hit the end of the source, stop */
-		if (*end != ';')
+	
+		// floating-point values must be numeric
+		case OPTION_FLOAT:
+			if (sscanf(data, "%f", &fval) != 1)
+			{
+				error_string.catprintf("Illegal float value for %s: \"%s\"; reverting to %s\n", curentry.name(), data.cstr(), curentry.value());
+				return false;
+			}
+			if (curentry.has_range() && (fval < atof(curentry.minimum()) || fval > atof(curentry.maximum())))
+			{
+				error_string.catprintf("Out-of-range float value for %s: \"%s\" (must be between %s and %s); reverting to %s\n", curentry.name(), data.cstr(), curentry.minimum(), curentry.maximum(), curentry.value());
+				return false;
+			}
 			break;
-		start = end + 1;
+		
+		// strings can be anything
+		case OPTION_STRING:
+			break;
+	
+		// anything else is invalid
+		case OPTION_INVALID:
+		case OPTION_HEADER:
+		default:
+			error_string.catprintf("Attempted to set invalid option %s\n", curentry.name());
+			return false;
 	}
-
-	/* have we found a range? */
-	if (end != NULL && *end == '(')
-	{
-		if (sscanf(end, "(%d-%d)", &data->range_minimum.i, &data->range_maximum.i) == 2)
-			data->range_type = OPTION_RANGE_INT;
-		else if (sscanf(end, "(%f-%f)", &data->range_minimum.f, &data->range_maximum.f) == 2)
-			data->range_type = OPTION_RANGE_FLOAT;
-	}
-	return curentry;
-}
-
-
-/*-------------------------------------------------
-    message - outputs a message to a listener
--------------------------------------------------*/
-
-static void message(core_options *opts, options_message msgtype, const char *format, ...)
-{
-	char buf[1024];
-	va_list argptr;
-
-	/* output a message if there is a non-NULL handler for it */
-	if (opts->output[msgtype] != NULL)
-	{
-		va_start(argptr, format);
-		vsprintf(buf, format, argptr);
-		va_end(argptr);
-
-		(*opts->output[msgtype])(buf);
-	}
-}
-
-
-/*-------------------------------------------------
-    hash_value - computes the hash value for a string
--------------------------------------------------*/
-
-static UINT32 hash_value(core_options *opts, const char *str)
-{
-    UINT32 hash = 5381;
-    int c;
-
-    while ((c = *str++) != 0)
-        hash = ((hash << 5) + hash) + c;
-
-    return hash % ARRAY_LENGTH(opts->hashtable);
-}
-
-
-/*-------------------------------------------------
-    output_printf - outputs an arbitrary message
-    to a callback
--------------------------------------------------*/
-
-static void output_printf(void (*output)(const char *s), const char *format, ...)
-{
-	char buf[1024];
-	va_list argptr;
-
-	va_start(argptr, format);
-	vsprintf(buf, format, argptr);
-	va_end(argptr);
-
-	output(buf);
+	
+	// set the data
+	curentry.set_value(data, priority);
+	return true;
 }

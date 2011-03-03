@@ -584,7 +584,7 @@ static void load_overlay_file(running_machine *machine)
 	int pcaddr;
 
 	/* determine the filename and open the file */
-	emu_file file(machine->options(), SEARCHPATH_RAW, OPEN_FLAG_READ);
+	emu_file file(OPEN_FLAG_READ);
 	file_error filerr = file.open(machine->gamedrv->name, ".kov");
 	if (filerr == FILERR_NONE)
 	{
@@ -610,7 +610,7 @@ static void save_overlay_file(running_machine *machine)
 	int pcaddr;
 
 	/* determin the filename and open the file */
-	emu_file file(machine->options(), SEARCHPATH_RAW, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 	file_error filerr = file.open(machine->gamedrv->name, ".kov");
 	if (filerr == FILERR_NONE)
 	{
@@ -753,7 +753,7 @@ static void execute_fdoutput(running_machine *machine, int ref, int params, cons
 		fd1094_regenerate_key(machine);
 
 	/* determin the filename and open the file */
-	emu_file file(machine->options(), SEARCHPATH_RAW, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 	file_error filerr = file.open(param[0]);
 	if (filerr == FILERR_NONE)
 		file.write(keyregion, KEY_SIZE);
@@ -1176,7 +1176,7 @@ static void execute_fddasm(running_machine *machine, int ref, int params, const 
 	filename = param[0];
 
 	/* open the file */
-	emu_file file(machine->options(), SEARCHPATH_RAW, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 	file_error filerr = file.open(filename);
 	if (filerr != FILERR_NONE)
 	{

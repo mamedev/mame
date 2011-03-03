@@ -76,7 +76,7 @@ void mb3773_device_config::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool mb3773_device_config::device_validity_check( core_options &options, const game_driver &driver ) const
+bool mb3773_device_config::device_validity_check( emu_options &options, const game_driver &driver ) const
 {
 	return false;
 }

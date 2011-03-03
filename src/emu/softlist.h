@@ -56,7 +56,7 @@ struct software_info
 typedef struct _software_list software_list;
 
 /* Handling a software list */
-software_list *software_list_open(core_options &options, const char *listname, int is_preload, void (*error_proc)(const char *message));
+software_list *software_list_open(emu_options &options, const char *listname, int is_preload, void (*error_proc)(const char *message));
 void software_list_close(software_list *swlist);
 software_info *software_list_find(software_list *swlist, const char *look_for, software_info *prev);
 const char *software_list_get_description(software_list *swlist);
@@ -66,8 +66,8 @@ software_part *software_find_part(software_info *sw, const char *partname, const
 software_part *software_part_next(software_part *part);
 
 /* helpers */
-const char *software_get_clone(core_options &options, char *swlist, const char *swname);
-UINT32 software_get_support(core_options &options, char *swlist, const char *swname);
+const char *software_get_clone(emu_options &options, char *swlist, const char *swname);
+UINT32 software_get_support(emu_options &options, char *swlist, const char *swname);
 const char *software_part_get_feature(software_part *part, const char *feature_name);
 
 bool load_software_part(device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);

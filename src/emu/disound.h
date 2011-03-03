@@ -127,7 +127,7 @@ public:
 
 protected:
 	// optional operation overrides
-	virtual bool interface_validity_check(core_options &options, const game_driver &driver) const;
+	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
 
 	// internal state
 	simple_list<sound_route> m_route_list;		// list of sound routes

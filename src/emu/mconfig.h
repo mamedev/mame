@@ -131,6 +131,7 @@ public:
 
 	// getters
 	const game_driver &gamedrv() const { return m_gamedrv; }
+	const device_config *first_device() const { return m_devicelist.first(); }
 	screen_device_config *first_screen() const;
 
 	// public state

@@ -58,7 +58,7 @@ public:
 protected:
 	// device_config overrides
 	virtual void device_config_complete();
-	virtual bool device_validity_check( core_options &options, const game_driver &driver ) const;
+	virtual bool device_validity_check( emu_options &options, const game_driver &driver ) const;
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config( int spacenum = 0 ) const;

@@ -100,7 +100,7 @@ static DEVICE_START( ram )
 	/* the device named 'ram' can get ram options from command line */
 	if (strcmp(device->tag(), RAM_TAG) == 0)
 	{
-		const char *ramsize_string = options_get_string(&device->machine->options(), OPTION_RAMSIZE);
+		const char *ramsize_string = device->machine->options().ram_size();
 
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
 			ram->size = ram_parse_string(ramsize_string);
@@ -141,8 +141,8 @@ static DEVICE_VALIDITY_CHECK( ram )
 	if (device->tag()!=NULL && strcmp(device->tag(), RAM_TAG) == 0)
 	{
 		/* verify command line ram option */
-		ramsize_string = options_get_string(&options, OPTION_RAMSIZE);
-		gamename_option = options_get_string(&options, OPTION_GAMENAME);
+		ramsize_string = options.ram_size();
+		gamename_option = options.system_name();
 
 		if ((ramsize_string != NULL) && (ramsize_string[0] != '\0'))
 		{

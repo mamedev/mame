@@ -95,8 +95,8 @@ extern const char build_version[];
 
 /* ----- core system management ----- */
 
-/* execute as configured by the OPTION_GAMENAME option on the specified options */
-int mame_execute(osd_interface &osd, core_options *options);
+/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
+int mame_execute(emu_options &options, osd_interface &osd);
 
 /* return true if the given machine is valid */
 int mame_is_valid_machine(running_machine *machine);
@@ -128,10 +128,6 @@ void mame_printf_debug(const char *format, ...) ATTR_PRINTF(1,2);
 
 
 /* ----- miscellaneous bits & pieces ----- */
-
-/* parse the configured INI files */
-void mame_parse_ini_files(core_options *options, const game_driver *driver);
-
 
 // pop-up a user visible message
 void CLIB_DECL popmessage(const char *format,...) ATTR_PRINTF(1,2);

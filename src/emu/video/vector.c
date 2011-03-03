@@ -175,10 +175,10 @@ float vector_get_beam(void)
 
 VIDEO_START( vector )
 {
-	beam_width = options_get_float(&machine->options(), OPTION_BEAM);
+	beam_width = machine->options().beam();
 
 	/* Grab the settings for this session */
-	vector_set_flicker(options_get_float(&machine->options(), OPTION_FLICKER));
+	vector_set_flicker(machine->options().flicker());
 
 	vector_index = 0;
 
@@ -256,7 +256,7 @@ void vector_clear_list (void)
 
 SCREEN_UPDATE( vector )
 {
-	UINT32 flags = PRIMFLAG_ANTIALIAS(options_get_bool(&screen->machine->options(), OPTION_ANTIALIAS) ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
+	UINT32 flags = PRIMFLAG_ANTIALIAS(screen->machine->options().antialias() ? 1 : 0) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD);
 	const rectangle &visarea = screen->visible_area();
 	float xscale = 1.0f / (65536 * (visarea.max_x - visarea.min_x));
 	float yscale = 1.0f / (65536 * (visarea.max_y - visarea.min_y));

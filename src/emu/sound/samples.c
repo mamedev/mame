@@ -184,7 +184,7 @@ loaded_samples *readsamples(running_machine *machine, const char *const *samplen
 	int i;
 
 	/* if the user doesn't want to use samples, bail */
-	if (!options_get_bool(&machine->options(), OPTION_SAMPLES))
+	if (!machine->options().samples())
 		return NULL;
 	if (samplenames == 0 || samplenames[0] == 0)
 		return NULL;
@@ -206,7 +206,7 @@ loaded_samples *readsamples(running_machine *machine, const char *const *samplen
 	for (i = 0; i < samples->total; i++)
 		if (samplenames[i+skipfirst][0])
 		{
-			emu_file file(machine->options(), SEARCHPATH_SAMPLE, OPEN_FLAG_READ);
+			emu_file file(machine->options().sample_path(), OPEN_FLAG_READ);
 
 			file_error filerr = file.open(basename, PATH_SEPARATOR, samplenames[i+skipfirst]);
 			if (filerr != FILERR_NONE && skipfirst)

@@ -1087,7 +1087,7 @@ static bool validate_inputs(const machine_config &config, int_map &defstr_map, i
     checks
 -------------------------------------------------*/
 
-static bool validate_devices(const machine_config &config, const ioport_list &portlist, region_array *rgninfo, core_options &options)
+static bool validate_devices(const machine_config &config, const ioport_list &portlist, region_array *rgninfo, emu_options &options)
 {
 	bool error = false;
 	const game_driver &driver = config.gamedrv();
@@ -1119,10 +1119,10 @@ static bool validate_devices(const machine_config &config, const ioport_list &po
 
 
 /*-------------------------------------------------
-    mame_validitychecks - master validity checker
+    validate_drivers - master validity checker
 -------------------------------------------------*/
 
-bool mame_validitychecks(core_options &options, const game_driver *curdriver)
+void validate_drivers(emu_options &options, const game_driver *curdriver)
 {
 	osd_ticks_t prep = 0;
 	osd_ticks_t expansion = 0;
@@ -1249,5 +1249,7 @@ bool mame_validitychecks(core_options &options, const game_driver *curdriver)
 	mame_printf_info("Input:     %8dm\n", (int)(input_checks / 1000000));
 #endif
 
-	return error;
+	// on a general error, throw rather than return
+	if (error)
+		throw emu_fatalerror(MAMERR_FAILED_VALIDITY, "Validity checks failed");
 }

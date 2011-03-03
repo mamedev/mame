@@ -190,6 +190,8 @@ const game_driver *driver_get_name(const char *name);
 const game_driver *driver_get_clone(const game_driver *driver);
 const game_driver *driver_get_compatible(const game_driver *drv);
 
+const char *driver_get_searchpath(const game_driver &driver, astring &string);
+
 void driver_list_get_approx_matches(const game_driver * const driverlist[], const char *name, int matches, const game_driver **list);
 int driver_list_get_count(const game_driver * const driverlist[]);
 

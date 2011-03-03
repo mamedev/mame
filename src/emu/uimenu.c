@@ -1405,7 +1405,7 @@ UINT32 ui_slider_ui_handler(running_machine *machine, render_container *containe
 
 void ui_menu_force_game_select(running_machine *machine, render_container *container)
 {
-	char *gamename = (char *)options_get_string(&machine->options(), OPTION_GAMENAME);
+	char *gamename = (char *)machine->options().system_name();
 
 	/* reset the menu stack */
 	ui_menu_stack_reset(machine);
@@ -1570,7 +1570,7 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 		ui_menu_item_append(menu, "Crosshair Options", NULL, 0, (void *)menu_crosshair);
 
 	/* add cheat menu */
-	if (options_get_bool(&machine->options(), OPTION_CHEAT) && machine->cheat().first() != NULL)
+	if (machine->options().cheat() && machine->cheat().first() != NULL)
 		ui_menu_item_append(menu, "Cheat", NULL, 0, (void *)menu_cheat);
 
 	/* add memory card menu */
@@ -3299,7 +3299,7 @@ static void menu_crosshair_populate(running_machine *machine, ui_menu *menu)
 			/* search for crosshair graphics */
 
 			/* open a path to the crosshairs */
-			file_enumerator path(machine->options(), OPTION_CROSSHAIRPATH);
+			file_enumerator path(machine->options().crosshair_path());
 			const osd_directory_entry *dir;
 			/* reset search flags */
 			int using_default = FALSE;
@@ -3462,7 +3462,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 				int audit_result;
 
 				/* audit the game first to see if we're going to work */
-				audit_records = audit_images(&menu->machine->options(), driver, AUDIT_VALIDATE_FAST, &audit);
+				audit_records = audit_images(menu->machine->options(), driver, AUDIT_VALIDATE_FAST, &audit);
 				audit_result = audit_summary(driver, audit_records, audit, FALSE);
 				if (audit_records > 0)
 					global_free(audit);
@@ -3614,7 +3614,7 @@ static void menu_select_game_build_driver_list(ui_menu *menu, select_game_state 
 	memset(found, 0, (driver_count + 7) / 8);
 
 	/* open a path to the ROMs and find them in the array */
-	file_enumerator path(menu->machine->options(), OPTION_ROMPATH);
+	file_enumerator path(menu->machine->options().media_path());
 	const osd_directory_entry *dir;
 
 	/* iterate while we get new objects */

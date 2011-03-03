@@ -308,6 +308,15 @@ public:
 		osd_break_into_debugger(text);
 	}
 
+	emu_fatalerror(int _exitcode, const char *format, ...)
+		: code(_exitcode)
+	{
+		va_list ap;
+		va_start(ap, format);
+		vsprintf(text, format, ap);
+		va_end(ap);
+	}
+
 	emu_fatalerror(int _exitcode, const char *format, va_list ap)
 		: code(_exitcode)
 	{

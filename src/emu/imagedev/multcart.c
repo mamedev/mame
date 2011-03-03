@@ -213,7 +213,7 @@ static multicart_open_error load_rom_resource(multicart_load_state *state, xml_d
     load_ram_resource
 -------------------------------------------------*/
 
-static multicart_open_error load_ram_resource(core_options &options, multicart_load_state *state, xml_data_node *resource_node,
+static multicart_open_error load_ram_resource(emu_options &options, multicart_load_state *state, xml_data_node *resource_node,
 	multicart_resource *resource)
 {
 	const char *length_string;
@@ -272,7 +272,7 @@ static multicart_open_error load_ram_resource(core_options &options, multicart_l
     load_resource
 -------------------------------------------------*/
 
-static multicart_open_error load_resource(core_options &options, multicart_load_state *state, xml_data_node *resource_node,
+static multicart_open_error load_resource(emu_options &options, multicart_load_state *state, xml_data_node *resource_node,
 	multicart_resource_type resource_type)
 {
 	const char *id;
@@ -328,7 +328,7 @@ static multicart_open_error load_resource(core_options &options, multicart_load_
     load_all_resources
 -------------------------------------------------*/
 
-static multicart_open_error load_all_resources(core_options &options, multicart_load_state *state)
+static multicart_open_error load_all_resources(emu_options &options, multicart_load_state *state)
 {
 	multicart_open_error err;
 	xml_data_node *resource_node;
@@ -355,7 +355,7 @@ static multicart_open_error load_all_resources(core_options &options, multicart_
     be freed on multicart_close.
 -------------------------------------------------*/
 
-static multicart_open_error save_ram_resources(core_options &options, multicart_t *cart)
+static multicart_open_error save_ram_resources(emu_options &options, multicart_t *cart)
 {
 	const multicart_resource *resource;
 
@@ -461,7 +461,7 @@ static multicart_open_error load_all_sockets(multicart_load_state *state)
     multicart_open - opens a multicart
 -------------------------------------------------*/
 
-multicart_open_error multicart_open(core_options &options, const char *filename, const char *gamedrv, multicart_load_flags load_flags, multicart_t **cart)
+multicart_open_error multicart_open(emu_options &options, const char *filename, const char *gamedrv, multicart_load_flags load_flags, multicart_t **cart)
 {
 	multicart_open_error err;
 	zip_error ziperr;
@@ -601,7 +601,7 @@ done:
     multicart_close - closes a multicart
 -------------------------------------------------*/
 
-void multicart_close(core_options &options, multicart_t *cart)
+void multicart_close(emu_options &options, multicart_t *cart)
 {
 	save_ram_resources(options, cart);
 	pool_free_lib(cart->data->pool);

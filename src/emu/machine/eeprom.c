@@ -164,7 +164,7 @@ void eeprom_device_config::static_set_default_value(device_config *device, UINT1
 //  on this device
 //-------------------------------------------------
 
-bool eeprom_device_config::device_validity_check(core_options &options, const game_driver &driver) const
+bool eeprom_device_config::device_validity_check(emu_options &options, const game_driver &driver) const
 {
 	bool error = false;
 

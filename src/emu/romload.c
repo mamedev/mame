@@ -81,9 +81,9 @@ static void rom_exit(running_machine &machine);
     HELPERS (also used by devimage.c)
  ***************************************************************************/
 
-file_error common_process_file(core_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file **image_file)
+file_error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file **image_file)
 {
-	*image_file = global_alloc(emu_file(options, SEARCHPATH_IMAGE, OPEN_FLAG_READ));
+	*image_file = global_alloc(emu_file(options.media_path(), OPEN_FLAG_READ));
 	file_error filerr;
 
 	if (location != NULL && strcmp(location, "") != 0)
@@ -99,9 +99,9 @@ file_error common_process_file(core_options &options, const char *location, cons
 	return filerr;
 }
 
-file_error common_process_file(core_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, emu_file **image_file)
+file_error common_process_file(emu_options &options, const char *location, bool has_crc, UINT32 crc, const rom_entry *romp, emu_file **image_file)
 {
-	*image_file = global_alloc(emu_file(options, SEARCHPATH_IMAGE, OPEN_FLAG_READ));
+	*image_file = global_alloc(emu_file(options.media_path(), OPEN_FLAG_READ));
 	file_error filerr;
 
 	if (has_crc)
@@ -330,7 +330,7 @@ static void CLIB_DECL ATTR_PRINTF(1,2) debugload(const char *string, ...)
 
 static void determine_bios_rom(rom_load_data *romdata)
 {
-	const char *specbios = options_get_string(&romdata->machine->options(), OPTION_BIOS);
+	const char *specbios = romdata->machine->options().bios();
 	const char *defaultname = NULL;
 	const rom_entry *rom;
 	int default_no = 1;
@@ -1003,7 +1003,7 @@ static void process_rom_entries(rom_load_data *romdata, const char *regiontag, c
     checksum
 -------------------------------------------------*/
 
-chd_error open_disk_image(core_options &options, const game_driver *gamedrv, const rom_entry *romp, emu_file **image_file, chd_file **image_chd, const char *locationtag)
+chd_error open_disk_image(emu_options &options, const game_driver *gamedrv, const rom_entry *romp, emu_file **image_file, chd_file **image_chd, const char *locationtag)
 {
 	const game_driver *drv, *searchdrv;
 	const rom_entry *region, *rom;
@@ -1155,7 +1155,7 @@ chd_error open_disk_image(core_options &options, const game_driver *gamedrv, con
     open_disk_diff - open a DISK diff file
 -------------------------------------------------*/
 
-static chd_error open_disk_diff(core_options &options, const rom_entry *romp, chd_file *source, emu_file **diff_file, chd_file **diff_chd)
+static chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file *source, emu_file **diff_file, chd_file **diff_chd)
 {
 	astring fname(ROM_GETNAME(romp), ".dif");
 	chd_error err;
@@ -1165,7 +1165,7 @@ static chd_error open_disk_diff(core_options &options, const rom_entry *romp, ch
 
 	/* try to open the diff */
 	LOG(("Opening differencing image file: %s\n", fname.cstr()));
-	*diff_file = global_alloc(emu_file(options, SEARCHPATH_IMAGE_DIFF, OPEN_FLAG_READ | OPEN_FLAG_WRITE));
+	*diff_file = global_alloc(emu_file(options.diff_directory(), OPEN_FLAG_READ | OPEN_FLAG_WRITE));
 	file_error filerr = (*diff_file)->open(fname);
 	if (filerr != FILERR_NONE)
 	{

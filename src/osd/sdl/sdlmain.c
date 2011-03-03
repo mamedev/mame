@@ -80,30 +80,30 @@
 //  Local variables
 //============================================================
 
-static const options_entry mame_sdl_options[] =
+const options_entry sdl_options::s_option_entries[] =
 {
-	{ SDLOPTION_INIPATH,                     INI_PATH,     0,                "path to ini files" },
+	{ SDLOPTION_INIPATH,                     INI_PATH,    OPTION_STRING,     "path to ini files" },
 
 	// debugging options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "DEBUGGING OPTIONS" },
 	{ SDLOPTION_OSLOG,                        "0",        OPTION_BOOLEAN,    "output error.log data to the system debugger" },
-	{ SDLOPTION_WATCHDOG ";wdog",             "0",        0,                 "force the program to terminate if no updates within specified number of seconds" },
+	{ SDLOPTION_WATCHDOG ";wdog",             "0",        OPTION_INTEGER,    "force the program to terminate if no updates within specified number of seconds" },
 
 	// performance options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "PERFORMANCE OPTIONS" },
 	{ SDLOPTION_MULTITHREADING ";mt",         "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
-	{ SDLOPTION_NUMPROCESSORS ";np",         "auto",      0,				 "number of processors; this overrides the number the system reports" },
+	{ SDLOPTION_NUMPROCESSORS ";np",         "auto",      OPTION_INTEGER,	 "number of processors; this overrides the number the system reports" },
 	{ SDLOPTION_SDLVIDEOFPS,                  "0",        OPTION_BOOLEAN,    "show sdl video performance" },
-	{ SDLOPTION_BENCH,                        "0",        0,                 "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
+	{ SDLOPTION_BENCH,                        "0",        OPTION_INTEGER,    "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
 	// video options
 	{ NULL,                                   NULL,       OPTION_HEADER,     "VIDEO OPTIONS" },
 // OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
 #ifdef SDLMAME_MACOSX
-	{ SDLOPTION_VIDEO,                   SDLOPTVAL_OPENGL,  0,                 "video output method: soft or opengl" },
+	{ SDLOPTION_VIDEO,                   SDLOPTVAL_OPENGL,  OPTION_STRING,   "video output method: soft or opengl" },
 #else
-	{ SDLOPTION_VIDEO,                   SDLOPTVAL_SOFT,  0,                 "video output method: soft or opengl" },
+	{ SDLOPTION_VIDEO,                   SDLOPTVAL_SOFT,  OPTION_STRING,     "video output method: soft or opengl" },
 #endif
-	{ SDLOPTION_NUMSCREENS,                   "1",        0,                 "number of screens to create; SDLMAME only supports 1 at this time" },
+	{ SDLOPTION_NUMSCREENS,                   "1",        OPTION_INTEGER,    "number of screens to create; SDLMAME only supports 1 at this time" },
 	{ SDLOPTION_WINDOW ";w",                  "0",        OPTION_BOOLEAN,    "enable window mode; otherwise, full screen mode is assumed" },
 	{ SDLOPTION_MAXIMIZE ";max",              "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
 	{ SDLOPTION_KEEPASPECT ";ka",             "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
@@ -115,70 +115,70 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_SYNCREFRESH,                  "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
 	#endif
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  0,                 "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 #else
-	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  0,                 "Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
+	{ SDLOPTION_SCALEMODE ";sm",         SDLOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, async, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
 #endif
 #if USE_OPENGL
 	// OpenGL specific options
 	{ NULL,                                   NULL,   OPTION_HEADER,  "OpenGL-SPECIFIC OPTIONS" },
 	{ SDLOPTION_FILTER ";glfilter;flt",       "1",    OPTION_BOOLEAN, "enable bilinear filtering on screen output" },
-	{ SDLOPTION_PRESCALE,                     "1",        0,                 "scale screen rendering by this amount in software" },
+	{ SDLOPTION_PRESCALE,                     "1",    OPTION_INTEGER,                 "scale screen rendering by this amount in software" },
 	{ SDLOPTION_GL_FORCEPOW2TEXTURE,          "0",    OPTION_BOOLEAN, "force power of two textures  (default no)" },
 	{ SDLOPTION_GL_NOTEXTURERECT,             "0",    OPTION_BOOLEAN, "don't use OpenGL GL_ARB_texture_rectangle (default on)" },
 	{ SDLOPTION_GL_VBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL VBO,  if available (default on)" },
 	{ SDLOPTION_GL_PBO,                       "1",    OPTION_BOOLEAN, "enable OpenGL PBO,  if available (default on)" },
 	{ SDLOPTION_GL_GLSL,                      "0",    OPTION_BOOLEAN, "enable OpenGL GLSL, if available (default off)" },
-	{ SDLOPTION_GLSL_FILTER,				  "1",    0,              "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
-	{ SDLOPTION_SHADER_MAME("0"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 0" },
-	{ SDLOPTION_SHADER_MAME("1"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 1" },
-	{ SDLOPTION_SHADER_MAME("2"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 2" },
-	{ SDLOPTION_SHADER_MAME("3"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 3" },
-	{ SDLOPTION_SHADER_MAME("4"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 4" },
-	{ SDLOPTION_SHADER_MAME("5"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 5" },
-	{ SDLOPTION_SHADER_MAME("6"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 6" },
-	{ SDLOPTION_SHADER_MAME("7"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 7" },
-	{ SDLOPTION_SHADER_MAME("8"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 8" },
-	{ SDLOPTION_SHADER_MAME("9"),    SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader set mame bitmap 9" },
-	{ SDLOPTION_SHADER_SCREEN("0"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 0" },
-	{ SDLOPTION_SHADER_SCREEN("1"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 1" },
-	{ SDLOPTION_SHADER_SCREEN("2"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 2" },
-	{ SDLOPTION_SHADER_SCREEN("3"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 3" },
-	{ SDLOPTION_SHADER_SCREEN("4"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 4" },
-	{ SDLOPTION_SHADER_SCREEN("5"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 5" },
-	{ SDLOPTION_SHADER_SCREEN("6"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 6" },
-	{ SDLOPTION_SHADER_SCREEN("7"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 7" },
-	{ SDLOPTION_SHADER_SCREEN("8"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 8" },
-	{ SDLOPTION_SHADER_SCREEN("9"),  SDLOPTVAL_NONE,  0,              "custom OpenGL GLSL shader screen bitmap 9" },
+	{ SDLOPTION_GLSL_FILTER,				  "1",    OPTION_STRING,  "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
+	{ SDLOPTION_SHADER_MAME "0",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 0" },
+	{ SDLOPTION_SHADER_MAME "1",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 1" },
+	{ SDLOPTION_SHADER_MAME "2",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 2" },
+	{ SDLOPTION_SHADER_MAME "3",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 3" },
+	{ SDLOPTION_SHADER_MAME "4",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 4" },
+	{ SDLOPTION_SHADER_MAME "5",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 5" },
+	{ SDLOPTION_SHADER_MAME "6",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 6" },
+	{ SDLOPTION_SHADER_MAME "7",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 7" },
+	{ SDLOPTION_SHADER_MAME "8",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 8" },
+	{ SDLOPTION_SHADER_MAME "9",     SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader set mame bitmap 9" },
+	{ SDLOPTION_SHADER_SCREEN "0",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 0" },
+	{ SDLOPTION_SHADER_SCREEN "1",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 1" },
+	{ SDLOPTION_SHADER_SCREEN "2",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 2" },
+	{ SDLOPTION_SHADER_SCREEN "3",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 3" },
+	{ SDLOPTION_SHADER_SCREEN "4",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 4" },
+	{ SDLOPTION_SHADER_SCREEN "5",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 5" },
+	{ SDLOPTION_SHADER_SCREEN "6",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 6" },
+	{ SDLOPTION_SHADER_SCREEN "7",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 7" },
+	{ SDLOPTION_SHADER_SCREEN "8",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 8" },
+	{ SDLOPTION_SHADER_SCREEN "9",   SDLOPTVAL_NONE,  OPTION_STRING,  "custom OpenGL GLSL shader screen bitmap 9" },
 	{ SDLOPTION_GL_GLSL_VID_ATTR,			 "1",    OPTION_BOOLEAN,  "enable OpenGL GLSL handling of brightness and contrast. Better RGB game performance for free. (default)" },
 #endif
 
 	// per-window options
-	{ NULL,                                   NULL, OPTION_HEADER,    "PER-WINDOW VIDEO OPTIONS" },
-	{ SDLOPTION_SCREEN(""),                   SDLOPTVAL_AUTO,   0,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("") ";screen_aspect",  SDLOPTVAL_AUTO,   0,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("") ";r",          SDLOPTVAL_AUTO,   0,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW(""),                     SDLOPTVAL_AUTO,   0,    "preferred view for all screens" },
+	{ NULL,                                   NULL,             OPTION_HEADER,    "PER-WINDOW VIDEO OPTIONS" },
+	{ SDLOPTION_SCREEN,                   SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT ";screen_aspect",  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio for all screens; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION ";r",          SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution for all screens; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW,                     SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for all screens" },
 
-	{ SDLOPTION_SCREEN("0"),                  SDLOPTVAL_AUTO,   0,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("0"),                  SDLOPTVAL_AUTO,   0,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("0") ";r0",        SDLOPTVAL_AUTO,   0,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW("0"),                    SDLOPTVAL_AUTO,   0,    "preferred view for the first screen" },
+	{ SDLOPTION_SCREEN "0",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the first screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT "0",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the first screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION "0;r0",        SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the first screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW "0",                    SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the first screen" },
 
-	{ SDLOPTION_SCREEN("1"),                  SDLOPTVAL_AUTO,   0,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("1"),                  SDLOPTVAL_AUTO,   0,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("1") ";r1",        SDLOPTVAL_AUTO,   0,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW("1"),                    SDLOPTVAL_AUTO,   0,    "preferred view for the second screen" },
+	{ SDLOPTION_SCREEN "1",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the second screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT "1",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the second screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION "1;r1",        SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the second screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW "1",                    SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the second screen" },
 
-	{ SDLOPTION_SCREEN("2"),                  SDLOPTVAL_AUTO,   0,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("2"),                  SDLOPTVAL_AUTO,   0,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("2") ";r2",        SDLOPTVAL_AUTO,   0,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW("2"),                    SDLOPTVAL_AUTO,   0,    "preferred view for the third screen" },
+	{ SDLOPTION_SCREEN "2",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the third screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT "2",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the third screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION "2;r2",        SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the third screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW "2",                    SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the third screen" },
 
-	{ SDLOPTION_SCREEN("3"),                  SDLOPTVAL_AUTO,   0,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_ASPECT("3"),                  SDLOPTVAL_AUTO,   0,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
-	{ SDLOPTION_RESOLUTION("3") ";r3",        SDLOPTVAL_AUTO,   0,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
-	{ SDLOPTION_VIEW("3"),                    SDLOPTVAL_AUTO,   0,    "preferred view for the fourth screen" },
+	{ SDLOPTION_SCREEN "3",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "explicit name of the fourth screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_ASPECT "3",                  SDLOPTVAL_AUTO,   OPTION_STRING,    "aspect ratio of the fourth screen; 'auto' here will try to make a best guess" },
+	{ SDLOPTION_RESOLUTION "3;r3",        SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred resolution of the fourth screen; format is <width>x<height>[@<refreshrate>] or 'auto'" },
+	{ SDLOPTION_VIEW "3",                    SDLOPTVAL_AUTO,   OPTION_STRING,    "preferred view for the fourth screen" },
 
 	// full screen options
 	{ NULL,                                   NULL,  OPTION_HEADER,     "FULL SCREEN OPTIONS" },
@@ -189,55 +189,55 @@ static const options_entry mame_sdl_options[] =
 
 	// sound options
 	{ NULL,                                   NULL,  OPTION_HEADER,     "SOUND OPTIONS" },
-	{ SDLOPTION_AUDIO_LATENCY,                "3",   0,                 "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+	{ SDLOPTION_AUDIO_LATENCY,                "3",   OPTION_INTEGER,    "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
 
 	// keyboard mapping
 	{ NULL, 		                          NULL,  OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
 	{ SDLOPTION_KEYMAP,                      "0",    OPTION_BOOLEAN,    "enable keymap" },
-	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", 0,           "keymap filename" },
+	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", OPTION_STRING, "keymap filename" },
 
 	// joystick mapping
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL JOYSTICK MAPPING" },
-	{ SDLOPTION_JOYINDEX "1",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #1" },
-	{ SDLOPTION_JOYINDEX "2",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #2" },
-	{ SDLOPTION_JOYINDEX "3",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #3" },
-	{ SDLOPTION_JOYINDEX "4",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #4" },
-	{ SDLOPTION_JOYINDEX "5",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #5" },
-	{ SDLOPTION_JOYINDEX "6",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #6" },
-	{ SDLOPTION_JOYINDEX "7",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #7" },
-	{ SDLOPTION_JOYINDEX "8",                SDLOPTVAL_AUTO, 0,         "name of joystick mapped to joystick #8" },
+	{ SDLOPTION_JOYINDEX "1",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #1" },
+	{ SDLOPTION_JOYINDEX "2",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #2" },
+	{ SDLOPTION_JOYINDEX "3",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #3" },
+	{ SDLOPTION_JOYINDEX "4",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #4" },
+	{ SDLOPTION_JOYINDEX "5",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #5" },
+	{ SDLOPTION_JOYINDEX "6",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #6" },
+	{ SDLOPTION_JOYINDEX "7",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #7" },
+	{ SDLOPTION_JOYINDEX "8",                SDLOPTVAL_AUTO, OPTION_STRING,         "name of joystick mapped to joystick #8" },
 	{ SDLOPTION_SIXAXIS,			         "0",	 OPTION_BOOLEAN,    "Use special handling for PS3 Sixaxis controllers" },
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL MOUSE MAPPING" },
-	{ SDLOPTION_MOUSEINDEX "1",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #1" },
-	{ SDLOPTION_MOUSEINDEX "2",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #2" },
-	{ SDLOPTION_MOUSEINDEX "3",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #3" },
-	{ SDLOPTION_MOUSEINDEX "4",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #4" },
-	{ SDLOPTION_MOUSEINDEX "5",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #5" },
-	{ SDLOPTION_MOUSEINDEX "6",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #6" },
-	{ SDLOPTION_MOUSEINDEX "7",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #7" },
-	{ SDLOPTION_MOUSEINDEX "8",              SDLOPTVAL_AUTO, 0,         "name of mouse mapped to mouse #8" },
+	{ SDLOPTION_MOUSEINDEX "1",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #1" },
+	{ SDLOPTION_MOUSEINDEX "2",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #2" },
+	{ SDLOPTION_MOUSEINDEX "3",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #3" },
+	{ SDLOPTION_MOUSEINDEX "4",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #4" },
+	{ SDLOPTION_MOUSEINDEX "5",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #5" },
+	{ SDLOPTION_MOUSEINDEX "6",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #6" },
+	{ SDLOPTION_MOUSEINDEX "7",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #7" },
+	{ SDLOPTION_MOUSEINDEX "8",              SDLOPTVAL_AUTO, OPTION_STRING,         "name of mouse mapped to mouse #8" },
 
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
-	{ SDLOPTION_KEYBINDEX "1",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #1" },
-	{ SDLOPTION_KEYBINDEX "2",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #2" },
-	{ SDLOPTION_KEYBINDEX "3",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #3" },
-	{ SDLOPTION_KEYBINDEX "4",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #4" },
-	{ SDLOPTION_KEYBINDEX "5",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #5" },
-	{ SDLOPTION_KEYBINDEX "6",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #6" },
-	{ SDLOPTION_KEYBINDEX "7",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #7" },
-	{ SDLOPTION_KEYBINDEX "8",               SDLOPTVAL_AUTO, 0,         "name of keyboard mapped to keyboard #8" },
+	{ SDLOPTION_KEYBINDEX "1",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #1" },
+	{ SDLOPTION_KEYBINDEX "2",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #2" },
+	{ SDLOPTION_KEYBINDEX "3",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #3" },
+	{ SDLOPTION_KEYBINDEX "4",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #4" },
+	{ SDLOPTION_KEYBINDEX "5",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #5" },
+	{ SDLOPTION_KEYBINDEX "6",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #6" },
+	{ SDLOPTION_KEYBINDEX "7",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #7" },
+	{ SDLOPTION_KEYBINDEX "8",               SDLOPTVAL_AUTO, OPTION_STRING,         "name of keyboard mapped to keyboard #8" },
 #endif
 	// SDL low level driver options
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL LOWLEVEL DRIVER OPTIONS" },
-	{ SDLOPTION_VIDEODRIVER ";vd",           SDLOPTVAL_AUTO,  0,        "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
+	{ SDLOPTION_VIDEODRIVER ";vd",           SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
 #if (SDL_VERSION_ATLEAST(1,3,0))
-	{ SDLOPTION_RENDERDRIVER ";rd",          SDLOPTVAL_AUTO,  0,        "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
+	{ SDLOPTION_RENDERDRIVER ";rd",          SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
 #endif
-	{ SDLOPTION_AUDIODRIVER ";ad",           SDLOPTVAL_AUTO,  0,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
+	{ SDLOPTION_AUDIODRIVER ";ad",           SDLOPTVAL_AUTO,  OPTION_STRING,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
 #if USE_OPENGL
-	{ SDLOPTION_GL_LIB,                      SDLOPTVAL_GLLIB, 0,        "alternative libGL.so to use; 'auto' for system default" },
+	{ SDLOPTION_GL_LIB,                      SDLOPTVAL_GLLIB, OPTION_STRING,        "alternative libGL.so to use; 'auto' for system default" },
 #endif
 
 	// End of list
@@ -260,6 +260,16 @@ void MorphToPM()
   if (pib->pib_ultype==2) pib->pib_ultype = 3;
 }
 #endif
+
+//============================================================
+//  sdl_options
+//============================================================
+
+sdl_options::sdl_options()
+{
+	add_entries(s_option_entries);
+}
+
 
 //============================================================
 //  main
@@ -330,7 +340,8 @@ int main(int argc, char *argv[])
 
 	{
 		sdl_osd_interface osd;
-		res = cli_execute(argc, argv, osd, mame_sdl_options);
+		sdl_options options;
+		res = cli_execute(options, osd, argc, argv);
 	}
 
 #ifdef MALLOC_DEBUG
@@ -524,27 +535,30 @@ void sdl_osd_interface::init(running_machine &machine)
 	// call our parent
 	osd_interface::init(machine);
 
+	sdl_options &options = downcast<sdl_options &>(machine.options());
 	const char *stemp;
 
 	// determine if we are benchmarking, and adjust options appropriately
-	int bench = options_get_int(&machine.options(), SDLOPTION_BENCH);
+	int bench = options.bench();
+	astring error_string;
 	if (bench > 0)
 	{
-		options_set_bool(&machine.options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_bool(&machine.options(), OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_string(&machine.options(), SDLOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
-		options_set_int(&machine.options(), OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
+		options.set_value(OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(SDLOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM, error_string);
+		options.set_value(OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM, error_string);
+		assert(!error_string);
 	}
 
 	// Some driver options - must be before audio init!
-	stemp = options_get_string(&machine.options(), SDLOPTION_AUDIODRIVER);
+	stemp = options.audio_driver();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		mame_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_AUDIODRIVER, stemp, 1);
 	}
 
-	stemp = options_get_string(&machine.options(), SDLOPTION_VIDEODRIVER);
+	stemp = options.video_driver();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		mame_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
@@ -553,7 +567,7 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	if (SDL_VERSION_ATLEAST(1,3,0))
 	{
-		stemp = options_get_string(&machine.options(), SDLOPTION_RENDERDRIVER);
+		stemp = options.render_driver();
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 		{
 			mame_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
@@ -566,7 +580,7 @@ void sdl_osd_interface::init(running_machine &machine)
      */
 	/* FIXME: move lib loading code from drawogl.c here */
 
-	stemp = options_get_string(&machine.options(), SDLOPTION_GL_LIB);
+	stemp = options.gl_lib();
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
@@ -574,7 +588,7 @@ void sdl_osd_interface::init(running_machine &machine)
 	}
 
 	/* get number of processors */
-	stemp = options_get_string(&machine.options(), SDLOPTION_NUMPROCESSORS);
+	stemp = options.numprocessors();
 
 	sdl_num_processors = 0;
 
@@ -630,13 +644,13 @@ void sdl_osd_interface::init(running_machine &machine)
 
 	sdloutput_init(&machine);
 
-	if (options_get_bool(&machine.options(), SDLOPTION_OSLOG))
+	if (options.oslog())
 		machine.add_logerror_callback(output_oslog);
 
 	/* now setup watchdog */
 
-	int watchdog_timeout = options_get_int(&machine.options(), SDLOPTION_WATCHDOG);
-	int str = options_get_int(&machine.options(), OPTION_SECONDS_TO_RUN);
+	int watchdog_timeout = options.watchdog();
+	int str = options.seconds_to_run();
 
 	/* only enable watchdog if seconds_to_run is enabled *and* relatively short (time taken from ui.c) */
 	if ((watchdog_timeout != 0) && (str > 0) && (str < 60*5 ))
@@ -941,8 +955,8 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 	if (!font)
 	{
-		mame_printf_verbose("Searching font %s in -%s\n", name.cstr(), SEARCHPATH_FONT);
-		emu_file file(machine().options(), SEARCHPATH_FONT, OPEN_FLAG_READ);
+		mame_printf_verbose("Searching font %s in -%s\n", name.cstr(), OPTION_FONTPATH);
+		emu_file file(machine().options().font_path(), OPEN_FLAG_READ);
 		if (file.open(name) == FILERR_NONE)
 		{
 			astring full_name = file.fullpath();

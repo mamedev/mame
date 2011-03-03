@@ -128,7 +128,7 @@ public:
 
 private:
 	// device_config overrides
-	virtual bool device_validity_check(core_options &options, const game_driver &driver) const;
+	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 
 	// timer types
 	enum timer_type

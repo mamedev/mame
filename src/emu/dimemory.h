@@ -123,7 +123,7 @@ protected:
 	virtual const address_space_config *memory_space_config(int spacenum) const = 0;
 
 	// optional operation overrides
-	virtual bool interface_validity_check(core_options &options, const game_driver &driver) const;
+	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
 
 	address_map_constructor	m_address_map[ADDRESS_SPACES]; // address maps for each address space
 };

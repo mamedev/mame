@@ -1093,7 +1093,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 	  m_symtable(&machine)
 {
 	// if the cheat engine is disabled, we're done
-	if (!options_get_bool(&machine.options(), OPTION_CHEAT))
+	if (!machine.options().cheat())
 		return;
 
 	// request a callback
@@ -1125,7 +1125,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 void cheat_manager::set_enable(bool enable)
 {
 	// if the cheat engine is disabled, we're done
-	if (!options_get_bool(&m_machine.options(), OPTION_CHEAT))
+	if (!m_machine.options().cheat())
 		return;
 
 	// if we're enabled currently and we don't want to be, turn things off
@@ -1160,7 +1160,7 @@ void cheat_manager::set_enable(bool enable)
 void cheat_manager::reload()
 {
 	// if the cheat engine is disabled, we're done
-	if (!options_get_bool(&m_machine.options(), OPTION_CHEAT))
+	if (!m_machine.options().cheat())
 		return;
 
 	// free everything
@@ -1215,7 +1215,7 @@ void cheat_manager::reload()
 bool cheat_manager::save_all(const char *filename)
 {
 	// open the file with the proper name
-	emu_file cheatfile(m_machine.options(), SEARCHPATH_CHEAT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file cheatfile(m_machine.options().cheat_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	file_error filerr = cheatfile.open(filename, ".xml");
 
 	// if that failed, return nothing
@@ -1411,7 +1411,7 @@ void cheat_manager::frame_update()
 void cheat_manager::load_cheats(const char *filename)
 {
 	xml_data_node *rootnode = NULL;
-	emu_file cheatfile(m_machine.options(), SEARCHPATH_CHEAT, OPEN_FLAG_READ);
+	emu_file cheatfile(m_machine.options().cheat_path(), OPEN_FLAG_READ);
 	try
 	{
 		// open the file with the proper name

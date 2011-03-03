@@ -39,7 +39,7 @@
 //
 //============================================================
 
-#include "options.h"
+#include "clifront.h"
 #include "osdepend.h"
 
 
@@ -84,26 +84,6 @@
 #define WINOPTION_RESOLUTION			"resolution"
 #define WINOPTION_VIEW					"view"
 
-#define WINOPTION_SCREEN0				"screen0"
-#define WINOPTION_ASPECT0				"aspect0"
-#define WINOPTION_RESOLUTION0			"resolution0"
-#define WINOPTION_VIEW0					"view0"
-
-#define WINOPTION_SCREEN1				"screen1"
-#define WINOPTION_ASPECT1				"aspect1"
-#define WINOPTION_RESOLUTION1			"resolution1"
-#define WINOPTION_VIEW1					"view1"
-
-#define WINOPTION_SCREEN2				"screen2"
-#define WINOPTION_ASPECT2				"aspect2"
-#define WINOPTION_RESOLUTION2			"resolution2"
-#define WINOPTION_VIEW2					"view2"
-
-#define WINOPTION_SCREEN3				"screen3"
-#define WINOPTION_ASPECT3				"aspect3"
-#define WINOPTION_RESOLUTION3			"resolution3"
-#define WINOPTION_VIEW3					"view3"
-
 // full screen options
 #define WINOPTION_TRIPLEBUFFER			"triplebuffer"
 #define WINOPTION_SWITCHRES				"switchres"
@@ -116,6 +96,76 @@
 
 // input options
 #define WINOPTION_DUAL_LIGHTGUN			"dual_lightgun"
+
+
+
+//============================================================
+//  TYPE DEFINITIONS
+//============================================================
+
+class windows_options : public cli_options
+{
+public:
+	// construction/destruction
+	windows_options();
+
+	// debugging options
+	bool oslog() const { return bool_value(WINOPTION_OSLOG); }
+	int watchdog() const { return int_value(WINOPTION_WATCHDOG); }
+	const char *debugger_font() const { return value(WINOPTION_DEBUGGER_FONT); }
+	float debugger_font_size() const { return float_value(WINOPTION_DEBUGGER_FONT_SIZE); }
+
+	// performance options
+	int priority() const { return int_value(WINOPTION_PRIORITY); }
+	bool multithreading() const { return bool_value(WINOPTION_MULTITHREADING); }
+	const char *numprocessors() const { return value(WINOPTION_NUMPROCESSORS); }
+	int profile() const { return int_value(WINOPTION_PROFILE); }
+	int bench() const { return int_value(WINOPTION_BENCH); }
+
+	// video options
+	const char *video() const { return value(WINOPTION_VIDEO); }
+	int numscreens() const { return int_value(WINOPTION_NUMSCREENS); }
+	bool window() const { return bool_value(WINOPTION_WINDOW); }
+	bool maximize() const { return bool_value(WINOPTION_MAXIMIZE); }
+	bool keep_aspect() const { return bool_value(WINOPTION_KEEPASPECT); }
+	int prescale() const { return int_value(WINOPTION_PRESCALE); }
+	bool wait_vsync() const { return bool_value(WINOPTION_WAITVSYNC); }
+	bool sync_refresh() const { return bool_value(WINOPTION_SYNCREFRESH); }
+	bool menu() const { return bool_value(WINOPTION_MENU); }
+
+	// DirectDraw-specific options
+	bool hwstretch() const { return bool_value(WINOPTION_HWSTRETCH); }
+
+	// Direct3D-specific options
+	int d3d_version() const { return int_value(WINOPTION_D3DVERSION); }
+	bool filter() const { return bool_value(WINOPTION_FILTER); }
+
+	// per-window options
+	const char *screen() const { return value(WINOPTION_SCREEN); }
+	const char *aspect() const { return value(WINOPTION_ASPECT); }
+	const char *resolution() const { return value(WINOPTION_RESOLUTION); }
+	const char *view() const { return value(WINOPTION_VIEW); }
+	const char *screen(int index) const { astring temp; return value(temp.format("%s%d", WINOPTION_SCREEN, index)); }
+	const char *aspect(int index) const { astring temp; return value(temp.format("%s%d", WINOPTION_ASPECT, index)); }
+	const char *resolution(int index) const { astring temp; return value(temp.format("%s%d", WINOPTION_RESOLUTION, index)); }
+	const char *view(int index) const { astring temp; return value(temp.format("%s%d", WINOPTION_VIEW, index)); }
+
+	// full screen options
+	bool triple_buffer() const { return bool_value(WINOPTION_TRIPLEBUFFER); }
+	bool switch_res() const { return bool_value(WINOPTION_SWITCHRES); }
+	float full_screen_brightness() const { return float_value(WINOPTION_FULLSCREENBRIGHTNESS); }
+	float full_screen_contrast() const { return float_value(WINOPTION_FULLLSCREENCONTRAST); }
+	float full_screen_gamma() const { return float_value(WINOPTION_FULLSCREENGAMMA); }
+
+	// sound options
+	int audio_latency() const { return int_value(WINOPTION_AUDIO_LATENCY); }
+
+	// input options
+	bool dual_lightgun() const { return bool_value(WINOPTION_DUAL_LIGHTGUN); }
+
+private:
+	static const options_entry s_option_entries[];
+};
 
 
 

@@ -93,7 +93,7 @@ static chd_file *get_disc(device_t *device)
 	chd_file *image_chd = NULL;
 
 	/* open a path to the ROMs and find the first CHD file */
-	file_enumerator path(device->machine->options(), OPTION_ROMPATH);
+	file_enumerator path(device->machine->options().media_path());
 	const osd_directory_entry *dir;
 
 	/* iterate while we get new objects */
@@ -112,7 +112,7 @@ static chd_file *get_disc(device_t *device)
 			chd_error chderr;
 
 			/* open the file itself via our search path */
-			image_file = auto_alloc(device->machine, emu_file(device->machine->options(), SEARCHPATH_IMAGE, OPEN_FLAG_READ));
+			image_file = auto_alloc(device->machine, emu_file(device->machine->options().media_path(), OPEN_FLAG_READ));
 			filerr = image_file->open(dir->name);
 			if (filerr == FILERR_NONE)
 			{

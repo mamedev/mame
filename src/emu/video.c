@@ -112,13 +112,13 @@ video_manager::video_manager(running_machine &machine)
 	  m_overall_real_ticks(0),
 	  m_overall_emutime(attotime::zero),
 	  m_overall_valid_counter(0),
-	  m_throttle(options_get_bool(&machine.options(), OPTION_THROTTLE)),
+	  m_throttle(machine.options().throttle()),
 	  m_fastforward(false),
-	  m_seconds_to_run(options_get_int(&machine.options(), OPTION_SECONDS_TO_RUN)),
-	  m_auto_frameskip(options_get_bool(&machine.options(), OPTION_AUTOFRAMESKIP)),
+	  m_seconds_to_run(machine.options().seconds_to_run()),
+	  m_auto_frameskip(machine.options().auto_frameskip()),
 	  m_speed(original_speed_setting()),
 	  m_empty_skip_count(0),
-	  m_frameskip_level(options_get_int(&machine.options(), OPTION_FRAMESKIP)),
+	  m_frameskip_level(machine.options().frameskip()),
 	  m_frameskip_counter(0),
 	  m_frameskip_adjust(0),
 	  m_skipping_this_frame(false),
@@ -142,7 +142,7 @@ video_manager::video_manager(running_machine &machine)
 	update_refresh_speed();
 
 	// create a render target for snapshots
-	const char *viewname = options_get_string(&machine.options(), OPTION_SNAPVIEW);
+	const char *viewname = machine.options().snap_view();
 	m_snap_native = (machine.primary_screen != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
 
 	// the native target is hard-coded to our internal layout and has all options disabled
@@ -165,15 +165,15 @@ video_manager::video_manager(running_machine &machine)
 	}
 
 	// extract snap resolution if present
-	if (sscanf(options_get_string(&machine.options(), OPTION_SNAPSIZE), "%dx%d", &m_snap_width, &m_snap_height) != 2)
+	if (sscanf(machine.options().snap_size(), "%dx%d", &m_snap_width, &m_snap_height) != 2)
 		m_snap_width = m_snap_height = 0;
 
 	// start recording movie if specified
-	const char *filename = options_get_string(&machine.options(), OPTION_MNGWRITE);
+	const char *filename = machine.options().mng_write();
 	if (filename[0] != 0)
 		begin_recording(filename, MF_MNG);
 
-	filename = options_get_string(&machine.options(), OPTION_AVIWRITE);
+	filename = machine.options().avi_write();
 	if (filename[0] != 0)
 		begin_recording(filename, MF_AVI);
 
@@ -220,7 +220,7 @@ void video_manager::frame_update(bool debug)
 	// only render sound and video if we're in the running phase
 	int phase = m_machine.phase();
 	bool skipped_it = m_skipping_this_frame;
-	if (phase == MACHINE_PHASE_RUNNING && (!m_machine.paused() || options_get_bool(&m_machine.options(), OPTION_UPDATEINPAUSE)))
+	if (phase == MACHINE_PHASE_RUNNING && (!m_machine.paused() || m_machine.options().update_in_pause()))
 	{
 		bool anything_changed = finish_screen_updates();
 
@@ -366,7 +366,7 @@ void video_manager::save_active_screen_snapshots()
 		for (screen_device *screen = m_machine.first_screen(); screen != NULL; screen = screen->next_screen())
 			if (m_machine.render().is_live(*screen))
 			{
-				emu_file file(m_machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+				emu_file file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 				file_error filerr = open_next(file, "png");
 				if (filerr == FILERR_NONE)
 					save_snapshot(screen, file);
@@ -376,7 +376,7 @@ void video_manager::save_active_screen_snapshots()
 	// otherwise, just write a single snapshot
 	else
 	{
-		emu_file file(m_machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		emu_file file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		file_error filerr = open_next(file, "png");
 		if (filerr == FILERR_NONE)
 			save_snapshot(NULL, file);
@@ -425,7 +425,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		file_error filerr;
 		astring fullpath;
 		{
-			emu_file tempfile(m_machine.options(), SEARCHPATH_MOVIE, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			emu_file tempfile(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			if (name != NULL)
 				filerr = tempfile.open(name);
 			else
@@ -452,7 +452,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 	else if (format == MF_MNG)
 	{
 		// create a new movie file and start recording
-		m_mngfile = auto_alloc(&m_machine, emu_file(m_machine.options(), SEARCHPATH_MOVIE, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
+		m_mngfile = auto_alloc(&m_machine, emu_file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
 		file_error filerr;
 		if (name != NULL)
 			filerr = m_mngfile->open(name);
@@ -650,7 +650,7 @@ inline bool video_manager::effective_throttle() const
 
 inline int video_manager::original_speed_setting() const
 {
-	return options_get_float(&m_machine.options(), OPTION_SPEED) * 100.0 + 0.5;
+	return m_machine.options().speed() * 100.0 + 0.5;
 }
 
 
@@ -850,7 +850,7 @@ osd_ticks_t video_manager::throttle_until_ticks(osd_ticks_t target_ticks)
 	// we're allowed to sleep via the OSD code only if we're configured to do so
     // and we're not frameskipping due to autoframeskip, or if we're paused
 	bool allowed_to_sleep = false;
-    if (options_get_bool(&m_machine.options(), OPTION_SLEEP) && (!effective_autoframeskip() || effective_frameskip() == 0))
+    if (m_machine.options().sleep() && (!effective_autoframeskip() || effective_frameskip() == 0))
     	allowed_to_sleep = true;
     if (m_machine.paused())
     	allowed_to_sleep = true;
@@ -956,7 +956,7 @@ void video_manager::update_frameskip()
 void video_manager::update_refresh_speed()
 {
 	// only do this if the refreshspeed option is used
-	if (options_get_bool(&m_machine.options(), OPTION_REFRESHSPEED))
+	if (m_machine.options().refresh_speed())
 	{
 		float minrefresh = m_machine.render().max_update_rate();
 		if (minrefresh != 0)
@@ -1043,7 +1043,7 @@ void video_manager::recompute_speed(attotime emutime)
 		if (m_machine.primary_screen != NULL)
 		{
 			// create a final screenshot
-			emu_file file(m_machine.options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			emu_file file(m_machine.options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 			file_error filerr = file.open(m_machine.basename(), PATH_SEPARATOR "final.png");
 			if (filerr == FILERR_NONE)
 				save_snapshot(m_machine.primary_screen, file);
@@ -1105,7 +1105,7 @@ file_error video_manager::open_next(emu_file &file, const char *extension)
 	UINT32 origflags = file.openflags();
 
 	// handle defaults
-	const char *snapname = options_get_string(&m_machine.options(), OPTION_SNAPNAME);
+	const char *snapname = m_machine.options().snap_name();
 
 	if (snapname == NULL || snapname[0] == 0)
 		snapname = "%g/%i";

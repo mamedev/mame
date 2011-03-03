@@ -125,7 +125,7 @@ static void image_dirs_save(running_machine *machine, int config_type, xml_data_
     INI files
 -------------------------------------------------*/
 
-static int write_config(core_options &options, const char *filename, const game_driver *gamedrv)
+static int write_config(emu_options &options, const char *filename, const game_driver *gamedrv)
 {
 	char buffer[128];
 	int retval = 1;
@@ -136,11 +136,13 @@ static int write_config(core_options &options, const char *filename, const game_
 		filename = buffer;
 	}
 
-	emu_file file(options, SEARCHPATH_INI, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
+	emu_file file(options.ini_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
 	file_error filerr = file.open(filename);
 	if (filerr == FILERR_NONE)
 	{
-		options_output_ini_file(&options, file);
+		astring inistring;
+		options.output_ini(inistring);
+		file.puts(inistring);
 		retval = 0;
 	}
 	return retval;
@@ -154,7 +156,8 @@ static int write_config(core_options &options, const char *filename, const game_
 static void image_options_extract(running_machine *machine)
 {
 	/* only extract the device options if we've added them */
-	if (options_get_bool(&machine->options(), OPTION_ADDED_DEVICE_OPTIONS)) {
+//	if (machine->options().bool_value(OPTION_ADDED_DEVICE_OPTIONS)) 
+	{
 		int index = 0;
 		device_image_interface *image = NULL;
 
@@ -163,14 +166,16 @@ static void image_options_extract(running_machine *machine)
 			const char *filename = image->filename();
 
 			/* and set the option */
-			options_set_string(&machine->options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);
+			astring error;
+			machine->options().set_value(image->image_config().instance_name(), filename ? filename : "", OPTION_PRIORITY_CMDLINE, error);
+			assert(!error);
 
 			index++;
 		}
 	}
 
 	/* write the config, if appropriate */
-	if (options_get_bool(&machine->options(), OPTION_WRITECONFIG))
+	if (machine->options().write_config())
 		write_config(machine->options(), NULL, machine->gamedrv);
 }
 
@@ -206,7 +211,7 @@ void image_device_init(running_machine *machine)
     for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		/* is an image specified for this image */
-		image_name = image_get_device_option(image);
+		image_name = machine->options().device_option(*image);
 
 		if ((image_name != NULL) && (image_name[0] != '\0'))
 		{
@@ -429,7 +434,7 @@ astring *image_info_astring(running_machine *machine, astring *string)
     to the function.
 -------------------------------------------------*/
 
-void image_battery_load_by_name(core_options &options, const char *filename, void *buffer, int length, int fill)
+void image_battery_load_by_name(emu_options &options, const char *filename, void *buffer, int length, int fill)
 {
     file_error filerr;
     int bytes_read = 0;
@@ -437,7 +442,7 @@ void image_battery_load_by_name(core_options &options, const char *filename, voi
     assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
     /* try to open the battery file and read it in, if possible */
-    emu_file file(options, SEARCHPATH_NVRAM, OPEN_FLAG_READ);
+    emu_file file(options.nvram_directory(), OPEN_FLAG_READ);
     filerr = file.open(filename);
     if (filerr == FILERR_NONE)
         bytes_read = file.read(buffer, length);
@@ -451,12 +456,12 @@ void image_battery_load_by_name(core_options &options, const char *filename, voi
     backed RAM for an image. A filename may be supplied
     to the function.
 -------------------------------------------------*/
-void image_battery_save_by_name(core_options &options, const char *filename, const void *buffer, int length)
+void image_battery_save_by_name(emu_options &options, const char *filename, const void *buffer, int length)
 {
     assert_always(buffer && (length > 0), "Must specify sensical buffer/length");
 
     /* try to open the battery file and write it out, if possible */
-    emu_file file(options, SEARCHPATH_NVRAM, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+    emu_file file(options.nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
     file_error filerr = file.open(filename);
     if (filerr == FILERR_NONE)
         file.write(buffer, length);

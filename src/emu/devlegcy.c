@@ -192,7 +192,7 @@ void legacy_device_config_base::static_set_inline_float(device_config *device, U
 //  checks on a device configuration
 //-------------------------------------------------
 
-bool legacy_device_config_base::device_validity_check(core_options &options, const game_driver &driver) const
+bool legacy_device_config_base::device_validity_check(emu_options &options, const game_driver &driver) const
 {
 	device_validity_check_func validity_func = reinterpret_cast<device_validity_check_func>(get_legacy_config_fct(DEVINFO_FCT_VALIDITY_CHECK));
 	if (validity_func != NULL)

@@ -224,7 +224,7 @@ void winwindow_init(running_machine *machine)
 	size_t temp;
 
 	// determine if we are using multithreading or not
-	multithreading_enabled = options_get_bool(&machine->options(), WINOPTION_MULTITHREADING);
+	multithreading_enabled = downcast<windows_options &>(machine->options()).multithreading();
 
 	// get the main thread ID before anything else
 	main_threadid = GetCurrentThreadId();
@@ -605,7 +605,6 @@ void winwindow_update_cursor_state(running_machine *machine)
 void winwindow_video_window_create(running_machine *machine, int index, win_monitor_info *monitor, const win_window_config *config)
 {
 	win_window_info *window, *win;
-	char option[20];
 
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -635,8 +634,8 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 	window->target = machine->render().target_alloc();
 
 	// set the specific view
-	sprintf(option, "view%d", index);
-	set_starting_view(index, window, options_get_string(&machine->options(), option));
+	windows_options &options = downcast<windows_options &>(machine->options());
+	set_starting_view(index, window, options.view(index));
 
 	// remember the current values in case they change
 	window->targetview = window->target->view();
@@ -650,7 +649,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->gamedrv->description, machine->gamedrv->name, index);
 
 	// set the initial maximized state
-	window->startmaximized = options_get_bool(&machine->options(), WINOPTION_MAXIMIZE);
+	window->startmaximized = options.maximize();
 
 	// finish the window creation on the window thread
 	if (multithreading_enabled)
@@ -850,7 +849,7 @@ static void create_window_class(void)
 
 static void set_starting_view(int index, win_window_info *window, const char *view)
 {
-	const char *defview = options_get_string(&window->machine->options(), WINOPTION_VIEW);
+	const char *defview = downcast<windows_options &>(window->machine->options()).view();
 	int viewindex;
 
 	assert(GetCurrentThreadId() == main_threadid);
@@ -1121,7 +1120,8 @@ static int complete_create(win_window_info *window)
 	monitorbounds = window->monitor->info.rcMonitor;
 
 	// create the window menu if needed
-	if (options_get_bool(&window->machine->options(), "menu")) {
+	if (downcast<windows_options &>(window->machine->options()).menu())
+	{
 		if (win_create_menu(window->machine, &menu))
 			return 1;
 	}

@@ -248,7 +248,7 @@ const device_type name = configclass::static_alloc_device_config
 #define DEVICE_GET_INFO_CALL(name)	DEVICE_GET_INFO_NAME(name)(device, state, info)
 
 #define DEVICE_VALIDITY_CHECK_NAME(name)	device_validity_check_##name
-#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device, core_options &options)
+#define DEVICE_VALIDITY_CHECK(name)			int DEVICE_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const device_config *device, emu_options &options)
 #define DEVICE_VALIDITY_CHECK_CALL(name)	DEVICE_VALIDITY_CHECK_NAME(name)(driver, device)
 
 #define DEVICE_START_NAME(name)		device_start_##name
@@ -383,7 +383,7 @@ resource_pool &machine_get_pool(running_machine &machine);
 
 // device interface function types
 typedef void (*device_get_config_func)(const device_config *device, UINT32 state, deviceinfo *info);
-typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device, core_options &options);
+typedef int (*device_validity_check_func)(const game_driver *driver, const device_config *device, emu_options &options);
 
 typedef void (*device_start_func)(device_t *device);
 typedef void (*device_stop_func)(device_t *device);
@@ -450,7 +450,7 @@ public:
 
 protected:
 	// overrides
-	virtual bool device_validity_check(core_options &options, const game_driver &driver) const;
+	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
 
 	// access to legacy configuration info
 	INT64 get_legacy_config_int(UINT32 state) const;

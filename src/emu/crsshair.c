@@ -158,7 +158,7 @@ static void create_bitmap(running_machine *machine, int player)
 	global_free(global.bitmap[player]);
 	machine->render().texture_free(global.texture[player]);
 
-	emu_file crossfile(machine->options(), OPTION_CROSSHAIRPATH, OPEN_FLAG_READ);
+	emu_file crossfile(machine->options().crosshair_path(), OPEN_FLAG_READ);
 	if (global.name[player][0] != 0)
 	{
 		/* look for user specified file */

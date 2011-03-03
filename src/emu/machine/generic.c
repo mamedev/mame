@@ -323,7 +323,7 @@ void nvram_load(running_machine *machine)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
-	emu_file file(machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_READ);
+	emu_file file(machine->options().nvram_directory(), OPEN_FLAG_READ);
 	if (file.open(machine->basename(), ".nv") == FILERR_NONE)
 	{
 		// read data from general NVRAM handler first
@@ -361,7 +361,7 @@ void nvram_save(running_machine *machine)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
-	emu_file file(machine->options(), SEARCHPATH_NVRAM, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine->options().nvram_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	if (file.open(machine->basename(), ".nv") == FILERR_NONE)
 	{
 		// write data via general NVRAM handler first
@@ -407,13 +407,13 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 	astring fname(machine->basename(), PATH_SEPARATOR, name);
 	if (!overwrite)
 	{
-		emu_file testfile(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_READ);
+		emu_file testfile(machine->options().memcard_directory(), OPEN_FLAG_READ);
 		if (testfile.open(fname) == FILERR_NONE)
 			return 1;
 	}
 
 	/* create a new file */
-	emu_file file(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine->options().memcard_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	file_error filerr = file.open(fname);
 	if (filerr != FILERR_NONE)
 		return 1;
@@ -446,7 +446,7 @@ int memcard_insert(running_machine *machine, int index)
 	memcard_name(index, name);
 
 	/* open the file; if we can't, it's an error */
-	emu_file file(machine->options(), SEARCHPATH_MEMCARD, OPEN_FLAG_READ);
+	emu_file file(machine->options().memcard_directory(), OPEN_FLAG_READ);
 	file_error filerr = file.open(machine->basename(), PATH_SEPARATOR, name);
 	if (filerr != FILERR_NONE)
 		return 1;
@@ -479,7 +479,7 @@ void memcard_eject(running_machine &machine)
 	memcard_name(state->memcard_inserted, name);
 
 	/* open the file; if we can't, it's an error */
-	emu_file file(machine.options(), SEARCHPATH_MEMCARD, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+	emu_file file(machine.options().memcard_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 	file_error filerr = file.open(machine.basename(), PATH_SEPARATOR, name);
 	if (filerr != FILERR_NONE)
 		return;

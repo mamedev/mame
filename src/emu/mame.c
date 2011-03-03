@@ -121,14 +121,6 @@ const char mame_disclaimer[] =
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static int parse_ini_file(core_options *options, const char *name, int priority);
-
-
-
-/***************************************************************************
     CORE IMPLEMENTATION
 ***************************************************************************/
 
@@ -147,13 +139,13 @@ int mame_is_valid_machine(running_machine *machine)
     mame_execute - run the core emulation
 -------------------------------------------------*/
 
-int mame_execute(osd_interface &osd, core_options *options)
+int mame_execute(emu_options &options, osd_interface &osd)
 {
 	bool firstgame = true;
 	bool firstrun = true;
 
 	// extract the verbose printing option
-	if (options_get_bool(options, OPTION_VERBOSE))
+	if (options.verbose())
 		print_verbose = true;
 
 	// loop across multiple hard resets
@@ -161,37 +153,34 @@ int mame_execute(osd_interface &osd, core_options *options)
 	int error = MAMERR_NONE;
 	while (error == MAMERR_NONE && !exit_pending)
 	{
-		// convert the specified gamename to a driver
-		astring gamename;
-		core_filename_extract_base(&gamename, options_get_string(options, OPTION_GAMENAME), true);
-		const game_driver *driver = driver_get_name(gamename);
-
 		// if no driver, use the internal empty driver
-		if (driver == NULL)
+		const game_driver *system = options.system();
+		if (system == NULL)
 		{
-			driver = &GAME_NAME(empty);
+			system = &GAME_NAME(empty);
 			if (firstgame)
 				started_empty = true;
 		}
 
 		// otherwise, perform validity checks before anything else
-		else if (mame_validitychecks(*options, driver) != 0)
-			return MAMERR_FAILED_VALIDITY;
+		else 
+			validate_drivers(options, system);
 
 		firstgame = false;
 
 		// parse any INI files as the first thing
-		if (options_get_bool(options, OPTION_READCONFIG))
+		if (options.read_config())
 		{
-			options_revert(options, OPTION_PRIORITY_INI);
-			mame_parse_ini_files(options, driver);
+			options.revert(OPTION_PRIORITY_INI);
+			astring errors;
+			options.parse_standard_inis(errors);
 		}
 
 		// create the machine configuration
-		const machine_config *config = global_alloc(machine_config(*driver));
+		const machine_config *config = global_alloc(machine_config(*system));
 
 		// create the machine structure and driver
-		running_machine *machine = global_alloc(running_machine(*config, osd, *options, started_empty));
+		running_machine *machine = global_alloc(running_machine(*config, osd, options, started_empty));
 
 		// looooong term: remove this
 		global_machine = machine;
@@ -203,7 +192,7 @@ int mame_execute(osd_interface &osd, core_options *options)
 		// check the state of the machine
 		if (machine->new_driver_pending())
 		{
-			options_set_string(options, OPTION_GAMENAME, machine->new_driver_name(), OPTION_PRIORITY_CMDLINE);
+			options.set_system_name(machine->new_driver_name());
 			firstrun = true;
 		}
 		if (machine->exit_pending())
@@ -213,10 +202,6 @@ int mame_execute(osd_interface &osd, core_options *options)
 		global_free(machine);
 		global_free(config);
 		global_machine = NULL;
-		if (firstrun) {
-			// clear flag for added devices
-			options_set_bool(options, OPTION_ADDED_DEVICE_OPTIONS, FALSE, OPTION_PRIORITY_CMDLINE);
-		}
 	}
 
 	// return an error
@@ -467,95 +452,3 @@ void CLIB_DECL logerror(const char *format, ...)
 	}
 }
 
-
-
-/***************************************************************************
-    INTERNAL INITIALIZATION LOGIC
-***************************************************************************/
-
-/*-------------------------------------------------
-    mame_parse_ini_files - parse the relevant INI
-    files and apply their options
--------------------------------------------------*/
-
-void mame_parse_ini_files(core_options *options, const game_driver *driver)
-{
-	/* parse the INI file defined by the platform (e.g., "mame.ini") */
-	/* we do this twice so that the first file can change the INI path */
-	parse_ini_file(options, CONFIGNAME, OPTION_PRIORITY_MAME_INI);
-	parse_ini_file(options, CONFIGNAME, OPTION_PRIORITY_MAME_INI);
-
-	/* debug mode: parse "debug.ini" as well */
-	if (options_get_bool(options, OPTION_DEBUG))
-		parse_ini_file(options, "debug", OPTION_PRIORITY_DEBUG_INI);
-
-	/* if we have a valid game driver, parse game-specific INI files */
-	if (driver != NULL && driver != &GAME_NAME(empty))
-	{
-		const game_driver *parent = driver_get_clone(driver);
-		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
-
-		/* parse "vertical.ini" or "horizont.ini" */
-		if (driver->flags & ORIENTATION_SWAP_XY)
-			parse_ini_file(options, "vertical", OPTION_PRIORITY_ORIENTATION_INI);
-		else
-			parse_ini_file(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI);
-
-		/* parse "vector.ini" for vector games */
-		{
-			machine_config config(*driver);
-			for (const screen_device_config *devconfig = config.first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
-				if (devconfig->screen_type() == SCREEN_TYPE_VECTOR)
-				{
-					parse_ini_file(options, "vector", OPTION_PRIORITY_VECTOR_INI);
-					break;
-				}
-		}
-
-		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
-		astring sourcename;
-		core_filename_extract_base(&sourcename, driver->source_file, TRUE)->ins(0, "source" PATH_SEPARATOR);
-		if (!parse_ini_file(options, sourcename, OPTION_PRIORITY_SOURCE_INI))
-		{
-			core_filename_extract_base(&sourcename, driver->source_file, TRUE);
-			parse_ini_file(options, sourcename, OPTION_PRIORITY_SOURCE_INI);
-		}
-
-		/* then parent the grandparent, parent, and game-specific INIs */
-		if (gparent != NULL)
-			parse_ini_file(options, gparent->name, OPTION_PRIORITY_GPARENT_INI);
-		if (parent != NULL)
-			parse_ini_file(options, parent->name, OPTION_PRIORITY_PARENT_INI);
-
-		options_revert_driver_only(options, OPTION_PRIORITY_CMDLINE);
-
-		parse_ini_file(options, driver->name, OPTION_PRIORITY_DRIVER_INI);
-	}
-}
-
-
-/*-------------------------------------------------
-    parse_ini_file - parse a single INI file
--------------------------------------------------*/
-
-static int parse_ini_file(core_options *options, const char *name, int priority)
-{
-	/* update game name so depending callback options could be added */
-	if (priority == OPTION_PRIORITY_DRIVER_INI || priority == OPTION_PRIORITY_SOURCE_INI)
-		options_force_option_callback(options, OPTION_GAMENAME, name, priority);
-
-	/* don't parse if it has been disabled */
-	if (!options_get_bool(options, OPTION_READCONFIG))
-		return FALSE;
-
-	/* open the file; if we fail, that's ok */
-	emu_file file(*options, SEARCHPATH_INI, OPEN_FLAG_READ);
-	file_error filerr = file.open(name, ".ini");
-	if (filerr != FILERR_NONE)
-		return FALSE;
-
-	/* parse the file and close it */
-	mame_printf_verbose("Parsing %s.ini\n", name);
-	options_parse_ini_file(options, file, priority, OPTION_PRIORITY_DRIVER_INI);
-	return TRUE;
-}

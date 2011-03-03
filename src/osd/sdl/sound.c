@@ -464,7 +464,7 @@ static int sdl_init(running_machine *machine)
 
 	sdl_xfer_samples = obtained.samples;
 
-	audio_latency = options_get_int(&machine->options(), SDLOPTION_AUDIO_LATENCY);
+	audio_latency = downcast<sdl_options &>(machine->options()).audio_latency();
 
 	// pin audio latency
 	if (audio_latency > MAX_AUDIO_LATENCY)

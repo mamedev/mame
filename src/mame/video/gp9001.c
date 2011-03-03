@@ -234,7 +234,7 @@ void gp9001vdp_device_config::static_set_gfx_region(device_config *device, int g
 	vdp->m_gfxregion = gfxregion;
 }
 
-bool gp9001vdp_device_config::device_validity_check(core_options &options, const game_driver &driver) const
+bool gp9001vdp_device_config::device_validity_check(emu_options &options, const game_driver &driver) const
 {
 	bool error = false;
 	return error;

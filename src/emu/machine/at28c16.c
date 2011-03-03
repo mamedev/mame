@@ -84,7 +84,7 @@ void at28c16_device_config::device_config_complete()
 //  on this device
 //-------------------------------------------------
 
-bool at28c16_device_config::device_validity_check( core_options &options, const game_driver &driver ) const
+bool at28c16_device_config::device_validity_check( emu_options &options, const game_driver &driver ) const
 {
 	return false;
 }

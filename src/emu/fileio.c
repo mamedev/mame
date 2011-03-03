@@ -40,7 +40,6 @@
 #include "emu.h"
 #include "hash.h"
 #include "unzip.h"
-#include "options.h"
 #include "fileio.h"
 
 
@@ -56,8 +55,8 @@ const UINT32 OPEN_FLAG_HAS_CRC	= 0x10000;
 //  path_iterator - constructor
 //-------------------------------------------------
 
-path_iterator::path_iterator(core_options &opts, const char *searchpath)
-	: m_base((searchpath != NULL && !osd_is_absolute_path(searchpath)) ? options_get_string(&opts, searchpath) : ""),
+path_iterator::path_iterator(const char *rawsearchpath)
+	: m_base(rawsearchpath),
 	  m_current(m_base),
 	  m_index(0)
 {
@@ -97,8 +96,8 @@ bool path_iterator::next(astring &buffer)
 //  file_enumerator - constructor
 //-------------------------------------------------
 
-file_enumerator::file_enumerator(core_options &options, const char *searchpath)
-	: m_iterator(options, searchpath),
+file_enumerator::file_enumerator(const char *searchpath)
+	: m_iterator(searchpath),
 	  m_curdir(NULL),
 	  m_buflen(0)
 {
@@ -159,9 +158,24 @@ const osd_directory_entry *file_enumerator::next()
 //  emu_file - constructor
 //-------------------------------------------------
 
-emu_file::emu_file(core_options &options, const char *searchpath, UINT32 openflags)
+emu_file::emu_file(UINT32 openflags)
 	: m_file(NULL),
-	  m_iterator(options, searchpath),
+	  m_iterator(""),
+	  m_crc(0),
+	  m_openflags(openflags),
+	  m_zipfile(NULL),
+	  m_zipdata(NULL),
+	  m_ziplength(0),
+	  m_remove_on_close(false)
+{
+	// sanity check the open flags
+	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))
+		throw emu_fatalerror("Attempted to open a file for write with OPEN_FLAG_HAS_CRC");
+}
+
+emu_file::emu_file(const char *searchpath, UINT32 openflags)
+	: m_file(NULL),
+	  m_iterator(searchpath),
 	  m_crc(0),
 	  m_openflags(openflags),
 	  m_zipfile(NULL),
@@ -199,6 +213,16 @@ emu_file::operator core_file *()
 
 	// return the core file
 	return m_file;
+}
+
+emu_file::operator core_file &()
+{
+	// load the ZIP file now if we haven't yet
+	if (m_zipfile != NULL && load_zipped_file() != FILERR_NONE)
+		throw emu_fatalerror("operator core_file & used on invalid file");
+
+	// return the core file
+	return *m_file;
 }
 
 

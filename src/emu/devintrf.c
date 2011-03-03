@@ -269,7 +269,7 @@ void device_config_interface::interface_config_complete()
 //  constructed
 //-------------------------------------------------
 
-bool device_config_interface::interface_validity_check(core_options &options, const game_driver &driver) const
+bool device_config_interface::interface_validity_check(emu_options &options, const game_driver &driver) const
 {
 	return false;
 }
@@ -336,7 +336,7 @@ void device_config::config_complete()
 //  configuration has been constructed
 //-------------------------------------------------
 
-bool device_config::validity_check(core_options &options, const game_driver &driver) const
+bool device_config::validity_check(emu_options &options, const game_driver &driver) const
 {
 	bool error = false;
 
@@ -370,7 +370,7 @@ void device_config::device_config_complete()
 //  the configuration has been constructed
 //-------------------------------------------------
 
-bool device_config::device_validity_check(core_options &options, const game_driver &driver) const
+bool device_config::device_validity_check(emu_options &options, const game_driver &driver) const
 {
 	// indicate no error by default
 	return false;

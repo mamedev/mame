@@ -372,7 +372,7 @@ void debug_command_init(running_machine *machine)
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_command_exit);
 
 	/* set up the initial debugscript if specified */
-	name = options_get_string(&machine->options(), OPTION_DEBUGSCRIPT);
+	name = machine->options().debug_script();
 	if (name[0] != 0)
 		debug_cpu_source_script(machine, name);
 }
@@ -2503,7 +2503,7 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 		astring fname(filename);
 		if (fname.find(0, ".png") == -1)
 			fname.cat(".png");
-		emu_file file(machine->options(), SEARCHPATH_SCREENSHOT, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+		emu_file file(machine->options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 		file_error filerr = file.open(fname);
 
 		if (filerr != FILERR_NONE)
