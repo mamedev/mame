@@ -45,6 +45,19 @@ reg[2] -> width (number of pixel to draw)
 with a write in reg[2] the command is executed
 
 not handled commands with reg[3] & 0xc0 == 0x00
+
+
+Stephh's notes (based on the game Z80 code and some tests) :
+
+  - "Reset" Dip Switch :
+      * OFF : no effect if NVRAM isn't corrupted
+      * ON  : reset (at least) credits, bets and last numbers (clear NVRAM)
+  - When "Coin Assistance" Dip Switch is ON, you can reset the number of credits
+    by pressing BOTH "Service" (IN0 bit 2) and "Clear Credits" (IN1 bit 6).
+  - When in "Service Mode", press "Add Fiche" (IN1 bit 0) to increase value displayed in green after "R".
+  - When in "Service Mode", press RIGHT (IN1 bit 1) to clear statistics (only possible when "R00" is displayed).
+  - You need at least 5 credits for outside bets
+
 */
 
 #include "emu.h"
@@ -194,31 +207,36 @@ static SCREEN_UPDATE(roul)
 	return 0;
 }
 
+
+/* verified from Z80 code */
 static INPUT_PORTS_START( roul )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1   ) PORT_NAME("Coin 1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Service") PORT_CODE(KEYCODE_X)
-	PORT_SERVICE( 0x08, IP_ACTIVE_LOW)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Service") PORT_CODE(KEYCODE_X)
+	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Z)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1  ) PORT_NAME("Add fiche")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Add Fiche")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Remove fiche")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Remove Fiche")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Clear Credits") PORT_CODE(KEYCODE_C)    /* see notes */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    /* single - split - street - square / double street / dozen - column - 1 to 18 - 19 to 36 - red - black - odd - even */
+	PORT_DIPNAME( 0x81, 0x00, "Max Bet" )
+	PORT_DIPSETTING(    0x00, "10 / 30 / 30" )
+	PORT_DIPSETTING(    0x80, "20 / 40 / 50" )
+	PORT_DIPSETTING(    0x01, "30 / 50 / 70" )
+	PORT_DIPSETTING(    0x81, "40 / 60 / 90" )
 	PORT_DIPNAME( 0x0e, 0x0e, "Percentage Payout" )
 	PORT_DIPSETTING(    0x00, "94%" )
 	PORT_DIPSETTING(    0x02, "88%" )
@@ -228,17 +246,14 @@ static INPUT_PORTS_START( roul )
 	PORT_DIPSETTING(    0x0a, "62%" )
 	PORT_DIPSETTING(    0x0c, "56%" )
 	PORT_DIPSETTING(    0x0e, "50%" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Reset Machine" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, "Doubble Odds" )
 	PORT_DIPSETTING(    0x20, "With" )
 	PORT_DIPSETTING(    0x00, "Without" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "Coin Assistance" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
