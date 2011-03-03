@@ -116,7 +116,7 @@ static READ8_HANDLER( keyboard_r )
 		case 0x5c7b:	// rmhaihai, rmhaisei, rmhaijin
 		case 0x5950:	// rmhaihib
 		case 0x5bf3:	// themj, but the test is NOPed out!
-			return 0xcc;	/* state->keyboard_cmd = 0xcb */
+			return 0xcc;	/* keyboard_cmd = 0xcb */
 
 
 		case 0x13a:	// additional checks done by rmhaijin

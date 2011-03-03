@@ -442,7 +442,7 @@ WRITE32_HANDLER( midvunit_video_control_w )
 	/* update the data */
 	COMBINE_DATA(&state->video_regs[offset]);
 
-	/* update the scanline state->timer */
+	/* update the scanline timer */
 	if (offset == 0)
 		state->scanline_timer->adjust(space->machine->primary_screen->time_until_pos((data & 0x1ff) + 1, 0), data & 0x1ff);
 

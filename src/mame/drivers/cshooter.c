@@ -88,41 +88,54 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "deprecat.h"
 #include "audio/seibu.h"
 
-static UINT8* cshooter_txram;
-static tilemap_t *cshooter_txtilemap;
 
-static UINT8 *mainram;
+class cshooter_state : public driver_device
+{
+public:
+	cshooter_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8* txram;
+	tilemap_t *txtilemap;
+	UINT8 *mainram;
+	int coin_stat;
+	int counter;
+};
+
+
+
 
 #if 0
-static int coin_stat=0;
 
 static void ar_coin_hack(running_machine *machine)
 {
+	cshooter_state *state = machine->driver_data<cshooter_state>();
 	if(input_port_read(machine, "COIN") & 1)
 	{
-		if(coin_stat==0)
+		if(state->coin_stat==0)
 		{
-			coin_stat=1;
-			if(mainram[0]==0)
+			state->coin_stat=1;
+			if(state->mainram[0]==0)
 			{
-				mainram[0]=0x80;
+				state->mainram[0]=0x80;
 			}
 
-			mainram[0x234]++;
+			state->mainram[0x234]++;
 
 		}
 	}
 	else
 	{
-		coin_stat=0;
+		state->coin_stat=0;
 	}
 }
 #endif
 
 static TILE_GET_INFO( get_cstx_tile_info )
 {
-	int code = (cshooter_txram[tile_index*2]);
-	int attr = (cshooter_txram[tile_index*2+1]);
+	cshooter_state *state = machine->driver_data<cshooter_state>();
+	int code = (state->txram[tile_index*2]);
+	int attr = (state->txram[tile_index*2+1]);
 	int rg;
 	rg=0;
 	if (attr & 0x20) rg = 1;
@@ -137,20 +150,23 @@ static TILE_GET_INFO( get_cstx_tile_info )
 
 static WRITE8_HANDLER(cshooter_txram_w)
 {
-	cshooter_txram[offset] = data;
-	tilemap_mark_tile_dirty(cshooter_txtilemap,offset/2);
+	cshooter_state *state = space->machine->driver_data<cshooter_state>();
+	state->txram[offset] = data;
+	tilemap_mark_tile_dirty(state->txtilemap,offset/2);
 }
 
 static VIDEO_START(cshooter)
 {
-	cshooter_txtilemap = tilemap_create(machine, get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
-	tilemap_set_transparent_pen(cshooter_txtilemap, 3);
+	cshooter_state *state = machine->driver_data<cshooter_state>();
+	state->txtilemap = tilemap_create(machine, get_cstx_tile_info,tilemap_scan_rows, 8,8,32, 32);
+	tilemap_set_transparent_pen(state->txtilemap, 3);
 }
 
 static SCREEN_UPDATE(cshooter)
 {
+	cshooter_state *state = screen->machine->driver_data<cshooter_state>();
 	bitmap_fill(bitmap, cliprect, 0/*get_black_pen(screen->screen->machine)*/);
-	tilemap_mark_all_tiles_dirty(cshooter_txtilemap);
+	tilemap_mark_all_tiles_dirty(state->txtilemap);
 
 	//sprites
 	{
@@ -189,8 +205,8 @@ static SCREEN_UPDATE(cshooter)
 		}
 	}
 
-	tilemap_mark_all_tiles_dirty(cshooter_txtilemap);
-	tilemap_draw(bitmap,cliprect,cshooter_txtilemap,0,0);
+	tilemap_mark_all_tiles_dirty(state->txtilemap);
+	tilemap_draw(bitmap,cliprect,state->txtilemap,0,0);
 	return 0;
 }
 
@@ -199,21 +215,22 @@ static SCREEN_UPDATE(cshooter)
 
 static INTERRUPT_GEN( cshooter_interrupt )
 {
+	//cshooter_state *state = device->machine->driver_data<cshooter_state>();
 	if(cpu_getiloops(device))
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
 	else
       cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 
-//  if(mainram!=NULL)
+//  if(state->mainram!=NULL)
 //      ar_coin_hack(device->machine);
 }
 
 
-static int cshooter_counter;
 
 static MACHINE_RESET( cshooter )
 {
-	cshooter_counter = 0;
+	cshooter_state *state = machine->driver_data<cshooter_state>();
+	state->counter = 0;
 }
 
 static MACHINE_RESET( airraid )
@@ -223,10 +240,11 @@ static MACHINE_RESET( airraid )
 
 static READ8_HANDLER ( cshooter_coin_r )
 {
+	cshooter_state *state = space->machine->driver_data<cshooter_state>();
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-	return ( (cshooter_counter++ & 1) ? 0xff : input_port_read(space->machine, "COIN") );
+	return ( (state->counter++ & 1) ? 0xff : input_port_read(space->machine, "COIN") );
 }
 
 static WRITE8_HANDLER ( cshooter_c500_w )
@@ -277,7 +295,7 @@ static ADDRESS_MAP_START( cshooter_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(&cshooter_txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE_MEMBER(cshooter_state, txram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -306,12 +324,12 @@ static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(&cshooter_txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE_MEMBER(cshooter_state, txram)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE(&mainram)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE_MEMBER(cshooter_state, mainram)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
@@ -433,7 +451,7 @@ static GFXDECODE_START( cshooter )
 	GFXDECODE_ENTRY( "gfx1", 128/8, cshooter_charlayout,   0, 64  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cshooter, driver_device )
+static MACHINE_CONFIG_START( cshooter, cshooter_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cshooter_map)
 	MCFG_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
@@ -462,7 +480,7 @@ static MACHINE_CONFIG_START( cshooter, driver_device )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( airraid, driver_device )
+static MACHINE_CONFIG_START( airraid, cshooter_state )
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
 	MCFG_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)

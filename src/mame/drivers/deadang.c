@@ -70,14 +70,14 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c000, 0x0cfff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0d000, 0x0dfff) AM_WRITEONLY
-	AM_RANGE(0x0e000, 0x0e0ff) AM_WRITEONLY AM_BASE(&deadang_scroll_ram)
+	AM_RANGE(0x0e000, 0x0e0ff) AM_WRITEONLY AM_BASE_MEMBER(deadang_state, scroll_ram)
 	AM_RANGE(0x0e100, 0x0ffff) AM_WRITEONLY
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
-	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(deadang_foreground_w) AM_BASE(&deadang_video_data)
+	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(deadang_foreground_w) AM_BASE_MEMBER(deadang_state, video_data)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x08000, 0x08001) AM_WRITE(deadang_bank_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(watchdog_reset16_w)

@@ -441,7 +441,7 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_CONFIG_START( quizdna, driver_device )
+static MACHINE_CONFIG_START( quizdna, quizdna_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */

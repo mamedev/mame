@@ -9,14 +9,6 @@
 #include "emu.h"
 #include "includes/stfight.h"
 
-// Real stuff
-UINT8 *stfight_text_char_ram;
-UINT8 *stfight_text_attr_ram;
-UINT8 *stfight_vh_latch_ram;
-UINT8 *stfight_sprite_ram;
-
-static tilemap_t *fg_tilemap,*bg_tilemap,*tx_tilemap;
-static int stfight_sprite_base = 0;
 
 /*
         Graphics ROM Format
@@ -142,14 +134,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	UINT8 attr = stfight_text_attr_ram[tile_index];
+	stfight_state *state = machine->driver_data<stfight_state>();
+	UINT8 attr = state->text_attr_ram[tile_index];
 	int color = attr & 0x0f;
 
 	tileinfo->group = color;
 
 	SET_TILE_INFO(
 			0,
-			stfight_text_char_ram[tile_index] + ((attr & 0x80) << 1),
+			state->text_char_ram[tile_index] + ((attr & 0x80) << 1),
 			attr & 0x0f,
 			TILE_FLIPYX((attr & 0x60) >> 5));
 }
@@ -163,12 +156,13 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 VIDEO_START( stfight )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,bg_scan,     16,16,128,256);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,fg_scan,16,16,128,256);
-	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8,8,32,32);
+	stfight_state *state = machine->driver_data<stfight_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,bg_scan,     16,16,128,256);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,fg_scan,16,16,128,256);
+	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows, 8,8,32,32);
 
-	tilemap_set_transparent_pen(fg_tilemap,0x0f);
-	colortable_configure_tilemap_groups(machine->colortable, tx_tilemap, machine->gfx[0], 0xcf);
+	tilemap_set_transparent_pen(state->fg_tilemap,0x0f);
+	colortable_configure_tilemap_groups(machine->colortable, state->tx_tilemap, machine->gfx[0], 0xcf);
 }
 
 
@@ -181,60 +175,64 @@ VIDEO_START( stfight )
 
 WRITE8_HANDLER( stfight_text_char_w )
 {
-	stfight_text_char_ram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset);
+	stfight_state *state = space->machine->driver_data<stfight_state>();
+	state->text_char_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
 }
 
 WRITE8_HANDLER( stfight_text_attr_w )
 {
-	stfight_text_attr_ram[offset] = data;
-	tilemap_mark_tile_dirty(tx_tilemap,offset);
+	stfight_state *state = space->machine->driver_data<stfight_state>();
+	state->text_attr_ram[offset] = data;
+	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
 }
 
 WRITE8_HANDLER( stfight_sprite_bank_w )
 {
-	stfight_sprite_base = ( ( data & 0x04 ) << 7 ) |
+	stfight_state *state = space->machine->driver_data<stfight_state>();
+	state->sprite_base = ( ( data & 0x04 ) << 7 ) |
 				          ( ( data & 0x01 ) << 8 );
 }
 
 WRITE8_HANDLER( stfight_vh_latch_w )
 {
+	stfight_state *state = space->machine->driver_data<stfight_state>();
 	int scroll;
 
 
-	stfight_vh_latch_ram[offset] = data;
+	state->vh_latch_ram[offset] = data;
 
 	switch( offset )
 	{
 		case 0x00:
 		case 0x01:
-			scroll = (stfight_vh_latch_ram[1] << 8) | stfight_vh_latch_ram[0];
-			tilemap_set_scrollx(fg_tilemap,0,scroll);
+			scroll = (state->vh_latch_ram[1] << 8) | state->vh_latch_ram[0];
+			tilemap_set_scrollx(state->fg_tilemap,0,scroll);
 			break;
 
 		case 0x02:
 		case 0x03:
-			scroll = (stfight_vh_latch_ram[3] << 8) | stfight_vh_latch_ram[2];
-			tilemap_set_scrolly(fg_tilemap,0,scroll);
+			scroll = (state->vh_latch_ram[3] << 8) | state->vh_latch_ram[2];
+			tilemap_set_scrolly(state->fg_tilemap,0,scroll);
 			break;
 
 		case 0x04:
 		case 0x05:
-			scroll = (stfight_vh_latch_ram[5] << 8) | stfight_vh_latch_ram[4];
-			tilemap_set_scrollx(bg_tilemap,0,scroll);
+			scroll = (state->vh_latch_ram[5] << 8) | state->vh_latch_ram[4];
+			tilemap_set_scrollx(state->bg_tilemap,0,scroll);
 			break;
 
 		case 0x06:
 		case 0x08:
-			scroll = (stfight_vh_latch_ram[8] << 8) | stfight_vh_latch_ram[6];
-			tilemap_set_scrolly(bg_tilemap,0,scroll);
+			scroll = (state->vh_latch_ram[8] << 8) | state->vh_latch_ram[6];
+			tilemap_set_scrolly(state->bg_tilemap,0,scroll);
 			break;
 
 		case 0x07:
-			tilemap_set_enable(tx_tilemap,data & 0x80);
+			tilemap_set_enable(state->tx_tilemap,data & 0x80);
 			/* 0x40 = sprites */
-			tilemap_set_enable(bg_tilemap,data & 0x20);
-			tilemap_set_enable(fg_tilemap,data & 0x10);
+			tilemap_set_enable(state->bg_tilemap,data & 0x20);
+			tilemap_set_enable(state->fg_tilemap,data & 0x10);
 			flip_screen_set(space->machine, data & 0x01);
 			break;
 	}
@@ -248,18 +246,19 @@ WRITE8_HANDLER( stfight_vh_latch_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	stfight_state *state = machine->driver_data<stfight_state>();
 	int offs,sx,sy;
 
 	for (offs = 0;offs < 4096;offs += 32)
 	{
 		int code;
-		int attr = stfight_sprite_ram[offs+1];
+		int attr = state->sprite_ram[offs+1];
 		int flipx = attr & 0x10;
 		int color = attr & 0x0f;
 		int pri = (attr & 0x20) >> 5;
 
-		sy = stfight_sprite_ram[offs+2];
-		sx = stfight_sprite_ram[offs+3];
+		sy = state->sprite_ram[offs+2];
+		sx = state->sprite_ram[offs+3];
 
 		// non-active sprites have zero y coordinate value
 		if( sy > 0 )
@@ -279,7 +278,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				flipx = !flipx;
 			}
 
-			code = stfight_sprite_base + stfight_sprite_ram[offs];
+			code = state->sprite_base + state->sprite_ram[offs];
 
 			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[4],
 				     code,
@@ -295,18 +294,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( stfight )
 {
+	stfight_state *state = screen->machine->driver_data<stfight_state>();
 	set_pens(screen->machine);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
-	bitmap_fill(bitmap,cliprect,0);	/* in case bg_tilemap is disabled */
-    tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
+	bitmap_fill(bitmap,cliprect,0);	/* in case state->bg_tilemap is disabled */
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,1);
 
 	/* Draw sprites (may be obscured by foreground layer) */
-	if (stfight_vh_latch_ram[0x07] & 0x40)
+	if (state->vh_latch_ram[0x07] & 0x40)
 		draw_sprites(screen->machine, bitmap,cliprect);
 
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 	return 0;
 }

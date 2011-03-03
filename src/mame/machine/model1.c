@@ -938,7 +938,7 @@ static TGP_FUNCTION( colbox_test )
 	(void)c;
 	logerror("TGP colbox_test %f, %f, %f (%x)\n", a, b, c, state->pushpc);
 
-	// #### Wrong, need to check with the state->tgp_vr_cbox coordinates
+	// #### Wrong, need to check with the tgp_vr_cbox coordinates
 	// Game only test sign, negative = collision
 	fifoout_push_f(state, -1);
 	next_fn(state);

@@ -56,11 +56,21 @@ Notes:
 #include "sound/3812intf.h"
 #include "includes/sei_crtc.h"
 
+
+class goodejan_state : public driver_device
+{
+public:
+	goodejan_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 mux_data;
+};
+
+
 #define GOODEJAN_MHZ1 7159090
 #define GOODEJAN_MHZ2 16000000
 #define GOODEJAN_MHZ3 12000000
 
-static UINT16 goodejan_mux_data;
 
 static WRITE16_HANDLER( goodejan_gfxbank_w )
 {
@@ -70,10 +80,11 @@ static WRITE16_HANDLER( goodejan_gfxbank_w )
 /* Multiplexer device for the mahjong panel */
 static READ16_HANDLER( mahjong_panel_r )
 {
+	goodejan_state *state = space->machine->driver_data<goodejan_state>();
 	UINT16 ret;
 	ret = 0xffff;
 
-	switch(goodejan_mux_data)
+	switch(state->mux_data)
 	{
 		case 1:    ret = input_port_read(space->machine, "KEY0"); break;
 		case 2:    ret = input_port_read(space->machine, "KEY1"); break;
@@ -87,7 +98,8 @@ static READ16_HANDLER( mahjong_panel_r )
 
 static WRITE16_HANDLER( mahjong_panel_w )
 {
-	goodejan_mux_data = data;
+	goodejan_state *state = space->machine->driver_data<goodejan_state>();
+	state->mux_data = data;
 }
 
 static ADDRESS_MAP_START( goodejan_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -322,7 +334,7 @@ static INTERRUPT_GEN( goodejan_irq )
 /* vector 0x00c is just a reti */
 }
 
-static MACHINE_CONFIG_START( goodejan, driver_device )
+static MACHINE_CONFIG_START( goodejan, goodejan_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)

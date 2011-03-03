@@ -5709,7 +5709,7 @@ static WRITE16_HANDLER( ddp3_asic_w )
 
 		state->ddp3lastcommand = state->value1 & 0xff;
 
-		/* typical frame (state->ddp3) (all 3 games use only these commands? for the most part of levels espgal just issues 8e)
+		/* typical frame (ddp3) (all 3 games use only these commands? for the most part of levels espgal just issues 8e)
             vbl
             145f28 command 67
             145f70 command e5

@@ -88,7 +88,7 @@ static WRITE8_HANDLER( video_disable_w )
 	igs017_state *state = space->machine->driver_data<igs017_state>();
 	state->video_disable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: unknown bits of state->video_disable written = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: unknown bits of video_disable written = %02x\n",cpu_get_pc(space->cpu),data);
 //  popmessage("VIDEO %02X",data);
 }
 static WRITE16_HANDLER( video_disable_lsb_w )
@@ -1081,7 +1081,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	igs017_state *state = space->machine->driver_data<igs017_state>();
 	state->nmi_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: state->nmi_enable = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: nmi_enable = %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( irq_enable_w )
@@ -1089,7 +1089,7 @@ static WRITE8_HANDLER( irq_enable_w )
 	igs017_state *state = space->machine->driver_data<igs017_state>();
 	state->irq_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: state->irq_enable = %02x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: irq_enable = %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( input_select_w )
@@ -1186,7 +1186,7 @@ static WRITE16_HANDLER( mgcs_magic_w )
 			}
 
 			if ( state->input_select & ~0xf8 )
-				logerror("%06x: warning, unknown bits written in state->input_select = %02x\n", cpu_get_pc(space->cpu), state->input_select);
+				logerror("%06x: warning, unknown bits written in input_select = %02x\n", cpu_get_pc(space->cpu), state->input_select);
 			break;
 
 		case 0x01:
@@ -1200,7 +1200,7 @@ static WRITE16_HANDLER( mgcs_magic_w )
 		// case 0x03: ?
 
 		default:
-			logerror("%06x: warning, writing to state->igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
 	}
 }
 
@@ -1213,7 +1213,7 @@ static READ16_HANDLER( mgcs_magic_r )
 			return BITSWAP8(state->scramble_data, 4,5,6,7, 0,1,2,3);
 
 		default:
-			logerror("%06x: warning, reading with state->igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
 			break;
 	}
 
@@ -1229,7 +1229,7 @@ static READ8_DEVICE_HANDLER( mgcs_keys_r )
 	if (~state->input_select & 0x40)	return input_port_read(device->machine, "KEY3");
 	if (~state->input_select & 0x80)	return input_port_read(device->machine, "KEY4");
 
-	logerror("%s: warning, reading key with state->input_select = %02x\n", device->machine->describe_context(), state->input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", device->machine->describe_context(), state->input_select);
 	return 0xff;
 }
 
@@ -1240,7 +1240,7 @@ static WRITE16_HANDLER( irq1_enable_w )
 		state->irq1_enable = data & 1;
 
 	if (data != 0 && data != 0xff)
-		logerror("PC %06X: state->irq1_enable = %04x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: irq1_enable = %04x\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE16_HANDLER( irq2_enable_w )
@@ -1250,7 +1250,7 @@ static WRITE16_HANDLER( irq2_enable_w )
 		state->irq2_enable = data & 1;
 
 	if (data != 0 && data != 0xff)
-		logerror("PC %06X: state->irq2_enable = %04x\n",cpu_get_pc(space->cpu),data);
+		logerror("PC %06X: irq2_enable = %04x\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE16_HANDLER( mgcs_paletteram_xRRRRRGGGGGBBBBB_w )
@@ -1309,7 +1309,7 @@ static READ8_HANDLER( sdmg2_keys_r )
 
 	if (state->input_select == 0x1f)	return input_port_read(space->machine, "KEY0");	// in joystick mode
 
-	logerror("%s: warning, reading key with state->input_select = %02x\n", space->machine->describe_context(), state->input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", space->machine->describe_context(), state->input_select);
 	return 0xff;
 }
 
@@ -1344,7 +1344,7 @@ static WRITE16_HANDLER( sdmg2_magic_w )
 			break;
 
 		default:
-			logerror("%06x: warning, writing to state->igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
 	}
 }
 
@@ -1363,7 +1363,7 @@ static READ16_HANDLER( sdmg2_magic_r )
 			return sdmg2_keys_r(space, 0);
 
 		default:
-			logerror("%06x: warning, reading with state->igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
 			break;
 	}
 
@@ -1400,7 +1400,7 @@ static READ8_HANDLER( mgdh_keys_r )
 
 	if ((state->input_select & 0xfc) == 0xfc)	return input_port_read(space->machine, "DSW1");
 
-	logerror("%s: warning, reading key with state->input_select = %02x\n", space->machine->describe_context(), state->input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", space->machine->describe_context(), state->input_select);
 	return 0xff;
 }
 
@@ -1422,7 +1422,7 @@ static WRITE16_HANDLER( mgdha_magic_w )
 			}
 
 			if ( data & ~0xc0 )
-				logerror("%06x: warning, unknown bits written to state->igs_magic 00 = %02x\n", cpu_get_pc(space->cpu), data);
+				logerror("%06x: warning, unknown bits written to igs_magic 00 = %02x\n", cpu_get_pc(space->cpu), data);
 
 			break;
 
@@ -1434,7 +1434,7 @@ static WRITE16_HANDLER( mgdha_magic_w )
 			}
 
 			if ( state->input_select & ~0xfd )
-				logerror("%06x: warning, unknown bits written in state->input_select = %02x\n", cpu_get_pc(space->cpu), state->input_select);
+				logerror("%06x: warning, unknown bits written in input_select = %02x\n", cpu_get_pc(space->cpu), state->input_select);
 
 			break;
 
@@ -1449,17 +1449,17 @@ static WRITE16_HANDLER( mgdha_magic_w )
 
 		default:
 /*
-            04aba0: warning, writing to state->igs_magic 08 = d0
-            04abb0: warning, writing to state->igs_magic 09 = 76
-            04abc0: warning, writing to state->igs_magic 0a = 97
-            04abd0: warning, writing to state->igs_magic 0b = bf
-            04abe0: warning, writing to state->igs_magic 0c = ff
-            04abf0: warning, writing to state->igs_magic 04 = 3f
-            04ac00: warning, writing to state->igs_magic 05 = 82
-            04ac10: warning, writing to state->igs_magic 06 = ff
-            04ac20: warning, writing to state->igs_magic 07 = 3f
+            04aba0: warning, writing to igs_magic 08 = d0
+            04abb0: warning, writing to igs_magic 09 = 76
+            04abc0: warning, writing to igs_magic 0a = 97
+            04abd0: warning, writing to igs_magic 0b = bf
+            04abe0: warning, writing to igs_magic 0c = ff
+            04abf0: warning, writing to igs_magic 04 = 3f
+            04ac00: warning, writing to igs_magic 05 = 82
+            04ac10: warning, writing to igs_magic 06 = ff
+            04ac20: warning, writing to igs_magic 07 = 3f
 */
-			logerror("%06x: warning, writing to state->igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0], data);
 	}
 }
 
@@ -1484,7 +1484,7 @@ static READ16_HANDLER( mgdha_magic_r )
 		}
 
 		default:
-			logerror("%06x: warning, reading with state->igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), state->igs_magic[0]);
 			break;
 	}
 

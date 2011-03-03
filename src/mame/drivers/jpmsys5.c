@@ -156,7 +156,7 @@ static WRITE16_HANDLER( ramdac_w )
 
 		if (++state->pal_idx == 3)
 		{
-			/* Update the MAME state->palette */
+			/* Update the MAME palette */
 			palette_set_color_rgb(space->machine, state->pal_addr, pal6bit(state->palette[state->pal_addr][0]), pal6bit(state->palette[state->pal_addr][1]), pal6bit(state->palette[state->pal_addr][2]));
 			state->pal_addr++;
 			state->pal_idx = 0;

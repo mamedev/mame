@@ -1,3 +1,19 @@
+class quizdna_state : public driver_device
+{
+public:
+	quizdna_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *bg_ram;
+	UINT8 *fg_ram;
+	tilemap_t *bg_tilemap;
+	tilemap_t *fg_tilemap;
+	UINT8 bg_xscroll[2];
+	int flipscreen;
+	int video_enable;
+};
+
+
 /*----------- defined in video/quizdna.c -----------*/
 
 VIDEO_START( quizdna );

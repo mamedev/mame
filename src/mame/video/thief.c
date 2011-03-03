@@ -7,16 +7,6 @@
 #include "includes/thief.h"
 
 
-static UINT8 thief_read_mask, thief_write_mask;
-static UINT8 thief_video_control;
-
-static struct {
-	UINT8 *context_ram;
-	UINT8 bank;
-	UINT8 *image_ram;
-	UINT8 param[0x9];
-} thief_coprocessor;
-
 enum {
 	IMAGE_ADDR_LO,		//0xe000
 	IMAGE_ADDR_HI,		//0xe001
@@ -32,21 +22,25 @@ enum {
 /***************************************************************************/
 
 READ8_HANDLER( thief_context_ram_r ){
-	return thief_coprocessor.context_ram[0x40*thief_coprocessor.bank+offset];
+	thief_state *state = space->machine->driver_data<thief_state>();
+	return state->coprocessor.context_ram[0x40*state->coprocessor.bank+offset];
 }
 
 WRITE8_HANDLER( thief_context_ram_w ){
-	thief_coprocessor.context_ram[0x40*thief_coprocessor.bank+offset] = data;
+	thief_state *state = space->machine->driver_data<thief_state>();
+	state->coprocessor.context_ram[0x40*state->coprocessor.bank+offset] = data;
 }
 
 WRITE8_HANDLER( thief_context_bank_w ){
-	thief_coprocessor.bank = data&0xf;
+	thief_state *state = space->machine->driver_data<thief_state>();
+	state->coprocessor.bank = data&0xf;
 }
 
 /***************************************************************************/
 
 WRITE8_HANDLER( thief_video_control_w ){
-	thief_video_control = data;
+	thief_state *state = space->machine->driver_data<thief_state>();
+	state->video_control = data;
 /*
     bit 0: screen flip
     bit 1: working page
@@ -72,51 +66,52 @@ WRITE8_HANDLER( thief_color_map_w ){
 /***************************************************************************/
 
 WRITE8_HANDLER( thief_color_plane_w ){
+	thief_state *state = space->machine->driver_data<thief_state>();
 /*
     --xx----    selects bitplane to read from (0..3)
     ----xxxx    selects bitplane(s) to write to (0x0 = none, 0xf = all)
 */
-	thief_write_mask = data&0xf;
-	thief_read_mask = (data>>4)&3;
+	state->write_mask = data&0xf;
+	state->read_mask = (data>>4)&3;
 }
 
 READ8_HANDLER( thief_videoram_r ){
 	thief_state *state = space->machine->driver_data<thief_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *source = &videoram[offset];
-	if( thief_video_control&0x02 ) source+=0x2000*4; /* foreground/background */
-	return source[thief_read_mask*0x2000];
+	if( state->video_control&0x02 ) source+=0x2000*4; /* foreground/background */
+	return source[state->read_mask*0x2000];
 }
 
 WRITE8_HANDLER( thief_videoram_w ){
 	thief_state *state = space->machine->driver_data<thief_state>();
 	UINT8 *videoram = state->videoram;
 	UINT8 *dest = &videoram[offset];
-	if( thief_video_control&0x02 )
+	if( state->video_control&0x02 )
 		dest+=0x2000*4; /* foreground/background */
-	if( thief_write_mask&0x1 ) dest[0x2000*0] = data;
-	if( thief_write_mask&0x2 ) dest[0x2000*1] = data;
-	if( thief_write_mask&0x4 ) dest[0x2000*2] = data;
-	if( thief_write_mask&0x8 ) dest[0x2000*3] = data;
+	if( state->write_mask&0x1 ) dest[0x2000*0] = data;
+	if( state->write_mask&0x2 ) dest[0x2000*1] = data;
+	if( state->write_mask&0x4 ) dest[0x2000*2] = data;
+	if( state->write_mask&0x8 ) dest[0x2000*3] = data;
 }
 
 /***************************************************************************/
 
 VIDEO_START( thief ){
 	thief_state *state = machine->driver_data<thief_state>();
-	memset( &thief_coprocessor, 0x00, sizeof(thief_coprocessor) );
+	memset( &state->coprocessor, 0x00, sizeof(state->coprocessor) );
 
 	state->videoram = auto_alloc_array_clear(machine, UINT8, 0x2000*4*2 );
 
-	thief_coprocessor.image_ram = auto_alloc_array(machine, UINT8, 0x2000 );
-	thief_coprocessor.context_ram = auto_alloc_array(machine, UINT8, 0x400 );
+	state->coprocessor.image_ram = auto_alloc_array(machine, UINT8, 0x2000 );
+	state->coprocessor.context_ram = auto_alloc_array(machine, UINT8, 0x400 );
 }
 
 SCREEN_UPDATE( thief ){
 	thief_state *state = screen->machine->driver_data<thief_state>();
 	UINT8 *videoram = state->videoram;
 	UINT32 offs;
-	int flipscreen = thief_video_control&1;
+	int flipscreen = state->video_control&1;
 	const UINT8 *source = videoram;
 
 	if (tms9927_screen_reset(screen->machine->device("tms")))
@@ -125,7 +120,7 @@ SCREEN_UPDATE( thief ){
 		return 0;
 	}
 
-	if( thief_video_control&4 ) /* visible page */
+	if( state->video_control&4 ) /* visible page */
 		source += 0x2000*4;
 
 	for( offs=0; offs<0x2000; offs++ ){
@@ -160,7 +155,7 @@ SCREEN_UPDATE( thief ){
 
 /***************************************************************************/
 
-static UINT16 fetch_image_addr( void ){
+static UINT16 fetch_image_addr( coprocessor_t &thief_coprocessor ){
 	int addr = thief_coprocessor.param[IMAGE_ADDR_LO]+256*thief_coprocessor.param[IMAGE_ADDR_HI];
 	/* auto-increment */
 	thief_coprocessor.param[IMAGE_ADDR_LO]++;
@@ -171,6 +166,8 @@ static UINT16 fetch_image_addr( void ){
 }
 
 WRITE8_HANDLER( thief_blit_w ){
+	thief_state *state = space->machine->driver_data<thief_state>();
+	coprocessor_t &thief_coprocessor = state->coprocessor;
 	int i, offs, xoffset, dy;
 	UINT8 *gfx_rom = space->machine->region( "gfx1" )->base();
 	UINT8 x = thief_coprocessor.param[SCREEN_XPOS];
@@ -197,7 +194,7 @@ WRITE8_HANDLER( thief_blit_w ){
 	height++;
 	while( height-- ){
 		for( i=0; i<=width; i++ ){
-			int addr = fetch_image_addr();
+			int addr = fetch_image_addr(thief_coprocessor);
 			if( addr<0x2000 ){
 				data = thief_coprocessor.image_ram[addr];
 			}
@@ -231,6 +228,8 @@ WRITE8_HANDLER( thief_blit_w ){
 }
 
 READ8_HANDLER( thief_coprocessor_r ){
+	thief_state *state = space->machine->driver_data<thief_state>();
+	coprocessor_t &thief_coprocessor = state->coprocessor;
 	switch( offset ){
 	case SCREEN_XPOS: /* xpos */
 	case SCREEN_YPOS: /* ypos */
@@ -244,7 +243,7 @@ READ8_HANDLER( thief_coprocessor_r ){
 
 	case GFX_PORT:
 		{
-			int addr = fetch_image_addr();
+			int addr = fetch_image_addr(thief_coprocessor);
 			if( addr<0x2000 ){
 				return thief_coprocessor.image_ram[addr];
 			}
@@ -274,10 +273,12 @@ READ8_HANDLER( thief_coprocessor_r ){
 }
 
 WRITE8_HANDLER( thief_coprocessor_w ){
+	thief_state *state = space->machine->driver_data<thief_state>();
+	coprocessor_t &thief_coprocessor = state->coprocessor;
 	switch( offset ){
 	case GFX_PORT:
 		{
-			int addr = fetch_image_addr();
+			int addr = fetch_image_addr(thief_coprocessor);
 			if( addr<0x2000 ){
 				thief_coprocessor.image_ram[addr] = data;
 			}

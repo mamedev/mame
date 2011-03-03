@@ -1,3 +1,28 @@
+class stfight_state : public driver_device
+{
+public:
+	stfight_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *text_char_ram;
+	UINT8 *text_attr_ram;
+	UINT8 *vh_latch_ram;
+	UINT8 *sprite_ram;
+	UINT8 *decrypt;
+	int adpcm_data_offs;
+	int adpcm_data_end;
+	int toggle;
+	UINT8 fm_data;
+	int coin_mech_latch[2];
+	int coin_mech_query_active;
+	int coin_mech_query;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
+	tilemap_t *tx_tilemap;
+	int sprite_base;
+};
+
+
 /*----------- defined in machine/stfight.c -----------*/
 
 DRIVER_INIT( empcity );
@@ -15,11 +40,6 @@ WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w );
 
 
 /*----------- defined in video/stfight.c -----------*/
-
-extern UINT8 *stfight_text_char_ram;
-extern UINT8 *stfight_text_attr_ram;
-extern UINT8 *stfight_vh_latch_ram;
-extern UINT8 *stfight_sprite_ram;
 
 PALETTE_INIT( stfight );
 WRITE8_HANDLER( stfight_text_char_w );

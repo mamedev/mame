@@ -108,18 +108,20 @@ static WRITE8_HANDLER( portrait_ctrl_w )
 
 static WRITE8_HANDLER( portrait_positive_scroll_w )
 {
-	portrait_scroll = data;
+	portrait_state *state = space->machine->driver_data<portrait_state>();
+	state->scroll = data;
 }
 
 static WRITE8_HANDLER( portrait_negative_scroll_w )
 {
-	portrait_scroll = - (data ^ 0xff);
+	portrait_state *state = space->machine->driver_data<portrait_state>();
+	state->scroll = - (data ^ 0xff);
 }
 
 static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(portrait_bgvideo_write) AM_BASE(&portrait_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_BASE(&portrait_fgvideoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(portrait_bgvideo_write) AM_BASE_MEMBER(portrait_state, bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_BASE_MEMBER(portrait_state, fgvideoram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9200, 0x97ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_w)
@@ -240,7 +242,7 @@ static GFXDECODE_START( portrait )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout, 0, 0x800/8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( portrait, driver_device )
+static MACHINE_CONFIG_START( portrait, portrait_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(portrait_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)

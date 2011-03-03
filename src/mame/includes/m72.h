@@ -10,8 +10,6 @@ public:
 	m72_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
-	UINT8 irqvector;
-	UINT32 sample_addr;
 	UINT16 *protection_ram;
 	emu_timer *scanline_timer;
 	UINT8 irq_base;

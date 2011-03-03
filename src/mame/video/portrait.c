@@ -8,20 +8,19 @@
 #include "emu.h"
 #include "includes/portrait.h"
 
-int portrait_scroll;
-UINT8 *portrait_bgvideoram, *portrait_fgvideoram;
-static tilemap_t *foreground, *background;
 
 WRITE8_HANDLER( portrait_bgvideo_write )
 {
-	tilemap_mark_tile_dirty(background,offset/2);
-	portrait_bgvideoram[offset] = data;
+	portrait_state *state = space->machine->driver_data<portrait_state>();
+	tilemap_mark_tile_dirty(state->background,offset/2);
+	state->bgvideoram[offset] = data;
 }
 
 WRITE8_HANDLER( portrait_fgvideo_write )
 {
-	tilemap_mark_tile_dirty(foreground,offset/2);
-	portrait_fgvideoram[offset] = data;
+	portrait_state *state = space->machine->driver_data<portrait_state>();
+	tilemap_mark_tile_dirty(state->foreground,offset/2);
+	state->fgvideoram[offset] = data;
 }
 
 INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, const UINT8 *source )
@@ -57,20 +56,23 @@ INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int ti
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	get_tile_info( machine, tileinfo, tile_index, portrait_bgvideoram );
+	portrait_state *state = machine->driver_data<portrait_state>();
+	get_tile_info( machine, tileinfo, tile_index, state->bgvideoram );
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	get_tile_info( machine, tileinfo, tile_index, portrait_fgvideoram );
+	portrait_state *state = machine->driver_data<portrait_state>();
+	get_tile_info( machine, tileinfo, tile_index, state->fgvideoram );
 }
 
 VIDEO_START( portrait )
 {
-	background = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 32, 32 );
-	foreground = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 32, 32 );
+	portrait_state *state = machine->driver_data<portrait_state>();
+	state->background = tilemap_create( machine, get_bg_tile_info, tilemap_scan_rows,       16, 16, 32, 32 );
+	state->foreground = tilemap_create( machine, get_fg_tile_info, tilemap_scan_rows,  16, 16, 32, 32 );
 
-	tilemap_set_transparent_pen( foreground, 7 );
+	tilemap_set_transparent_pen( state->foreground, 7 );
 }
 
 
@@ -129,6 +131,7 @@ PALETTE_INIT( portrait )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	portrait_state *state = machine->driver_data<portrait_state>();
 	UINT8 *source = machine->generic.spriteram.u8;
 	UINT8 *finish = source + 0x200;
 
@@ -164,11 +167,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			break;
 
 		case 0x40:
-			sy -= portrait_scroll;
+			sy -= state->scroll;
 			break;
 
 		case 0x80:
-			sy -= portrait_scroll;
+			sy -= state->scroll;
 			break;
 
 		case 0xc0:
@@ -187,6 +190,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( portrait )
 {
+	portrait_state *state = screen->machine->driver_data<portrait_state>();
 	rectangle cliprect_scroll, cliprect_no_scroll;
 
 	cliprect_scroll = cliprect_no_scroll = *cliprect;
@@ -194,15 +198,15 @@ SCREEN_UPDATE( portrait )
 	cliprect_no_scroll.min_x = cliprect_no_scroll.max_x - 111;
 	cliprect_scroll.max_x    = cliprect_scroll.min_x    + 319;
 
-	tilemap_set_scrolly(background, 0, 0);
-	tilemap_set_scrolly(foreground, 0, 0);
-	tilemap_draw(bitmap, &cliprect_no_scroll, background, 0, 0);
-	tilemap_draw(bitmap, &cliprect_no_scroll, foreground, 0, 0);
+	tilemap_set_scrolly(state->background, 0, 0);
+	tilemap_set_scrolly(state->foreground, 0, 0);
+	tilemap_draw(bitmap, &cliprect_no_scroll, state->background, 0, 0);
+	tilemap_draw(bitmap, &cliprect_no_scroll, state->foreground, 0, 0);
 
-	tilemap_set_scrolly(background, 0, portrait_scroll);
-	tilemap_set_scrolly(foreground, 0, portrait_scroll);
-	tilemap_draw(bitmap, &cliprect_scroll, background, 0, 0);
-	tilemap_draw(bitmap, &cliprect_scroll, foreground, 0, 0);
+	tilemap_set_scrolly(state->background, 0, state->scroll);
+	tilemap_set_scrolly(state->foreground, 0, state->scroll);
+	tilemap_draw(bitmap, &cliprect_scroll, state->background, 0, 0);
+	tilemap_draw(bitmap, &cliprect_scroll, state->foreground, 0, 0);
 
 	draw_sprites(screen->machine, bitmap,cliprect);
 	return 0;

@@ -58,13 +58,24 @@ RSSENGO2.72   chr.
 #include "includes/sei_crtc.h"
 #include "machine/nvram.h"
 
-static UINT16 sengokumj_mux_data;
-static UINT8 hopper_io;
+
+class sengokmj_state : public driver_device
+{
+public:
+	sengokmj_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 sengokumj_mux_data;
+	UINT8 hopper_io;
+};
+
+
 
 /* Multiplexer device for the mahjong panel */
 static READ16_HANDLER( mahjong_panel_r )
 {
-	switch(sengokumj_mux_data)
+	sengokmj_state *state = space->machine->driver_data<sengokmj_state>();
+	switch(state->sengokumj_mux_data)
 	{
 		case 0x0100: return input_port_read(space->machine, "KEY0");
 		case 0x0200: return input_port_read(space->machine, "KEY1");
@@ -79,11 +90,13 @@ static READ16_HANDLER( mahjong_panel_r )
 
 static WRITE16_HANDLER( mahjong_panel_w )
 {
-	sengokumj_mux_data = data;
+	sengokmj_state *state = space->machine->driver_data<sengokmj_state>();
+	state->sengokumj_mux_data = data;
 }
 
 static WRITE16_HANDLER( sengokmj_out_w )
 {
+	sengokmj_state *state = space->machine->driver_data<sengokmj_state>();
 	/* ---- ---- ---x ---- J.P. Signal (?)*/
 	/* ---- ---- ---- -x-- Coin counter (done AFTER that you press start)*/
 	/* ---- ---- ---- --x- Cash enable (lockout)*/
@@ -91,13 +104,14 @@ static WRITE16_HANDLER( sengokmj_out_w )
 	coin_lockout_w(space->machine, 0,~data & 2);
 	coin_lockout_w(space->machine, 1,~data & 2);
 	coin_counter_w(space->machine, 0,data & 4);
-	hopper_io = ((data & 1)<<6);
-//  popmessage("%02x",hopper_io);
+	state->hopper_io = ((data & 1)<<6);
+//  popmessage("%02x",state->hopper_io);
 }
 
 static READ16_HANDLER( sengokmj_system_r )
 {
-	return (input_port_read(space->machine, "SYSTEM") & 0xffbf) | hopper_io;
+	sengokmj_state *state = space->machine->driver_data<sengokmj_state>();
+	return (input_port_read(space->machine, "SYSTEM") & 0xffbf) | state->hopper_io;
 }
 
 static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -276,7 +290,7 @@ static INTERRUPT_GEN( sengokmj_interrupt )
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xc8/4);
 }
 
-static MACHINE_CONFIG_START( sengokmj, driver_device )
+static MACHINE_CONFIG_START( sengokmj, sengokmj_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */

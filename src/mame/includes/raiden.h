@@ -5,12 +5,19 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT16 *videoram;
+	UINT16 *shared_ram;
+	UINT16 *back_data;
+	UINT16 *fore_data;
+	UINT16 *scroll_ram;
+	tilemap_t *bg_layer;
+	tilemap_t *fg_layer;
+	tilemap_t *tx_layer;
+	int flipscreen;
+	int alternate;
 };
 
 
 /*----------- defined in video/raiden.c -----------*/
-
-extern UINT16 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;
 
 WRITE16_HANDLER( raiden_background_w );
 WRITE16_HANDLER( raiden_foreground_w );

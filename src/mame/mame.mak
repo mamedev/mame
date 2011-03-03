@@ -493,10 +493,10 @@ $(MAMEOBJ)/barcrest.a: \
 	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/bfm.a: \
-	$(DRIVERS)/bfm_sc1.o \
-	$(DRIVERS)/bfmsys85.o \
 	$(DRIVERS)/bfcobra.o \
+	$(DRIVERS)/bfm_sc1.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
+	$(DRIVERS)/bfmsys85.o \
 	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
 
 $(MAMEOBJ)/bmc.a: \
@@ -1224,8 +1224,8 @@ $(MAMEOBJ)/seta.a: \
 	$(DRIVERS)/macs.o \
 	$(DRIVERS)/seta.o $(VIDEO)/seta.o \
 	$(DRIVERS)/seta2.o $(VIDEO)/seta2.o \
-	$(DRIVERS)/speglsht.o \
 	$(DRIVERS)/speedatk.o $(VIDEO)/speedatk.o \
+	$(DRIVERS)/speglsht.o \
 	$(DRIVERS)/srmp2.o $(VIDEO)/srmp2.o \
 	$(DRIVERS)/srmp5.o \
 	$(DRIVERS)/srmp6.o \

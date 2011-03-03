@@ -32,7 +32,6 @@ Credits:
 #define MASTER_CLOCK	XTAL_20MHz
 
 
-static UINT8 thief_input_select;
 
 static INTERRUPT_GEN( thief_interrupt )
 {
@@ -96,7 +95,8 @@ static void tape_set_motor( device_t *samples, int bOn )
 
 static WRITE8_HANDLER( thief_input_select_w )
 {
-	thief_input_select = data;
+	thief_state *state = space->machine->driver_data<thief_state>();
+	state->input_select = data;
 }
 
 static WRITE8_DEVICE_HANDLER( tape_control_w )
@@ -140,7 +140,8 @@ static WRITE8_DEVICE_HANDLER( tape_control_w )
 
 static READ8_HANDLER( thief_io_r )
 {
-	switch( thief_input_select )
+	thief_state *state = space->machine->driver_data<thief_state>();
+	switch( state->input_select )
 	{
 		case 0x01: return input_port_read(space->machine, "DSW1");
 		case 0x02: return input_port_read(space->machine, "DSW2");

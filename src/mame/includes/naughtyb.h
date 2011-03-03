@@ -5,14 +5,19 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 popflame_prot_seed;
+	int r_index;
+	int prot_count;
+	int question_offset;
+	UINT8 *videoram2;
+	UINT8 *scrollreg;
+	int cocktail;
+	UINT8 palreg;
+	int bankreg;
 };
 
 
 /*----------- defined in video/naughtyb.c -----------*/
-
-extern UINT8 *naughtyb_videoram2;
-extern UINT8 *naughtyb_scrollreg;
-extern int naughtyb_cocktail;
 
 WRITE8_HANDLER( naughtyb_videoreg_w );
 WRITE8_HANDLER( popflame_videoreg_w );

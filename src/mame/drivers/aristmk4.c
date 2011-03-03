@@ -313,7 +313,7 @@ static READ8_HANDLER(cgdrr)
 
    if(state->cgdrsw) // is the LC closed
    {
-        return state->ripple; // return a positive value from the state->ripple counter
+        return state->ripple; // return a positive value from the ripple counter
    }
    return 0x0; // otherwise the counter outputs are set low.
 }

@@ -15,11 +15,6 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
-	UINT8 sound_int_state;
-	UINT8 audio_talkback;
-	UINT8 audio_sync;
-	device_t *sound_cpu;
-	device_t *soundalt_cpu;
 	UINT8 *mayday_protection;
 	UINT8 *videoram;
 	UINT8 *williams2_tileram;

@@ -112,9 +112,10 @@ TODO:
 
 static READ8_HANDLER( in0_port_r )
 {
+	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
 	int in0 = input_port_read(space->machine, "IN0");
 
-	if ( naughtyb_cocktail )
+	if ( state->cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
@@ -140,24 +141,21 @@ static READ8_HANDLER( dsw0_port_r )
    If the values all match then it will jump to 0x0011 instead of 0x0009 (refresh instead of reset)
    Paul Priest: tourniquet@mameworld.net */
 
-//static int popflame_prot_count = 0;
-static UINT8 popflame_prot_seed;
-static int r_index;
 
 static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 {
+	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
 	static const int seed00[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
 	static const int seed10[4] = { 0x68, 0x60, 0x68, 0x60|0x80 };
-	static int count;
-	static UINT8 seedxx;
+	UINT8 seedxx;
 
-	seedxx = (r_index < 0x89) ? 1 : 0;
+	seedxx = (state->r_index < 0x89) ? 1 : 0;
 
-	count = (count + 1) % 4;
-	if(popflame_prot_seed == 0x10)
-		return seed10[count] | seedxx;
+	state->prot_count = (state->prot_count + 1) % 4;
+	if(state->popflame_prot_seed == 0x10)
+		return seed10[state->prot_count] | seedxx;
 	else
-		return seed00[count] | seedxx;
+		return seed00[state->prot_count] | seedxx;
 
 #if 0
 	if ( cpu_get_pc(space->cpu) == (0x26F2 + 0x03) )
@@ -186,6 +184,7 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 
 static WRITE8_HANDLER( popflame_protection_w )
 {
+	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
 	/*
     Alternative protection check is executed at the end of stage 3, it seems some kind of pseudo "EEPROM" device:
 2720: 21 98 B0      ld   hl,$B098
@@ -236,12 +235,12 @@ static WRITE8_HANDLER( popflame_protection_w )
     ---- --x- puts a bit into the write buffer
     ---- ---x reset write index buffer
     */
-	if(data & 1 && ((popflame_prot_seed & 1) == 0)) //Note: we use the write buffer index
-		r_index = 0;
-	if(data & 8 && ((popflame_prot_seed & 8) == 0))
-		r_index++;
+	if(data & 1 && ((state->popflame_prot_seed & 1) == 0)) //Note: we use the write buffer index
+		state->r_index = 0;
+	if(data & 8 && ((state->popflame_prot_seed & 8) == 0))
+		state->r_index++;
 
-	popflame_prot_seed = data & 0x10;
+	state->popflame_prot_seed = data & 0x10;
 
 }
 
@@ -251,9 +250,9 @@ static ADDRESS_MAP_START( naughtyb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&naughtyb_videoram2)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(naughtyb_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(&naughtyb_scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, scrollreg)
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
@@ -264,9 +263,9 @@ static ADDRESS_MAP_START( popflame_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&naughtyb_videoram2)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(popflame_videoreg_w)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(&naughtyb_scrollreg)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(naughtyb_state, scrollreg)
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
@@ -861,25 +860,26 @@ static DRIVER_INIT( popflame )
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb000, 0xb0ff, 0, 0, popflame_protection_w);
 }
 
-static int question_offset = 0;
 
 static READ8_HANDLER( trvmstr_questions_r )
 {
-	return space->machine->region("user1")->base()[question_offset];
+	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
+	return space->machine->region("user1")->base()[state->question_offset];
 }
 
 static WRITE8_HANDLER( trvmstr_questions_w )
 {
+	naughtyb_state *state = space->machine->driver_data<naughtyb_state>();
 	switch(offset)
 	{
 	case 0:
-		question_offset = (question_offset & 0xffff00) | data;
+		state->question_offset = (state->question_offset & 0xffff00) | data;
 		break;
 	case 1:
-		question_offset = (question_offset & 0xff00ff) | (data << 8);
+		state->question_offset = (state->question_offset & 0xff00ff) | (data << 8);
 		break;
 	case 2:
-		question_offset = (question_offset & 0x00ffff) | (data << 16);
+		state->question_offset = (state->question_offset & 0x00ffff) | (data << 16);
 		break;
 	}
 }

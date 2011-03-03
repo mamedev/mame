@@ -31,12 +31,23 @@
 #include "machine/pcecommn.h"
 #include "video/vdc.h"
 
-static UINT8 jamma_if_control_latch = 0;
+
+class uapce_state : public driver_device
+{
+public:
+	uapce_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 jamma_if_control_latch;
+};
+
+
 
 static WRITE8_HANDLER( jamma_if_control_latch_w )
 {
-	UINT8 diff = data ^ jamma_if_control_latch;
-	jamma_if_control_latch = data;
+	uapce_state *state = space->machine->driver_data<uapce_state>();
+	UINT8 diff = data ^ state->jamma_if_control_latch;
+	state->jamma_if_control_latch = data;
 
 	space->machine->sound().system_enable( (data >> 7) & 1 );
 
@@ -52,7 +63,8 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 
 static READ8_HANDLER( jamma_if_control_latch_r )
 {
-	return jamma_if_control_latch & 0x08;
+	uapce_state *state = space->machine->driver_data<uapce_state>();
+	return state->jamma_if_control_latch & 0x08;
 }
 
 static READ8_HANDLER( jamma_if_read_dsw )
@@ -99,7 +111,8 @@ static READ8_HANDLER( jamma_if_read_dsw )
 
 static UINT8 jamma_if_read_joystick( running_machine *machine )
 {
-	if ( jamma_if_control_latch & 0x10 )
+	uapce_state *state = machine->driver_data<uapce_state>();
+	if ( state->jamma_if_control_latch & 0x10 )
 	{
 		return input_port_read(machine,  "JOY" );
 	}
@@ -111,8 +124,9 @@ static UINT8 jamma_if_read_joystick( running_machine *machine )
 
 static MACHINE_RESET( uapce )
 {
+	uapce_state *state = machine->driver_data<uapce_state>();
 	pce_set_joystick_readinputport_callback( jamma_if_read_joystick );
-	jamma_if_control_latch = 0;
+	state->jamma_if_control_latch = 0;
 }
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -183,7 +197,7 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-static MACHINE_CONFIG_START( uapce, driver_device )
+static MACHINE_CONFIG_START( uapce, uapce_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)

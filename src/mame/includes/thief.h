@@ -1,3 +1,10 @@
+typedef struct {
+	UINT8 *context_ram;
+	UINT8 bank;
+	UINT8 *image_ram;
+	UINT8 param[0x9];
+} coprocessor_t;
+
 class thief_state : public driver_device
 {
 public:
@@ -5,6 +12,11 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 input_select;
+	UINT8 read_mask;
+	UINT8 write_mask;
+	UINT8 video_control;
+	coprocessor_t coprocessor;
 };
 
 

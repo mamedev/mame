@@ -395,7 +395,7 @@ WRITE32_HANDLER( gaelco3d_render_w )
 	if (state->polydata_count >= MAX_POLYDATA)
 		fatalerror("Out of polygon buffer space!");
 
-	/* if we've accumulated a completed state->poly set of data, queue it */
+	/* if we've accumulated a completed poly set of data, queue it */
 	if (!space->machine->video().skip_this_frame())
 	{
 		if (state->polydata_count >= 18 && (state->polydata_count % 2) == 1 && IS_POLYEND(state->polydata_buffer[state->polydata_count - 2]))

@@ -169,13 +169,13 @@ Afega stands for "Art-Fiction Electronic Game"
 
 **********************************************************/
 
-UINT16* nmk16_mainram;
 
 static WRITE16_HANDLER( nmk16_mainram_strange_w )
 {
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
 	UINT16* dstram;
 
-	dstram = nmk16_mainram;
+	dstram = state->mainram;
 
 	if (!ACCESSING_BITS_8_15)
 	{
@@ -235,6 +235,7 @@ static WRITE16_HANDLER( tharrier_mcu_control_w )
 
 static READ16_HANDLER( tharrier_mcu_r )
 {
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
 	/* The MCU is mapped as the top byte for byte accesses only,
         all word accesses are to the input port */
 	if (ACCESSING_BITS_8_15 && !ACCESSING_BITS_0_7)
@@ -247,8 +248,8 @@ static READ16_HANDLER( tharrier_mcu_r )
 
 		int res;
 
-		if (cpu_get_pc(space->cpu)==0x8aa) res = (nmk16_mainram[0x9064/2])|0x20; /* Task Force Harrier */
-		else if (cpu_get_pc(space->cpu)==0x8ce) res = (nmk16_mainram[0x9064/2])|0x60; /* Task Force Harrier */
+		if (cpu_get_pc(space->cpu)==0x8aa) res = (state->mainram[0x9064/2])|0x20; /* Task Force Harrier */
+		else if (cpu_get_pc(space->cpu)==0x8ce) res = (state->mainram[0x9064/2])|0x60; /* Task Force Harrier */
 		else
 		{
 			res = to_main[prot_count++];
@@ -323,10 +324,10 @@ static ADDRESS_MAP_START( vandyke_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE(vandyke_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
 	AM_RANGE(0x094000, 0x097fff) AM_RAM /* what is this? */
-	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vandykeb_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -342,10 +343,10 @@ static ADDRESS_MAP_START( vandykeb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITENOP	/* just in case... */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
 	AM_RANGE(0x094000, 0x097fff) AM_RAM /* what is this? */
-	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( manybloc_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -359,10 +360,10 @@ static ADDRESS_MAP_START( manybloc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08001c, 0x08001d) AM_WRITENOP			/* See notes at the top of the driver */
 	AM_RANGE(0x08001e, 0x08001f) AM_READWRITE(soundlatch2_word_r,soundlatch_word_w)
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(manybloc_scroll_w) AM_BASE(&gunnail_scrollram)
-	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(manybloc_scroll_w) AM_BASE_MEMBER(nmk16_state, gunnail_scrollram)
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -379,10 +380,10 @@ static ADDRESS_MAP_START( tharrier_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080202, 0x080203) AM_READ_PORT("IN2")
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 //  AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM /* Unused txvideoram area? */
-	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -415,9 +416,9 @@ static ADDRESS_MAP_START( mustang_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mustangb_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -432,9 +433,9 @@ static ADDRESS_MAP_START( mustangb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 
@@ -450,15 +451,15 @@ static ADDRESS_MAP_START( twinactn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( acrobatm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x80000, 0x8ffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 	AM_RANGE(0xc0000, 0xc0001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc0002, 0xc0003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc0008, 0xc0009) AM_READ_PORT("DSW1")
@@ -470,8 +471,8 @@ static ADDRESS_MAP_START( acrobatm_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc001e, 0xc001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0xc4000, 0xc45ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc8000, 0xc8007) AM_RAM_WRITE(nmk_scroll_w)
-	AM_RANGE(0xcc000, 0xcffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0xd4000, 0xd47ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0xcc000, 0xcffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0xd4000, 0xd47ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bioship_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -487,9 +488,9 @@ static ADDRESS_MAP_START( bioship_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_RAM_WRITE(bioshipbg_scroll_w)
 	AM_RANGE(0x08c010, 0x08c017) AM_RAM_WRITE(bioship_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 /******************************************************************************************
@@ -511,19 +512,19 @@ life,but the game looks pretty much hard without it.
 
 
 #define PROT_JSR(_offs_,_protvalue_,_pc_) \
-	if(nmk16_mainram[(_offs_)/2] == _protvalue_) \
+	if(state->mainram[(_offs_)/2] == _protvalue_) \
 	{ \
-		nmk16_mainram[(_offs_)/2] = 0xffff;  /*(MCU job done)*/ \
-		nmk16_mainram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
-		nmk16_mainram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
-		nmk16_mainram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
+		state->mainram[(_offs_)/2] = 0xffff;  /*(MCU job done)*/ \
+		state->mainram[(_offs_+2-0x10)/2] = 0x4ef9;/*JMP*/\
+		state->mainram[(_offs_+4-0x10)/2] = 0x0000;/*HI-DWORD*/\
+		state->mainram[(_offs_+6-0x10)/2] = _pc_;  /*LO-DWORD*/\
 	} \
 
 #define PROT_INPUT(_offs_,_protvalue_,_protinput_,_input_) \
-	if(nmk16_mainram[_offs_] == _protvalue_) \
-	{\
-		nmk16_mainram[_protinput_] = ((_input_ & 0xffff0000)>>16);\
-		nmk16_mainram[_protinput_+1] = (_input_ & 0x0000ffff);\
+	if(state->mainram[_offs_] == _protvalue_) \
+	{ \
+		state->mainram[_protinput_] = ((_input_ & 0xffff0000)>>16);\
+		state->mainram[_protinput_+1] = (_input_ & 0x0000ffff);\
 	}
 
 #ifdef UNUSED_FUNCTION
@@ -599,7 +600,8 @@ f0 - player bombs (8c36)
 
 static WRITE16_HANDLER( hachamf_mainram_w )
 {
-	COMBINE_DATA(&nmk16_mainram[offset]);
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
+	COMBINE_DATA(&state->mainram[offset]);
 
 	switch(offset)
 	{
@@ -640,13 +642,13 @@ static WRITE16_HANDLER( hachamf_mainram_w )
 		case 0xe1fe/2: PROT_JSR(0xe1fe,0x8026,0x8c36);//8c36
 					  PROT_JSR(0xe1fe,0x8016,0xd620); break;  //unused
 		case 0xef00/2:
-			if(nmk16_mainram[0xef00/2] == 0x60fe)
+			if(state->mainram[0xef00/2] == 0x60fe)
 			{
-				nmk16_mainram[0xef00/2] = 0x0000; //this is the coin counter
-				nmk16_mainram[0xef02/2] = 0x0000;
-				nmk16_mainram[0xef04/2] = 0x4ef9;
-				nmk16_mainram[0xef06/2] = 0x0000;
-				nmk16_mainram[0xef08/2] = 0x7dc2;
+				state->mainram[0xef00/2] = 0x0000; //this is the coin counter
+				state->mainram[0xef02/2] = 0x0000;
+				state->mainram[0xef04/2] = 0x4ef9;
+				state->mainram[0xef06/2] = 0x0000;
+				state->mainram[0xef08/2] = 0x7dc2;
 			}
 			break;
 	}
@@ -666,17 +668,18 @@ static ADDRESS_MAP_START( hachamf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	/* Video Region */
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
 	/* Main RAM, inc sprites, shared with MCU */
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(hachamf_mainram_w) AM_BASE(&nmk16_mainram) // ram is shared with MCU
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(hachamf_mainram_w) AM_BASE_MEMBER(nmk16_state, mainram) // ram is shared with MCU
 ADDRESS_MAP_END
 
 
 
 static WRITE16_HANDLER( tdragon_mainram_w )
 {
-	COMBINE_DATA(&nmk16_mainram[offset]);
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
+	COMBINE_DATA(&state->mainram[offset]);
 
 	switch(offset)
 	{
@@ -717,13 +720,13 @@ static WRITE16_HANDLER( tdragon_mainram_w )
 		case 0xe7fe/2: PROT_JSR(0xe7fe,0x8026,0xa57a);
 					  PROT_JSR(0xe7fe,0x8016,0xa57a); break;
 		case 0xef00/2:
-			if(nmk16_mainram[0xef00/2] == 0x60fe)
+			if(state->mainram[0xef00/2] == 0x60fe)
 			{
-				nmk16_mainram[0xef00/2] = 0x0000; //this is the coin counter
-				nmk16_mainram[0xef02/2] = 0x0000;
-				nmk16_mainram[0xef04/2] = 0x4ef9;
-				nmk16_mainram[0xef06/2] = 0x0000;
-				nmk16_mainram[0xef08/2] = 0x92f4;
+				state->mainram[0xef00/2] = 0x0000; //this is the coin counter
+				state->mainram[0xef02/2] = 0x0000;
+				state->mainram[0xef04/2] = 0x4ef9;
+				state->mainram[0xef06/2] = 0x0000;
+				state->mainram[0xef08/2] = 0x92f4;
 			}
 			break;
 	}
@@ -732,22 +735,23 @@ static WRITE16_HANDLER( tdragon_mainram_w )
 /*coin setting MCU simulation*/
 static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 {
+	nmk16_state *state = machine->driver_data<nmk16_state>();
 	static UINT8 input_pressed;
-	static UINT16 coin_input;
+	UINT16 coin_input;
 	UINT8 dsw[2];
 	static UINT8 start_helper = 0;
 	static UINT8 coin_count[2],coin_count_frac[2];
-	static UINT8 i;
+	UINT8 i;
 
 	/*Accept the start button but needs some m68k processing first,otherwise you can't start a play with 1 credit inserted*/
-	if(start_helper & 1 && nmk16_mainram[0x9000/2] & 0x0200) /*start 1 */
+	if(start_helper & 1 && state->mainram[0x9000/2] & 0x0200) /*start 1 */
 	{
-		nmk16_mainram[0xef00/2]--;
+		state->mainram[0xef00/2]--;
 		start_helper = start_helper & 2;
 	}
-	if(start_helper & 2 && nmk16_mainram[0x9000/2] & 0x0100) /*start 2*/
+	if(start_helper & 2 && state->mainram[0x9000/2] & 0x0100) /*start 2*/
 	{
-		nmk16_mainram[0xef00/2]--;
+		state->mainram[0xef00/2]--;
 		start_helper = start_helper & 1;
 	}
 
@@ -760,7 +764,7 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 		{
 			switch(dsw[i] & 7)
 			{
-				case 0: nmk16_mainram[0x9000/2]|=0x4000; break; //free play
+				case 0: state->mainram[0x9000/2]|=0x4000; break; //free play
 				case 1: coin_count_frac[i] = 1; coin_count[i] = 4; break;
 				case 2: coin_count_frac[i] = 1; coin_count[i] = 3; break;
 				case 3: coin_count_frac[i] = 1; coin_count[i] = 2; break;
@@ -779,7 +783,7 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 		{
 			switch(dsw[i] & 7)
 			{
-				case 0: nmk16_mainram[0x9000/2]|=0x4000; break; //free play
+				case 0: state->mainram[0x9000/2]|=0x4000; break; //free play
 				case 1: coin_count_frac[i] = 4; coin_count[i] = 1; break;
 				case 2: coin_count_frac[i] = 3; coin_count[i] = 1; break;
 				case 3: coin_count_frac[i] = 2; coin_count[i] = 1; break;
@@ -800,15 +804,15 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 		{
 			if(coin_count_frac[0] != 1)
 			{
-				nmk16_mainram[0xef02/2]+=coin_count[0];
-				if(coin_count_frac[0] == nmk16_mainram[0xef02/2])
+				state->mainram[0xef02/2]+=coin_count[0];
+				if(coin_count_frac[0] == state->mainram[0xef02/2])
 				{
-					nmk16_mainram[0xef00/2]+=coin_count[0];
-					nmk16_mainram[0xef02/2] = 0;
+					state->mainram[0xef00/2]+=coin_count[0];
+					state->mainram[0xef02/2] = 0;
 				}
 			}
 			else
-				nmk16_mainram[0xef00/2]+=coin_count[0];
+				state->mainram[0xef00/2]+=coin_count[0];
 		}
 		input_pressed = (input_pressed & 0xfe) | 1;
 	}
@@ -821,15 +825,15 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 		{
 			if(coin_count_frac[1] != 1)
 			{
-				nmk16_mainram[0xef02/2]+=coin_count[1];
-				if(coin_count_frac[1] == nmk16_mainram[0xef02/2])
+				state->mainram[0xef02/2]+=coin_count[1];
+				if(coin_count_frac[1] == state->mainram[0xef02/2])
 				{
-					nmk16_mainram[0xef00/2]+=coin_count[1];
-					nmk16_mainram[0xef02/2] = 0;
+					state->mainram[0xef00/2]+=coin_count[1];
+					state->mainram[0xef02/2] = 0;
 				}
 			}
 			else
-				nmk16_mainram[0xef00/2]+=coin_count[1];
+				state->mainram[0xef00/2]+=coin_count[1];
 		}
 		input_pressed = (input_pressed & 0xfd) | 2;
 	}
@@ -839,18 +843,18 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 	if(coin_input & 0x04)//service 1
 	{
 		if((input_pressed & 0x04) == 0)
-			nmk16_mainram[0xef00/2]++;
+			state->mainram[0xef00/2]++;
 		input_pressed = (input_pressed & 0xfb) | 4;
 	}
 	else
 		input_pressed = (input_pressed & 0xfb);
 
 	/*The 0x9000 ram address is the status */
-	if(nmk16_mainram[0xef00/2] > 0 && nmk16_mainram[0x9000/2] & 0x8000) //enable start button
+	if(state->mainram[0xef00/2] > 0 && state->mainram[0x9000/2] & 0x8000) //enable start button
 	{
 		if(coin_input & 0x08)//start 1
 		{
-			if((input_pressed & 0x08) == 0 && (!(nmk16_mainram[0x9000/2] & 0x0200))) //start 1
+			if((input_pressed & 0x08) == 0 && (!(state->mainram[0x9000/2] & 0x0200))) //start 1
 				start_helper = 1;
 
 			input_pressed = (input_pressed & 0xf7) | 8;
@@ -861,8 +865,8 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 		if(coin_input & 0x10)//start 2
 		{
 			/*Decrease two coins to let two players play with one start 2 button and two credits inserted at the insert coin screen.*/
-			if((input_pressed & 0x10) == 0 && (!(nmk16_mainram[0x9000/2] & 0x0100))) // start 2
-				start_helper = (nmk16_mainram[0x9000/2] == 0x8000) ? (3) : (2);
+			if((input_pressed & 0x10) == 0 && (!(state->mainram[0x9000/2] & 0x0100))) // start 2
+				start_helper = (state->mainram[0x9000/2] == 0x8000) ? (3) : (2);
 
 			input_pressed = (input_pressed & 0xef) | 0x10;
 		}
@@ -889,7 +893,7 @@ static ADDRESS_MAP_START( tdragon_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x0b9000, 0x0bdfff) AM_RAM AM_BASE(&nmk16_mcu_work_ram)   /* Work RAM */
 //  AM_RANGE(0x0be000, 0x0befff) AM_READWRITE(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE(&nmk16_mcu_shared_ram)  /* Work RAM */
 //  AM_RANGE(0x0bf000, 0x0bffff) AM_RAM    /* Work RAM */
-	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM_WRITE( tdragon_mainram_w ) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM_WRITE( tdragon_mainram_w ) AM_BASE_MEMBER(nmk16_state, mainram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0008, 0x0c0009) AM_READ_PORT("DSW1")
@@ -900,14 +904,14 @@ static ADDRESS_MAP_START( tdragon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdragonb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044022, 0x044023) AM_READNOP  /* No Idea */
-	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0008, 0x0c0009) AM_READ_PORT("DSW1")
@@ -917,13 +921,13 @@ static ADDRESS_MAP_START( tdragonb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(seibu_main_mustb_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssmissin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("DSW1")
@@ -933,8 +937,8 @@ static ADDRESS_MAP_START( ssmissin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE(ssmissin_sound_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_MIRROR(0x1800) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram) //mirror for airattck
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_MIRROR(0x1800) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram) //mirror for airattck
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssmissin_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -958,10 +962,10 @@ static ADDRESS_MAP_START( strahl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x84000, 0x84007) AM_RAM_WRITE(nmk_scroll_w)
 	AM_RANGE(0x88000, 0x88007) AM_RAM_WRITE(nmk_scroll_2_w)
 	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x90000, 0x93fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x94000, 0x97fff) AM_RAM_WRITE(nmk_fgvideoram_w) AM_BASE(&nmk_fgvideoram)
-	AM_RANGE(0x9c000, 0x9c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0xf0000, 0xfffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x90000, 0x93fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x94000, 0x97fff) AM_RAM_WRITE(nmk_fgvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_fgvideoram)
+	AM_RANGE(0x9c000, 0x9c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0xf0000, 0xfffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -977,9 +981,9 @@ static ADDRESS_MAP_START( macross_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_RAM_WRITE(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunnail_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -994,12 +998,12 @@ static ADDRESS_MAP_START( gunnail_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x08c000, 0x08c1ff) AM_WRITEONLY AM_BASE(&gunnail_scrollram)
-	AM_RANGE(0x08c200, 0x08c3ff) AM_WRITEONLY AM_BASE(&gunnail_scrollramy)
+	AM_RANGE(0x08c000, 0x08c1ff) AM_WRITEONLY AM_BASE_MEMBER(nmk16_state, gunnail_scrollram)
+	AM_RANGE(0x08c200, 0x08c3ff) AM_WRITEONLY AM_BASE_MEMBER(nmk16_state, gunnail_scrollramy)
 	AM_RANGE(0x08c400, 0x08c7ff) AM_WRITEONLY	// unknown
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x001000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x001000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1015,17 +1019,17 @@ static ADDRESS_MAP_START( macross2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(macross2_sound_command_w)	/* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE(&gunnail_scrollram)
-	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE(&gunnail_scrollramy)
+	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE_MEMBER(nmk16_state, gunnail_scrollram)
+	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE_MEMBER(nmk16_state, gunnail_scrollramy)
 	AM_RANGE(0x130400, 0x1307ff) AM_RAM
 
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE(nmk_bgvideoram1_w) AM_BASE(&nmk_bgvideoram1)
-	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE(nmk_bgvideoram2_w) AM_BASE(&nmk_bgvideoram2)
-	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram3_w) AM_BASE(&nmk_bgvideoram3)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE(nmk_bgvideoram1_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram1)
+	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE(nmk_bgvideoram2_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram2)
+	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram3_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram3)
 
-	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raphero_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1041,18 +1045,18 @@ static ADDRESS_MAP_START( raphero_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(macross2_sound_command_w)	/* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE(&gunnail_scrollram)
-	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE(&gunnail_scrollramy)
+	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE_MEMBER(nmk16_state, gunnail_scrollram)
+	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE_MEMBER(nmk16_state, gunnail_scrollramy)
 	AM_RANGE(0x130400, 0x1307ff) AM_RAM
 
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE(nmk_bgvideoram1_w) AM_BASE(&nmk_bgvideoram1)
-	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE(nmk_bgvideoram2_w) AM_BASE(&nmk_bgvideoram2)
-	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram3_w) AM_BASE(&nmk_bgvideoram3)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE(nmk_bgvideoram1_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram1)
+	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE(nmk_bgvideoram2_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram2)
+	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE(nmk_bgvideoram3_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram3)
 
 
-	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 #if 0
@@ -1062,11 +1066,11 @@ ADDRESS_MAP_END
     ff,ff,ff,ff     20,00,f8,02     20,00,f8,04     00,04,d8,09
     0f,00,00,ff     00,00,18,03     a0,13,fe,05     40,1e,1b,09
 */
-static int mask[4*2];
 static WRITE8_HANDLER( okibank_w )
 {
-	mask[offset] |= 1 << (data & 0x1f);
-	popmessage("%x %x %x %x - %x %x %x %x",mask[0],mask[1],mask[2],mask[3],mask[4],mask[5],mask[6],mask[7]);
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
+	state->mask[offset] |= 1 << (data & 0x1f);
+	popmessage("%x %x %x %x - %x %x %x %x",state->mask[0],state->mask[1],state->mask[2],state->mask[3],state->mask[4],state->mask[5],state->mask[6],state->mask[7]);
 }
 #endif
 
@@ -1118,8 +1122,8 @@ static ADDRESS_MAP_START( bjtwin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP	/* IRQ enable? */
-	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, mainram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vandyke )
@@ -3549,7 +3553,7 @@ static const nmk112_interface nmk16_nmk112_intf =
 	"oki1", "oki2", 0
 };
 
-static MACHINE_CONFIG_START( tharrier, driver_device )
+static MACHINE_CONFIG_START( tharrier, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
@@ -3595,7 +3599,7 @@ static MACHINE_CONFIG_START( tharrier, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( manybloc, driver_device )
+static MACHINE_CONFIG_START( manybloc, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
@@ -3639,7 +3643,7 @@ static MACHINE_CONFIG_START( manybloc, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mustang, driver_device )
+static MACHINE_CONFIG_START( mustang, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3681,7 +3685,7 @@ static MACHINE_CONFIG_START( mustang, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mustangb, driver_device )
+static MACHINE_CONFIG_START( mustangb, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3716,7 +3720,7 @@ MACHINE_CONFIG_END
 #define BIOSHIP_CRYSTAL1 10000000
 #define BIOSHIP_CRYSTAL2 12000000
 
-static MACHINE_CONFIG_START( bioship, driver_device )
+static MACHINE_CONFIG_START( bioship, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
@@ -3758,7 +3762,7 @@ static MACHINE_CONFIG_START( bioship, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vandyke, driver_device )
+static MACHINE_CONFIG_START( vandyke, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
@@ -3800,7 +3804,7 @@ static MACHINE_CONFIG_START( vandyke, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vandykeb, driver_device )
+static MACHINE_CONFIG_START( vandykeb, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3835,7 +3839,7 @@ static MACHINE_CONFIG_START( vandykeb, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( acrobatm, driver_device )
+static MACHINE_CONFIG_START( acrobatm, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
@@ -3878,7 +3882,7 @@ static MACHINE_CONFIG_START( acrobatm, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tdragonb, driver_device )	/* bootleg using Raiden sound hardware */
+static MACHINE_CONFIG_START( tdragonb, nmk16_state )	/* bootleg using Raiden sound hardware */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -3910,7 +3914,7 @@ static MACHINE_CONFIG_START( tdragonb, driver_device )	/* bootleg using Raiden s
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tdragon, driver_device )
+static MACHINE_CONFIG_START( tdragon, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -3954,7 +3958,7 @@ static MACHINE_CONFIG_START( tdragon, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ssmissin, driver_device )
+static MACHINE_CONFIG_START( ssmissin, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
@@ -3988,7 +3992,7 @@ static MACHINE_CONFIG_START( ssmissin, driver_device )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( strahl, driver_device )
+static MACHINE_CONFIG_START( strahl, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
@@ -4030,7 +4034,7 @@ static MACHINE_CONFIG_START( strahl, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hachamf, driver_device )
+static MACHINE_CONFIG_START( hachamf, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4073,7 +4077,7 @@ static MACHINE_CONFIG_START( hachamf, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macross, driver_device )
+static MACHINE_CONFIG_START( macross, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4115,7 +4119,7 @@ static MACHINE_CONFIG_START( macross, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( blkheart, driver_device )
+static MACHINE_CONFIG_START( blkheart, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -4157,7 +4161,7 @@ static MACHINE_CONFIG_START( blkheart, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gunnail, driver_device )
+static MACHINE_CONFIG_START( gunnail, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz? */
@@ -4199,7 +4203,7 @@ static MACHINE_CONFIG_START( gunnail, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macross2, driver_device )
+static MACHINE_CONFIG_START( macross2, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4242,7 +4246,7 @@ static MACHINE_CONFIG_START( macross2, driver_device )
 	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tdragon2, driver_device )
+static MACHINE_CONFIG_START( tdragon2, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
@@ -4285,7 +4289,7 @@ static MACHINE_CONFIG_START( tdragon2, driver_device )
 	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( raphero, driver_device )
+static MACHINE_CONFIG_START( raphero, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
@@ -4327,7 +4331,7 @@ static MACHINE_CONFIG_START( raphero, driver_device )
 	MCFG_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bjtwin, driver_device )
+static MACHINE_CONFIG_START( bjtwin, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
@@ -4621,12 +4625,14 @@ static READ16_HANDLER( afega_unknown_r )
 
 static WRITE16_HANDLER( afega_scroll0_w )
 {
-	COMBINE_DATA(&afega_scroll_0[offset]);
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
+	COMBINE_DATA(&state->afega_scroll_0[offset]);
 }
 
 static WRITE16_HANDLER( afega_scroll1_w )
 {
-	COMBINE_DATA(&afega_scroll_1[offset]);
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
+	COMBINE_DATA(&state->afega_scroll_1[offset]);
 }
 
 /*
@@ -4650,13 +4656,13 @@ static ADDRESS_MAP_START( afega, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080020, 0x087fff) AM_WRITEONLY				//
 /**/AM_RANGE(0x088000, 0x0885ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) // Palette
 	AM_RANGE(0x088600, 0x08bfff) AM_WRITEONLY				//
-/**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE(afega_scroll0_w) AM_BASE(&afega_scroll_0)	// Scroll
-/**/AM_RANGE(0x08c004, 0x08c007) AM_RAM_WRITE(afega_scroll1_w) AM_BASE(&afega_scroll_1)	//
+/**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE(afega_scroll0_w) AM_BASE_MEMBER(nmk16_state, afega_scroll_0)	// Scroll
+/**/AM_RANGE(0x08c004, 0x08c007) AM_RAM_WRITE(afega_scroll1_w) AM_BASE_MEMBER(nmk16_state, afega_scroll_1)	//
 	AM_RANGE(0x08c008, 0x08ffff) AM_WRITEONLY				//
-/**/AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE(&nmk_bgvideoram0)	// Layer 0                  // ?
-/**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE(&nmk_txvideoram)	// Layer 1
+/**/AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_BASE_MEMBER(nmk16_state, nmk_bgvideoram0)	// Layer 0                  // ?
+/**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, nmk_txvideoram)	// Layer 1
 
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE("share1") AM_BASE(&nmk16_mainram)
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE("share1") AM_BASE_MEMBER(nmk16_state, mainram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -4667,15 +4673,17 @@ ADDRESS_MAP_END
 // The high byte of the word written is the address to write to (byte offset), the low byte is data
 static WRITE16_HANDLER( twinactn_scroll0_w )
 {
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
 	int byte = ((data >> 8) & 3) ^ 2;
 	int bit  = ((byte & 1) ? 0 : 8);
-	afega_scroll_0[byte / 2] = (afega_scroll_0[byte / 2] & (0xff << (8-bit))) | ((data & 0xff) << bit);
+	state->afega_scroll_0[byte / 2] = (state->afega_scroll_0[byte / 2] & (0xff << (8-bit))) | ((data & 0xff) << bit);
 }
 static WRITE16_HANDLER( twinactn_scroll1_w )
 {
+	nmk16_state *state = space->machine->driver_data<nmk16_state>();
 	int byte = ((data >> 8) & 3) ^ 2;
 	int bit  = ((byte & 1) ? 0 : 8);
-	afega_scroll_1[byte / 2] = (afega_scroll_1[byte / 2] & (0xff << (8-bit))) | ((data & 0xff) << bit);
+	state->afega_scroll_1[byte / 2] = (state->afega_scroll_1[byte / 2] & (0xff << (8-bit))) | ((data & 0xff) << bit);
 }
 
 static WRITE16_HANDLER( twinactn_flipscreen_w )
@@ -4833,7 +4841,7 @@ static const ym2151_interface afega_ym2151_intf =
 };
 
 
-static MACHINE_CONFIG_START( stagger1, driver_device )
+static MACHINE_CONFIG_START( stagger1, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
@@ -4918,7 +4926,7 @@ static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
 	MCFG_SCREEN_UPDATE(bubl2000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firehawk, driver_device )
+static MACHINE_CONFIG_START( firehawk, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
@@ -4953,7 +4961,7 @@ static MACHINE_CONFIG_START( firehawk, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( twinactn, driver_device )
+static MACHINE_CONFIG_START( twinactn, nmk16_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)

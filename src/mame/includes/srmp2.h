@@ -19,6 +19,9 @@ public:
 		UINT8 *u8;
 		UINT16 *u16;
 	} spriteram1, spriteram2, spriteram3;
+	UINT8 iox_data;
+	UINT8 iox_mux;
+	UINT8 iox_ff;
 };
 
 

@@ -270,7 +270,7 @@ static SCREEN_UPDATE( madalien )
 	draw_foreground(screen->machine, bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels).
-     * also, bit 1 of the state->video_flags register (6A) is
+     * also, bit 1 of the video_flags register (6A) is
      * combined with the headlight signal through NOR gate 1A,
      * which is used to light up the tunnel when an alien explodes
     */

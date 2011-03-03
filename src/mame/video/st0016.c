@@ -9,20 +9,15 @@
 UINT8 *st0016_charram;
 static UINT8 *st0016_spriteram,*st0016_paletteram;
 
-UINT8 *macs_ram1,*macs_ram2;
-
 UINT32 st0016_game;
 
-extern UINT8 macs_cart_slot;
+UINT8 macs_cart_slot;
 
 static INT32 st0016_spr_bank,st0016_spr2_bank,st0016_pal_bank,st0016_char_bank;
 static int spr_dx,spr_dy;
 
 static UINT8 st0016_vregs[0xc0];
 static int st0016_ramgfx;
-
-//super eagle shot
-static bitmap_t *speglsht_bitmap;
 
 static const gfx_layout charlayout =
 {
@@ -424,7 +419,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-void st0016_save_init(running_machine *machine)
+static void st0016_save_init(running_machine *machine)
 {
 	state_save_register_global(machine, st0016_spr_bank);
 	state_save_register_global(machine, st0016_spr2_bank);
@@ -441,6 +436,8 @@ void st0016_save_init(running_machine *machine)
 VIDEO_START( st0016 )
 {
 	int gfx_index=0;
+
+	macs_cart_slot = 0;
 	st0016_charram=auto_alloc_array(machine, UINT8, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
 	st0016_spriteram=auto_alloc_array(machine, UINT8, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 	st0016_paletteram=auto_alloc_array(machine, UINT8, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
@@ -471,10 +468,6 @@ VIDEO_START( st0016 )
 			machine->primary_screen->set_visible_area(8,41*8-1,0,30*8-1);
 			spr_dx=0;
 			spr_dy=8;
-		break;
-
-		case 3: //super eagle shot
-			speglsht_bitmap = auto_bitmap_alloc(machine, 512, 5122, BITMAP_FORMAT_INDEXED16 );
 		break;
 
 		case 4: //mayjinsen 1&2
@@ -591,9 +584,11 @@ static void draw_bgmap(running_machine *machine, bitmap_t *bitmap,const rectangl
 }
 
 
-#define PLOT_PIXEL_RGB(x,y,r,g,b)	if(y>=0 && x>=0 && x<512 && y<512) \
-{ \
-		*BITMAP_ADDR32(bitmap, y, x) = (b) | ((g)<<8) | ((r)<<16); \
+void st0016_draw_screen(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	draw_bgmap(screen->machine, bitmap,cliprect,0);
+	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_bgmap(screen->machine, bitmap,cliprect,1);
 }
 
 SCREEN_UPDATE( st0016 )
@@ -621,49 +616,8 @@ SCREEN_UPDATE( st0016 )
 	}
 #endif
 
-	if((st0016_game&0x3f)==3)
-	{
-		//super eagle shot
-		int x,y,dy;
-
-		bitmap_fill(speglsht_bitmap,NULL,0);
-		dy=(speglsht_videoreg&0x20)?(256*512):0; //visible frame
-
-		for(y=0;y<256;y++)
-		{
-			for(x=0;x<512;x++)
-			{
-				int tmp=dy+y*512+x;
-				PLOT_PIXEL_RGB(x-67,y-5,(speglsht_framebuffer[tmp]>>0)&0xff,(speglsht_framebuffer[tmp]>>8)&0xff,(speglsht_framebuffer[tmp]>>16)&0xff);
-			}
-		}
-
-		//draw st0016 gfx to temporary bitmap (indexed 16)
-		draw_bgmap(screen->machine, speglsht_bitmap,cliprect,0);
-		draw_sprites(screen->machine, speglsht_bitmap,cliprect);
-		draw_bgmap(screen->machine, speglsht_bitmap,cliprect,1);
-
-		//copy temporary bitmap to rgb 32 bit bitmap
-		for(y=cliprect->min_y; y<cliprect->max_y;y++)
-		{
-			UINT16 *srcline = BITMAP_ADDR16(speglsht_bitmap, y, 0);
-			for(x=cliprect->min_x; x<cliprect->max_x;x++)
-			{
-				if(srcline[x])
-				{
-					rgb_t color=palette_get_color(screen->machine, srcline[x]);
-					PLOT_PIXEL_RGB(x,y,RGB_RED(color),RGB_GREEN(color),RGB_BLUE(color));
-				}
-			}
-		}
-	}
-	else
-	{
-		bitmap_fill(bitmap,cliprect,UNUSED_PEN);
-		draw_bgmap(screen->machine, bitmap,cliprect,0);
-		draw_sprites(screen->machine, bitmap,cliprect);
-		draw_bgmap(screen->machine, bitmap,cliprect,1);
-	}
+	bitmap_fill(bitmap,cliprect,UNUSED_PEN);
+	st0016_draw_screen(screen, bitmap, cliprect);
 	return 0;
 }
 

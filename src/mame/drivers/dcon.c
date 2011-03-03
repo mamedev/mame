@@ -24,17 +24,17 @@ static ADDRESS_MAP_START( dcon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8bfff) AM_RAM
 
-	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_WRITE(dcon_background_w) AM_BASE(&dcon_back_data)
-	AM_RANGE(0x8c800, 0x8cfff) AM_RAM_WRITE(dcon_foreground_w) AM_BASE(&dcon_fore_data)
-	AM_RANGE(0x8d000, 0x8d7ff) AM_RAM_WRITE(dcon_midground_w) AM_BASE(&dcon_mid_data)
-	AM_RANGE(0x8d800, 0x8e7ff) AM_RAM_WRITE(dcon_text_w) AM_BASE(&dcon_textram)
+	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_WRITE(dcon_background_w) AM_BASE_MEMBER(dcon_state, back_data)
+	AM_RANGE(0x8c800, 0x8cfff) AM_RAM_WRITE(dcon_foreground_w) AM_BASE_MEMBER(dcon_state, fore_data)
+	AM_RANGE(0x8d000, 0x8d7ff) AM_RAM_WRITE(dcon_midground_w) AM_BASE_MEMBER(dcon_state, mid_data)
+	AM_RANGE(0x8d800, 0x8e7ff) AM_RAM_WRITE(dcon_text_w) AM_BASE_MEMBER(dcon_state, textram)
 	AM_RANGE(0x8e800, 0x8f7ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(dcon_gfxbank_w)
 
 	AM_RANGE(0xa0000, 0xa000d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0xc001c, 0xc001d) AM_READWRITE(dcon_control_r, dcon_control_w)
-	AM_RANGE(0xc0020, 0xc002f) AM_WRITEONLY AM_BASE(&dcon_scroll_ram)
+	AM_RANGE(0xc0020, 0xc002f) AM_WRITEONLY AM_BASE_MEMBER(dcon_state, scroll_ram)
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITENOP
 	AM_RANGE(0xc00c0, 0xc00c1) AM_WRITENOP
 	AM_RANGE(0xe0000, 0xe0001) AM_READ_PORT("DSW")
@@ -243,7 +243,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( dcon, driver_device )
+static MACHINE_CONFIG_START( dcon, dcon_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( dcon, driver_device )
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(4000000,1320000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sdgndmps, driver_device )
+static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)

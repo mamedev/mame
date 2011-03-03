@@ -5,12 +5,24 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT16 *videoram;
+	UINT16 *back_data;
+	UINT16 *fore_data;
+	UINT16 *scroll_ram;
+	tilemap_t *bg_layer;
+	tilemap_t *fg_layer;
+	tilemap_t *tx_layer;
+	int back_bankbase;
+	int fore_bankbase;
+	int back_enable;
+	int fore_enable;
+	int sprite_enable;
+	int txt_enable;
+	int old_back;
+	int old_fore;
 };
 
 
 /*----------- defined in video/dynduke.c -----------*/
-
-extern UINT16 *dynduke_back_data, *dynduke_fore_data, *dynduke_scroll_ram;
 
 WRITE16_HANDLER( dynduke_background_w );
 WRITE16_HANDLER( dynduke_foreground_w );

@@ -55,17 +55,16 @@ static READ16_HANDLER( pip16_r )
 }
 
 
-static int msm5205next;
 
 static void toki_adpcm_int (device_t *device)
 {
-	static int toggle = 0;
+	toki_state *state = device->machine->driver_data<toki_state>();
 
-	msm5205_data_w (device, msm5205next);
-	msm5205next >>= 4;
+	msm5205_data_w (device, state->msm5205next);
+	state->msm5205next >>= 4;
 
-	toggle ^= 1;
-	if (toggle)
+	state->toggle ^= 1;
+	if (state->toggle)
 		cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -84,7 +83,8 @@ static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
 
 static WRITE8_HANDLER( toki_adpcm_data_w )
 {
-	msm5205next = data;
+	toki_state *state = space->machine->driver_data<toki_state>();
+	state->msm5205next = data;
 }
 
 
@@ -95,11 +95,11 @@ static ADDRESS_MAP_START( toki_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
 	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
+	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE_MEMBER(toki_state, background1_videoram16)
+	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE_MEMBER(toki_state, background2_videoram16)
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE_MEMBER(toki_state, videoram)
 	AM_RANGE(0x080000, 0x08000d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_BASE(&toki_scrollram16)
+	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_BASE_MEMBER(toki_state, scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("SYSTEM")
@@ -110,8 +110,8 @@ static ADDRESS_MAP_START( tokib_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06dfff) AM_RAM
 	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE(&toki_background1_videoram16)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE(&toki_background2_videoram16)
+	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE_MEMBER(toki_state, background1_videoram16)
+	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE_MEMBER(toki_state, background2_videoram16)
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE_MEMBER(toki_state, videoram)
 	AM_RANGE(0x071000, 0x071001) AM_WRITENOP	/* sprite related? seems another scroll register */
 				/* gets written the same value as 75000a (bg2 scrollx) */
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( tokib_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07180e, 0x071e45) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x072000, 0x072001) AM_READ(watchdog_reset16_r)   /* probably */
 	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)
-	AM_RANGE(0x075004, 0x07500b) AM_WRITEONLY AM_BASE(&toki_scrollram16)
+	AM_RANGE(0x075004, 0x07500b) AM_WRITEONLY AM_BASE_MEMBER(toki_state, scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("SYSTEM")

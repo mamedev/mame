@@ -450,7 +450,7 @@ static MACHINE_RESET( phoenix )
 }
 
 
-static MACHINE_CONFIG_START( phoenix, driver_device )
+static MACHINE_CONFIG_START( phoenix, phoenix_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)	/* 2.75 MHz */
@@ -519,7 +519,7 @@ static I8085_CONFIG( survival_i8085_config )
 	DEVCB_NULL							/* SOD changed callback (8085A only) */
 };
 
-static MACHINE_CONFIG_START( survival, driver_device )
+static MACHINE_CONFIG_START( survival, phoenix_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)	/* 5.50 MHz */

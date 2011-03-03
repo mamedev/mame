@@ -73,6 +73,10 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	tilemap_t *bgtilemap;
+	tilemap_t *txttilemap;
+	UINT8 *scrollram;
+	UINT8 *mainram;
 };
 
 
@@ -80,9 +84,6 @@ public:
 #define SOUND_CLOCK		XTAL_14_31818MHz
 #define TC15_CLOCK		XTAL_12MHz
 
-static tilemap_t *bgtilemap, *txttilemap;
-static UINT8 *scrollram;
-static UINT8 *mainram;
 
 static PALETTE_INIT( panicr )
 {
@@ -186,7 +187,7 @@ static WRITE8_HANDLER(t5182shared_w)
 
 
 static ADDRESS_MAP_START( panicr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE(&mainram)
+	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE_MEMBER(panicr_state, mainram)
 	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION("user3", 0) //attribue map ?
@@ -201,20 +202,22 @@ static ADDRESS_MAP_START( panicr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d404, 0x0d404) AM_READ_PORT("START")
 	AM_RANGE(0x0d406, 0x0d406) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d407, 0x0d407) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_BASE (&scrollram)
+	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_BASE_MEMBER(panicr_state, scrollram)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static VIDEO_START( panicr )
 {
-	bgtilemap = tilemap_create( machine, get_bgtile_info,tilemap_scan_rows,16,16,1024,16 );
+	panicr_state *state = machine->driver_data<panicr_state>();
+	state->bgtilemap = tilemap_create( machine, get_bgtile_info,tilemap_scan_rows,16,16,1024,16 );
 
-	txttilemap = tilemap_create( machine, get_txttile_info,tilemap_scan_rows,8,8,32,32 );
-	colortable_configure_tilemap_groups(machine->colortable, txttilemap, machine->gfx[0], 0);
+	state->txttilemap = tilemap_create( machine, get_txttile_info,tilemap_scan_rows,8,8,32,32 );
+	colortable_configure_tilemap_groups(machine->colortable, state->txttilemap, machine->gfx[0], 0);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
+	panicr_state *state = machine->driver_data<panicr_state>();
 	UINT8 *spriteram = machine->generic.spriteram.u8;
 	int offs,flipx,flipy,x,y,color,sprite;
 
@@ -227,7 +230,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		if (spriteram[offs+1] & 0x40) x -= 0x100;
 
 		color = spriteram[offs+1] & 0x0f;
-		sprite = spriteram[offs+0]+(scrollram[0x0c]<<8);
+		sprite = spriteram[offs+0]+(state->scrollram[0x0c]<<8);
 
 		drawgfx_transmask(bitmap,cliprect,machine->gfx[2],
 				sprite,
@@ -238,12 +241,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static SCREEN_UPDATE( panicr)
 {
+	panicr_state *state = screen->machine->driver_data<panicr_state>();
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-	tilemap_mark_all_tiles_dirty( txttilemap );
-	tilemap_set_scrollx( bgtilemap,0, ((scrollram[0x02]&0x0f)<<12)+((scrollram[0x02]&0xf0)<<4)+((scrollram[0x04]&0x7f)<<1)+((scrollram[0x04]&0x80)>>7) );
-	tilemap_draw(bitmap,cliprect,bgtilemap,0,0);
+	tilemap_mark_all_tiles_dirty( state->txttilemap );
+	tilemap_set_scrollx( state->bgtilemap,0, ((state->scrollram[0x02]&0x0f)<<12)+((state->scrollram[0x02]&0xf0)<<4)+((state->scrollram[0x04]&0x7f)<<1)+((state->scrollram[0x04]&0x80)>>7) );
+	tilemap_draw(bitmap,cliprect,state->bgtilemap,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,txttilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->txttilemap,0,0);
 
 	return 0;
 }

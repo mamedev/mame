@@ -14,15 +14,17 @@
 #include "sound/dac.h"
 
 
+class xtheball_state : public driver_device
+{
+public:
+	xtheball_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-/*************************************
- *
- *  Global variables
- *
- *************************************/
+	UINT16 *vram_bg;
+	UINT16 *vram_fg;
+	UINT8 bitvals[32];
+};
 
-static UINT16 *vram_bg, *vram_fg;
-static UINT8 bitvals[32];
 
 
 
@@ -34,17 +36,18 @@ static UINT8 bitvals[32];
 
 static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT16 *srcbg = &vram_bg[(params->rowaddr << 8) & 0xff00];
+	xtheball_state *state = screen.machine->driver_data<xtheball_state>();
+	UINT16 *srcbg = &state->vram_bg[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
 	int coladdr = params->coladdr;
 	int x;
 
 	/* bit value 0x13 controls which foreground mode to use */
-	if (!bitvals[0x13])
+	if (!state->bitvals[0x13])
 	{
 		/* mode 0: foreground is the same as background */
-		UINT16 *srcfg = &vram_fg[(params->rowaddr << 8) & 0xff00];
+		UINT16 *srcfg = &state->vram_fg[(params->rowaddr << 8) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
@@ -59,7 +62,7 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, in
 	{
 		/* mode 1: foreground is half background resolution in */
 		/* X and supports two pages */
-		UINT16 *srcfg = &vram_fg[(params->rowaddr << 7) & 0xff00];
+		UINT16 *srcfg = &state->vram_fg[(params->rowaddr << 7) & 0xff00];
 
 		for (x = params->heblnk; x < params->hsblnk; x += 2, coladdr++)
 		{
@@ -83,10 +86,11 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, in
 
 static void xtheball_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
+	xtheball_state *state = space->machine->driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
-		memcpy(shiftreg, &vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
+		memcpy(shiftreg, &state->vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
-		memcpy(shiftreg, &vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
+		memcpy(shiftreg, &state->vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
 		logerror("%s:xtheball_to_shiftreg(%08X)\n", space->machine->describe_context(), address);
 }
@@ -94,10 +98,11 @@ static void xtheball_to_shiftreg(address_space *space, UINT32 address, UINT16 *s
 
 static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
+	xtheball_state *state = space->machine->driver_data<xtheball_state>();
 	if (address >= 0x01000000 && address <= 0x010fffff)
-		memcpy(&vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&state->vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else if (address >= 0x02000000 && address <= 0x020fffff)
-		memcpy(&vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&state->vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
 		logerror("%s:xtheball_from_shiftreg(%08X)\n", space->machine->describe_context(), address);
 }
@@ -112,6 +117,8 @@ static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 
 
 static WRITE16_HANDLER( bit_controls_w )
 {
+	xtheball_state *state = space->machine->driver_data<xtheball_state>();
+	UINT8 *bitvals = state->bitvals;
 	if (ACCESSING_BITS_0_7)
 	{
 		if (bitvals[offset] != (data & 1))
@@ -201,8 +208,8 @@ static READ16_HANDLER( analogy_watchdog_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE(&vram_bg)
-	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE(&vram_fg)
+	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE_MEMBER(xtheball_state, vram_bg)
+	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE_MEMBER(xtheball_state, vram_fg)
 	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x03040000, 0x030401ff) AM_WRITE(bit_controls_w)
 	AM_RANGE(0x03040080, 0x0304008f) AM_READ_PORT("DSW")
@@ -321,7 +328,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( xtheball, driver_device )
+static MACHINE_CONFIG_START( xtheball, xtheball_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
 	MCFG_CPU_CONFIG(tms_config)

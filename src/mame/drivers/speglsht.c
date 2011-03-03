@@ -109,10 +109,20 @@ Notes:
 #include "sound/st0016.h"
 #include "includes/st0016.h"
 
-static UINT8 *shared;
 
-UINT32 *speglsht_framebuffer;
-UINT32  speglsht_videoreg;
+class speglsht_state : public driver_device
+{
+public:
+	speglsht_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *shared;
+	UINT32 *framebuffer;
+	UINT32 videoreg;
+	bitmap_t *bitmap;
+	UINT32 *cop_ram;
+};
+
 
 static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -124,7 +134,7 @@ static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_snd_r, st0016_snd_w)
 	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&shared)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(speglsht_state, shared)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
@@ -141,35 +151,39 @@ ADDRESS_MAP_END
 
 static READ32_HANDLER(shared_r)
 {
-	return shared[offset];
+	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	return state->shared[offset];
 }
 
 static WRITE32_HANDLER(shared_w)
 {
-	shared[offset]=data&0xff;
+	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	state->shared[offset]=data&0xff;
 }
 
 static WRITE32_HANDLER(videoreg_w)
 {
-	COMBINE_DATA(&speglsht_videoreg);
+	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	COMBINE_DATA(&state->videoreg);
 }
 
-static UINT32 *cop_ram;
 
 static WRITE32_HANDLER(cop_w)
 {
-	COMBINE_DATA(&cop_ram[offset]);
+	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	COMBINE_DATA(&state->cop_ram[offset]);
 
-	if(cop_ram[offset]&0x8000) //fix (sign)
+	if(state->cop_ram[offset]&0x8000) //fix (sign)
 	{
-		cop_ram[offset]|=0xffff0000;
+		state->cop_ram[offset]|=0xffff0000;
 	}
 }
 
 //matrix * vector
 static READ32_HANDLER(cop_r)
 {
-	INT32 *cop=(INT32*)&cop_ram[0];
+	speglsht_state *state = space->machine->driver_data<speglsht_state>();
+	INT32 *cop=(INT32*)&state->cop_ram[0];
 
 	union
 	{
@@ -210,11 +224,11 @@ static READ32_HANDLER(irq_ack_clear)
 static ADDRESS_MAP_START( speglsht_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x01007fff) AM_RAM //tested - STATIC RAM
-	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE(cop_r, cop_w) AM_BASE(&cop_ram)
+	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE(cop_r, cop_w) AM_BASE_MEMBER(speglsht_state, cop_ram)
 	AM_RANGE(0x01800200, 0x01800203) AM_WRITE(videoreg_w)
 	AM_RANGE(0x01800300, 0x01800303) AM_READ_PORT("IN0")
 	AM_RANGE(0x01800400, 0x01800403) AM_READ_PORT("IN1")
-	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM AM_BASE(&speglsht_framebuffer)
+	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM AM_BASE_MEMBER(speglsht_state, framebuffer)
 	AM_RANGE(0x01b00000, 0x01b07fff) AM_RAM //cleared ...  video related ?
 	AM_RANGE(0x01c00000, 0x01dfffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE(shared_r, shared_w)
@@ -315,10 +329,60 @@ static const r3000_cpu_core r3000_config =
 
 static MACHINE_RESET(speglsht)
 {
-	memset(shared,0,0x1000);
+	speglsht_state *state = machine->driver_data<speglsht_state>();
+	memset(state->shared,0,0x1000);
 }
 
-static MACHINE_CONFIG_START( speglsht, driver_device )
+static VIDEO_START(speglsht)
+{
+	speglsht_state *state = machine->driver_data<speglsht_state>();
+	state->bitmap = auto_bitmap_alloc(machine, 512, 5122, BITMAP_FORMAT_INDEXED16 );
+	VIDEO_START_CALL(st0016);
+}
+
+#define PLOT_PIXEL_RGB(x,y,r,g,b)	if(y>=0 && x>=0 && x<512 && y<512) \
+{ \
+		*BITMAP_ADDR32(bitmap, y, x) = (b) | ((g)<<8) | ((r)<<16); \
+}
+
+static SCREEN_UPDATE(speglsht)
+{
+	speglsht_state *state = screen->machine->driver_data<speglsht_state>();
+	int x,y,dy;
+
+	dy=(state->videoreg&0x20)?(256*512):0; //visible frame
+
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<512;x++)
+		{
+			int tmp=dy+y*512+x;
+			PLOT_PIXEL_RGB(x-67,y-5,(state->framebuffer[tmp]>>0)&0xff,(state->framebuffer[tmp]>>8)&0xff,(state->framebuffer[tmp]>>16)&0xff);
+		}
+	}
+
+	//draw st0016 gfx to temporary bitmap (indexed 16)
+	bitmap_fill(state->bitmap,NULL,0);
+	st0016_draw_screen(screen, state->bitmap, cliprect);
+
+	//copy temporary bitmap to rgb 32 bit bitmap
+	for(y=cliprect->min_y; y<cliprect->max_y;y++)
+	{
+		UINT16 *srcline = BITMAP_ADDR16(state->bitmap, y, 0);
+		for(x=cliprect->min_x; x<cliprect->max_x;x++)
+		{
+			if(srcline[x])
+			{
+				rgb_t color=palette_get_color(screen->machine, srcline[x]);
+				PLOT_PIXEL_RGB(x,y,RGB_RED(color),RGB_GREEN(color),RGB_BLUE(color));
+			}
+		}
+	}
+
+	return 0;
+}
+
+static MACHINE_CONFIG_START( speglsht, speglsht_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 8000000) /* 8 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
@@ -341,12 +405,12 @@ static MACHINE_CONFIG_START( speglsht, driver_device )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
-	MCFG_SCREEN_UPDATE(st0016)
+	MCFG_SCREEN_UPDATE(speglsht)
 
 	MCFG_GFXDECODE(speglsht)
 	MCFG_PALETTE_LENGTH(16*16*4+1)
 
-	MCFG_VIDEO_START(st0016)
+	MCFG_VIDEO_START(speglsht)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

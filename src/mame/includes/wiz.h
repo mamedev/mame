@@ -5,16 +5,23 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	int dsc0;
+	int dsc1;
+	UINT8 *videoram2;
+	UINT8 *colorram2;
+	UINT8 *attributesram;
+	UINT8 *attributesram2;
+	UINT8 *sprite_bank;
+	INT32 flipx;
+	INT32 flipy;
+	INT32 bgpen;
+	UINT8 char_bank[2];
+	UINT8 palbank[2];
+	int palette_bank;
 };
 
 
 /*----------- defined in video/wiz.c -----------*/
-
-extern UINT8 *wiz_videoram2;
-extern UINT8 *wiz_colorram2;
-extern UINT8 *wiz_attributesram;
-extern UINT8 *wiz_attributesram2;
-extern UINT8 *wiz_sprite_bank;
 
 WRITE8_HANDLER( wiz_char_bank_select_w );
 WRITE8_HANDLER( wiz_palettebank_w );
