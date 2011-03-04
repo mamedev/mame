@@ -1243,7 +1243,7 @@ INLINE void serial_receive(mcs51_state_t *mcs51_state)
 {
 	int mode = (GET_SM0<<1) | GET_SM1;
 
-	if(GET_ES && GET_REN) {
+	if (GET_REN) {
 		switch(mode) {
 			//8 bit shifter ( + start,stop bit ) - baud set by clock freq / 12
 			case 0:
