@@ -231,16 +231,6 @@ static INPUT_PORTS_START( bagmans )
 	PORT_DIPSETTING(	0x20, DEF_STR ( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( sbagman )
-	PORT_INCLUDE( bagman )
-
-	PORT_MODIFY("P1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* double-function button, start and shoot */
-
-	PORT_MODIFY("P2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL /* double-function button, start and shoot */
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( pickin )
 	PORT_INCLUDE( bagman )
 
@@ -940,8 +930,8 @@ GAME( 1982, bagnard,  bagman,  bagman,  bagman,  0,        ROT270, "Valadon Auto
 GAME( 1982, bagnarda, bagman,  bagman,  bagman,  bagnarda, ROT270, "Valadon Automation", "Le Bagnard (set 2)", 0 )
 GAME( 1982, bagmans,  bagman,  bagman,  bagmans, 0,        ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", 0 )
 GAME( 1982, bagmans2, bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", 0 )
-GAME( 1984, sbagman,       0,  bagman,  sbagman, 0,        ROT270, "Valadon Automation", "Super Bagman", 0 )
-GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", 0 )
+GAME( 1984, sbagman,       0,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Super Bagman", 0 )
+GAME( 1984, sbagmans, sbagman, bagman,  bagman,  0,        ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", 0 )
 GAME( 1983, pickin,	   0,  pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
 GAME( 1984, botanic,       0,  botanic, botanic, 0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
 GAME( 1984, squaitsa,      0,  squaitsa,squaitsa,0,        ROT0,   "Itisa",              "Squash (Itisa)", 0 )
