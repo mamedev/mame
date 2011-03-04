@@ -88,7 +88,7 @@ PALETTE_INIT( bagman )
 
 WRITE8_HANDLER( bagman_flipscreen_w )
 {
-	if (flip_screen_get(space->machine) != (data & 0x01))
+	if ((flip_screen_get(space->machine) ^ data) & 1)
 	{
 		flip_screen_set(space->machine, data & 0x01);
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
@@ -108,6 +108,8 @@ VIDEO_START( bagman )
 {
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
+
+	tilemap_set_scrolldy(bg_tilemap, 0, -1);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -119,19 +121,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int sx,sy,flipx,flipy;
 
-
 		sx = spriteram[offs + 3];
 		sy = 255 - spriteram[offs + 2] - 16;
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
 		if (flip_screen_x_get(machine))
 		{
-			sx = 256 - sx  - 15;
+			sx = bitmap->width - sx - 15;
 			flipx = !flipx;
 		}
 		if (flip_screen_y_get(machine))
 		{
-			sy = 255 - sy - 8;
+			sy = bitmap->height - sy - 15;
 			flipy = !flipy;
 		}
 
@@ -148,11 +149,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( bagman )
 {
+	bitmap_fill(bitmap,cliprect,0);
+
 	if (*bagman_video_enable == 0)
 		return 0;
 
-	tilemap_set_scrolldx(bg_tilemap, 0, -128);
-	tilemap_set_scrolldy(bg_tilemap, -1, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
