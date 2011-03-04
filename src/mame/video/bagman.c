@@ -109,8 +109,9 @@ VIDEO_START( bagman )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_scrolldy(bg_tilemap, 0, -1);
+	tilemap_set_scrolldy(bg_tilemap, -1, -1);
 }
+
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
@@ -145,7 +146,6 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					sx,sy,0);
 	}
 }
-
 
 SCREEN_UPDATE( bagman )
 {
