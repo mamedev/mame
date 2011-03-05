@@ -5,9 +5,10 @@
  *
  */
 
+#include "emu.h"
 #include "psx.h"
 
-extern unsigned dasmr3k(char *,unsigned, UINT32);
+extern CPU_DISASSEMBLE( r3000le );
 extern unsigned dasmmips3(char *,unsigned, UINT32);
 
 static struct
@@ -76,7 +77,7 @@ int main( int argc, char *argv[] )
 	UINT32 filelen;
 	UINT32 len;
 	UINT32 pc;
-	char buf[ 80 ];
+	char buffer[ 80 ];
 	char *filename;
 	UINT32 format;
 	UINT32 cpu;
@@ -252,7 +253,7 @@ int main( int argc, char *argv[] )
 
 	fseek (f,begin,SEEK_SET);
 	len=(filelen>end)? (end-begin+1):(filelen-begin);
-	filebuf=malloc(len+16);
+	filebuf=(UINT8 *)malloc(len+16);
 	if (!filebuf)
 	{
 		printf ("Memory allocation error\n");
@@ -290,20 +291,22 @@ int main( int argc, char *argv[] )
 		switch( cpu )
 		{
 		case CPU_PSX:
-			i = DasmPSXCPU( NULL, buf, pc + offset, filebuf + pc );
+			i = DasmPSXCPU( NULL, buffer, pc + offset, filebuf + pc );
 			break;
 		case CPU_R3000:
 			{
+				legacy_cpu_device *device = NULL;
+				int options = 0;
 				UINT8 *opram = filebuf + pc;
-				UINT32 op = ( opram[ 3 ] << 24 ) | ( opram[ 2 ] << 16 ) | ( opram[ 1 ] << 8 ) | ( opram[ 0 ] << 0 );
-				i = dasmr3k( buf, pc + offset, op );
+				UINT8 *oprom = opram;
+				i = CPU_DISASSEMBLE_CALL( r3000le );
 			}
 			break;
 		case CPU_R4000:
 			{
 				UINT8 *opram = filebuf + pc;
 				UINT32 op = ( opram[ 3 ] << 24 ) | ( opram[ 2 ] << 16 ) | ( opram[ 1 ] << 8 ) | ( opram[ 0 ] << 0 );
-				i = dasmmips3( buf, pc + offset, op );
+				i = dasmmips3( buffer, pc + offset, op );
 			}
 			break;
 		}
@@ -321,8 +324,31 @@ int main( int argc, char *argv[] )
 			printf( "   " );
 			j++;
 		}
-		printf( "%s\n", buf );
+		printf( "%s\n", buffer );
 	}
 	free (filebuf);
 	return 0;
+}
+
+void *malloc_file_line(size_t size, const char *file, int line)
+{
+	// allocate the memory and fail if we can't
+	return osd_malloc(size);
+}
+
+void free_file_line( void *memory, const char *file, int line )
+{
+	osd_free( memory );
+}
+
+void osd_free( void *memory )
+{
+#undef free
+	free( memory );
+}
+
+void *osd_malloc( size_t size )
+{
+#undef malloc
+	return malloc( size );
 }
