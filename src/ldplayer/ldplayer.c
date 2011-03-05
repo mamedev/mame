@@ -117,7 +117,7 @@ static chd_file *get_disc(device_t *device)
 			if (filerr == FILERR_NONE)
 			{
 				/* try to open the CHD */
-				chderr = chd_open_file(image_file, CHD_OPEN_READ, NULL, &image_chd);
+				chderr = chd_open_file(*image_file, CHD_OPEN_READ, NULL, &image_chd);
 				if (chderr == CHDERR_NONE)
 				{
 					set_disk_handle(*device->machine, "laserdisc", *image_file, *image_chd);
