@@ -361,7 +361,7 @@ int running_machine::run(bool firstrun)
 		// if we have a logfile, set up the callback
 		if (m_options.log())
 		{
-			m_logfile = auto_alloc(this, emu_file(NULL, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
+			m_logfile = auto_alloc(this, emu_file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS));
 			file_error filerr = m_logfile->open("error.log");
 			assert_always(filerr == FILERR_NONE, "unable to open log file");
 			add_logerror_callback(logfile_callback);
