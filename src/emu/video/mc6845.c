@@ -883,6 +883,10 @@ static void common_start(device_t *device, int device_type)
 		if ( mc6845->intf->screen_tag != NULL )
 		{
 			mc6845->screen = downcast<screen_device *>(device->machine->device(mc6845->intf->screen_tag));
+			if (mc6845->screen == NULL) {
+				astring tempstring;
+				mc6845->screen = downcast<screen_device *>(device->machine->device(device->owner()->subtag(tempstring,mc6845->intf->screen_tag)));
+			}
 			assert(mc6845->screen != NULL);
 		}
 		else
