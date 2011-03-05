@@ -5000,7 +5000,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.06 Quest of D ver.1.20a */
 						/* 2005.09 Quest of D ver.1.21 */
 						/* 2005.10 Sangokushi Taisen Ranse no Gunrou ver.1.100 */
-						/* 2005.10 Wangan Midnight Maximum Tune 2 ver.B */
+	DRIVER( wangmd2b )	/* 2005.10 Wangan Midnight Maximum Tune 2 ver.B */
 						/* 2005.11 Sangokushi Taisen Ranse no Gunrou ver.1.110 */
 						/* 2005.12 Quest of D Gofu no Keisyousya ver.2.00 */
 						/* 2005.12 Kidou Senshi Gundam 0079 Card Builder */

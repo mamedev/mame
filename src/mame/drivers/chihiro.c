@@ -1,16 +1,295 @@
 /*
+ 
+Chihiro is an Xbox-based arcade system from SEGA.
 
-Chihiro is an Xbox based arcade motherboard from SEGA
-A Chihiro system consists of network board, media board, base board & Xbox board
+Games on this system include....
 
-The whole system is divided into 2 parts and each part has two boards.
-The upper part contains a media board with a TSOP48 where there is an xbox .xbe loader
-(this is the dashboard you see when you power the Chihiro) and for a network board (100% the same
-as the one in the Triforce v3, same firmware also)
+ Game                                                   Manufacturer              Media                Key Chip
++----------------------------------------------------+-------------------------+--------------------+--------------|
+|*The House of the Dead III                          | Sega, 2002              | GDROM GDX-0001     | 317-0348-COM |
+|*Out Run 2 (Rev. A)                                 | Sega, 2003              | GDROM GDX-0004A    | 317-0372-COM |
+|*Sega Network Taisen Mahjong MJ 2 (Rev. C)          | Sega, 2005              | GDROM GDX-0006C    |              |
+|*Ollie King                                         | Sega, 2005              | GDROM GDX-0007     |              |
+|*Wangan Midnight Maximum Tune (Rev. B) Export       | Sega, 2005              | GDROM GDX-0009B    |              |
+|*Wangan Midnight Maximum Tune (Rev. B) Japan        | Sega, 2005              | GDROM GDX-0008B    |              |
+|*Wangan Midnight Maximum Tune 2 (Export)            | Sega, 2005              | GDROM GDX-0015     | 317-5106-COM |
+|*Wangan Midnight Maximum Tune 2 (Japan)             | Sega, 2005              | GDROM GDX-0016     | 317-5106-JPN |
+|*Wangan Midnight Maximum Tune 2 Ver.B               | Sega, 2005              | GDROM GDX-0016A    | 317-5106-JPN |
+|Ghost Squad                                         | Sega, 2004              |                    |              |
+|*Ghost Squad (Ver. A)                               | Sega, 2005              | GDROM GDX-0012A    | 317-0398-COM |
+|*Gundam Battle Operating Simulator                  | Banpresto, 2005         | GDROM GDX-0013     |              |
+|*Virtua Cop 3                                       | Sega, 2003              | GDROM GDX-0003A    | 317-0354-COM |
+|*Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega, 2005              | GDROM GDX-0017D    |              |
+|Sega Network Taisen Mahjong MJ 3 EVO                | Sega, 2007              |                    |              |
+|*Sega Club Golf 2006 Next Tours (Rev A)             | Sega, 2006              | GDROM GDX-0018A    |              |
+|*Crazy Taxi High Roller                             | Sega, 2003              | GDROM GDX-0002     |              |
+|Manic Panic Ghosts                                  | Sega, 2007              |                    |              |
+|Outrun 2 SP Japan                                   | Sega, 2004              | GDROM GDX-0011     |              |
+|*Outrun 2 Special Tours                             | Sega, 200x              | GDROM GDX-0014A    |              |
+|Quest Of D                                          | Sega, 2004              |                    |              |
+|Quest Of D The Battle Kingdom                       | Sega, 2007              |                    |              |
+|Quest Of D Ver.2.0                                  | Sega, 2005              |                    |              |
+|Sangokushi Taisen                                   | Sega, 2005              |                    |              |
+|Sangokushi Taisen 2                                 | Sega, 2006              |                    |              |
+|Sangokushi Taisen 3                                 | Sega, 2008              |                    |              |
+|Sega Golf Club Network Pro Tour                     | Sega, 2004              | GDROM GDX-0005     |              |
+|Mobile Suit Gundam 0079                             | Dimps/Banpresto, 2006   |                    |              |
+|Chihiro Firmware Update For Compact Flash Box       | Sega, 200x              | GDROM GDX-0024A    |              |
++----------------------------------------------------+-------------------------+--------------------+--------------+
+* denotes these games are archived.
+If you can help with the undumped games or know of missing Chihiro games, please contact...
+http://guru.mameworld.info/  or  http://www.mamedev.org
+   
+A Chihiro system consists of several boards. 
+The system is in 2 separate metal boxes that fit together to form one box. 
+In order from top to bottom they are....
+ - Network board  \
+ - Media board    /  Together in the top box
+ 
+ - Base board     \
+ - Xbox board     /  Together in the bottom box
 
-The bottom section consists of an Xbox board with 128MB of RAM and with a different MCPX than
-a retail one and a base board that handles JVS and Video.
+The 2 boxes join together via the Base Board upper connector and Media Board lower connector.
 
+The Microsoft-manufactured XBox board is the lowest board. It's mostly the same as the V1 XBox retail
+board with the exception that it has 128MB of RAM and a NVidia MCPX X2 chip. The retail XBox board has a 
+MCPX X3 chip. The board was probably released to Sega very early in development and the chip was updated
+in the mass-produced retail version.
+
+The Sega-manufactured base board is connected to the XBox board via a 40 pin 80-wire flat cable and a 16 
+pin 16-wire flat cable connects to the LPC header, plus a couple of thin multi-wire cables which join to the 
+XBox game controller ports (USB1.1) and front panel connector.
+On the reverse side of that board are the power output connectors going to the XBox board and a 100 pin 
+connector where the media board plugs in. A CR2032 coin battery is also located there and next to it are 6 
+jumpers....
+JP3S 2-3 \
+JP4S 1-2 |
+JP5S 1-2 |
+JP6S 2-3 | These are connected to the USB chip on the other side of this board
+JP7S 1-2 |
+JP8S 2-3 /
+A long connector on one edge connects to the filter board (power supply input etc) and on another edge are 
+connectors for VGA output, audio/video input (from a short cable coming from the A/V connector on the XBox board) 
+and a 14 pin connector which is unused. The base board handles JVS and video output.
+
+The upper part contains a Sega-manufactured media board with a TSOP48 flash ROM containing an xbox .xbe loader
+(this is the Chihiro logo you see when you power the Chihiro) and there's a connector for a Sega network board. 
+The network board is 100% the same as the one in the Triforce v3 with the same firmware also.
+
+The system requires one of the various Sega JVS I/O boards to operate.
+
+ROMs on the boards
+------------------
+Network Board : One ST 29W160ET 2M x8-bit TSOP48 Flash ROM stamped 'FPR24036' at location IC2
+Media Board   : One ST 29W160ET 2M x8-bit TSOP48 Flash ROM stamped 'FPR24042' at location IC8
+                As in Triforce, it consists of two versions in the same flash, the first MB of the flash has
+                an older version as backup, and the second MB has the current version, versions included are:
+                SegaBoot Ver.2.00.0 Build:Feb  7 2003 12:28:30
+                SegaBoot Ver.2.13.0 Build:Mar  3 2005 17:03:15
+Base Board    : Two Microchip 24LC64 64k Serial EEPROMs at locations IC32 and IC10
+                One Microchip 24LC24 2k Serial EEPROM at location IC11
+                The chip at IC32 seems to be a backup of the base board firmware without region or serial.
+                The chip at IC11 has an unknown purpose. It contains some strings. The interesting thing is that it 
+                contains the string SBJE. If you go to the system info menu and press the service button 16 times in a row
+                a message will be displayed: GAME ID SBJE
+                The chip at IC10 contains the firmware of the Base Board, serial number and REGION of the whole system.
+                The region is located at offset 0x00001F10. 01 is JAPAN, 02 is USA, 03 is EXPORT. If you want to change 
+                the region of your Chihiro unit just change this byte. 
+                Alternatively, if you have a netboot PIC, plug that in and power up with it.
+                 1) Enter the test menu (push the test button)
+                 2) Go to the System Information menu.
+                 3) Press the Service button 30 times in a row and a hidden menu will appear to change the region.
+                 4) Once the region is changed, exit from the menus and after the Chihiro reboots, power off the system and
+                    power on again.
+Xbox Board    : One Macronix 29F040TC-90 512k x8-bit TSOP32 Flash ROM at location U7D1
+
+  
+Board Layouts
+=============
+
+
+XBox Board
+----------
+
+|--------------------------------------------|
+|     LAN        FAN1         A/V        FAN2|
+|                                            |
+|                      LF353     CONEXANT    |
+|DVD_PWR      WM9709             XC25871-14  |
+|                                            |
+|     ICS_UA431317                           |-------------------|
+|                                             LM358              |
+|     27MHz   PIC16LC63A                                         |
+|IDE            BR24C02                                          |
+|     ICS_455R-02                                                |
+|                     K4D263238D                                 |
+|        29F040.U7D1  *K4D263238D                                |
+|                                                                |
+|                                     GPU          CPU @733MHz   |
+|       16_PIN_CONN                  (WITH FAN)   (SL5SN 733/128)|
+|                     K4D263238D                                 |
+|                     *K4D263238D                                |
+|                                                                |
+|                                                                |
+|                          K4D263238D   K4D263238D               |
+|                          *K4D263238D  *K4D263238D              |
+|          NVIDIA                                                |
+|          MCPX X2                                               |
+|                                                    POWER_CONN  |
+|                                                                |
+|                                                                |
+|                                                                |
+|                           GAME1/2   FRONT_PANEL    GAME3/4     |
+|----------------------------------------------------------------|
+Notes:
+      * These parts located on the other side of the PCB
+      Some of the connectors are not used.
+
+
+Base Board
+----------
+
+171-8204B
+837-14280 SEGA 2002
+Sticker: 837-14280-92
+|----------------------------------------------------------------|
+|*CN16S   *CN14S     *CN19S                      ADM3222         |
+|                                                             CN8|
+|                                          24LC64.IC32           |
+|CN11    CN18        CN1                           PC410         |
+|                                                     LM1881     |
+|                     SN65240                                    |
+|                              SN65240     AN2131SC   BA7623     |
+|                                                            CN10|
+|                                      12MHz     BA7623          |
+|                        *CR2032                                 |
+|                               SUPERCAP                         |
+|                          32.768kHz                             |
+|CN12                      RV5C386A                              |
+|                    24LC024.IC11 M68AF127                    CN9|
+|                    24LC64.IC10          AN2131QC               |
+|                                 ADM3222             DS485      |
+|                                               1.85MHz          |
+|      3771                                                   CN5|
+|-------------------------|       CN15         |-----------------|
+                          |--------------------|
+Notes: 
+      (* these parts on other side of the PCB)
+      RV5C386A  - I2C Bus Serial Interface Real-Time Clock IC with Voltage Monitoring Function (SSOP10)
+      24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8)
+      24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8)
+      M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32)
+      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80)
+      AN2131SC  /                                                             (QFP44)
+      ADM3222   - Analog Devices ADM3222 High-Speed, +3.3V, 2-Channel RS232/V.28 Interface Device (SOIC20)
+      SN65240   - Texas Instruments SN65240 USB Port Transient Suppressor (SOIC8)
+      BA7623    - Rohm BA7623 75-Ohm driver IC with 3 internal circuits (SOIC8)
+      LM1881    - National LM1881 Video Sync Separator (SOIC8)
+      DS485     - National DS485 Low-Power RS-485/RS-422 Multipoint Transceiver (SOIC8)
+      3771      - Fujitsu MB3771 System Reset IC (SOIC8)
+      PC410     - Sharp PC410 Ultra-high Speed Response OPIC Photocoupler
+      CN1       - 22-pin multi-wire cable connector joining to XBox board
+      CN5       - USB connector joining to JVS I/O board with standard USB cable
+      CN8       - A/V input connector (from XBox board via short A/V cable)
+      CN9       - VGA output connector
+      CN10      - 14 pin connector (purpose unknown but appears to be unused)
+      CN11      - 16-pin flat cable connector joining to LPC connector on XBox board
+      CN12      - 40-pin IDE flat cable connector joining to IDE connector on XBox board
+      CN14S     - 7-pin power output connector joining to XBox board
+      CN15      - 96-pin connector joining to filter board
+      CN16S     - 2-pin connector joining to case fan on Chihiro lower section (next to XBox PCB)
+      CN18      - 10-pin multi-wire cable connector joining to XBox board
+      CN19S     - 5-pin power output connector joining to XBox board
+      There are also many power-related components such as capacitors, mosfets and transistors.
+
+
+Network Board
+-------------
+
+This board is identical to the network board used in Triforce games.
+See src/mame/drivers/triforce.c
+
+
+Media Board
+-----------
+
+171-8234C
+837-14359-01 SEGA 2002
+Sticker: 837-14359-91
+|----------------------------------------------------------------|
+|             LED LED                                            |
+|                                         FLASH.IC8              |
+| LED                    CN12 CN11                               |
+| LED    JP4-JP10                                            CN10|
+|                                                                |
+|                                                                |
+|                                   |----------|                 |
+|                                   |SEGA      |                 |
+|    CN14S*                         |315-6355  |                 |
+|                                   |          |                 |
+|                                   |          |                 |
+| MB3800*                           |----------|              CN8|
+|                                               CY25560*         |
+|                                                                |
+|                         CY23S09SC         49.25MHz             |
+|                                                                |
+|                          CN4 (DIMM)                            |
+|                          CN3 (DIMM)                         CN5|
+| MM1433*                                                        |
+| CN13  TPC8009              CN9             CN6                 |
+|----------------------------------------------------------------|
+Notes:
+      *         - These parts on other side of PCB
+      CN3/4     - 72 pin DIMM sockets
+      CN5       - GDROM data cable connector (SCSI mini-honda connection but signal/protocol is IDE)
+      CN6       - 40 pin flat cable connector (unused)
+      CN8       - 6 pin GDROM power connector
+      CN9       - 6 pin power connector (unused)
+      CN10      - Connector for small 90-degrees upright board where PIC plugs in. The upright board contains only a DIP18 socket and a 4MHz OSC.
+      CN11/12   - Network board connectors joining to Sega Network PCB
+      CN13      - Battery connector (maintains power to DIMM RAM)
+      CN14S     - 100 pin connector joining to base board
+      JP4-10    - Jumpers. Settings are as follows (taken from Wangan Midnight Maximum Tune 2 Ver.B)
+                  JP4 2-3
+                  JP5 2-3. Sets DIMM RAM size. 1-2 = 1GB (2x 512M sticks), 2-3 = 512MB (1x 512M stick)
+                  JP6 1-2
+                  JP7 2-3
+                  JP8 2-3
+                  JP9 1-2
+                  JP10 1-2
+      FLASH.IC8 - ST M29W160 16MBit Flash ROM stamped 'FPR24042' (TSOP48)
+
+
+Filter Board
+------------
+
+839-1208-02
+171-8205C SEGA 2002
+|----------------------------------------------------------------|
+| SP-DIF     LED_STATUS2  LED_STATUS1                    CN3     |
+|                                                                |
+|                          DIN1                       LED_3.3V   |
+|                                                     LED_5V     |
+|            DIPSW(8)                                 LED_12V    |
+|CN6 CN5 CN4          SW2  SW1           CN2         CN1         |
+|----------------------------------------------------------------|
+Notes:
+      CN1   - 8-pin JVS power input connector
+      CN2   - 6-pin JVS power input connector
+      CN3   - Red/white RCA unamplified stereo audio output jacks
+      CN4   - 11-pin connector
+      CN5   - 8-pin connector
+      CN6   - 7-pin connector
+      SW1/2 - test/service buttons
+      DIN1  - 96-pin connector joining to Base Board
+      DIPSW - 8-position DIP switch. On this game (Wangan Midnight Maximum Tune 2 Ver.B) DIPs 3, 4, 6, 7 & 8 are set ON. The others are OFF.
+ 
+*/
+
+/* 
+ 
+Dump info: 
+ 
 Network Board Dump : Ver1305.bin
 Media Board dump   : FPR21042_M29W160ET.bin
 Base Board Dumps   : ic10_g24lc64.bin ic11_24lc024.bin pc20_g24lc64.bin
@@ -25,10 +304,6 @@ SegaBoot Ver.2.13.0 Build:Mar  3 2005 17:03:15
 ic10_g24lc64.bin: This dump contains the firmware of the Base Board, serial number and REGION of the whole system
 Region is located at Offset 0x00001F10 , 01 means JAP, 02 Means USA, 03 Means EXPORT, if you
 want to change the region of your Chihiro Board, just change this byte.
-pc20_g24lc64.bin: it seems a backup of the base board without region or serial, older version maybe?
-ic11_24lc024.bin: this is the mysterious one, as the previous 2, its on the Base Board, and just contains some
-strings the interesting thing is that it contains the string SBJE and if you go to the system info menu
-on the Chihiro and you press service button 16 times in a row, a message will be displayed: GAME ID SBJE
 
 Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
@@ -504,6 +779,17 @@ ROM_START( wangmid2 )
 ROM_END
 
 
+ROM_START( wangmd2b )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0016a", 0, SHA1(cb306df60550bbd8df312634cb97014bb39f1631) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	ROM_LOAD("317-5106-com.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
+ROM_END
+
+
 ROM_START( mj3 )
 	CHIHIRO_BIOS
 
@@ -559,6 +845,7 @@ GAME( 2005, mj2,      chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",       
 GAME( 2005, ollie,    chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Ollie King (GDX-0007)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid,  chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune (Rev. B) (Export) (GDX-0009B)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, wangmid2, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 (Export) (GDX-0015)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, wangmd2b, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Wangan Midnight Maximum Tune 2 Ver. B (Japan) (GDX-0016A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ghostsqu, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Ghost Squad (Ver. A?) (GDX-0012A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, gundamos, chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Gundam Battle Operating Simulator (GDX-0013)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, outr2st,  chihiro, chihirogd,    chihiro,    0, ROT0, "Sega",           "Out Run 2 Special Tours (GDX-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
