@@ -1,11 +1,36 @@
+/***************************************************************************
+
+    psx.h
+
+    Sony PlayStation CPU emulator.
+
+***************************************************************************/
+
 #pragma once
 
-#ifndef __PSX_H__
-#define __PSX_H__
+#ifndef __PSXCPU_H__
+#define __PSXCPU_H__
 
 
-#define PSXCPU_DELAYR_PC ( 32 )
-#define PSXCPU_DELAYR_NOTPC ( 33 )
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
+
+// cache
+
+#define ICACHE_ENTRIES ( 0x400 )
+#define DCACHE_ENTRIES ( 0x100 )
+
+// interrupts
+
+#define PSXCPU_IRQ0	( 0 )
+#define PSXCPU_IRQ1	( 1 )
+#define PSXCPU_IRQ2	( 2 )
+#define PSXCPU_IRQ3	( 3 )
+#define PSXCPU_IRQ4	( 4 )
+#define PSXCPU_IRQ5	( 5 )
+
+// register enumeration
 
 enum
 {
@@ -71,12 +96,223 @@ enum
 	PSXCPU_CP2CR30, PSXCPU_CP2CR31
 };
 
-#define PSXCPU_IRQ0	( 0 )
-#define PSXCPU_IRQ1	( 1 )
-#define PSXCPU_IRQ2	( 2 )
-#define PSXCPU_IRQ3	( 3 )
-#define PSXCPU_IRQ4	( 4 )
-#define PSXCPU_IRQ5	( 5 )
+extern const device_type PSXCPU;
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+//#define MCFG_PSXCPU_CONFIG(_config)
+//  psxcpu_device_config::static_set_config(device, _config);
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+extern const device_type PSXCPU;
+extern const device_type CXD8661R;
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class psxcpu_device;
+
+
+// ======================> psxcpu_device_config
+
+class psxcpu_device_config :  public cpu_device_config
+{
+    friend class psxcpu_device;
+
+public:
+    // allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+    // construction/destruction
+	psxcpu_device_config(const machine_config &mconfig, device_type _type, const char *name, const char *tag, const device_config *owner, UINT32 clock, address_map_constructor internal_map);
+protected:
+	// device_config_execute_interface overrides
+	virtual UINT32 execute_min_cycles() const { return 1; }
+	virtual UINT32 execute_max_cycles() const { return 40; }
+	virtual UINT32 execute_input_lines() const { return 6; }
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const { return ( clocks + 3 ) / 4; }
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const { return cycles * 4; }
+
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const { return (spacenum == AS_PROGRAM) ? &m_program_config : NULL; }
+
+	// device_config_disasm_interface overrides
+	virtual UINT32 disasm_min_opcode_bytes() const { return 4; }
+	virtual UINT32 disasm_max_opcode_bytes() const { return 4; }
+
+	// address spaces
+	const address_space_config m_program_config;
+};
+
+class cxd8661r_device_config : public psxcpu_device_config
+{
+public:
+    // allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+};
+
+// ======================> psxcpu_device
+
+class psxcpu_device : public cpu_device
+{
+	friend class psxcpu_device_config;
+	friend class cxd8661r_device_config;
+
+public:
+	// public interfaces
+	void set_berr();
+	void set_biu( UINT32 data, UINT32 mem_mask );
+	UINT32 get_biu();
+
+protected:
+	// construction/destruction
+	psxcpu_device(running_machine &_machine, const psxcpu_device_config &config);
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_post_load();
+
+	// device_execute_interface overrides
+	virtual void execute_run();
+	virtual void execute_set_input(int inputnum, int state);
+
+	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry);
+	virtual void state_string_export(const device_state_entry &entry, astring &string);
+
+	// device_disasm_interface overrides
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
+
+
+
+	// CPU registers
+	UINT32 m_pc;
+	UINT32 m_r[ 32 ];
+	UINT32 m_cp0r[ 16 ];
+	PAIR m_cp2cr[ 32 ];
+	PAIR m_cp2dr[ 32 ];
+	UINT32 m_hi;
+	UINT32 m_lo;
+
+    // internal stuff
+	UINT32 m_op;
+
+	// memory access
+	inline UINT32 program_read(UINT32 addr);
+	inline void program_write(UINT32 addr, UINT32 data);
+	inline UINT32 opcode_read();
+
+	// address spaces
+	address_space *m_program;
+	direct_read_data *m_direct;
+
+	// other internal states
+    int m_icount;
+	UINT32 m_delayv;
+	UINT32 m_delayr;
+	UINT32 m_berr;
+	UINT32 m_biu;
+	UINT32 m_icacheTag[ ICACHE_ENTRIES / 4 ];
+	UINT32 m_icache[ ICACHE_ENTRIES ];
+	UINT32 m_dcache[ DCACHE_ENTRIES ];
+	int m_multiplier_operation;
+	UINT32 m_multiplier_operand1;
+	UINT32 m_multiplier_operand2;
+	int m_bus_attached;
+	UINT32 m_bad_byte_address_mask;
+	UINT32 m_bad_half_address_mask;
+	UINT32 m_bad_word_address_mask;
+
+	void stop();
+	UINT32 cache_readword( UINT32 offset );
+	void cache_writeword( UINT32 offset, UINT32 data );
+	UINT8 readbyte( UINT32 address );
+	UINT16 readhalf( UINT32 address );
+	UINT32 readword( UINT32 address );
+	UINT32 readword_masked( UINT32 address, UINT32 mask );
+	void writeword( UINT32 address, UINT32 data );
+	void writeword_masked( UINT32 address, UINT32 data, UINT32 mask );
+	UINT32 log_bioscall_parameter( int parm );
+	const char *log_bioscall_string( int parm );
+	const char *log_bioscall_hex( int parm );
+	const char *log_bioscall_char( int parm );
+	void log_bioscall();
+	void log_syscall();
+	void update_memory_handlers();
+	void funct_mthi();
+	void funct_mtlo();
+	void funct_mult();
+	void funct_multu();
+	void funct_div();
+	void funct_divu();
+	void multiplier_update();
+	UINT32 get_hi();
+	UINT32 get_lo();
+	int execute_unstoppable_instructions( int executeCop2 );
+	void update_address_masks();
+	void update_scratchpad();
+	void update_cop0( int reg );
+	void commit_delayed_load();
+	void set_pc( unsigned pc );
+	void fetch_next_op();
+	int advance_pc();
+	void load( UINT32 reg, UINT32 value );
+	void delayed_load( UINT32 reg, UINT32 value );
+	void branch( UINT32 address );
+	void conditional_branch( int takeBranch );
+	void unconditional_branch();
+	void common_exception( int exception, UINT32 romOffset, UINT32 ramOffset );
+	void exception( int exception );
+	void breakpoint_exception();
+	void load_bus_error_exception();
+	void store_bus_error_exception();
+	void load_bad_address( UINT32 address );
+	void store_bad_address( UINT32 address );
+	int data_address_breakpoint( int dcic_rw, int dcic_status, UINT32 address );
+	int load_data_address_breakpoint( UINT32 address );
+	int store_data_address_breakpoint( UINT32 address );
+
+	UINT32 get_register_from_pipeline( int reg );
+	int cop0_usable();
+	void lwc( int cop, int sr_cu );
+	void swc( int cop, int sr_cu );
+	void bc( int cop, int sr_cu, int condition );
+
+	UINT32 getcp1dr( int reg );
+	void setcp1dr( int reg, UINT32 value );
+	UINT32 getcp1cr( int reg );
+	void setcp1cr( int reg, UINT32 value );
+	UINT32 getcp3dr( int reg );
+	void setcp3dr( int reg, UINT32 value );
+	UINT32 getcp3cr( int reg );
+	void setcp3cr( int reg, UINT32 value );
+	INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag );
+	UINT32 getcp2dr( int reg );
+	void setcp2dr( int reg, UINT32 value );
+	UINT32 getcp2cr( int reg );
+	void setcp2cr( int reg, UINT32 value );
+	INT64 BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag );
+	UINT32 Lm_E( UINT32 result );
+	void docop2( int gteop );
+};
+
+#define PSXCPU_DELAYR_PC ( 32 )
+#define PSXCPU_DELAYR_NOTPC ( 33 )
 
 #define PSXCPU_BYTE_EXTEND( a ) ( (INT32)(INT8)a )
 #define PSXCPU_WORD_EXTEND( a ) ( (INT32)(INT16)a )
@@ -202,6 +438,8 @@ enum
 #define CF_TLBP ( 8 )
 #define CF_RFE ( 16 )
 
+
+
 typedef struct _DasmPSXCPU_state DasmPSXCPU_state;
 
 struct _DasmPSXCPU_state
@@ -214,7 +452,4 @@ struct _DasmPSXCPU_state
 
 extern unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UINT8 *opram );
 
-DECLARE_LEGACY_CPU_DEVICE(PSXCPU, psxcpu);
-DECLARE_LEGACY_CPU_DEVICE(CXD8661R, cxd8661r);
-
-#endif /* __PSX_H__ */
+#endif /* __PSXCPU_H__ */
