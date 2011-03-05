@@ -739,10 +739,11 @@ public:
 	const char *				tag;			/* pointer to this port's tag */
 	const input_field_config *	fieldlist;		/* list of input_field_configs */
 
-	/* these two fields are only valid if the port is live */
+	/* these fields are only valid if the port is live */
 	input_port_state *			state;			/* live state of port (NULL if not live) */
 	running_machine *			machine;		/* machine if port is live */
 	device_config *				owner;			/* associated device, when appropriate */
+	input_port_value			active;			/* mask of active bits in the port */
 };
 
 
@@ -1127,6 +1128,17 @@ int input_field_has_next_setting(const input_field_config *field);
 /* select the next item for a DIP switch or configuration field */
 void input_field_select_next_setting(const input_field_config *field);
 
+
+/* ----- port checking ----- */
+
+/* return whether an input port exists */
+bool input_port_exists(running_machine *machine, const char *tag);
+
+/* return a bitmask of which bits of an input port are active (i.e. not unused or unknown) */
+input_port_value input_port_active(running_machine *machine, const char *tag);
+
+/* return a bitmask of which bits of an input port are active (i.e. not unused or unknown), or a default value if the port does not exist */
+input_port_value input_port_active_safe(running_machine *machine, const char *tag, input_port_value defvalue);
 
 
 /* ----- port reading ----- */

@@ -1493,6 +1493,52 @@ const input_type_desc *input_type_list(running_machine *machine)
 
 
 /***************************************************************************
+    PORT CHECKING
+***************************************************************************/
+
+
+/*-------------------------------------------------
+	input_port_exists - return whether an input
+	port exists
+-------------------------------------------------*/
+
+bool input_port_exists(running_machine *machine, const char *tag)
+{
+	return machine->port(tag) != 0;
+}
+
+
+/*-------------------------------------------------
+	input_port_active - return a bitmask of which
+	bits of an input port are active (i.e. not
+	unused or unknown) 
+-------------------------------------------------*/
+
+input_port_value input_port_active(running_machine *machine, const char *tag)
+{
+	const input_port_config *port = machine->port(tag);
+	if (port == NULL)
+		fatalerror("Unable to locate input port '%s'", tag);
+	return port->active;
+}
+
+
+/*-------------------------------------------------
+	input_port_active_safe - return a bitmask of
+	which bits of an input port are active (i.e.
+	not unused or unknown), or a default value if
+	the port does not exist
+-------------------------------------------------*/
+
+input_port_value input_port_active_safe(running_machine *machine, const char *tag, input_port_value defvalue)
+{
+	const input_port_config *port = machine->port(tag);
+	return port == NULL ? defvalue : port->active;
+}
+
+
+
+/***************************************************************************
     PORT READING
 ***************************************************************************/
 
@@ -2971,6 +3017,9 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 					return;
 				}
 
+				if (type != IPT_UNKNOWN && type != IPT_UNUSED)
+					curport->active |= mask;
+
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				curfield = field_config_alloc(curport, type, defval, mask);
@@ -3570,7 +3619,9 @@ input_port_config::input_port_config(const char *_tag)
 	  tag(_tag),
 	  fieldlist(NULL),
 	  state(NULL),
-	  machine(NULL)
+	  machine(NULL),
+	  owner(NULL),
+	  active(0)
 {
 }
 
