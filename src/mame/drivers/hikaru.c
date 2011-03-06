@@ -13,8 +13,8 @@ The games on this system include....
 Air Trix                     (C) Sega, 2001
 !Brave Fire Fighters         (C) Sega, 1999
 *Cyber Troopers Virtual On 4 (C) Sega, 2001
-!Nascar Racing               (C) Sega, 2000
-!Planet Harriers             (C) Sega, 2001
+Nascar Racing               (C) Sega, 2000
+Planet Harriers             (C) Sega, 2001
 !Star Wars Racer Arcade      (C) Sega, 2000
 
 ! - denotes secured but not fully dumped yet
@@ -575,7 +575,7 @@ ROM_START( sgnascar )
 	ROM_LOAD32_WORD( "epr-23485a.ic35", 0x000000, 0x400000, CRC(1072f531) SHA1(ca07a8bfb7247e4aec57e18cb091d24dcef666c1) )
 	ROM_LOAD32_WORD( "epr-23486a.ic36", 0x000002, 0x400000, CRC(02d4aab6) SHA1(b1b0e07dc71dc124177e27dfd8b459444e8ae4d3) )
 
-	/* ROM board using 64M SOP44 MASKROM */
+	/* ROM board using 128M TSOP48 MASKROMs */
 	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD( "mpr-23469.ic19", 0x0000000, 0x1000000, CRC(89cbad8d) SHA1(e4f103b96a3a842a90182172ddcf3bc5dfe6cca8) ) 
 	ROM_LOAD( "mpr-23473.ic20", 0x1000000, 0x1000000, CRC(977b87d6) SHA1(079eeebc6f9c60d0a016a46386bbe846d8a354da) ) 
