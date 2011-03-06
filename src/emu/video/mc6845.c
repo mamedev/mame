@@ -837,7 +837,18 @@ void mc6845_update(device_t *device, bitmap_t *bitmap, const rectangle *cliprect
 			INT8 cursor_x = cursor_visible ? (mc6845->cursor_addr - mc6845->current_disp_addr) : -1;
 
 			/* call the external system to draw it */
-			mc6845->intf->update_row(device, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
+			if (MODE_ROW_COLUMN_ADDRESSING(mc6845))
+			{
+				UINT8 cc = 0;
+				UINT8 cr = y / (mc6845->max_ras_addr + 1);
+				UINT16 ma = (cr << 8) | cc;
+
+				mc6845->intf->update_row(device, bitmap, cliprect, ma, ra, y, mc6845->horiz_disp, cursor_x, param);
+			}
+			else
+			{
+				mc6845->intf->update_row(device, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
+			}
 
 			/* update MA if the last raster address */
 			if (ra == mc6845->max_ras_addr)
