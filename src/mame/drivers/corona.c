@@ -1366,12 +1366,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( re800, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz. but seems a bit low */
+	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
 	MCFG_CPU_IO_MAP(re800_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz. but seems a bit low */
+	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_sound_map)
 	MCFG_CPU_IO_MAP(re800_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
@@ -1400,12 +1400,12 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( luckyrlt, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz. but seems a bit low */
+	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)
 	MCFG_CPU_IO_MAP(luckyrlt_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz. but seems a bit low */
+	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_sound_map)
 	MCFG_CPU_IO_MAP(luckyrlt_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
@@ -1541,9 +1541,10 @@ ROM_START(re800v3)
 ROM_END
 
 /******************************
-  Lucky Roulette?
-
-  We know almost nothing about.
+  Lucky Roulette
+  6-players spanish roulette.
+  
+  Unknown manufacturer.
   
 ******************************/
 
@@ -1556,7 +1557,7 @@ ROM_START(luckyrlt)
 	ROM_RELOAD(             0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "promrulxx.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+	ROM_LOAD( "promrulxx.123",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
 
