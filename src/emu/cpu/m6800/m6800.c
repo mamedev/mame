@@ -1062,6 +1062,7 @@ static CPU_RESET( m6800 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 
+	cpustate->cc = 0xc0;
 	SEI;				/* IRQ disabled */
 	PCD = RM16(cpustate,  0xfffe );
 
@@ -1099,8 +1100,6 @@ static CPU_RESET( m6800 )
 	cpustate->trcsr_read_rdrf = 0;
 
 	set_rmcr(cpustate, 0);
-
-	cpustate->cc = 0xc0;
 }
 
 /****************************************************************************
