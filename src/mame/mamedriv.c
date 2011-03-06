@@ -1351,8 +1351,6 @@ const game_driver * const drivers[] =
 	DRIVER( ozmawars2 )	/* Shin Nihon Kikaku (SNK) */
 	DRIVER( solfight )	/* bootleg */
 	DRIVER( spaceph )	/* Zilec Games */
-	DRIVER( galactic )	/* (c) 19?? Taito */
-	DRIVER( spacmiss )	/* bootleg? */
 	DRIVER( schaser )	/* RT  Taito */
 	DRIVER( schasercv )	/* RT  Taito */
 	DRIVER( lupin3 )	/* LP  (c) 1980 Taito */
@@ -10715,6 +10713,7 @@ Other Sun games
 	DRIVER( re800ea )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v1 )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v3 )	/* (c) 1992 Entretenimientos GEMINIS */
+	DRIVER( luckyrlt )	/* (c) 198? unknown */
 	
 	DRIVER( dfruit )
 

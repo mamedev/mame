@@ -1841,7 +1841,8 @@ $(DRIVERS)/circus.o:	$(LAYOUT)/circus.lh \
 
 $(DRIVERS)/copsnrob.o:	$(LAYOUT)/copsnrob.lh
 
-$(DRIVERS)/corona.o:	$(LAYOUT)/re800.lh
+$(DRIVERS)/corona.o:	$(LAYOUT)/re800.lh \
+						$(LAYOUT)/luckyrlt.lh
 
 $(DRIVERS)/darius.o:	$(LAYOUT)/darius.lh
 
