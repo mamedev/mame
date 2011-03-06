@@ -282,6 +282,7 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_CPU_ADD("audiocpu", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
 	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
 
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	MCFG_MACHINE_START(amspdwy)
 	MCFG_MACHINE_RESET(amspdwy)
 
