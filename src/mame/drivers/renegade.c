@@ -168,7 +168,7 @@ DEVICE_GET_INFO( renegade_adpcm )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Renegade Custom ADPCM");		break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);						break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
 
@@ -178,11 +178,8 @@ DEFINE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
 
 static WRITE8_HANDLER( adpcm_play_w )
 {
-	int offs;
-	int len;
-
-	offs = (data - 0x2c) * 0x2000;
-	len = 0x2000 * 2;
+	int offs = (data - 0x2c) * 0x2000;
+	int len = 0x2000 * 2;
 
 	/* kludge to avoid reading past end of ROM */
 	if (offs + len > 0x20000)
@@ -190,6 +187,9 @@ static WRITE8_HANDLER( adpcm_play_w )
 
 	if (offs >= 0 && offs+len <= 0x20000)
 	{
+		renegade_adpcm.stream->update();
+		renegade_adpcm.adpcm.reset();
+
 		renegade_adpcm.current = offs;
 		renegade_adpcm.end = offs + len/2;
 		renegade_adpcm.nibble = 4;
