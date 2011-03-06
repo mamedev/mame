@@ -361,54 +361,54 @@ static const UINT8 cycles1[] =
 };
 
 static void (*const m6809_main[0x100])(m68_state_t *) = {
-/*          0xX0,   0xX1,     0xX2,    0xX3,    0xX4,    0xX5,    0xX6,    0xX7,
-            0xX8,   0xX9,     0xXA,    0xXB,    0xXC,    0xXD,    0xXE,    0xXF   */
+/*			0xX0,	0xX1,	0xX2,	0xX3,	0xX4,	0xX5,	0xX6,	0xX7,
+            0xX8,	0xX9,	0xXA,	0xXB,	0xXC,	0xXD,	0xXE,	0xXF	*/
 
-/* 0x0X */  neg_di, neg_di, com_di,com_di, lsr_di, lsr_di, ror_di, asr_di,
-            asl_di, rol_di, dec_di, dec_di, inc_di, tst_di, jmp_di, clr_di,
+/* 0x0X */	neg_di,	neg_di,	com_di,	com_di,	lsr_di,	lsr_di,	ror_di,	asr_di,
+			asl_di,	rol_di,	dec_di,	dec_di,	inc_di,	tst_di,	jmp_di,	clr_di,
 
-/* 0x1X */  pref10, pref11, nop,	sync,	illegal,illegal,lbra,	lbsr,
-            illegal,daa,	orcc,	illegal,andcc,	sex,	exg,	tfr,
+/* 0x1X */	pref10,	pref11,	nop,	sync,	illegal,illegal,lbra,	lbsr,
+			illegal,daa,	orcc,	illegal,andcc,	sex,	exg,	tfr,
 
-/* 0x2X */  bra,	brn,	bhi,	bls,	bcc,	bcs,	bne,	beq,
-	    bvc,	bvs,	bpl,	bmi,	bge,	blt,	bgt,	ble,
+/* 0x2X */	bra,	brn,	bhi,	bls,	bcc,	bcs,	bne,	beq,
+			bvc,	bvs,	bpl,	bmi,	bge,	blt,	bgt,	ble,
 
-/* 0x3X */  leax,	leay,	leas,	leau,	pshs,	puls,	pshu,	pulu,
-            illegal,rts,	abx,	rti,	cwai,	mul,	illegal,swi,
+/* 0x3X */	leax,	leay,	leas,	leau,	pshs,	puls,	pshu,	pulu,
+			illegal,rts,	abx,	rti,	cwai,	mul,	illegal,swi,
 
-/* 0x4X */  nega,	nega,coma,coma,	lsra,	lsra,rora,	asra,
-	    asla,	rola,	deca,	deca,inca,	tsta,	clra,clra,
+/* 0x4X */	nega,	nega,	coma,	coma,	lsra,	lsra,	rora,	asra,
+			asla,	rola,	deca,	deca,	inca,	tsta,	clra,	clra,
 
-/* 0x5X */  negb,	negb,comb,comb,	lsrb,	lsrb,rorb,	asrb,
-	    aslb,	rolb,	decb,	decb,incb,	tstb,	clrb,clrb,
+/* 0x5X */	negb,	negb,	comb,	comb,	lsrb,	lsrb,	rorb,	asrb,
+			aslb,	rolb,	decb,	decb,	incb,	tstb,	clrb,	clrb,
 
-/* 0x6X */  neg_ix, neg_ix,com_ix,com_ix, lsr_ix, lsr_ix,ror_ix, asr_ix,
-	    asl_ix, rol_ix, dec_ix, dec_ix,inc_ix, tst_ix, jmp_ix, clr_ix,
+/* 0x6X */	neg_ix, neg_ix,	com_ix,	com_ix, lsr_ix, lsr_ix,	ror_ix, asr_ix,
+			asl_ix, rol_ix, dec_ix, dec_ix,	inc_ix, tst_ix, jmp_ix, clr_ix,
 
-/* 0x7X */  neg_ex, neg_ex,com_ex,com_ex, lsr_ex, lsr_ex,ror_ex, asr_ex,
-	    asl_ex, rol_ex, dec_ex, dec_ex,inc_ex, tst_ex, jmp_ex, clr_ex,
+/* 0x7X */	neg_ex, neg_ex,	com_ex,	com_ex, lsr_ex, lsr_ex,	ror_ex, asr_ex,
+			asl_ex, rol_ex, dec_ex, dec_ex,	inc_ex, tst_ex, jmp_ex, clr_ex,
 
-/* 0x8X */  suba_im,cmpa_im,sbca_im,subd_im,anda_im,bita_im,lda_im, sta_im,
-	    eora_im,adca_im,ora_im, adda_im,cmpx_im,bsr,	ldx_im, stx_im,
+/* 0x8X */	suba_im,cmpa_im,sbca_im,subd_im,anda_im,bita_im,lda_im, sta_im,
+			eora_im,adca_im,ora_im, adda_im,cmpx_im,bsr,	ldx_im, stx_im,
 
-/* 0x9X */  suba_di,cmpa_di,sbca_di,subd_di,anda_di,bita_di,lda_di, sta_di,
-	    eora_di,adca_di,ora_di, adda_di,cmpx_di,jsr_di, ldx_di, stx_di,
+/* 0x9X */	suba_di,cmpa_di,sbca_di,subd_di,anda_di,bita_di,lda_di, sta_di,
+			eora_di,adca_di,ora_di, adda_di,cmpx_di,jsr_di, ldx_di, stx_di,
 
-/* 0xAX */  suba_ix,cmpa_ix,sbca_ix,subd_ix,anda_ix,bita_ix,lda_ix, sta_ix,
-	    eora_ix,adca_ix,ora_ix, adda_ix,cmpx_ix,jsr_ix, ldx_ix, stx_ix,
+/* 0xAX */	suba_ix,cmpa_ix,sbca_ix,subd_ix,anda_ix,bita_ix,lda_ix, sta_ix,
+			eora_ix,adca_ix,ora_ix, adda_ix,cmpx_ix,jsr_ix, ldx_ix, stx_ix,
 
-/* 0xBX */  suba_ex,cmpa_ex,sbca_ex,subd_ex,anda_ex,bita_ex,lda_ex, sta_ex,
-	    eora_ex,adca_ex,ora_ex, adda_ex,cmpx_ex,jsr_ex, ldx_ex, stx_ex,
+/* 0xBX */	suba_ex,cmpa_ex,sbca_ex,subd_ex,anda_ex,bita_ex,lda_ex, sta_ex,
+			eora_ex,adca_ex,ora_ex, adda_ex,cmpx_ex,jsr_ex, ldx_ex, stx_ex,
 
-/* 0xCX */  subb_im,cmpb_im,sbcb_im,addd_im,andb_im,bitb_im,ldb_im, stb_im,
-	    eorb_im,adcb_im,orb_im, addb_im,ldd_im, std_im, ldu_im, stu_im,
+/* 0xCX */	subb_im,cmpb_im,sbcb_im,addd_im,andb_im,bitb_im,ldb_im, stb_im,
+			eorb_im,adcb_im,orb_im, addb_im,ldd_im, std_im, ldu_im, stu_im,
 
-/* 0xDX */  subb_di,cmpb_di,sbcb_di,addd_di,andb_di,bitb_di,ldb_di, stb_di,
-	    eorb_di,adcb_di,orb_di, addb_di,ldd_di, std_di, ldu_di, stu_di,
+/* 0xDX */	subb_di,cmpb_di,sbcb_di,addd_di,andb_di,bitb_di,ldb_di, stb_di,
+			eorb_di,adcb_di,orb_di, addb_di,ldd_di, std_di, ldu_di, stu_di,
 
-/* 0xEX */  subb_ix,cmpb_ix,sbcb_ix,addd_ix,andb_ix,bitb_ix,ldb_ix, stb_ix,
-	    eorb_ix,adcb_ix,orb_ix, addb_ix,ldd_ix, std_ix, ldu_ix, stu_ix,
+/* 0xEX */	subb_ix,cmpb_ix,sbcb_ix,addd_ix,andb_ix,bitb_ix,ldb_ix, stb_ix,
+			eorb_ix,adcb_ix,orb_ix, addb_ix,ldd_ix, std_ix, ldu_ix, stu_ix,
 
-/* 0xFX */  subb_ex,cmpb_ex,sbcb_ex,addd_ex,andb_ex,bitb_ex,ldb_ex, stb_ex,
-	    eorb_ex,adcb_ex,orb_ex, addb_ex,ldd_ex, std_ex, ldu_ex, stu_ex
+/* 0xFX */	subb_ex,cmpb_ex,sbcb_ex,addd_ex,andb_ex,bitb_ex,ldb_ex, stb_ex,
+			eorb_ex,adcb_ex,orb_ex, addb_ex,ldd_ex, std_ex, ldu_ex, stu_ex
 };
