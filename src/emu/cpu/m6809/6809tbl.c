@@ -342,14 +342,14 @@ static const UINT8 index_cycle_em[256] = {        /* Index Loopup cycle counts *
 static const UINT8 cycles1[] =
 {
 	/*   0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
-  /*0*/  6, 6, 2, 6, 6, 2, 6, 6, 6, 6, 6, 2, 6, 6, 3, 6,
+  /*0*/  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 6,
   /*1*/  0, 0, 2, 4, 2, 2, 5, 9, 2, 2, 3, 2, 3, 2, 8, 6,
   /*2*/  3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
   /*3*/  4, 4, 4, 4, 5, 5, 5, 5, 2, 5, 3, 6,20,11, 2,19,
   /*4*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-  /*5*/  2, 0, 0, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-  /*6*/  6, 2, 2, 6, 6, 2, 6, 6, 6, 6, 6, 2, 6, 6, 3, 6,
-  /*7*/  7, 2, 2, 7, 7, 2, 7, 7, 7, 7, 7, 2, 7, 7, 4, 7,
+  /*5*/  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+  /*6*/  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 6,
+  /*7*/  7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 4, 7,
   /*8*/  2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 2, 2, 4, 7, 3, 2,
   /*9*/  4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 6, 7, 5, 5,
   /*A*/  4, 4, 4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 6, 7, 5, 5,
@@ -364,8 +364,8 @@ static void (*const m6809_main[0x100])(m68_state_t *) = {
 /*          0xX0,   0xX1,     0xX2,    0xX3,    0xX4,    0xX5,    0xX6,    0xX7,
             0xX8,   0xX9,     0xXA,    0xXB,    0xXC,    0xXD,    0xXE,    0xXF   */
 
-/* 0x0X */  neg_di, neg_di, illegal,com_di, lsr_di, illegal,ror_di, asr_di,
-            asl_di, rol_di, dec_di, illegal,inc_di, tst_di, jmp_di, clr_di,
+/* 0x0X */  neg_di, neg_di, com_di,com_di, lsr_di, lsr_di, ror_di, asr_di,
+            asl_di, rol_di, dec_di, dec_di, inc_di, tst_di, jmp_di, clr_di,
 
 /* 0x1X */  pref10, pref11, nop,	sync,	illegal,illegal,lbra,	lbsr,
             illegal,daa,	orcc,	illegal,andcc,	sex,	exg,	tfr,
@@ -376,17 +376,17 @@ static void (*const m6809_main[0x100])(m68_state_t *) = {
 /* 0x3X */  leax,	leay,	leas,	leau,	pshs,	puls,	pshu,	pulu,
             illegal,rts,	abx,	rti,	cwai,	mul,	illegal,swi,
 
-/* 0x4X */  nega,	illegal,illegal,coma,	lsra,	illegal,rora,	asra,
-	    asla,	rola,	deca,	illegal,inca,	tsta,	illegal,clra,
+/* 0x4X */  nega,	nega,coma,coma,	lsra,	lsra,rora,	asra,
+	    asla,	rola,	deca,	deca,inca,	tsta,	clra,clra,
 
-/* 0x5X */  negb,	illegal,illegal,comb,	lsrb,	illegal,rorb,	asrb,
-	    aslb,	rolb,	decb,	illegal,incb,	tstb,	illegal,clrb,
+/* 0x5X */  negb,	negb,comb,comb,	lsrb,	lsrb,rorb,	asrb,
+	    aslb,	rolb,	decb,	decb,incb,	tstb,	clrb,clrb,
 
-/* 0x6X */  neg_ix, illegal,illegal,com_ix, lsr_ix, illegal,ror_ix, asr_ix,
-	    asl_ix, rol_ix, dec_ix, illegal,inc_ix, tst_ix, jmp_ix, clr_ix,
+/* 0x6X */  neg_ix, neg_ix,com_ix,com_ix, lsr_ix, lsr_ix,ror_ix, asr_ix,
+	    asl_ix, rol_ix, dec_ix, dec_ix,inc_ix, tst_ix, jmp_ix, clr_ix,
 
-/* 0x7X */  neg_ex, illegal,illegal,com_ex, lsr_ex, illegal,ror_ex, asr_ex,
-	    asl_ex, rol_ex, dec_ex, illegal,inc_ex, tst_ex, jmp_ex, clr_ex,
+/* 0x7X */  neg_ex, neg_ex,com_ex,com_ex, lsr_ex, lsr_ex,ror_ex, asr_ex,
+	    asl_ex, rol_ex, dec_ex, dec_ex,inc_ex, tst_ex, jmp_ex, clr_ex,
 
 /* 0x8X */  suba_im,cmpa_im,sbca_im,subd_im,anda_im,bita_im,lda_im, sta_im,
 	    eora_im,adca_im,ora_im, adda_im,cmpx_im,bsr,	ldx_im, stx_im,
