@@ -1778,7 +1778,11 @@ static INT32 slider_mixervol(running_machine *machine, void *arg, astring *strin
 	if (!machine->sound().indexed_speaker_input((FPTR)arg, info))
 		return 0;
 	if (newval != SLIDER_NOCHANGE)
+	{
+		INT32 curval = floor(info.stream->input_gain(info.inputnum) * 1000.0f + 0.5f);
+		if (newval > curval && (newval - curval) <= 4) newval += 4; // round up on increment
 		info.stream->set_input_gain(info.inputnum, (float)newval * 0.001f);
+	}
 	if (string != NULL)
 		string->printf("%4.2f", info.stream->input_gain(info.inputnum));
 	return floor(info.stream->input_gain(info.inputnum) * 1000.0f + 0.5f);
