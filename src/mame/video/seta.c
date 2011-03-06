@@ -603,10 +603,10 @@ PALETTE_INIT( gundhara )
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable_entry_set_value(machine->colortable, 0x0200 + ((color << 6) | pen), 0x400 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0x0200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
 			colortable_entry_set_value(machine->colortable, 0x1200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
 
-			colortable_entry_set_value(machine->colortable, 0x0a00 + ((color << 6) | pen), 0x200 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0x0a00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
 			colortable_entry_set_value(machine->colortable, 0x1a00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
 }
@@ -624,11 +624,11 @@ PALETTE_INIT( jjsquawk )
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable_entry_set_value(machine->colortable, 0x0200 + ((color << 6) | pen), 0x400 + pen); // untested
-			colortable_entry_set_value(machine->colortable, 0x1200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
+			colortable_entry_set_value(machine->colortable, 0x0200 + ((color << 6) | pen), 0x400 + (((color << 4) + pen) & 0x1ff)); // used by madshark
+			colortable_entry_set_value(machine->colortable, 0x1200 + ((color << 6) | pen), 0x400 + (((color << 4) + pen) & 0x1ff));
 
-			colortable_entry_set_value(machine->colortable, 0x0a00 + ((color << 6) | pen), 0x200 + pen); // untested
-			colortable_entry_set_value(machine->colortable, 0x1a00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
+			colortable_entry_set_value(machine->colortable, 0x0a00 + ((color << 6) | pen), 0x200 + (((color << 4) + pen) & 0x1ff)); // used by madshark
+			colortable_entry_set_value(machine->colortable, 0x1a00 + ((color << 6) | pen), 0x200 + (((color << 4) + pen) & 0x1ff));
 		}
 }
 
@@ -644,7 +644,7 @@ PALETTE_INIT( zingzip )
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable_entry_set_value(machine->colortable, 0x400 + ((color << 6) | pen), 0x400 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0x400 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
 			colortable_entry_set_value(machine->colortable, 0xc00 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
 }
@@ -692,7 +692,7 @@ PALETTE_INIT( usclssic )
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x200 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff)); // used?
 			colortable_entry_set_value(machine->colortable, 0xa00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
 }
