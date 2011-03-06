@@ -1351,6 +1351,8 @@ const game_driver * const drivers[] =
 	DRIVER( ozmawars2 )	/* Shin Nihon Kikaku (SNK) */
 	DRIVER( solfight )	/* bootleg */
 	DRIVER( spaceph )	/* Zilec Games */
+	DRIVER( galactic )	/* (c) 19?? Taito */
+	DRIVER( spacmiss )	/* bootleg? */
 	DRIVER( schaser )	/* RT  Taito */
 	DRIVER( schasercv )	/* RT  Taito */
 	DRIVER( lupin3 )	/* LP  (c) 1980 Taito */
