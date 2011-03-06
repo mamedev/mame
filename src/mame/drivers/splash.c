@@ -36,8 +36,8 @@ TS 2006.12.22:
   but copyright messages are removed.
 - Rebus protection patch sits at the end of trap $b (rtos call) and in some cases returns 0 in D0.
   It's not a real protection check i think.
-- Funy strip reads shared (?) mem in two places - both checks are patched. But game
-  is still not playable...
+
+More notes about Funny Strip protection issus at the boottom of source file (DRIVER INIT)
 
 ***************************************************************************/
 
@@ -63,7 +63,7 @@ static WRITE16_HANDLER( roldf_sh_irqtrigger_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	// give the z80 time to see it
@@ -131,7 +131,6 @@ ADDRESS_MAP_END
 
 /* Return of Lady Frog Maps */
 /* note, sprite ram has moved, extra protection ram, and extra write for the pixel layer */
-/* sound hardware is also different -- not done yet! */
 
 static READ16_HANDLER( roldfrog_bombs_r )
 {
@@ -139,6 +138,34 @@ static READ16_HANDLER( roldfrog_bombs_r )
 
 	state->ret ^= 0x100;
 	return state->ret;
+}
+
+static WRITE8_HANDLER(sound_bank_w)
+{
+	memory_set_bank(space->machine, "sound_bank", data & 0xf);
+}
+
+
+static void roldfrog_update_irq( running_machine *machine )
+{
+	splash_state * state = machine->driver_data<splash_state>();
+	int irq = (state->sound_irq ? 0x08 : 0) | ((state->vblank_irq) ? 0x18 : 0);
+	cpu_set_input_line_and_vector(machine->device("audiocpu"), 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); 
+}
+
+static WRITE8_HANDLER( roldfrog_vblank_ack_w )
+{
+	splash_state * driver_state = space->machine->driver_data<splash_state>();
+	driver_state->vblank_irq = 0;
+	roldfrog_update_irq(space->machine);
+}
+
+
+static void ym_irq(device_t *device, int state)
+{
+	splash_state * driver_state = device->machine->driver_data<splash_state>();
+	driver_state->sound_irq = state;
+	roldfrog_update_irq(device->machine);
 }
 
 static ADDRESS_MAP_START( roldfrog_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -162,37 +189,125 @@ static ADDRESS_MAP_START( roldfrog_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( roldfrog_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)	/* wrong, probably banked somehow */
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
 ADDRESS_MAP_END
+
+static READ8_HANDLER(roldfrog_unk_r)
+{
+	// dragon punch leftovers
+	return 0xff;
+}
 
 static ADDRESS_MAP_START( roldfrog_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x12, 0x13) AM_DEVWRITE("ymsnd", ym2203_w)
-	AM_RANGE(0x40, 0x40) AM_NOP	/* NMI ack */
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x40, 0x40) AM_NOP
+	AM_RANGE(0x31, 0x31) AM_WRITE(sound_bank_w)
+	AM_RANGE(0x37, 0x37) AM_WRITE(roldfrog_vblank_ack_w )
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_r)
+	
+	AM_RANGE(0x0, 0xff) AM_READ(roldfrog_unk_r)
 ADDRESS_MAP_END
+
+static READ16_HANDLER(spr_read)
+{
+	splash_state *state = space->machine->driver_data<splash_state>();
+	return state->spriteram[offset]|0xff00;
+}
+
+static WRITE16_HANDLER(spr_write)
+{
+	splash_state *state = space->machine->driver_data<splash_state>();
+	COMBINE_DATA(&state->spriteram[offset]);
+	state->spriteram[offset]|=0xff00; /* 8 bit, expected 0xffnn when read as 16 bit */
+}
+
+static WRITE16_HANDLER( funystrp_sh_irqtrigger_w )
+{
+	soundlatch_w(space, 0, data>>8);
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static ADDRESS_MAP_START( funystrp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM													/* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM													/* protection? RAM */
+	AM_RANGE(0x100000, 0x1fffff) AM_RAM													/* protection? RAM */
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, pixelram)						/* Pixel Layer */
-//  AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)                       /* Sound command */
-	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0x84000a, 0x84000b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(funystrp_sh_irqtrigger_w)                       /* Sound command */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
+	AM_RANGE(0x840008, 0x840009) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, videoram)	/* Video RAM */
 	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, vregs)							/* Scroll registers */
-	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
+	AM_RANGE(0x881804, 0x881fff) AM_WRITENOP
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE_MEMBER(splash_state, spriteram)						/* Sprite RAM */
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM													/* Work RAM */
+	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(spr_read, spr_write) AM_BASE_MEMBER(splash_state, spriteram)		/* Sprite RAM */
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM	 AM_MASK(0xffff) /* there's fe0000 <-> ff0000 compare */				/* Work RAM */
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( funystrp_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x6fff) AM_ROM
+	AM_RANGE(0x7000, 0x7fff) AM_RAM
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
+ADDRESS_MAP_END
+
+static READ8_HANDLER(int_source_r)
+{
+	splash_state *state = space->machine->driver_data<splash_state>();
+	return ~state->msm_source;
+}
+
+static WRITE8_HANDLER(msm1_data_w)
+{
+	splash_state *state = space->machine->driver_data<splash_state>();
+	state->msm_data1=data;
+	state->msm_source&=~1;
+	state->msm_toggle1=0;
+}
+
+static WRITE8_HANDLER(msm1_interrupt_w)
+{
+	splash_state *state = space->machine->driver_data<splash_state>();
+	state->snd_interrupt_enable1=~data;
+}
+
+static WRITE8_HANDLER(msm2_interrupt_w)
+{
+	splash_state *state = space->machine->driver_data<splash_state>();
+	state->snd_interrupt_enable2=~data;
+}
+
+static WRITE8_HANDLER(msm2_data_w)
+{
+	splash_state *state = space->machine->driver_data<splash_state>();
+	state->msm_data2=data;
+	state->msm_source&=~2;
+	state->msm_toggle2=0;
+}
+
+static ADDRESS_MAP_START( funystrp_sound_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_data_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_data_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(sound_bank_w)
+	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_r)
+	AM_RANGE(0x04, 0x04) AM_READ(int_source_r)
+	AM_RANGE(0x06, 0x06) AM_WRITE(msm1_interrupt_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(msm2_interrupt_w)
+ADDRESS_MAP_END
+
+static MACHINE_RESET( funystrp )
+{
+	splash_state *state = machine->driver_data<splash_state>();
+
+	state->adpcm_data = 0;
+	state->ret = 0x100;
+}
 
 
 static INPUT_PORTS_START( splash )
@@ -339,6 +454,12 @@ static INPUT_PORTS_START( funystrp )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+	
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0xffff, 0xffff, "Clear EEPROM" )
+	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0xffff, DEF_STR( On ) )
+	
 INPUT_PORTS_END
 
 static const gfx_layout tilelayout8 =
@@ -420,20 +541,24 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static void ym_irq(device_t *device, int state)
-{
-	logerror("2203 IRQ: %d\n", state);
-}
 
 static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
+		DEVCB_NULL, DEVCB_NULL,
+		DEVCB_NULL, DEVCB_NULL
 	},
 	ym_irq
 };
+
+static INTERRUPT_GEN(  roldfrog_interrupt )
+{
+	splash_state *state = device->machine->driver_data<splash_state>();
+	state->vblank_irq = 1;
+	roldfrog_update_irq(device->machine);
+}
 
 static MACHINE_CONFIG_START( roldfrog, splash_state )
 
@@ -445,7 +570,7 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 	MCFG_CPU_ADD("audiocpu", Z80,3000000)			/* 3 MHz - verified */
 	MCFG_CPU_PROGRAM_MAP(roldfrog_sound_map)
 	MCFG_CPU_IO_MAP(roldfrog_sound_io_map)
-//  MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60*64)  /* needed for the msm5205 to play the samples */
+	MCFG_CPU_VBLANK_INT("screen", roldfrog_interrupt)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -454,7 +579,7 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(64*8, 64*8)
 	MCFG_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 2*8, 32*8-1)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
+
 	MCFG_SCREEN_UPDATE(splash)
 
 	MCFG_GFXDECODE(splash)
@@ -464,28 +589,72 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 
 	MCFG_MACHINE_RESET( splash )
 
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
 	MCFG_SOUND_CONFIG(ym2203_config)
-	MCFG_SOUND_ROUTE(0, "mono", 0.60)
-	MCFG_SOUND_ROUTE(1, "mono", 0.60)
-	MCFG_SOUND_ROUTE(2, "mono", 0.60)
-	MCFG_SOUND_ROUTE(3, "mono", 0.40)
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
+static void adpcm_int1( device_t *device )
+{
+	splash_state *state = device->machine->driver_data<splash_state>();
+	if (state->snd_interrupt_enable1  || state->msm_toggle1 == 1)
+	{
+		msm5205_data_w(device, state->msm_data1 >> 4);
+		state->msm_data1 <<= 4;
+		state->msm_toggle1 ^= 1;
+		if (state->msm_toggle1 == 0)
+		{
+			state->msm_source|=1;
+			cpu_set_input_line_and_vector(device->machine->device("audiocpu"), 0, HOLD_LINE, 0x38);
+		}
+	}
+}
+
+static void adpcm_int2( device_t *device )
+{
+	splash_state *state = device->machine->driver_data<splash_state>();
+	if (state->snd_interrupt_enable2 || state->msm_toggle2 == 1)
+	{
+		msm5205_data_w(device, state->msm_data2 >> 4);
+		state->msm_data2 <<= 4;
+		state->msm_toggle2 ^= 1;
+		if (state->msm_toggle2 == 0)
+		{
+			state->msm_source|=2;
+			cpu_set_input_line_and_vector(device->machine->device("audiocpu"), 0, HOLD_LINE, 0x38);
+		}
+	}
+}
+
+static const msm5205_interface msm_interface1 =
+{
+	adpcm_int1,			/* interrupt function */
+	MSM5205_S64_4B	/* 1 / 96 = 3906.25Hz playback  - guess */
+};
+
+static const msm5205_interface msm_interface2 =
+{
+	adpcm_int2,			/* interrupt function */
+	MSM5205_S96_4B	/* 1 / 96 = 3906.25Hz playback  - guess */
+};
 
 static MACHINE_CONFIG_START( funystrp, splash_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */
 	MCFG_CPU_PROGRAM_MAP(funystrp_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-//  MCFG_CPU_ADD("audiocpu", Z80,30000000/8)
-//  MCFG_CPU_PROGRAM_MAP(funystrp_sound_map)
-//  MCFG_CPU_PERIODIC_INT(nmi_line_pulse,60*64)  /* needed for the msm5205 to play the samples */
-
+	MCFG_CPU_ADD("audiocpu", Z80,30000000/8)
+	MCFG_CPU_PROGRAM_MAP(funystrp_sound_map)
+	MCFG_CPU_IO_MAP(funystrp_sound_io_map)
+	
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -500,17 +669,18 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 
 	MCFG_VIDEO_START(splash)
 
-	MCFG_MACHINE_RESET( splash )
+	MCFG_MACHINE_RESET( funystrp )
 
 	/* sound hardware */
-//  MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-//  MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("msm1", MSM5205, 400000)
+	MCFG_SOUND_CONFIG(msm_interface1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-//  MCFG_SOUND_ADD("msm", MSM5205, 384000)
-//  MCFG_SOUND_CONFIG(msm5205_config)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("msm2", MSM5205, 400000)
+	MCFG_SOUND_CONFIG(msm_interface2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -570,9 +740,10 @@ ROM_START( roldfrog )
 	/* 68000 code - supplied by protection device? */
 	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x400000, 0x8000, CRC(ecaa8dd1) SHA1(b15f583d1a96b6b7ce50bcdca8cb28508f92b6a5) )
 
-	ROM_REGION( 0x90000, "audiocpu", 0 )	/* Z80 Code */
-	ROM_LOAD( "roldfrog.001", 0x00000, 0x20000, CRC(ba9eb1c6) SHA1(649d1103f3188554eaa3fc87a1f52c53233932b2) )
-	ROM_RELOAD(               0x20000, 0x20000 )
+	ROM_REGION( 0x40000, "audiocpu", 0 )	/* Z80 Code */
+	ROM_LOAD( "roldfrog.001", 0x00000, 0x08000, CRC(ba9eb1c6) SHA1(649d1103f3188554eaa3fc87a1f52c53233932b2) )
+	ROM_CONTINUE(             0x10000, 0x10000 )
+	ROM_CONTINUE(             0x38000, 0x08000 )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "roldfrog.010",       0x00000, 0x20000, CRC(51fd0e1a) SHA1(940c4231b21d16c62cad47c22fe735b18662af4a) )
@@ -595,9 +766,10 @@ ROM_START( roldfroga )
 	ROM_LOAD16_WORD_SWAP( "protdata.bin", 0x400000, 0x8000, CRC(ecaa8dd1) SHA1(b15f583d1a96b6b7ce50bcdca8cb28508f92b6a5) )
 
 	ROM_REGION( 0x90000, "audiocpu", 0 )	/* Z80 Code */
-	ROM_LOAD( "roldfrog.001", 0x00000, 0x20000, CRC(ba9eb1c6) SHA1(649d1103f3188554eaa3fc87a1f52c53233932b2) )
-	ROM_RELOAD(               0x20000, 0x20000 )
-
+	ROM_LOAD( "roldfrog.001", 0x00000, 0x08000, CRC(ba9eb1c6) SHA1(649d1103f3188554eaa3fc87a1f52c53233932b2) )
+	ROM_CONTINUE(             0x10000, 0x10000 )
+	ROM_CONTINUE(             0x38000, 0x08000 )
+	
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "roldfrog.010",       0x00000, 0x20000, CRC(51fd0e1a) SHA1(940c4231b21d16c62cad47c22fe735b18662af4a) )
 	ROM_LOAD( "roldfrog.011",       0x20000, 0x20000, CRC(610bf6f3) SHA1(04a7efac2e83c6747d4bd480b1f3118eb44a1f76) )
@@ -824,7 +996,7 @@ ROM_START( puckpepl )
 	ROM_LOAD16_BYTE( "pp22.u87", 0x000000, 0x010000, CRC(1ceb522d) SHA1(216cd24bc2cc3fbd389ab96bc8b729c4d919faab) )
 	ROM_LOAD16_BYTE( "pp23.111", 0x000001, 0x010000, CRC(84336569) SHA1(4358c48bf65dfdb6f52326ec5f026e1b9614a108) )
 
-	ROM_REGION( 0x080000, "cpu1", 0 )	/* Z80 code + sound data */
+	ROM_REGION( 0x080000, "audiocpu", 0 )	/* Z80 code + sound data */
 	ROM_LOAD( "pp31.130", 0x000000, 0x040000, CRC(9b6c302f) SHA1(349e5cf16dd2e8b6c0f56ca1b9ce81475c442435) )
 	ROM_LOAD( "pp30.181", 0x040000, 0x040000, CRC(a5697b3d) SHA1(28ef3cfea82b3016c7c042a18509ba2bf83048e5) )
 
@@ -857,7 +1029,9 @@ static DRIVER_INIT( splash10 )
 static DRIVER_INIT( roldfrog )
 {
 	splash_state *state = machine->driver_data<splash_state>();
-
+	UINT8 * ROM = (UINT8 *)machine->region("audiocpu")->base();
+	memory_configure_bank(machine, "sound_bank", 0, 16, &ROM[0x10000], 0x8000);
+	
 	state->bitmap_type = 1;
 	state->sprite_attr2_shift = 8;
 }
@@ -900,20 +1074,52 @@ static DRIVER_INIT( funystrp )
 	state->bitmap_type = 0;
 	state->sprite_attr2_shift = 0;
 
-	/* part of the protection? */
+	// initial protection checks, just after boot
+	
 	ROM[0x04770/2] = 0x4e71;
 	ROM[0x04772/2] = 0x4e71;
 
-	ROM[0x0f77e/2] = 0x7001;
-	ROM[0x0f780/2] = 0x4e75;
+	// temporary solution - work in progress - will be turned into proper r/w handlers
+	// protection write -> read -> compare tests
+	// not all of them should always pass ( especially the ones that compares data read with ram variable )
+	// side effect of the above is broken (sometimes) sound
+	// there's stil problem with  (broken) gameplay = sometimes one (or more) dot is moved 
+	// out of playfield (and placed on right part of screen ) and there's no way to complete the level
+	// game reads sprite coords directly from sprite ram and checks distance between player and each(!) dot or
+	// game object every frame
+	// most of the patched protection checks are very similar. when test fails, dot counter is altered.
+	// sometimes it's increased = level is impossible to complete, sometimes - cleared (and level ends
+	// immediately). 
+	
+	ROM[0x07b30/2] = 0x7001;
+	ROM[0x07ec6/2] = 0x7001;
+	ROM[0x07fbe/2] = 0x7001;	
+	ROM[0x08060/2] = 0x7001;
+	ROM[0x08576/2] = 0x7001;
+	ROM[0x08948/2] = 0x7001;
+	ROM[0x09e16/2] = 0x7001;
+	ROM[0x0a994/2] = 0x7001;
+	ROM[0x0c648/2] = 0x7001;
+	ROM[0x0c852/2] = 0x7001;			
+	ROM[0x0dc22/2] = 0x7001;
+	ROM[0x0f780/2] = 0x7001;
+	ROM[0x0f882/2] = 0x7001;
+	ROM[0x11032/2] = 0x7001;
+	ROM[0x11730/2] = 0x7001;
+	ROM[0x11f80/2] = 0x7001;
+
+	ROM = (UINT16 *)machine->region("audiocpu")->base();
+	
+	memory_configure_bank(machine, "sound_bank", 0, 16, &ROM[0x00000], 0x8000);
+
 }
 
 GAME( 1992, splash,   0,        splash,   splash,   splash,   ROT0, "Gaelco",    "Splash! (Ver. 1.2 World)", 0 )
 GAME( 1992, splash10, splash,   splash,   splash,   splash10, ROT0, "Gaelco",    "Splash! (Ver. 1.0 World)", 0 )
 GAME( 1992, paintlad, splash,   splash,   splash,   splash,   ROT0, "Gaelco",    "Painted Lady (Splash) (Ver. 1.3 US)", 0 )
 
-GAME( 1993, roldfrog, 0,        roldfrog, splash,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 1)", GAME_NO_SOUND )
-GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 2)", GAME_NO_SOUND )
+GAME( 1993, roldfrog, 0,        roldfrog, splash,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 1)", 0)
+GAME( 1993, roldfroga,roldfrog, roldfrog, splash,   roldfrog, ROT0, "Microhard", "The Return of Lady Frog (set 2)", 0 )
 GAME( 1995, rebus,    0,        roldfrog, splash,   rebus,    ROT0, "Microhard", "Rebus", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND )
-GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND )
-GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp, ROT0, "Microhard", "Puck People", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION|GAME_NO_SOUND )
+GAME( 199?, funystrp, 0,        funystrp, funystrp, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )
+GAME( 199?, puckpepl, funystrp, funystrp, funystrp, funystrp, ROT0, "Microhard", "Puck People", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION )

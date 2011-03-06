@@ -238,12 +238,14 @@ static void funystrp_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 	const gfx_element *gfx = machine->gfx[1];
 
 	for (i = 0; i < 0x400; i += 4){
-		int sx = state->spriteram[i+2] & 0x1ff;
+		int sx = state->spriteram[i+2] & 0xff;
 		int sy = (240 - (state->spriteram[i+1] & 0xff)) & 0xff;
 		int attr = state->spriteram[i+3] & 0xff;
 		int attr2 = state->spriteram[i+0x400] >> state->sprite_attr2_shift;
 		int number = (state->spriteram[i] & 0xff) + (attr & 0xf)*256;
 
+		if (attr2 & 0x80) sx += 256;
+		
 		drawgfx_transpen(bitmap,cliprect,gfx,number,
 			(attr2 & 0x7f),attr & 0x40,attr & 0x80,
 			sx-8,sy,0);
