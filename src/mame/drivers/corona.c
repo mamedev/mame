@@ -28,7 +28,7 @@
   4-players horse racing game.
 
   Very rare game, due to massive conversions to any kind of roulette games.
-  
+
   ------
 
   This game is a milestone. If you ask any old operator about the gambling
@@ -490,7 +490,7 @@ static WRITE8_HANDLER( mux_port_w )
 
 	coin_counter_w(space->machine, 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
 	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
-	
+
 //	logerror("muxsel: %02x \n", input_selector);
 }
 
@@ -510,7 +510,7 @@ static WRITE8_HANDLER( wc_meters_w )
 	coin_counter_w(space->machine, 0, (data ^ 0xff) & 0x01);	/* Credits In */
 	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x02);	/* Credits In (through Coin 3) */
 	coin_counter_w(space->machine, 2, (data ^ 0xff) & 0x04);	/* Credits Out */
-	
+
 //	popmessage("meters: %02x", (data ^ 0xff));
 }
 
@@ -633,9 +633,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-//	AM_RANGE(0x01, 0x02) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-//	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_WRITENOP //socket for another ay, inited but never played
 ADDRESS_MAP_END
 
 /* Ruleta RE-800
@@ -738,7 +738,7 @@ static ADDRESS_MAP_START( luckyrlt_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
 	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
 	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
-	
+
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("DSW1")
@@ -1203,7 +1203,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_DIPNAME( 0x80, 0x00, "Player 3 Credits Lock" )	/* lock the credits in/out */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	
+
 	PORT_START("IN0-4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("Player 4 - Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("Player 4 - Right")
@@ -1227,7 +1227,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_DIPNAME( 0x80, 0x00, "Player 5 Credits Lock" )	/* lock the credits in/out */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-	
+
 	PORT_START("IN0-6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Player 6 - Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_PGDN)  PORT_NAME("Player 6 - Right")
@@ -1342,7 +1342,6 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_CPU_ADD("soundcpu", Z80, WC_MAIN_XTAL/10)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)
 	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
 
 //	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1556,9 +1555,9 @@ ROM_END
 /******************************
   Lucky Roulette
   6-players spanish roulette.
-  
+
   Unknown manufacturer.
-  
+
 ******************************/
 
 ROM_START(luckyrlt)
