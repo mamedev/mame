@@ -4287,6 +4287,28 @@ ROM_START( smooncrs )
 	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+ROM_START( sstarcrs )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "ss1",          0x0000, 0x0800, CRC(2ff72897) SHA1(c34c149ee32dd3318a04eda8928f0cd5f997d184) )
+	ROM_LOAD( "ss2",          0x0800, 0x0800, CRC(565e7880) SHA1(cd8d1154c2e970e863bd489856819cd34848570b) )
+	ROM_LOAD( "ss3",          0x1000, 0x0800, CRC(a1939def) SHA1(c9be93d325dde496d89e0735ec4e7abca932c0f6) )
+	ROM_LOAD( "ss4",          0x1800, 0x0800, CRC(a332e012) SHA1(7b32001fe342dcae2bce1c39dd1e75c6b5806199) )
+	ROM_LOAD( "ss5",          0x2000, 0x0800, CRC(b9e58453) SHA1(60890208a5dee6e5e52e4ffafcb3501de080adf8) )
+	ROM_LOAD( "ss6",          0x2800, 0x0800, CRC(7cbb5bc8) SHA1(5158d798e9b4649636f9fecf29738f271a3edef2) )
+	ROM_LOAD( "ss7",          0x3000, 0x0800, CRC(57713b91) SHA1(ba01ed3f047ebbd0f9e6956e649bec0e8b730a45) )
+	ROM_LOAD( "ss8",          0x3800, 0x0800, CRC(c857e898) SHA1(a596abe4971e65785945a844a783be2dbca559bc) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "ss10",         0x0000, 0x0800, CRC(2a95b8ea) SHA1(b2f7f2d4aca55b8cbbb907c990b27c06b7b2d77b) )
+	ROM_LOAD( "ss12",         0x0800, 0x0800, CRC(b92c4c30) SHA1(4abc4c759e401be4edcce4f3f2d7b2b3f1827a99) )
+	ROM_LOAD( "ss9",          0x1000, 0x0800, CRC(3661e084) SHA1(bb5b8b7c9c61a0379a3f1eec02d61bbb385cd3e9) )
+	ROM_LOAD( "ss11",         0x1800, 0x0800, CRC(95613048) SHA1(b9ba1ca11ef3154a800a90adaa8c491bb944a3a2) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	// not present in this set
+	ROM_LOAD( "mmi6331.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
+ROM_END
+
 ROM_START( mooncmw )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "60.1x",      0x0000, 0x0800, CRC(322859e6) SHA1(292dccb66c38c8de837ec3ac10928d092494958e) )
@@ -6059,11 +6081,12 @@ GAME( 1980, mooncrsb, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg",
 GAME( 1980, mooncrs2, mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon Cresta (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, mooncrs3, mooncrst, mooncrst, mooncrst, mooncrsu, ROT90,  "bootleg (Jeutel)", "Moon Cresta (bootleg set 3)", GAME_SUPPORTS_SAVE ) /* Jeutel bootleg, similar to bootleg set 2 */
 GAME( 1980, fantazia, mooncrst, mooncrst, fantazia, mooncrsu, ROT90,  "bootleg? (Subelectro)", "Fantazia (bootleg?)", GAME_SUPPORTS_SAVE )
-GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license?)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
-GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Nichibutsu (Centuri license?)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
-GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license?)", "Eagle (set 3)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1980, eagle,    mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 1)", GAME_SUPPORTS_SAVE ) // or bootleg?
+GAME( 1980, eagle2,   mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 2)", GAME_SUPPORTS_SAVE ) // "
+GAME( 1980, eagle3,   mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "Nichibutsu (Centuri license)", "Eagle (set 3)", GAME_SUPPORTS_SAVE ) // "
 GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2,   mooncrsu, ROT90,  "bootleg? (Fortrek)", "Space Thunderbird", GAME_SUPPORTS_SAVE )
 GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
+GAME( 1980?,sstarcrs, mooncrst, mooncrst, mooncrsg, mooncrsu, ROT90,  "Nichibutsu (Taito do Brasil license)", "Super Star Crest", GAME_SUPPORTS_SAVE )
 GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, mooncrsu, ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 // The boards were marked 'Space Dragon' although this doesn't appear in the games.
 GAME( 1980, spcdrag,  mooncrst, mooncrst, smooncrs, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )

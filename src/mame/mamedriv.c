@@ -199,6 +199,7 @@ const game_driver * const drivers[] =
 	DRIVER( mooncrstg )	/* (c) 1980 Gremlin */
 	DRIVER( mooncrstuk )/* (c) 1980 Nichibutsu UK */
 	DRIVER( smooncrs )	/* Gremlin */
+	DRIVER( sstarcrs )	/* Taito (Brazil) */
 	DRIVER( mooncmw )	/* bootleg */
 	DRIVER( mooncrsb )	/* bootleg */
 	DRIVER( mooncrs2 )	/* bootleg */
