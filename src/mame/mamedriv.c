@@ -10710,8 +10710,9 @@ Other Sun games
 	DRIVER( avtnfl )	/* (c) 1989 AVT */
 
 	/* Corona hardware */
-	DRIVER( winner81 )	/* (c) 1981 Corona Co., Ltd. */
-	DRIVER( winner82 )	/* (c) 1982 Corona Co., Ltd. */
+	DRIVER( winner81 )	/* (c) 1981 Corona Co, Ltd. */
+	DRIVER( winner81b )	/* (c) 1981 Corona Co, Ltd. */
+	DRIVER( winner82 )	/* (c) 1982 Corona Co, Ltd. */
 	DRIVER( re800ea )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v1 )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v3 )	/* (c) 1992 Entretenimientos GEMINIS */
