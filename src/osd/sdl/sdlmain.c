@@ -195,6 +195,13 @@ const options_entry sdl_options::s_option_entries[] =
 	{ NULL, 		                          NULL,  OPTION_HEADER,     "SDL KEYBOARD MAPPING" },
 	{ SDLOPTION_KEYMAP,                      "0",    OPTION_BOOLEAN,    "enable keymap" },
 	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", OPTION_STRING, "keymap filename" },
+#ifdef MESS
+#ifdef SDLMAME_MACOSX
+	{ SDLOPTION_UIMODEKEY,					 "DELETE", 0,               "Key to toggle MESS keyboard mode" },
+#else
+	{ SDLOPTION_UIMODEKEY,			         "SCRLOCK", 0,            "Key to toggle MESS keyboard mode" },
+#endif	// SDLMAME_MACOSX
+#endif	// MESS
 
 	// joystick mapping
 	{ NULL, 		                         NULL,   OPTION_HEADER,     "SDL JOYSTICK MAPPING" },

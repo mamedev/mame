@@ -227,76 +227,76 @@ struct _kt_table {
 static kt_table sdl_key_trans_table[] =
 {
 	// MAME key         SDL key         vkey    ascii
-	KTT_ENTRY0(  ESC,			ESCAPE,			0x1b,	0x1b,		"ESC"  ),
-	KTT_ENTRY1(  1,				1 ),
-	KTT_ENTRY1(  2,				2 ),
-	KTT_ENTRY1(  3,				3 ),
-	KTT_ENTRY1(  4,				4 ),
-	KTT_ENTRY1(  5,				5 ),
-	KTT_ENTRY1(  6,				6 ),
-	KTT_ENTRY1(  7,				7 ),
-	KTT_ENTRY1(  8,				8 ),
-	KTT_ENTRY1(  9,				9 ),
-	KTT_ENTRY1(  0,				0 ),
-	KTT_ENTRY0(  MINUS,			MINUS,			0xbd,	'-',	"MINUS" ),
-	KTT_ENTRY0(  EQUALS,		EQUALS,			0xbb,	'=',	"EQUALS" ),
-	KTT_ENTRY0(  BACKSPACE,		BACKSPACE,		0x08,	0x08,	"BACKSPACE" ),
-	KTT_ENTRY0(  TAB,			TAB,			0x09,	0x09,	"TAB" ),
-	KTT_ENTRY1(  Q,				Q ),
-	KTT_ENTRY1(  W,				W ),
-	KTT_ENTRY1(  E,				E ),
-	KTT_ENTRY1(  R,				R ),
-	KTT_ENTRY1(  T,				T ),
-	KTT_ENTRY1(  Y,				Y ),
-	KTT_ENTRY1(  U,				U ),
-	KTT_ENTRY1(  I,				I ),
-	KTT_ENTRY1(  O,				O ),
-	KTT_ENTRY1(  P,				P ),
-	KTT_ENTRY0(  OPENBRACE,	LEFTBRACKET,		0xdb,	'[',	"OPENBRACE" ),
-	KTT_ENTRY0(  CLOSEBRACE,RIGHTBRACKET,		0xdd,	']',	"CLOSEBRACE" ),
-	KTT_ENTRY0(  ENTER,		RETURN, 			0x0d,	0x0d,	"RETURN" ),
-	KTT_ENTRY2(  LCONTROL,	LCTRL ),
-	KTT_ENTRY1(  A,				A ),
-	KTT_ENTRY1(  S, 			S ),
-	KTT_ENTRY1(  D, 			D ),
-	KTT_ENTRY1(  F, 			F ),
-	KTT_ENTRY1(  G, 			G ),
-	KTT_ENTRY1(  H, 			H ),
-	KTT_ENTRY1(  J, 			J ),
-	KTT_ENTRY1(  K, 			K ),
-	KTT_ENTRY1(  L, 			L ),
-	KTT_ENTRY0(  COLON, 		SEMICOLON,		0xba,	';',	"COLON" ),
-	KTT_ENTRY0(  QUOTE, 		APOSTROPHE,			0xde,	'\'',	"QUOTE" ),
-	KTT_ENTRY2(  LSHIFT,		LSHIFT ),
-	KTT_ENTRY0(  BACKSLASH,		BACKSLASH,		0xdc,	'\\',	"BACKSLASH" ),
-	KTT_ENTRY1(  Z, 			Z ),
-	KTT_ENTRY1(  X, 			X ),
-	KTT_ENTRY1(  C, 			C ),
-	KTT_ENTRY1(  V, 			V ),
-	KTT_ENTRY1(  B, 			B ),
-	KTT_ENTRY1(  N, 			N ),
-	KTT_ENTRY1(  M, 			M ),
-	KTT_ENTRY0(  COMMA, 		COMMA,	    	0xbc,	',',	"COMMA" ),
-	KTT_ENTRY0(  STOP,			PERIOD, 		0xbe,	'.',	"STOP"  ),
-	KTT_ENTRY0(  SLASH, 		SLASH,	    	0xbf,	'/',	"SLASH" ),
-	KTT_ENTRY2(  RSHIFT,		RSHIFT ),
-	KTT_ENTRY0(  ASTERISK,		KP_MULTIPLY,    '*',	'*',	"ASTERIX" ),
-	KTT_ENTRY2(  LALT,			LALT ),
-	KTT_ENTRY0(  SPACE, 		SPACE,			' ',	' ',	"SPACE" ),
-	KTT_ENTRY2(  CAPSLOCK,		CAPSLOCK ),
-	KTT_ENTRY2(  F1,			F1 ),
-	KTT_ENTRY2(  F2,			F2 ),
-	KTT_ENTRY2(  F3,			F3 ),
-	KTT_ENTRY2(  F4,			F4 ),
-	KTT_ENTRY2(  F5,			F5 ),
-	KTT_ENTRY2(  F6,			F6 ),
-	KTT_ENTRY2(  F7,			F7 ),
-	KTT_ENTRY2(  F8,			F8 ),
-	KTT_ENTRY2(  F9,			F9 ),
-	KTT_ENTRY2(  F10,			F10 ),
-	KTT_ENTRY2(  NUMLOCK,		NUMLOCKCLEAR ),
-	KTT_ENTRY2(  SCRLOCK,		SCROLLLOCK ),
-	KTT_ENTRY2(  7_PAD, 		KP_7 ),
+	KTT_ENTRY0(  ESC,			ESCAPE,			0x1b,	0x1b,		"ESC"  ),   		 // 0
+	KTT_ENTRY1(  1,				1 ),                                                     // 1
+	KTT_ENTRY1(  2,				2 ),                                                     // 2
+	KTT_ENTRY1(  3,				3 ),                                                     // 3
+	KTT_ENTRY1(  4,				4 ),                                                     // 4
+	KTT_ENTRY1(  5,				5 ),                                                     // 5
+	KTT_ENTRY1(  6,				6 ),                                                     // 6
+	KTT_ENTRY1(  7,				7 ),                                                     // 7
+	KTT_ENTRY1(  8,				8 ),                                                     // 8
+	KTT_ENTRY1(  9,				9 ),                                                     // 9
+	KTT_ENTRY1(  0,				0 ),                                                     // 10
+	KTT_ENTRY0(  MINUS,			MINUS,			0xbd,	'-',	"MINUS" ),               // 11
+	KTT_ENTRY0(  EQUALS,		EQUALS,			0xbb,	'=',	"EQUALS" ),              // 12
+	KTT_ENTRY0(  BACKSPACE,		BACKSPACE,		0x08,	0x08,	"BACKSPACE" ),           // 13
+	KTT_ENTRY0(  TAB,			TAB,			0x09,	0x09,	"TAB" ),                 // 14
+	KTT_ENTRY1(  Q,				Q ),                                                     // 15
+	KTT_ENTRY1(  W,				W ),                                                     // 16
+	KTT_ENTRY1(  E,				E ),                                                     // 17
+	KTT_ENTRY1(  R,				R ),                                                     // 18
+	KTT_ENTRY1(  T,				T ),                                                     // 19
+	KTT_ENTRY1(  Y,				Y ),                                                     // 20
+	KTT_ENTRY1(  U,				U ),                                                     // 21
+	KTT_ENTRY1(  I,				I ),                                                     // 22
+	KTT_ENTRY1(  O,				O ),                                                     // 23
+	KTT_ENTRY1(  P,				P ),                                                     // 24
+	KTT_ENTRY0(  OPENBRACE,	LEFTBRACKET,		0xdb,	'[',	"OPENBRACE" ),           // 25
+	KTT_ENTRY0(  CLOSEBRACE,RIGHTBRACKET,		0xdd,	']',	"CLOSEBRACE" ),          // 26
+	KTT_ENTRY0(  ENTER,		RETURN, 			0x0d,	0x0d,	"RETURN" ),              // 27
+	KTT_ENTRY2(  LCONTROL,	LCTRL ),                                                     // 28
+	KTT_ENTRY1(  A,				A ),                                                     // 29
+	KTT_ENTRY1(  S, 			S ),                                                     // 30
+	KTT_ENTRY1(  D, 			D ),                                                     // 31
+	KTT_ENTRY1(  F, 			F ),                                                     // 32
+	KTT_ENTRY1(  G, 			G ),                                                     // 33
+	KTT_ENTRY1(  H, 			H ),                                                     // 34
+	KTT_ENTRY1(  J, 			J ),                                                     // 35
+	KTT_ENTRY1(  K, 			K ),                                                     // 36
+	KTT_ENTRY1(  L, 			L ),                                                     // 37
+	KTT_ENTRY0(  COLON, 		SEMICOLON,		0xba,	';',	"COLON" ),               // 38
+	KTT_ENTRY0(  QUOTE, 		APOSTROPHE,			0xde,	'\'',	"QUOTE" ),           // 39
+	KTT_ENTRY2(  LSHIFT,		LSHIFT ),                                                // 40
+	KTT_ENTRY0(  BACKSLASH,		BACKSLASH,		0xdc,	'\\',	"BACKSLASH" ),           // 41
+	KTT_ENTRY1(  Z, 			Z ),                                                     // 42
+	KTT_ENTRY1(  X, 			X ),                                                     // 43
+	KTT_ENTRY1(  C, 			C ),                                                     // 44
+	KTT_ENTRY1(  V, 			V ),                                                     // 45
+	KTT_ENTRY1(  B, 			B ),                                                     // 46
+	KTT_ENTRY1(  N, 			N ),                                                     // 47
+	KTT_ENTRY1(  M, 			M ),                                                     // 48
+	KTT_ENTRY0(  COMMA, 		COMMA,	    	0xbc,	',',	"COMMA" ),               // 49
+	KTT_ENTRY0(  STOP,			PERIOD, 		0xbe,	'.',	"STOP"  ),               // 50
+	KTT_ENTRY0(  SLASH, 		SLASH,	    	0xbf,	'/',	"SLASH" ),               // 51
+	KTT_ENTRY2(  RSHIFT,		RSHIFT ),                                                // 52
+	KTT_ENTRY0(  ASTERISK,		KP_MULTIPLY,    '*',	'*',	"ASTERIX" ),             // 53
+	KTT_ENTRY2(  LALT,			LALT ),                                                  // 54
+	KTT_ENTRY0(  SPACE, 		SPACE,			' ',	' ',	"SPACE" ),               // 55
+	KTT_ENTRY2(  CAPSLOCK,		CAPSLOCK ),                                              // 56
+	KTT_ENTRY2(  F1,			F1 ),                                                    // 57
+	KTT_ENTRY2(  F2,			F2 ),                                                    // 58
+	KTT_ENTRY2(  F3,			F3 ),                                                    // 59
+	KTT_ENTRY2(  F4,			F4 ),                                                    // 60
+	KTT_ENTRY2(  F5,			F5 ),                                                    // 61
+	KTT_ENTRY2(  F6,			F6 ),                                                    // 62
+	KTT_ENTRY2(  F7,			F7 ),                                                    // 63
+	KTT_ENTRY2(  F8,			F8 ),                                                    // 64
+	KTT_ENTRY2(  F9,			F9 ),                                                    // 65
+	KTT_ENTRY2(  F10,			F10 ),                                                   // 66
+	KTT_ENTRY2(  NUMLOCK,		NUMLOCKCLEAR ),                                          // 67
+	KTT_ENTRY2(  SCRLOCK,		SCROLLLOCK ),                                            // 68
+	KTT_ENTRY2(  7_PAD, 		KP_7 ),                                                  // 69
 	KTT_ENTRY2(  8_PAD, 		KP_8 ),
 	KTT_ENTRY2(  9_PAD, 		KP_9 ),
 	KTT_ENTRY2(  MINUS_PAD,		KP_MINUS ),
@@ -1081,7 +1081,7 @@ static void sdlinput_register_keyboards(running_machine *machine)
 		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 
 		// add the item to the device
-		//printf("Test %d\n", OSD_SDL_INDEX(key_trans_table[keynum].sdl_key) );
+//		printf("Keynum %d => sdl key %d\n", keynum, OSD_SDL_INDEX(key_trans_table[keynum].sdl_key));
 		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
 	}
 
@@ -1306,7 +1306,7 @@ void sdlinput_poll(running_machine *machine)
 		switch(event.type) {
 		case SDL_KEYDOWN:
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
-			//printf("Key down %d %d %s\n", event.key.which, event.key.keysym.scancode, devinfo->name);
+//			printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name, OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 			ui_input_push_char_event(machine, sdl_window_list->target, (unicode_char) event.key.keysym.unicode);
@@ -1594,6 +1594,7 @@ void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
 	int mameid_code ,ui_code;
 	input_type_desc *typedesc;
 	const char*  uimode;
+	char fullmode[64];
 
 	// loop over the defaults
 	for (typedesc = typelist; typedesc != NULL; typedesc = typedesc->next)
@@ -1603,14 +1604,18 @@ void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
 				uimode = downcast<sdl_options &>(machine().options()).ui_mode_key();
-				if(!strcmp(uimode,"auto")) {
+				if(!strcmp(uimode,"auto"))
+				{
 					#if defined(__APPLE__) && defined(__MACH__)
 					mameid_code = lookup_mame_code("ITEM_ID_INSERT");
 					#else
 					mameid_code = lookup_mame_code("ITEM_ID_SCRLOCK");
 					#endif
-				} else {
-					mameid_code = lookup_mame_code(uimode);
+				} 
+				else 
+				{
+					snprintf(fullmode, 63, "ITEM_ID_%s", uimode);
+					mameid_code = lookup_mame_code(fullmode);
 				}
 				ui_code = INPUT_CODE(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, mameid_code);
 				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], ui_code);
