@@ -222,6 +222,7 @@ static void PS7500_startTimer1(void);
 static emu_timer *PS7500timer0;
 static emu_timer *PS7500timer1;
 
+static int iocr_hack;
 
 static SCREEN_UPDATE(ssfindo)
 {
@@ -230,6 +231,7 @@ static SCREEN_UPDATE(ssfindo)
 	if( PS7500_IO[VIDCR]&0x20) //video DMA enabled
 	{
 		s=( (PS7500_IO[VIDINITA]&0x1fffffff)-0x10000000)/4;
+
 		if(s>=0 && s<(0x10000000/4))
 		{
 			for(y=0;y<256;y++)
@@ -243,6 +245,7 @@ static SCREEN_UPDATE(ssfindo)
 				}
 		}
 	}
+	
 	return 0;
 }
 
@@ -333,7 +336,6 @@ static void ppcar_speedups(address_space* space)
 
 static READ32_HANDLER(PS7500_IO_r)
 {
-
 	switch(offset)
 	{
 		case MSECR:
@@ -357,8 +359,13 @@ static READ32_HANDLER(PS7500_IO_r)
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
 			if (ssfindo_speedup) ssfindo_speedup(space);
-			//printf("IOCR %08x\n",cpu_get_pc(space->cpu));
-			return (input_port_read(space->machine, "PS7500") & 0x80) | 0x34 | 3;
+			
+			if( iocr_hack)
+			{
+				return (input_port_read(space->machine, "PS7500") & 0x80) | 0x34 | (space->machine->rand()&3); //eeprom read ?
+			}
+			
+			return (input_port_read(space->machine, "PS7500") & 0x80) | 0x37;
 
 		case VIDCR:
 			return (PS7500_IO[offset] | 0x50) & 0xfffffff0;
@@ -374,8 +381,7 @@ static READ32_HANDLER(PS7500_IO_r)
 
 			return PS7500_IO[offset];
 
-		//default:
-			//mame_printf_debug("ior %i @%x\n",offset,cpu_get_pc(space->cpu));
+
 	}
 	return space->machine->rand();//PS7500_IO[offset];
 }
@@ -440,6 +446,8 @@ static WRITE32_HANDLER(PS7500_IO_w)
 		case VIDINITA: //TODO: bit 30 (last bit) p.105
 					COMBINE_DATA(&PS7500_IO[offset]);
 		break;
+		
+		
 
 	}
 }
@@ -545,12 +553,26 @@ static ADDRESS_MAP_START( ppcar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_BASE (&vram)
 ADDRESS_MAP_END
 
+static READ32_HANDLER(tetfight_unk_r)
+{
+	//sound status ?
+	return space->machine->rand();
+}
+
+static WRITE32_HANDLER(tetfight_unk_w)
+{
+	//sound latch ?
+}
+
 static ADDRESS_MAP_START( tetfight_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
-	AM_RANGE(0x033c0000, 0x033c0003) AM_READ(io_r) AM_WRITE(io_w)
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)
-	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_BASE (&vram)
+	AM_RANGE(0x03240000, 0x03240003) AM_READ_PORT("DSW")
+	AM_RANGE(0x03240004, 0x03240007) AM_READ_PORT("IN0")
+	AM_RANGE(0x03240008, 0x0324000b) AM_READ_PORT("DSW2")
+	AM_RANGE(0x03240020, 0x03240023) AM_READWRITE( tetfight_unk_r, tetfight_unk_w)
+	AM_RANGE(0x10000000, 0x14ffffff) AM_RAM AM_BASE (&vram)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( ssfindo )
@@ -623,6 +645,74 @@ static INPUT_PORTS_START( ppcar )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1	)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tetfight )
+	PORT_START("PS7500")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "DSW 0" )
+	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DSW 1" )
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DSW 2" )
+	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DSW 3" )
+	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x010, "DSW 4" )
+	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DSW 5" )
+	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x040, "DSW 6" )
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW 7" )
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )
+	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "DSW 1" )
+	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DSW 2" )
+	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Initialize" )
+	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x010, "DSW 4" )
+	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "DSW 5" )
+	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x040, "DSW 6" )
+	PORT_DIPSETTING(	0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "DSW 7" )
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1	) PORT_PLAYER(1) //guess
+
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1	) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2	) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3	) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -744,6 +834,7 @@ static DRIVER_INIT(ssfindo)
 	DRIVER_INIT_CALL(common);
 	flashType=0;
 	ssfindo_speedup = ssfindo_speedups;
+	iocr_hack=0;
 }
 
 static DRIVER_INIT(ppcar)
@@ -751,14 +842,16 @@ static DRIVER_INIT(ppcar)
 	DRIVER_INIT_CALL(common);
 	flashType=1;
 	ssfindo_speedup = ppcar_speedups;
+	iocr_hack=0;
 }
 
 static DRIVER_INIT(tetfight)
 {
 	DRIVER_INIT_CALL(common);
-	flashType=0; //?
+	flashType=0; 
+	iocr_hack=1;
 }
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo,	ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )
 GAME( 1999, ppcar,   0,        ppcar,    ppcar,    ppcar,	ROT0, "Icarus", "Pang Pang Car", GAME_NO_SOUND )
-GAME( 2001, tetfight,0,        tetfight, ssfindo,  tetfight,ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, tetfight,0,        tetfight, tetfight,  tetfight,ROT0, "Sego", "Tetris Fighters", GAME_NO_SOUND|GAME_NOT_WORKING )
