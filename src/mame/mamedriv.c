@@ -2740,6 +2740,7 @@ V-V                           TP-027
 	DRIVER( ffightj2 )	/* 05/03/1990 (c) 1989 (Japan) */
 	DRIVER( ffightjh )	/* hack */
 	DRIVER( 1941 )	/*  2/1990 (c) 1990 (World) */
+	DRIVER( 1941u )	/* 27/02/1990 (c) 1990 (USA) */
 	DRIVER( 1941j )	/*  2/1990 (c) 1990 (Japan) */
 	DRIVER( mercs )	/* 02/03/1990 (c) 1990 (World) */
 	DRIVER( mercsu )	/* 08/06/1990 (c) 1990 (USA) */

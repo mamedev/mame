@@ -58,7 +58,8 @@ Final Fight (Japan 900112)                                     88622B-?   S222B 
 Final Fight (Japan 900305)                                     88622B-?   S222B            ?     ?            CPS-B-02  DL-0411-10002
 
 1941: Counter Attack (World)                             1990  ?          YI24B            ?     ?            CPS-B-05  DL-0411-10006
-1941: Counter Attack (Japan)                                   89625B-1   YI22B?           LWIO? 88622-C-5    CPS-B-05  DL-0411-10006  None
+1941: Counter Attack (USA 900227)                              89624B-3   YI24B            IOB1  88622-C-5    CPS-B-05  DL-0411-10006  None
+1941: Counter Attack (Japan)                                   89625B-1   YI22B            LWIO? 88622-C-5    CPS-B-05  DL-0411-10006  None
 
 Mercs (World 900302)                                     1990  89624B-3   O224B            IOB1  90628-C-1    CPS-B-12  DL-0411-10007  C628
 Mercs (USA 900302)                                             89624B-3   O224B            IOB1  90628-C-1    CPS-B-12  DL-0411-10007  C628
@@ -1286,7 +1287,8 @@ static const struct CPS1config cps1_config_table[]=
 	{"ffightj2",    CPS_B_02,     mapper_S224B },	// wrong, this set uses S222B, still non dumped
 	{"ffightjh",    CPS_B_01,     mapper_S224B },	// wrong, ffightjh hack doesn't even use the S222B PAL, since replaced with a GAL.
 	{"1941",        CPS_B_05,     mapper_YI24B },
-	{"1941j",       CPS_B_05,     mapper_YI24B },	// PAL used could be YI22B
+	{"1941u",       CPS_B_05,     mapper_YI24B },
+	{"1941j",       CPS_B_05,     mapper_YI24B },	// wrong, this set uses YI22B, still non dumped
 	{"unsquad",     CPS_B_11,     mapper_AR24B },
 	{"area88",      CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
 	{"area88r",     CPS_B_21_DEF, mapper_AR22B },	// wrong, this set uses ARA63B, still non dumped
