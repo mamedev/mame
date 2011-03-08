@@ -5089,7 +5089,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( cgraplop )	/* 28 1982.11 Grapelop */
 	DRIVER( cgraplop2 )	/* 28 */
 	DRIVER( clapapa )	/* 29 1982.11 Lapapa/Rootin' Tootin' */
-	DRIVER( clapapa2 )	/* 29 */ /* this one doesn't display lapapa anyehere */
+	DRIVER( clapapa2 )	/* 29 */ /* this one doesn't display lapapa anywhere */
 						/* 30 1983.03 Skater */
 	DRIVER( cprobowl )	/* 31 1983.03 Pro Bowling */
 	DRIVER( cnightst )	/* 32 1983.04 Night Star */
@@ -5104,7 +5104,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( cppicf )	/* 39 1984.02 Peter Pepper's Ice Cream Factory */
 	DRIVER( cppicf2 )	/* 39 */
 	DRIVER( cfghtice )	/* 40 1984.04 Fighting Ice Hockey */
-						/* 41 1984.05 Oozumou */
+						/* 41 1984.05 Oozumou/The Grand Sumo */
 						/* 42 1984.08 Hellow Gateball */ /* not a typo, this is official spelling */
 						/* 43 1984.08 Yellow Cab */
 	DRIVER( cbdash )	/* 44 1985.08 Boulder Dash */
