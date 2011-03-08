@@ -27,6 +27,7 @@ public:
 
 WRITE8_HANDLER( carjmbre_flipscreen_w );
 WRITE8_HANDLER( carjmbre_bgcolor_w );
+WRITE8_HANDLER( carjmbre_8806_w );
 WRITE8_HANDLER( carjmbre_videoram_w );
 
 PALETTE_INIT( carjmbre );
