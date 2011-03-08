@@ -9,7 +9,8 @@
 
   Games running in this hardware:
 
-  * Winners Circle (81),                 1981, Corona Co, LTD.
+  * Winners Circle (81, 28*28 PCB),      1981, Corona Co, LTD.
+  * Winners Circle (81, 18*22 PCB),      1981, Corona Co, LTD.
   * Winners Circle (82),                 1982, Corona Co, LTD.
   * Ruleta RE-800 (earlier),             1991, Entretenimientos GEMINIS & GENATRON.
   * Ruleta RE-800 (v1.0),                1991, Entretenimientos GEMINIS & GENATRON.
@@ -272,7 +273,8 @@
 #define WC_MAIN_XTAL		(XTAL_24MHz)	/* Main for Winners Circle boards */
 #define RE_MAIN_XTAL		(XTAL_16MHz)	/* Main for roulette boards */
 #define VIDEO_XTAL			(XTAL_20MHz)	/* Video circuitry Xtal (all) */
-#define AY_CLK				(1000000)		/* AY-3-8912 clock, measured */
+#define AY_CLK1				(1000000)		/* AY-3-8912 clock for 81 (28*28 PCB), measured */
+#define AY_CLK2				(2000000)		/* AY-3-8912 clock for 81b & 82 (18*22 PCB), guessed */
 
 
 #include "emu.h"
@@ -418,7 +420,7 @@ static SCREEN_UPDATE(luckyrlt)
 
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 256; x++)
-			*BITMAP_ADDR16(bitmap, 256 - y, x) = videobuf[y * 512 + x];
+			*BITMAP_ADDR16(bitmap, 255 - y, x) = videobuf[y * 512 + x];
 
 	return 0;
 }
@@ -449,11 +451,6 @@ static WRITE8_HANDLER( ball_w )
 	output_set_lamp_value(lamp_old, 0);
 	lamp_old = lamp;
 }
-
-//static READ8_HANDLER( test_r )
-//{
-//	return space->machine->rand() & 0xff;
-//}
 
 
 /********  Multiplexed Inputs  ********/
@@ -535,6 +532,7 @@ static WRITE8_HANDLER( wc_meters_w )
 		   DF (01)
            71 (FF/00)
 		   D8 (00....) --> snd_latch?
+           EF: meters.
 
   Reads: E8/E9....EA/EB/EC/ED/EE
 
@@ -543,8 +541,7 @@ static WRITE8_HANDLER( wc_meters_w )
 */
 static ADDRESS_MAP_START( winner81_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM // (nvram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xb800, 0xb8ff) AM_RAM // copied from 8000 (0x10 bytes, repeated)
 ADDRESS_MAP_END
 
@@ -557,17 +554,17 @@ static ADDRESS_MAP_START( winner81_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x75, 0x75) AM_READ(blitter_status_r)
 	AM_RANGE(0x76, 0x76) AM_WRITE(blitter_aux_w)
 
-	AM_RANGE(0xd8, 0xd8) AM_WRITENOP
+	AM_RANGE(0xd8, 0xd8) AM_WRITENOP			/* dunno, but is writting 0's very often */
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(sound_latch_w)
 
 	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("IN0")	/* credits for players A, B, C, D */
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("IN3")
-
 	AM_RANGE(0xea, 0xea) AM_READ_PORT("IN1")	/* left & right for all players */
 	AM_RANGE(0xeb, 0xeb) AM_READ_PORT("IN2")	/* bet for all players */
-	AM_RANGE(0xec, 0xec) AM_READ_PORT("DSW2")
-	AM_RANGE(0xed, 0xed) AM_READ_PORT("DSW1")
-	AM_RANGE(0xee, 0xee) AM_READ_PORT("IN4")
+	AM_RANGE(0xec, 0xec) AM_READ_PORT("IN4")
+	AM_RANGE(0xed, 0xed) AM_READ_PORT("DSW1")	/* DIP switches bank 1 */
+	AM_RANGE(0xee, 0xee) AM_READ_PORT("DSW2")
+	AM_RANGE(0xef, 0xef) AM_WRITE(wc_meters_w)	/* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(  winner81_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -601,8 +598,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM //AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM //AM_BASE_SIZE_GENERIC(nvram) 801a comm
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_cpu_io_map, ADDRESS_SPACE_IO, 8 )
@@ -627,15 +624,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( winner82_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
-//	AM_RANGE(0x4800, 0x4fff) AM_RAM
-//	AM_RANGE(0xc800, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_WRITENOP //socket for another ay, inited but never played
+	AM_RANGE(0x02, 0x03) AM_WRITENOP	/* socket for another ay, inited but never played */
 ADDRESS_MAP_END
 
 /* Ruleta RE-800
@@ -1310,7 +1305,7 @@ static MACHINE_CONFIG_START( winner81, driver_device )
 	MCFG_CPU_IO_MAP(winner81_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_PALETTE_INIT(winner)
 
@@ -1328,7 +1323,7 @@ static MACHINE_CONFIG_START( winner81, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)	/* measured */
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)	/* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1343,7 +1338,7 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)
 	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
 
-//	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_PALETTE_INIT(winner)
 
@@ -1361,7 +1356,7 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)	/* measured */
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)	/* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1395,7 +1390,7 @@ static MACHINE_CONFIG_START( re800, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)	/* measured */
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1421,7 +1416,7 @@ static MACHINE_CONFIG_START( luckyrlt, driver_device )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
 	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
 	MCFG_SCREEN_UPDATE(luckyrlt)
 
 	MCFG_PALETTE_LENGTH(0x100)
@@ -1429,7 +1424,7 @@ static MACHINE_CONFIG_START( luckyrlt, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK)	/* measured */
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1525,7 +1520,7 @@ ROM_START(re800ea)
 	ROM_RELOAD(                     0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
 ROM_START(re800v1)
@@ -1537,7 +1532,7 @@ ROM_START(re800v1)
 	ROM_RELOAD(             0x0800, 0x0800 )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, BAD_DUMP CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+	ROM_LOAD( "promcoro.123",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
 ROM_END
 
 ROM_START(re800v3)
@@ -1578,10 +1573,10 @@ ROM_END
 ******************************************/
 
 /*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                              FLAGS                   LAYOUT      */
-GAME(  1981, winner81,  0,        winner81, winner81, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",      GAME_IMPERFECT_SOUND )
-GAME(  1981, winner81b, winner82, winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",      GAME_IMPERFECT_SOUND )
-GAME(  1982, winner82,  0,        winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                 GAME_IMPERFECT_SOUND )
-GAMEL( 1991, re800ea,   0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", 0,                      layout_re800 )
+GAME(  1981, winner81,  winner82, winner81, winner81, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",      GAME_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",      0 )
+GAME(  1982, winner82,  0,        winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                 0 )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", 0,                      layout_re800 )
 GAMEL( 1991, re800v1,   0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                0,                      layout_re800 )
 GAMEL( 1991, re800v3,   0,        re800,    re800v3,  0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                GAME_IMPERFECT_COLORS,  layout_re800 )
 GAMEL( 198?, luckyrlt,  0,        luckyrlt, luckyrlt, 0,        ROT90,  "<unknown>",                "Lucky Roulette (6-players, Spanish)", 0,                      layout_luckyrlt )
