@@ -43,7 +43,7 @@
   --------------
 
 
-  * Winners Circle:
+  * Winners Circle 81 (28*28 pins PCB):
 
   1x Z80 @ 3 MHz. (main CPU)
   1x Z80 @ 2.4 MHz. (sound CPU)
@@ -60,6 +60,33 @@
   1x 82s123 (Color bipolar PROM)
 
   1x Xtal @ 24 MHz. (main)
+  1x Xtal @ 20 MHz. (video)
+
+
+  * Winners Circle 82 (18*22 pins PCB):
+
+  1x Z80 @ 2.6 MHz. (main CPU)
+  1x Z80 @ 2.6 MHz. (sound CPU)
+
+  1x AY-3-8910 @ 2 MHz? (need clk confirmation).
+  1x empty socket (maybe an AY replacement?)
+    wih the following pinouts:
+	(28 pins)
+	Vcc +5v @ Pin 19
+	GND @ pins 6 & 16
+	Analog Channels @ Pins 1 y 5
+	Clock @ pin 15
+
+  16x 8116 (16K x 1bit). DRAM Video (should be set as 32 KB).
+  1x 6116 (NVRAM)
+  2x 2114 (Sound DRAM)
+
+  4x 2732 (Main program ROMs).
+  1x 2716 (Sound program ROM).
+
+  1x 82s123 (Color bipolar PROM)
+
+  1x Xtal @ 18.432 MHz. (main)
   1x Xtal @ 20 MHz. (video)
 
 
@@ -264,17 +291,19 @@
 
   TODO:
 
-  - Inputs/Outputs for Winners Circle.
-  - Check the sound CPU connection in Winners Circle sets.
+  - See why the "rainbow timer" for gamble the earnings is nearly twice
+    the slow against the real thing.
+  - Check the sound CPU and AY clocks in Winners Circle sets.
 
 
 **************************************************************************/
 
-#define WC_MAIN_XTAL		(XTAL_24MHz)	/* Main for Winners Circle boards */
-#define RE_MAIN_XTAL		(XTAL_16MHz)	/* Main for roulette boards */
-#define VIDEO_XTAL			(XTAL_20MHz)	/* Video circuitry Xtal (all) */
-#define AY_CLK1				(1000000)		/* AY-3-8912 clock for 81 (28*28 PCB), measured */
-#define AY_CLK2				(2000000)		/* AY-3-8912 clock for 81b & 82 (18*22 PCB), guessed */
+#define WC81_MAIN_XTAL		(XTAL_24MHz)		/* Main crystal for Winners Circle 28*28 pins PCB's */
+#define WC82_MAIN_XTAL		(XTAL_18_432MHz)	/* Main crystal for Winners Circle 18*22 pins PCB's */
+#define RE_MAIN_XTAL		(XTAL_16MHz)		/* Main for roulette boards */
+#define VIDEO_XTAL			(XTAL_20MHz)		/* Video circuitry crystal (all) */
+#define AY_CLK1				(1000000)			/* AY-3-8912 clock for WC81 (28*28 PCB), measured */
+#define AY_CLK2				(2000000)			/* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
 
 
 #include "emu.h"
@@ -509,6 +538,16 @@ static WRITE8_HANDLER( wc_meters_w )
 	coin_counter_w(space->machine, 2, (data ^ 0xff) & 0x04);	/* Credits Out */
 
 //	popmessage("meters: %02x", (data ^ 0xff));
+}
+
+static WRITE8_DEVICE_HANDLER(ay_port_a_out)
+{
+	logerror("AY port A write: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(ay_port_b_out)
+{
+	logerror("AY port B write: %02X\n", data);
 }
 
 
@@ -1290,17 +1329,31 @@ INPUT_PORTS_END
 
 
 /*******************************************
+*             Sound Interface              *
+*******************************************/
+static const ay8910_interface aysnd_config =
+{
+	AY8910_LEGACY_OUTPUT,
+	AY8910_DEFAULT_LOADS,
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_HANDLER(ay_port_a_out),	/* Port A write */
+	DEVCB_HANDLER(ay_port_b_out)	/* Port B write */
+};
+
+
+/*******************************************
 *             Machine Drivers              *
 *******************************************/
 
 static MACHINE_CONFIG_START( winner81, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC_MAIN_XTAL/8)	/* measured */
+	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_map)
 	MCFG_CPU_IO_MAP(winner81_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC_MAIN_XTAL/10)	/* measured */
+	MCFG_CPU_ADD("soundcpu", Z80, WC81_MAIN_XTAL/10)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_sound_map)
 	MCFG_CPU_IO_MAP(winner81_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
@@ -1324,17 +1377,18 @@ static MACHINE_CONFIG_START( winner81, driver_device )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)	/* measured */
+	MCFG_SOUND_CONFIG(aysnd_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( winner82, driver_device )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, WC_MAIN_XTAL/8)	/* measured */
+	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_map)
 	MCFG_CPU_IO_MAP(winner82_cpu_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MCFG_CPU_ADD("soundcpu", Z80, WC_MAIN_XTAL/10)	/* measured */
+	MCFG_CPU_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8)	/* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)
 	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
 
@@ -1356,7 +1410,7 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)	/* measured */
+	MCFG_SOUND_ADD("aysnd", AY8910, AY_CLK2)	/* measured */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1390,7 +1444,7 @@ static MACHINE_CONFIG_START( re800, driver_device )
 	MCFG_VIDEO_START(winner)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK1)
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
