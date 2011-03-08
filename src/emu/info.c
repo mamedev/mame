@@ -467,11 +467,14 @@ static const char *get_merge_name(const hash_collection &romhashes, int parents,
 		for (psource = rom_first_source(*pconfig); psource != NULL; psource = rom_next_source(*psource))
 			for (pregion = rom_first_region(*psource); pregion != NULL; pregion = rom_next_region(pregion))
 				for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
-					if (romhashes == hash_collection(ROM_GETHASHDATA(prom)))
+				{
+					hash_collection phashes(ROM_GETHASHDATA(prom));
+					if (!phashes.flag(hash_collection::FLAG_NO_DUMP) && romhashes == phashes)
 					{
 						merge_name = ROM_GETNAME(prom);
 						break;
 					}
+				}
 	}
 
 	return merge_name;
