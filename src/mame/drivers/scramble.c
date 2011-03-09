@@ -1797,6 +1797,7 @@ ROM_END
 /*
 
 Conqueror (c) ???? ????
+ROM data reveals that it's a space shooter, based on Domino's Hot Shocker, >=1982.
 
 CPU: Z80 (x2)
 Sound: AY-3-8910 (x2)
@@ -1820,7 +1821,7 @@ ROM_START( conquer )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
 	ROM_LOAD( "conquer4.h3",       0x0000, 0x1000, CRC(ac533893) SHA1(bb1fee3ec1b856423aa032a905c90a62f405bba8) )
-	ROM_LOAD( "conquer5.h5",       0x1000, 0x1000, CRC(d884fd49) SHA1(108ed4a1aebd20b2c44e0bf07c2144b9b58dbda1) )
+	ROM_LOAD( "conquer5.h5",       0x1000, 0x1000, CRC(d884fd49) SHA1(108ed4a1aebd20b2c44e0bf07c2144b9b58dbda1) ) // data unused? (hotshock gfx still intact)
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "c01s.6e",    0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
@@ -1974,8 +1975,8 @@ GAME( 1983, mrkougar2,mrkougar, mrkougar, mrkougar, mrkougar,     ROT90, "ATW", 
 GAME( 1983, mrkougb,  mrkougar, mrkougb,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mrkougb2, mrkougar, mrkougb,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, hotshock, 0,        hotshock, hotshock, hotshock,     ROT90, "E.G. Felaco (Domino license)", "Hot Shocker", GAME_SUPPORTS_SAVE )
-GAME( 1982, hotshockb,hotshock, hotshock, hotshock, hotshock,     ROT90, "bootleg", "Hot Shocker (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1982, conquer,  0,        hotshock, hotshock, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
+GAME( 1982, hotshockb,hotshock, hotshock, hotshock, hotshock,     ROT90, "E.G. Felaco", "Hot Shocker (early revision?)", GAME_SUPPORTS_SAVE ) // has "Dudley presents" (protagonist of the game), instead of Domino
+GAME( 198?, conquer,  0,        hotshock, hotshock, 0,            ROT90, "<unknown>", "Conqueror", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
 GAME( 1983, hunchbks, hunchbak, hunchbks, hunchbks, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1984, hncholms, huncholy, hncholms, hncholms, scramble_ppi, ROT90, "Century Electronics / Seatongrove Ltd", "Hunchback Olympic (Scramble hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1983, cavelon,  0,        cavelon,  cavelon,  cavelon,      ROT90, "Jetsoft", "Cavelon", GAME_SUPPORTS_SAVE )
