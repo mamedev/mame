@@ -18,7 +18,7 @@ Supported games:
     ghoxj       TP-021        Toaplan       Ghox (8-Way Joystick controls)
     dogyuun     TP-022        Toaplan       Dogyuun
     dogyuuna    TP-022        Toaplan       Dogyuun (older)
-    dogyuunt    TP-022        Toaplan       Dogyuun (test location version)
+    dogyuunt    TP-022        Toaplan       Dogyuun (location test)
     kbash       TP-023        Toaplan       Knuckle Bash
     kbash2      bootleg       Toaplan       Knuckle Bash 2
     truxton2    TP-024        Toaplan       Truxton 2 / Tatsujin Oh
@@ -64,7 +64,7 @@ Supported games:
 
     SET NOTES:
 
-    dogyuun  - In the test location version, if you are hit while you have a bomb, the bomb explodes
+    dogyuun  - In the location test version, if you are hit while you have a bomb, the bomb explodes
                automatically and saves you from dying. In the final released version, the bomb explodes
                but you die anyway.
                The only difference between the dogyuun and dogyuuna sets is some of the region jumper
@@ -5173,7 +5173,7 @@ GAME( 1991, ghoxj,      ghox,     ghox,     ghox,     0,        ROT270, "Toaplan
 
 GAME( 1992, dogyuun,    0,        dogyuun,  dogyuun,  dogyuun,  ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
 GAME( 1992, dogyuuna,   dogyuun,  dogyuun,  dogyuuna, dogyuun,  ROT270, "Toaplan", "Dogyuun (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunt,   dogyuun,  dogyuun,  dogyuunt, dogyuun,  ROT270, "Toaplan", "Dogyuun (test location version)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunt,   dogyuun,  dogyuun,  dogyuunt, dogyuun,  ROT270, "Toaplan", "Dogyuun (location test)", GAME_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,      0,        kbash,    kbash,    0,        ROT0,   "Toaplan", "Knuckle Bash", GAME_SUPPORTS_SAVE )
 

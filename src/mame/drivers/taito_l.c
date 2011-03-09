@@ -2904,7 +2904,7 @@ static DRIVER_INIT( evilston )
 
 GAME( 1988, raimais,   0,        raimais,  raimais,  0,        ROT0,   "Taito Corporation Japan", "Raimais (World)", 0 )
 GAME( 1988, raimaisj,  raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan)", 0 )
-GAME( 1988, raimaisjo, raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan / First Revision)", 0 )
+GAME( 1988, raimaisjo, raimais,  raimais,  raimaisj, 0,        ROT0,   "Taito Corporation", "Raimais (Japan, first revision)", 0 )
 GAME( 1988, fhawk,     0,        fhawk,    fhawk,    0,        ROT270, "Taito Corporation Japan", "Fighting Hawk (World)", 0 )
 GAME( 1988, fhawkj,    fhawk,    fhawk,    fhawkj,   0,        ROT270, "Taito Corporation", "Fighting Hawk (Japan)", 0 )
 GAME( 1989, champwr,   0,        champwr,  champwr,  0,        ROT0,   "Taito Corporation Japan", "Champion Wrestler (World)", GAME_IMPERFECT_SOUND )
@@ -2915,8 +2915,8 @@ GAME( 1988, kurikintu, kurikint, kurikint, kurikintj,0,        ROT0,   "Taito Am
 GAME( 1988, kurikintj, kurikint, kurikint, kurikintj,0,        ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
 GAME( 1988, kurikinta, kurikint, kurikinta,kurikinta,0,        ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
 GAME( 1989, plotting,  0,        plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
-GAME( 1989, plottinga, plotting, plotting, plotting, plottinga,ROT0,   "Taito Corporation Japan", "Plotting (World set 2, Protected)", 0 )
-GAME( 1989, plottingb, plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 3, Earliest Version)", 0 )
+GAME( 1989, plottinga, plotting, plotting, plotting, plottinga,ROT0,   "Taito Corporation Japan", "Plotting (World set 2, protected)", 0 )
+GAME( 1989, plottingb, plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation Japan", "Plotting (World set 3, earliest version)", 0 )
 GAME( 1989, plottingu, plotting, plotting, plotting, 0,        ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
 GAME( 1989, flipull,   plotting, plotting, plotting, 0,        ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 GAME( 1989, puzznic,   0,        puzznic,  puzznic,  0,        ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )
@@ -2927,7 +2927,7 @@ GAME( 1990, palamed,   0,        palamed,  palamed,  0,        ROT0,   "Taito Co
 GAME( 1993, cachat,    0,        cachat,   cachat,   0,        ROT0,   "Taito Corporation", "Cachat (Japan)", 0 )
 GAME( 1993, tubeit,    cachat,   cachat,   tubeit,   0,        ROT0,   "Taito Corporation", "Tube-It", 0 )  // No (c) message
 
-GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Hot-B",   "Cuby Bop (Location Test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
+GAME( 199?, cubybop,   0,        cachat,   cubybop,  0,        ROT0,   "Hot-B",   "Cuby Bop (location test)", 0 ) // No (c) message, but Hot-B company logo in tile gfx
 GAME( 1992, plgirls,   0,        cachat,   plgirls,  0,        ROT270, "Hot-B",   "Play Girls", 0 )
 GAME( 1992, lagirl,    plgirls,  cachat,   plgirls,  0,        ROT270, "bootleg", "LA Girl", 0 ) /* bootleg hardware with changed title & backgrounds */
 GAME( 1993, plgirls2,  0,        cachat,   plgirls2, 0,        ROT270, "Hot-B",   "Play Girls 2", 0 )
