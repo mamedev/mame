@@ -22,8 +22,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/3812intf.h"
 #include "includes/toaplan2.h"
 
 #define RAIZING_TX_GFXRAM_SIZE  0x8000	/* GFX data decode RAM size */
@@ -75,6 +73,11 @@ static void register_state_save(running_machine *machine)
 	state->save_item(NAME(state->tx_flip));
 }
 
+static STATE_POSTLOAD( truxton2_postload )
+{
+	for (int i = 0; i < 1024; i++)
+		gfx_element_mark_dirty(machine->gfx[2], i);
+}
 
 VIDEO_START( toaplan2 )
 {
@@ -101,8 +104,6 @@ VIDEO_START( toaplan2 )
 		state->vdp1->custom_priority_bitmap = state->custom_priority_bitmap;
 	}
 
-	state->display_tx = 1;
-
 	register_state_save(machine);
 }
 
@@ -113,17 +114,21 @@ VIDEO_START( truxton2 )
 	VIDEO_START_CALL( toaplan2 );
 
 	/* Create the Text tilemap for this game */
+	gfx_element_set_source(machine->gfx[2], (UINT8 *)state->tx_gfxram16);
+	machine->state().register_postload(truxton2_postload, NULL);
+
 	truxton2_create_tx_tilemap(machine);
-	if (machine->gfx[2]->srcdata == NULL)
-		gfx_element_set_source(machine->gfx[2], (UINT8 *)state->tx_gfxram16);
 	tilemap_set_scrolldx(state->tx_tilemap, 0x1d4 +1, 0x2a);
 }
 
-VIDEO_START( fixeighb )
+VIDEO_START( fixeightbl )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
-	VIDEO_START_CALL( truxton2 );
+	VIDEO_START_CALL( toaplan2 );
+
+	/* Create the Text tilemap for this game */
+	truxton2_create_tx_tilemap(machine);
 
 	/* This bootleg has additional layer offsets on the VDP */
 	state->vdp0->bg.extra_xoffset.normal  = -0x1d6  -26;
@@ -165,18 +170,13 @@ VIDEO_START( batrider )
 	state->tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
 	state->save_pointer(NAME(state->tx_gfxram16), RAIZING_TX_GFXRAM_SIZE/2);
 	gfx_element_set_source(machine->gfx[2], (UINT8 *)state->tx_gfxram16);
+	machine->state().register_postload(truxton2_postload, NULL);
+
 	truxton2_create_tx_tilemap(machine);
 	tilemap_set_scrolldx(state->tx_tilemap, 0x1d4, 0x2a);
 
 	/* Has special banking */
 	state->vdp0->gp9001_gfxrom_is_banked = 1;
-}
-
-READ16_HANDLER( toaplan2_txvideoram16_r )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	return state->txvideoram16[offset];
 }
 
 WRITE16_HANDLER( toaplan2_txvideoram16_w )
@@ -188,19 +188,10 @@ WRITE16_HANDLER( toaplan2_txvideoram16_w )
 		tilemap_mark_tile_dirty(state->tx_tilemap, offset);
 }
 
-READ16_HANDLER( toaplan2_txvideoram16_offs_r )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	return state->txvideoram16_offs[offset];
-}
-
 WRITE16_HANDLER( toaplan2_txvideoram16_offs_w )
 {
-	/* Besides containing flip, function of this RAM is still unknown */
-	/* This is however line related as per line-scroll RAM below */
-	/* Maybe specifies which line to draw text info (line number data is */
-	/*   opposite when flip bits are on) */
+	// FIXME: implement line select and per-line flipping for all games
+	// see SCREEN_UPDATE( batrider )
 
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 	UINT16 oldword = state->txvideoram16_offs[offset];
@@ -227,13 +218,6 @@ WRITE16_HANDLER( toaplan2_txvideoram16_offs_w )
 //  logerror("Writing %04x to text offs RAM offset %04x\n",data,offset);
 }
 
-READ16_HANDLER( toaplan2_txscrollram16_r )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	return state->txscrollram16[offset];
-}
-
 WRITE16_HANDLER( toaplan2_txscrollram16_w )
 {
 	/*** Line-Scroll RAM for Text Layer ***/
@@ -245,13 +229,6 @@ WRITE16_HANDLER( toaplan2_txscrollram16_w )
 
 //  logerror("Writing %04x to text scroll RAM offset %04x\n",data,offset);
 	COMBINE_DATA(&state->txscrollram16[offset]);
-}
-
-READ16_HANDLER( toaplan2_tx_gfxram16_r )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	return state->tx_gfxram16[offset];
 }
 
 WRITE16_HANDLER( toaplan2_tx_gfxram16_w )
@@ -269,49 +246,33 @@ WRITE16_HANDLER( toaplan2_tx_gfxram16_w )
 	}
 }
 
-READ16_HANDLER( raizing_tx_gfxram16_r )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	offset += 0x3400/2;
-	return state->tx_gfxram16[offset];
-}
-
-WRITE16_HANDLER( raizing_tx_gfxram16_w )
-{
-	/*** Dynamic Text GFX decoding for Batrider ***/
-
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-	UINT16 oldword;
-
-	offset += 0x3400/2;
-	oldword = state->tx_gfxram16[offset];
-	if (oldword != data)
-	{
-		COMBINE_DATA(&state->tx_gfxram16[offset]);
-	}
-}
-
-WRITE16_HANDLER( batrider_textdata_decode )
+WRITE16_HANDLER( batrider_textdata_dma_w )
 {
 	/*** Dynamic Text GFX decoding for Batrider ***/
 	/*** Only done once during start-up ***/
 
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-	int code;
-	UINT16 *dest = (UINT16 *)state->tx_gfxram16;
+	UINT16 *dest = state->tx_gfxram16;
 
 	memcpy(dest, state->txvideoram16, state->tx_vram_size);
 	dest += (state->tx_vram_size/2);
-	memcpy(dest, space->machine->generic.paletteram.u16, state->paletteram16_size);
-	dest += (state->paletteram16_size/2);
+	memcpy(dest, space->machine->generic.paletteram.u16, state->paletteram_size);
+	dest += (state->paletteram_size/2);
 	memcpy(dest, state->txvideoram16_offs, state->tx_offs_vram_size);
 	dest += (state->tx_offs_vram_size/2);
 	memcpy(dest, state->txscrollram16, state->tx_scroll_vram_size);
+	dest += (state->tx_scroll_vram_size/2);
+	memcpy(dest, state->mainram16, state->mainram_overlap_size);
 
-	/* Decode text characters; force them to update immediately */
-	for (code = 0; code < 1024; code++)
-		gfx_element_decode(space->machine->gfx[2], code);
+	for (int i = 0; i < 1024; i++)
+		gfx_element_mark_dirty(space->machine->gfx[2], i);
+}
+
+WRITE16_HANDLER( batrider_unknown_dma_w )
+{
+	// FIXME: In batrider and bbakraid, the text layer and palette RAM
+	// are probably DMA'd from main RAM by writing here at every vblank,
+	// rather than being directly accessible to the 68K like the other games
 }
 
 WRITE16_HANDLER( batrider_objectbank_w )

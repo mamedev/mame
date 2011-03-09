@@ -21,9 +21,6 @@
 
 
  To Do / Unknowns
-    -  Hack is needed to reset sound CPU and sound chip when machine
-        is 'tilted' in Pipi & Bibis. Otherwise sound CPU interferes
-        with the main CPU test of shared RAM. You get a 'Sub CPU RAM Error'
     -  What do Scroll registers 0Eh and 0Fh really do ????
     -  Snow Bros 2 sets bit 6 of the sprite X info word during weather
         world map, and bits 4, 5 and 6 of the sprite X info word during
@@ -589,19 +586,6 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 
 
 		case 0x0e:	/******* Initialise video controller register ? *******/
-					#if 0 // do we know this works on real hw?
-					if ((gp9001_sub_cpu == CPU_2_Z80) && (data == 3))
-					{
-						/* HACK! When tilted, sound CPU needs to be reset. */
-						device_t *ym = vdp->machine->device("ymsnd");
-
-						if (ym && ym->type() == YM3812)
-						{
-							cputag_set_input_line(vdp->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
-							devtag_reset(vdp->machine, "ymsnd");
-						}
-					}
-					#endif
 
 		case 0x0f:	break;
 

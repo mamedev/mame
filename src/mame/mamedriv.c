@@ -2383,7 +2383,7 @@ const game_driver * const drivers[] =
 	DRIVER( ghox )		/* TP-021 (c) 1991 Toaplan */
 	DRIVER( ghoxj )		/* TP-021 (c) 1991 Toaplan */
 	DRIVER( dogyuun )	/* TP-022 (c) 1992 Toaplan */
-	DRIVER( dogyuunk )	/* TP-022 (c) 1992 Toaplan */
+	DRIVER( dogyuuna )	/* TP-022 (c) 1992 Toaplan */
 	DRIVER( dogyuunt )	/* TP-022 (c) 1992 Toaplan */
 	DRIVER( kbash )		/* TP-023 (c) 1993 Toaplan */
 	DRIVER( kbash2 )	/* bootleg */
@@ -2407,9 +2407,9 @@ const game_driver * const drivers[] =
 	DRIVER( fixeightj )
 	DRIVER( fixeightjt )
 	DRIVER( fixeightbl )	/* bootleg */
-	DRIVER( vfive )		/* TP-027 (c) 1993 Toaplan (Japan) */
 	DRIVER( grindstm )	/* TP-027 (c) 1993 Toaplan + Unite Trading license (Korea) */
 	DRIVER( grindstma )	/* TP-027 (c) 1993 Toaplan + Unite Trading license (Korea) */
+	DRIVER( vfive )		/* TP-027 (c) 1993 Toaplan (Japan) */
 	DRIVER( batsugun )	/* TP-030 (c) 1993 Toaplan */
 	DRIVER( batsuguna )	/* TP-030 (c) 1993 Toaplan */
 	DRIVER( batsugunsp )/* TP-??? (c) 1993 Toaplan */
@@ -2417,24 +2417,24 @@ const game_driver * const drivers[] =
 	DRIVER( sstriker )	/* (c) 1993 Raizing */
 	DRIVER( sstrikera )	/* (c) 1993 Raizing */
 	DRIVER( mahoudai )	/* (c) 1993 Raizing + Able license */
+	DRIVER( kingdmgp )	/* (c) 1994 Raizing/8ing */
 	DRIVER( shippumd )	/* (c) 1994 Raizing/8ing */
-	DRIVER( kingdmgp )	/* (c) 1994 Raizing/8ing (hack?) */
 	DRIVER( bgaregga )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgareggahk )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgareggatw )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgaregganv )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgareggat2 )	/* (c) 1996 Raizing/8ing */
 	DRIVER( bgareggacn )	/* (c) 1996 Raizing/8ing */
-	DRIVER( batrid )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridu )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridc )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridj )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridk )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridja )	/* (c) 1998 Raizing/8ing */
-	DRIVER( batridta )	/* (c) 1998 Raizing/8ing */
-	DRIVER( bkraidu )	/* (c) 1999 8ing */
-	DRIVER( bkraiduj )	/* (c) 1999 8ing */
-	DRIVER( bkraidj )	/* (c) 1999 8ing */
+	DRIVER( batrider )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batrideru )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batriderc )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batriderj )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batriderk )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batriderja )	/* (c) 1998 Raizing/8ing */
+	DRIVER( batridert )	/* (c) 1998 Raizing/8ing */
+	DRIVER( bbakraid )	/* (c) 1999 8ing */
+	DRIVER( bbakraidj )	/* (c) 1999 8ing */
+	DRIVER( bbakraidja )	/* (c) 1999 8ing */
 
 /*
 Toa Plan's board list

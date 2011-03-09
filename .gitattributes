@@ -1455,7 +1455,6 @@ src/mame/audio/targ.c svneol=native#text/plain
 src/mame/audio/tiamc1.c svneol=native#text/plain
 src/mame/audio/timeplt.c svneol=native#text/plain
 src/mame/audio/timeplt.h svneol=native#text/plain
-src/mame/audio/toaplan2.c svneol=native#text/plain
 src/mame/audio/trackfld.c svneol=native#text/plain
 src/mame/audio/trackfld.h svneol=native#text/plain
 src/mame/audio/triplhnt.c svneol=native#text/plain

@@ -9,7 +9,6 @@
    many thanks to Richard Bush and the Raine team. [Yochizo]
 
 
-
 Supported games:
 
     Name        Board No      Maker         Game name
@@ -18,96 +17,204 @@ Supported games:
     ghox        TP-021        Toaplan       Ghox (Spinner with single up/down axis control)
     ghoxj       TP-021        Toaplan       Ghox (8-Way Joystick controls)
     dogyuun     TP-022        Toaplan       Dogyuun
-    dogyuunk    TP-022        Toaplan       Dogyuun (Licensed to Unite Trading For Korea)
+    dogyuuna    TP-022        Toaplan       Dogyuun (older)
+    dogyuunt    TP-022        Toaplan       Dogyuun (test location version)
     kbash       TP-023        Toaplan       Knuckle Bash
     kbash2      bootleg       Toaplan       Knuckle Bash 2
     truxton2    TP-024        Toaplan       Truxton 2 / Tatsujin Oh
-    pipibibs    TP-025        Toaplan       Pipi & Bibis
-    whoopee     TP-025        Toaplan       Whoopee
-    pipibibi    bootleg       Toaplan       Pipi & Bibis
+    pipibibs    TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 1)
+    pipibibsa   TP-025        Toaplan       Pipi & Bibis / Whoopee!! (set 2)
+    whoopee    *TP-025/TP-020 Toaplan       Pipi & Bibis / Whoopee!! (Teki Paki hardware)
+    pipibibsbl  bootleg       Toaplan       Pipi & Bibis / Whoopee!! (bootleg)
     fixeight    TP-026        Toaplan       FixEight
-    fixeighb    bootleg       Toaplan       FixEight
-    grindstm    TP-027        Toaplan       Grind Stormer  (1992)
-    grindsta    TP-027        Toaplan       Grind Stormer  (1992) (older)
-    vfive       TP-027        Toaplan       V-V  (V-Five)  (1993 - Japan only)
+    fixeightbl  bootleg       Toaplan       FixEight
+    grindstm    TP-027        Toaplan       Grind Stormer (1992)
+    grindstma   TP-027        Toaplan       Grind Stormer (1992) (older)
+    vfive       TP-027        Toaplan       V-V (V-Five)  (1993 - Japan only)
     batsugun    TP-030        Toaplan       Batsugun
-    batugnsp    TP-030        Toaplan       Batsugun  (Special Version)
-    snowbro2    ??????        Toaplan       Snow Bros. 2 - With New Elves
+    batsuguna   TP-030        Toaplan       Batsugun (older)
+    batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
+    snowbro2    ??????        Hanafram      Snow Bros. 2 - With New Elves
+
+    * This version of Whoopee!! is on a board labeled TP-020
+      (same board number, and same hardware, as Teki Paki)
+      but the ROMs are labeled TP-025.
 
     sstriker    RA-MA7893-01  Raizing       Sorcer Striker
-    mahoudai    RA-MA7893-01  Raizing       Mahou Daisakusen
+    sstrikera   RA-MA7893-01  Raizing       Sorcer Striker (Unite Trading license)
+    mahoudai    RA-MA7893-01  Raizing       Mahou Daisakusen (Japan)
     kingdmgp    RA-MA9402-03  Raizing/8ing  Kingdom Grandprix
-    shippumd    RA-MA9402-03  Raizing/8ing  Shippu Mahou Daisakusen
+    shippumd    RA-MA9402-03  Raizing/8ing  Shippu Mahou Daisakusen (Japan)
     bgaregga    RA9503        Raizing/8ing  Battle Garegga (World - Sat Feb 3 1996)
-    bgareghk    RA9503        Raizing/8ing  Battle Garegga (Hong Kong (and Austria?) - Sat Feb 3 1996)
-    bgaregtw    RA9503        Raizing/8ing  Battle Garegga (Taiwan and Germany - Thu Feb 1 1996)
-    bgaregnv    RA9503        Raizing/8ing  Battle Garegga - New Version (Hong Kong (and Austria?) - Sat Mar 2 1996)
-    bgaregt2    RA9503        Raizing/8ing  Battle Garegga - Type 2 (World - Sat Mar 2 1996)
-    bgaregcn    RA9503        Raizing/8ing  Battle Garegga - Type 2 (China (and Denmark?) - Tue Apr 2 1996)
-    batrider    RA9704        Raizing/8ing  Armed Police Batrider - B Version (Japan - Fri Feb 13 1998)
-    batridra    RA9704        Raizing/8ing  Armed Police Batrider (Japan - Mon Dec 22 1997)
-    batridrk    RA9704        Raizing/8ing  Armed Police Batrider (Korea - Fri Feb 13 1998)
-    bbakraid    ET68-V99      8ing          Battle Bakraid (Japan - Wed Apr 7th, 1999)
-    bbakradu    ET68-V99      8ing          Battle Bakraid - Unlimited Version (Japan - Tue Jun 8th, 1999)
+    bgareggahk  RA9503        Raizing/8ing  Battle Garegga (Hong Kong (and Austria?) - Sat Feb 3 1996)
+    bgareggatw  RA9503        Raizing/8ing  Battle Garegga (Taiwan (and Germany?) - Thu Feb 1 1996)
+    bgaregganv  RA9503        Raizing/8ing  Battle Garegga - New Version (Hong Kong (and Austria?) - Sat Mar 2 1996)
+    bgareggat2  RA9503        Raizing/8ing  Battle Garegga - Type 2 (World - Sat Mar 2 1996)
+    bgareggacn  RA9503        Raizing/8ing  Battle Garegga - Type 2 (China (and Denmark?) - Tue Apr 2 1996)
+    batrider    RA9704        Raizing/8ing  Armed Police Batrider (Europe - Fri Feb 13 1998)
+    batrideru   RA9704        Raizing/8ing  Armed Police Batrider (USA - Fri Feb 13 1998)
+    batriderc   RA9704        Raizing/8ing  Armed Police Batrider (China - Fri Feb 13 1998)
+    batriderj   RA9704        Raizing/8ing  Armed Police Batrider - B Version (Japan - Fri Feb 13 1998)
+    batriderk   RA9704        Raizing/8ing  Armed Police Batrider (Korea - Fri Feb 13 1998)
+    batriderja  RA9704        Raizing/8ing  Armed Police Batrider (Japan - Mon Dec 22 1997)
+    batridert   RA9704        Raizing/8ing  Armed Police Batrider (Taiwan - Mon Dec 22 1997)
+    bbakraid    ET68-V99      8ing          Battle Bakraid - Unlimited Version (USA - Tue Jun 8th, 1999)
+    bbakraidj   ET68-V99      8ing          Battle Bakraid - Unlimited Version (Japan - Tue Jun 8th, 1999)
+    bbakraidja  ET68-V99      8ing          Battle Bakraid (Japan - Wed Apr 7th, 1999)
 
     SET NOTES:
 
-    sstriker - The region jumper is read with this set but even when set to Japan you get all English
-               text etc. which seems a little odd. However, this has been verified correct on two boards.
+    dogyuun  - In the test location version, if you are hit while you have a bomb, the bomb explodes
+               automatically and saves you from dying. In the final released version, the bomb explodes
+               but you die anyway.
+               The only difference between the dogyuun and dogyuuna sets is some of the region jumper
+               settings; see the INPUT_PORTS definitions.
 
-    kingdmgp - Might be a bootleg / hack, some of the tiles needed for the credits screen have been
-               stripped out, doesn't seem very professional, since it's rare and should probably only
-               have a different graphics rom, it's nearly impossible for us to verify. A lot of boards
-               being sold as 'Kingdom Grand Prix' are infact conversions using Neill Corlett's hack.
+    truxton2 - Although the truxton2 PCB has only standard JAMMA mono audio output, and uses a YM3014B
+               mono DAC, the YM2151 music is actually sequenced in stereo. In toaplan2.h, uncomment
+               "#define TRUXTON2_STEREO" to hear the game's music the way it was originally composed.
+               Difficulty is much lower when the region is set to Europe or USA than when set to any
+               Asian region, independent of the "Difficulty" dipswitches. See the code beginning at
+               1FE94 (RAM address 1002D6 contains 0 if region is an Asian region, 1 if Europe or USA)
 
-            ** The above two look like genuine Korean release boards, Raizing probably just missed a few things
+    grindstm - Code at 20A26 in vfive forces region to Japan. All sets have some NOPs at reset vector,
+               and the NEC V25 CPU test that the other games do is skipped. Furthermore, all sets have
+               a broken ROM checksum routine that reads address ranges that don't match the actual
+               location or size of the ROM, and that has a hack at the end so it always passes.
+               Normally you would expect to see code like this in a bootleg, but the NOPs and other
+               oddities are identical among three different sets.
 
-    bgaregga - The clones have fewer types of enemy bullets (not fewer bullets, just fewer types!)
-               and Stage Edit is disabled - the dipswitch is still listed in service mode but it
-               doesn't do anything. In addition to these changes, bgaregt2 has no third button!
-               Instead of being able to change the formation of your options with a button press,
-               each of the selectable ships has a different, fixed option formation.
+    batsugun - The Special Version has many changes to make the game easier: it adds an autofire button,
+               replaces the regular bomb with the more powerful double bomb (which in the original version
+               required both players in a two player game to press their bomb buttons at once), gives you
+               a shield that can absorb one hit each time your ship "levels up", etc. It also changes the
+               colors of the title screen, ship select screen, stages, and enemies.
+               batsugun compared to batsuguna has code that looks more like the Special Version, but it
+               doesn't have any of the Special Version features. All the differences between batsugun
+               and batsuguna look like bug fixes that were carried over into the Special Version.
 
-    batrider - The original release was marketed as a two button game, but actually needed a third button
-               to fully use some of the ships' weaponry! This error was rectified in the B Version
-               (which is fully playable with either two or three buttons).
+    sstriker - The mahoudai set reads the region jumpers, but the lookup tables in ROM that map jumper
+               settings to copyright text, coinage settings, etc., contain identical values for every
+               jumper setting, effectively ignoring the jumpers and forcing the region to Japan.
+               On the other hand, sstriker has its title screen and all its text in English even when
+               the region is set to Japan. This seems odd but has been verified correct on two boards.
+               The only difference between sstriker and sstrikera is the copyright text displayed when
+               the region is set to Korea.
 
-    bbakraid - The Unlimited Version can display more score digits (as players managed to counter stop
-               the original within days of its release!) and adds a "team" mode ala Batrider where you
-               select a different ship for each of your three lives.
+    kingdmgp - The kingdmgp and shippumd sets have identical program ROMs but a different graphics ROM
+               for the text layer. Setting the region to Japan with the kingdmgp ROM, or to anything other
+               than Japan with the shippumd ROM, results in a corrupt title screen and unreadable text.
+               In kingdmgp some of the tiles needed for the credits screen in attract mode have been
+               stripped out, resulting in boxes where letters should be. It doesn't seem very professional
+               but appears to be a genuine release. A lot of boards being sold as 'Kingdom Grand Prix' are
+               in fact conversions using Neill Corlett's hack.
 
-    dogyuunk - PCB says "TOAPLAN CO.,LTD. TP-022-1 MADE IN KOREA". It contains 3 custom Toaplan chips
-               (2 gfx chips and TS-002-MACH sound MCU). Uses original Toaplan-badged MASKROMs for GFX
-               and sound and original 'TP-022 01 TOAPLAN' sticker on program EPROM.
+    bgaregga - The later versions change the small bullet-shaped enemy bullets to bright yellow balls,
+               eliminate the flying metal debris from explosions, and require additional joystick input
+               to access the Extended, Harder, Special, and Stage Edit hidden features.
+               In addition to these changes, the bgareggat2 set uses only two buttons. Instead of being
+               able to change the formation of your options with the third button, each of the selectable
+               ships has a different, fixed option formation. However, the third button can still be used
+               to select an alternate ship color and to enter the secret character and Stage Edit codes.
+
+    batrider - Batrider was marketed as a two button game, and the regular ships all use only the first
+               two buttons, but in the original version you need the third button in order to control the
+               options of the hidden Battle Garegga ships.
+               This problem was fixed in the B Version, which lets you change the Battle Garegga ships'
+               option formation using Street Fighter style joystick commands (as well as by using the third
+               button, if the cabinet has one)
+
+    bbakraid - Because players managed to counter stop the original Battle Bakraid not long after release,
+               the Unlimited Version, which can display more score digits, was released as a ROM upgrade.
+               The upgrade also fixes the bug in the original version that prevented the unlocking of
+               Team Edit mode from being saved in the EEPROM.
 
 
  ****************************************************************************
- * Battle Garegga and Armed Police Batrider have secret characters.         *
+ * Battle Garegga and Armed Police Batrider have secret characters          *
+ * and game features.                                                       *
  * Try to input the following commands to use them.                         *
  * ======================================================================== *
  * Battle Garegga                                                           *
- *      After inserting a coin (pushing a credit button), input             *
- *      UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  C  START        *
- *      then you can use Mahou Daisakusen characters.                       *
+ *       The button you use to select your ship not only determines its     *
+ *       color, but affects its characteristics.                            *
+ *           A: Default characteristics.                                    *
+ *           B: Slightly higher speed than A type.                          *
+ *           C: Slightly smaller hitbox than A type.                        *
+ *       A+B+C: Same speed as B type and same hitbox as C type.             *
  *                                                                          *
+ *       After inserting a coin (pushing a credit button), input            *
+ *       UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  C  START       *
+ *       then you can use Mahou Daisakusen characters.                      *
+ *                                                                          *
+ * Note: In versions of the game dated Mar 2 1996 or later, you must        *
+ *       hold the joystick RIGHT in addition to the specified button(s)     *
+ *       when entering any of the following commands. Even if Stage Edit    *
+ *       is enabled via dipswitch, you need to hold RIGHT to use it.        *
+ *                                                                          *
+ * EXTENDED:   After inserting a coin, hold A and press START.              *
+ *             You play through all stages twice before the game ends.      *
+ * HARDER:     After inserting a coin, hold B and press START.              *
+ *             Difficulty is increased.                                     *
+ * SPECIAL:    After inserting a coin, hold A and B and press START.        *
+ *             Combination of EXTENDED and HARDER modes.                    *
+ * STAGE EDIT: After inserting a coin, hold C and press START.              *
+ *             You can choose what order to play Stage 2, 3 and 4 in,       *
+ *             or even skip them.                                           *
+ *                                                                          *
+ * EXTENDED, HARDER, and SPECIAL modes each have their own high score list. *
  * ------------------------------------------------------------------------ *
  * Armed Police Batrider                                                    *
- *      After inserting a coin (pushing a credit button), input             *
- *      UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  START           *
- *      then you can use Mahou Daisakusen and Battle Garegga characters.    *
+ *       The button you use to select your ship not only determines its     *
+ *       color, but affects its characteristics.                            *
+ *           A: High main shot power, low option shot power.                *
+ *              Average speed. Default autofire rate is 15 Hz.              *
+ *           B: Low main shot power, high option shot power. Slightly       *
+ *              slower than A type. Default autofire rate is 12 Hz.         *
+ *           C: High main shot and option shot power, but lowest speed.     *
+ *              Default autofire rate is 20 Hz.                             *
+ *       START: Low main shot and option shot power, but highest speed.     *
+ *              Default autofire rate is 10 Hz.                             *
  *                                                                          *
+ * Note: The following features can also be enabled via dipswitches.        *
+ *                                                                          *
+ * PLAYER SELECT: After inserting a coin, input                             *
+ *       UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A                 *
+ *       You can select a single character instead of a team.               *
+ * GUEST PLAYERS: After inserting a coin, input                             *
+ *       UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B                 *
+ *       You can use Mahou Daisakusen and Battle Garegga characters.        *
+ * SPECIAL COURSE: After inserting a coin, input                            *
+ *       UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B                 *
+ *       You can select the Special course, which consists of bosses only.  *
+ * STAGE EDIT: When you select your course, press A and B simultaneously.   *
+ *       You can choose what order to play Stage 2, 3 and 4 in,             *
+ *       or even skip them.                                                 *
  ****************************************************************************
 
 
  ############################################################################
+ # In Battle Bakraid, the button you use to select your ship not only       #
+ # determines its color, but affects its characteristics.                   #
+ #     A: Increased main shot power. Default autofire rate is 20 Hz.        #
+ #     B: Increased bomb blast duration. Default autofire rate is 12 Hz.    #
+ #     C: Increased side shot power. Default autofire rate is 15 Hz.        #
+ # START: Increased speed. Default autofire rate is 10 Hz.                  #
+ #                                                                          #
+ # STAGE EDIT: When you select your course, press A and B simultaneously.   #
+ #        You can choose what order to play Stage 2, 3, 4 and 5 in,         #
+ #        or even skip them. Stage Edit can also be enabled via dipswitch.  #
+ # ======================================================================== #
  # Battle Bakraid has unlocking codes to gain access to extra players       #
- # and game features.                                                       #
+ # and game features. Once each feature is unlocked, it is saved in EEPROM  #
+ # and remains unlocked until you erase the EEPROM from the service mode.   #
+ # However, in the original (non-Unlimited) version, the unlocking of       #
+ # Team Edit is not saved in EEPROM, apparently due to a bug.               #
  # Special thanks go to the 'R8ZING Shooter Tribute' page for finding       #
  # and publishing this info.                                                #
- #                                                                          #
  # ======================================================================== #
  #      PLAYER SELECT: PHASE 2                                              #
- # Result:  3 more fighter planes available:                                #
+ # Result:  3 more fighter planes available.                                #
  # Code:    UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  Start       #
  # Conditions:                                                              #
  #      1. Start from the title screen                                      #
@@ -116,13 +223,12 @@ Supported games:
  #         between the counting.                                            #
  # Example: 12,up,11,up,10,down,9,down,8,left,7,right,6.left,5,r..          #
  # After entering the [B] button a chime should sound. Phase 2 unlocked!    #
- #                                                                          #
  # ------------------------------------------------------------------------ #
  #      PLAYER SELECT: PHASE 3                                              #
- # Result:  2 more fighter planes available:                                #
+ # Result:  2 more fighter planes available.                                #
  # Code:    UP  UP  DOWN  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A  Start       #
  # Conditions:                                                              #
- #      1. Start from the title screen                                      #
+ #      1. Unlock Player Select Phase 2 first                               #
  #      2. Insert Coin                                                      #
  #      3. Watch the 20 sec. counter and enter each part of the code right  #
  #         between the counting.                                            #
@@ -131,14 +237,13 @@ Supported games:
  # insertion, right before it starts to count:                              #
  # Example: up,19,up,18,down,17,down,16,left,15,right,14.left,..            #
  # After entering the [A] button a chime should sound. Phase 3 unlocked!    #
- #                                                                          #
  # ------------------------------------------------------------------------ #
- #      TEAM EDIT: ENABLE (Unlimited Version only)                          #
+ #      TEAM EDIT: ENABLE                                                   #
  # Result:  Unlocks the 'team edit' feature to select a team of different   #
- #          ships. See selection secrets on how to enter the team edit mode.#
+ #          ships like in Batrider.                                         #
  # Code:    UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  A  B  Start       #
  # Conditions:                                                              #
- #      1. Start from the title screen                                      #
+ #      1. Unlock Player Select Phase 2 and Phase 3 first                   #
  #      2. Insert Coin                                                      #
  #      3. Watch the 20 sec. counter and enter each part of the code right  #
  #         between the counting.                                            #
@@ -147,10 +252,14 @@ Supported games:
  # Example: 9,up,8,down,7,up,6,down,5,left,4,right,3,left,2,right,1,A,0,B   #
  # After entering the [B] button a chime should sound. Team edit unlocked!  #
  #                                                                          #
+ # Note: In the Japan version, to use Team Edit after unlocking it,         #
+ #       you must hold UP or DOWN  while selecting your course.             #
+ #       In the USA version, if Team Edit is unlocked, the game asks you    #
+ #       if you want to use it after you select your course.                #
  # ------------------------------------------------------------------------ #
  #      SPECIAL COURSE: ENABLE                                              #
- # Result:  Unlocks the boss mode, a game mode where you fight the bosses   #
- #          only.                                                           #
+ # Result:  Unlocks the Special course, a game mode where you fight the     #
+ #          bosses only.                                                    #
  # Code:    UP  DOWN  UP  DOWN  LEFT  RIGHT  LEFT  RIGHT  B  A  Start       #
  # Conditions:                                                              #
  #      1. Start from the title screen                                      #
@@ -177,27 +286,15 @@ Sound CPU/MCU:
  NEC V25
 
 Sound Chips:
- YM3812
- YM2151
- YM2151 + YM3014
- YM2151 + M6295
- YM2151 + M6295 + M6295
- YMZ280B-F + YAC516-E (Digital to Analog Converter)
-
+ YM3812 + YM3014B (DAC)
+ YM2151 + YM3014B
+ YM2151 + YM3014B + M6295
+ YM2151 + YM3012 (DAC) + M6295 + M6295
+ YMZ280B-F + YAC516-E (DAC)
 
 Graphics Custom 208pin QFP:
  GP9001 L7A0498 TOA PLAN
-
-Found on....
-Fixeight
-Grind Stormer
-Truxton II
-Ghox
-Armed Police Batrider
-Battle Garegga
-Mahou Daisakusen
-Battle Bakraid
-(emulated in video/gp9001.c)
+ (emulated in video/gp9001.c)
 
 *********************************************************************
 
@@ -205,16 +302,16 @@ Game status:
 
 Teki Paki                      Working, but no sound. Missing sound MCU dump. Chip is protected. It's a QFP80 Hitachi HD647180.
 Ghox                           Working, but no sound. Missing sound MCU dump. It's a QFP80 Hitachi HD647180.
-Dogyuun                        Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-002-MACH'.*
-Knuckle Bash                   Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-DASH'.*
+Dogyuun                        Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-002-MACH'.*
+Knuckle Bash                   Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-DASH'.*
 Truxton 2                      Working.
 Pipi & Bibis                   Working.
-Whoopee                        Working, but no sound. Missing sound MCU dump. It's a Hitachi HD647180.
-Pipi & Bibis (Ryouta Kikaku)   Working.
-FixEight                       Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-001-TURBO'
-FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
-Grind Stormer / VFive          Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.*
-Batsugun / Batsugun Sp'        Working, MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.*
+Pipi & Bibis (Teki Paki h/w)   Working, but no sound. Missing sound MCU dump. It's a Hitachi HD647180.
+Pipi & Bibis bootleg           Working. One unknown ROM.
+FixEight                       Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-001-TURBO'
+FixEight bootleg               Working. One unknown ROM (same as pipibibs bootleg one). Region hardcoded to Korea (@ $4d8)
+Grind Stormer / VFive          Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.*
+Batsugun / Batsugun Sp'        Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-007-SPY'.*
 Snow Bros. 2                   Working.
 Mahou Daisakusen               Working.
 Shippu Mahou Daisakusen        Working.
@@ -222,24 +319,21 @@ Battle Garegga                 Working.
 Armed Police Batrider          Working.
 Battle Bakraid                 Working.
 
-
-* Some PCBs use another version stamped 'NITRO' which is the same chip type. MACH, DASH and SPY seem to be the same chip (same encryption table)
+* Some PCBs use another version stamped 'NITRO' which is the same chip type.
+  MACH, DASH and SPY seem to be the same chip (same encryption table)
   Batsugun has the CPU hooked up in non-encrypted mode.
 
 Notes:
     See Input Port definition header below, for instructions
       on how to enter pause/slow motion modes.
-    Code at $20A26 forces territory to Japan in V-Five. Some stuff
-      NOP'd at reset vector, and NEC V25 CPU post test is skipped (bootleg?)
 
 To Do / Unknowns:
-    - Whoopee/Teki Paki sometimes tests bit 5 of the territory port
-        just after testing for vblank. Why ?
-    - Fix top character text layer (implement the line position table).
-    - Priority problem on 2nd player side of selection screen in FixEight (both original and bootleg)
+    - Whoopee/Teki Paki sometimes tests bit 5 of the region jumper port
+        just after testing for vblank. Why?
+    - Implement the line position table in all games that have a top text layer, not just batrider.
+    - Priority problem on 2nd player side of selection screen in Fixeight bootleg.
     - Fixeight bootleg text in sound check mode does not display properly
         with the CPU set to 10MHz (ok at 16MHz). Possible error in video_count_r routine.
-
     - Need to sort out the video status register.
     - Find out how exactly how sound CPU communication really works in bgaregga/batrider/bbakraid
         current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
@@ -249,10 +343,10 @@ To Do / Unknowns:
 
 
 #include "emu.h"
-#include "cpu/z180/z180.h"
-#include "cpu/nec/nec.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "cpu/z180/z180.h"
 #include "machine/eeprom.h"
 #include "machine/nmk112.h"
 #include "sound/2151intf.h"
@@ -260,15 +354,27 @@ To Do / Unknowns:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "includes/toaplan2.h"
-#include "rendlay.h"
 
-static MACHINE_RESET(batsugun);
-static READ16_HANDLER( batsugun_share_r );
-static WRITE16_HANDLER( batsugun_share_w );
 
 /***************************************************************************
   Initialisation handlers
 ***************************************************************************/
+
+
+static MACHINE_START( toaplan2 )
+{
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+
+	state->main_cpu = machine->device("maincpu");
+	state->sub_cpu = machine->device("audiocpu");
+
+	state->save_item(NAME(state->mcu_data));
+	state->save_item(NAME(state->video_status));
+	state->save_item(NAME(state->old_p1_paddle_h));
+	state->save_item(NAME(state->old_p2_paddle_h));
+	state->save_item(NAME(state->z80_busreq));
+}
+
 
 static void toaplan2_reset(device_t *device)
 {
@@ -278,19 +384,19 @@ static void toaplan2_reset(device_t *device)
 		cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
+
 static MACHINE_RESET( toaplan2 )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
 	state->mcu_data = 0x00;
 
-	/*
-      All games execute a RESET instruction on init, presumably to reset the sound CPU.
-      This is important for games with common RAM; the RAM test will fail
-      when leaving service mode if the sound CPU is not reset.
-    */
-	m68k_set_reset_callback(machine->device("maincpu"), toaplan2_reset);
+	// All games execute a RESET instruction on init, presumably to reset the sound CPU.
+	// This is important for games with common RAM; the RAM test will fail
+	// when leaving service mode if the sound CPU is not reset.
+	m68k_set_reset_callback(state->main_cpu, toaplan2_reset);
 }
+
 
 static MACHINE_RESET( ghox )
 {
@@ -301,124 +407,46 @@ static MACHINE_RESET( ghox )
 	state->old_p2_paddle_h = 0;
 }
 
-static MACHINE_RESET( dogyuun )
+
+static DRIVER_INIT( dogyuun )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
-	MACHINE_RESET_CALL(batsugun);
-	state->mcu_data = 0xffaa;
-}
-
-static MACHINE_RESET( vfive )
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	MACHINE_RESET_CALL(batsugun);
-	state->mcu_data = 0xffaa;
-}
-
-static MACHINE_RESET( bgaregga )
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-	UINT8 *Z80 = (UINT8 *)machine->region("audiocpu")->base();
-
-	// Set Z80 bank switch - default bank is 2
-	state->current_bank = 4;
-	memory_configure_bank(machine, "bank1", 0, 16, Z80, 0x4000);
-	memory_set_bank(machine, "bank1", 4);
-
-	MACHINE_RESET_CALL(toaplan2);
-}
-
-static void register_state_save(running_machine *machine)
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	state->save_item(NAME(state->mcu_data));
-	state->save_item(NAME(state->video_status));
-	state->save_item(NAME(state->old_p1_paddle_h));
-	state->save_item(NAME(state->old_p2_paddle_h));
-	state->save_item(NAME(state->current_bank));
-	state->save_item(NAME(state->z80_busreq));
-}
-
-static DRIVER_INIT( T2_Z80 )		/* init_t2_Z80(); */
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	state->sub_cpu_type = CPU_2_Z80;
-	state->sub_cpu = machine->device("audiocpu");
-	register_state_save(machine);
-}
-
-static DRIVER_INIT( T2_Z180 )
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	state->sub_cpu_type = CPU_2_HD647180;
-	state->sub_cpu = machine->device("mcu");
-	register_state_save(machine);
-}
-
-static DRIVER_INIT( T2_V25 )
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	state->sub_cpu_type = CPU_2_V25;
-	state->sub_cpu = machine->device("audiocpu");
 	state->v25_reset_line = 0x20;
-	register_state_save(machine);
 }
 
-static DRIVER_INIT( T2_noZ80 )
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	state->sub_cpu_type = CPU_2_NONE;
-	state->sub_cpu = NULL;
-	register_state_save(machine);
-}
 
 static DRIVER_INIT( fixeight )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
-	state->sub_cpu_type = CPU_2_V25;
-	state->sub_cpu = machine->device("audiocpu");
 	state->v25_reset_line = 0x08;
-
-	register_state_save(machine);
 }
 
-static DRIVER_INIT( fixeighb )
+
+static DRIVER_INIT( fixeightbl )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-	UINT16 *bgdata = (UINT16 *)machine->region("maincpu")->base();
+	UINT8 *ROM = machine->region("oki")->base();
 
-	memory_set_bankptr(machine, "bank1", &bgdata[0x40000]); /* $80000 - $fffff */
-	state->sub_cpu_type = CPU_2_NONE;
-	state->sub_cpu = NULL;
-	register_state_save(machine);
+	memory_configure_bank(machine, "bank1", 0, 5, &ROM[0x30000], 0x10000);
 }
+
 
 static DRIVER_INIT( vfive )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
-	state->sub_cpu_type = CPU_2_V25;
-	state->sub_cpu = machine->device("audiocpu");
 	state->v25_reset_line = 0x10;
-	register_state_save(machine);
 }
+
 
 static DRIVER_INIT( pipibibsbl )
 {
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 	int A;
 	int oldword, newword;
 	UINT16 *pipibibi_68k_rom = (UINT16 *)(machine->region("maincpu")->base());
 
-	/* unscramble the 68K ROM data. */
+	// unscramble the 68K ROM data
 
 	for (A = 0; A < (0x040000/2); A+=4)
 	{
@@ -488,42 +516,33 @@ static DRIVER_INIT( pipibibsbl )
 		newword |= ((oldword & 0x8000) >> 7);
 		pipibibi_68k_rom[A+3] = newword;
 	}
-
-	state->sub_cpu_type = CPU_2_Z80;
-	state->sub_cpu = machine->device("audiocpu");
-	register_state_save(machine);
 }
+
+
+static DRIVER_INIT( bgaregga )
+{
+	UINT8 *Z80 = machine->region("audiocpu")->base();
+
+	// seems to only use banks 0x0a to 0x0f
+	memory_configure_bank(machine, "bank1", 8, 8, Z80, 0x4000);
+}
+
 
 static DRIVER_INIT( batrider )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+	UINT8 *Z80 = machine->region("audiocpu")->base();
 
+	memory_configure_bank(machine, "bank1", 0, 16, Z80, 0x4000);
 	state->sndirq_line = 4;
-	state->sub_cpu_type = CPU_2_Z80;
-	state->sub_cpu = machine->device("audiocpu");
-	register_state_save(machine);
 }
+
 
 static DRIVER_INIT( bbakraid )
 {
 	toaplan2_state *state = machine->driver_data<toaplan2_state>();
 
-	state->unlimited_ver = 0;
 	state->sndirq_line = 2;
-	state->sub_cpu_type = CPU_2_Z80;
-	state->sub_cpu = machine->device("audiocpu");
-	register_state_save(machine);
-}
-
-static DRIVER_INIT( bbakradu )
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	state->unlimited_ver = 1;
-	state->sndirq_line = 2;
-	state->sub_cpu_type = CPU_2_Z80;
-	state->sub_cpu = machine->device("audiocpu");
-	register_state_save(machine);
 }
 
 
@@ -532,22 +551,23 @@ static DRIVER_INIT( bbakradu )
 ***************************************************************************/
 
 
-
-
 static TIMER_CALLBACK( toaplan2_raise_irq )
 {
-	cputag_set_input_line(machine, "maincpu", param, HOLD_LINE);
+	toaplan2_state *state = machine->driver_data<toaplan2_state>();
+
+	cpu_set_input_line(state->main_cpu, param, HOLD_LINE);
 }
 
 static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
 {
-	/* the IRQ appears to fire at line 0xe6 */
+	// the IRQ appears to fire at line 0xe6
 	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0xe6), FUNC(toaplan2_raise_irq), irq_line);
 }
 
 static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(device->machine, 1); }
 static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(device->machine, 2); }
 static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(device->machine, 4); }
+
 
 static READ16_HANDLER( video_count_r )
 {
@@ -561,7 +581,7 @@ static READ16_HANDLER( video_count_r )
 	int hpos = space->machine->primary_screen->hpos();
 	int vpos = space->machine->primary_screen->vpos();
 
-	state->video_status = 0xff00;						/* Set signals inactive */
+	state->video_status = 0xff00;	// Set signals inactive
 
 	vpos = (vpos + 15) % 262;
 
@@ -586,6 +606,7 @@ static READ16_HANDLER( video_count_r )
 	return state->video_status;
 }
 
+
 static WRITE8_HANDLER( toaplan2_coin_w )
 {
 	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
@@ -601,13 +622,14 @@ static WRITE8_HANDLER( toaplan2_coin_w )
 	}
 	else
 	{
-		coin_lockout_global_w(space->machine, 1); /* Lock all coin slots */
+		coin_lockout_global_w(space->machine, 1);	// Lock all coin slots
 	}
 	if (data & 0xe0)
 	{
 		logerror("Writing unknown upper bits (%02x) to coin control\n",data);
 	}
 }
+
 
 static WRITE16_HANDLER( toaplan2_coin_word_w )
 {
@@ -640,6 +662,7 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 	}
 }
 
+
 static WRITE16_HANDLER( shippumd_coin_word_w )
 {
 	if (ACCESSING_BITS_0_7)
@@ -653,60 +676,53 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 	}
 }
 
-static READ16_HANDLER( z80_shared_r )
+
+static READ16_HANDLER( shared_ram_r )
 {
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
-	return state->z80_shared_ram[offset] & 0xff;
+	return state->shared_ram[offset];
 }
 
-static WRITE16_HANDLER( z80_shared_w )
+
+static WRITE16_HANDLER( shared_ram_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
-		state->z80_shared_ram[offset] = data & 0xff;
+		state->shared_ram[offset] = data;
 	}
 }
+
 
 static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 {
-	/* Command sent to secondary CPU. Support for HD647180 will be
-       required when a ROM dump becomes available for this hardware */
+	// Command sent to secondary CPU. Support for HD647180 will be
+	// required when a ROM dump becomes available for this hardware
 
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
-		if (state->sub_cpu_type == CPU_2_Z80)			/* Whoopee */
-		{
-			state->z80_shared_ram[0] = data & 0xff;
-		}
-		else										/* Teki Paki */
-		{
-			state->mcu_data = data & 0xff;
-			logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", cpu_get_previouspc(space->cpu), state->mcu_data);
-		}
+		state->mcu_data = data & 0xff;
+		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", cpu_get_previouspc(space->cpu), state->mcu_data);
 	}
 }
+
 
 static CUSTOM_INPUT( c2map_r )
 {
 	toaplan2_state *state = field->port->machine->driver_data<toaplan2_state>();
 
-	/* For Teki Paki hardware */
-	/* bit 4 high signifies secondary CPU is ready */
-	/* bit 5 is tested low before V-Blank bit ??? */
-	switch (state->sub_cpu_type)
-	{
-		case CPU_2_Z80:			state->mcu_data = state->z80_shared_ram[0]; break; /* Whoopee */
-		case CPU_2_HD647180:	state->mcu_data = 0xff; break;					  /* Teki Paki */
-		default:				state->mcu_data = 0x00; break;
-	}
+	// For Teki Paki hardware
+	// bit 4 high signifies secondary CPU is ready
+	// bit 5 is tested low before V-Blank bit ???
+	state->mcu_data = 0xff;
 
 	return (state->mcu_data == 0xff) ? 0x01 : 0x00;
 }
+
 
 static READ16_HANDLER( ghox_p1_h_analog_r )
 {
@@ -720,6 +736,7 @@ static READ16_HANDLER( ghox_p1_h_analog_r )
 	return value;
 }
 
+
 static READ16_HANDLER( ghox_p2_h_analog_r )
 {
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
@@ -732,10 +749,12 @@ static READ16_HANDLER( ghox_p2_h_analog_r )
 	return value;
 }
 
+
 static READ16_HANDLER( ghox_mcu_r )
 {
 	return 0xff;
 }
+
 
 static WRITE16_HANDLER( ghox_mcu_w )
 {
@@ -748,14 +767,14 @@ static WRITE16_HANDLER( ghox_mcu_w )
 		if ((data >= 0xd0) && (data < 0xe0))
 		{
 			offset = ((data & 0x0f) * 2) + (0x38 / 2);
-			toaplan2_shared_ram16[offset  ] = 0x0005;	/* Return address for */
-			toaplan2_shared_ram16[offset-1] = 0x0056;	/*   RTS instruction */
+			toaplan2_shared_ram16[offset  ] = 0x0005;	// Return address for
+			toaplan2_shared_ram16[offset-1] = 0x0056;	//   RTS instruction
 		}
 		else
 		{
 			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n", cpu_get_previouspc(space->cpu), state->mcu_data);
 		}
-		toaplan2_shared_ram16[0x56 / 2] = 0x004e;	/* Return a RTS instruction */
+		toaplan2_shared_ram16[0x56 / 2] = 0x004e;	// Return a RTS instruction
 		toaplan2_shared_ram16[0x58 / 2] = 0x0075;
 
 		if (data == 0xd3)
@@ -780,26 +799,26 @@ static WRITE16_HANDLER( ghox_mcu_w )
 	}
 }
 
+
 static READ16_HANDLER( ghox_shared_ram_r )
 {
-	/* Ghox 68K reads data from MCU shared RAM and writes it to main RAM.
-       It then subroutine jumps to main RAM and executes this code.
-       Here, we're just returning a RTS instruction for now.
-       See above ghox_mcu_w routine.
+	// Ghox 68K reads data from MCU shared RAM and writes it to main RAM.
+	// It then subroutine jumps to main RAM and executes this code.
+	// Here, we're just returning a RTS instruction for now.
+	// See above ghox_mcu_w routine.
 
-       Offset $56 and $58 are accessed from around PC:0F814
-
-       Offset $38 and $36 are accessed from around PC:0DA7C
-       Offset $3c and $3a are accessed from around PC:02E3C
-       Offset $40 and $3E are accessed from around PC:103EE
-       Offset $44 and $42 are accessed from around PC:0FB52
-       Offset $48 and $46 are accessed from around PC:06776
-    */
+	// Offset $56 and $58 are accessed from around PC:0F814
+	// Offset $38 and $36 are accessed from around PC:0DA7C
+	// Offset $3c and $3a are accessed from around PC:02E3C
+	// Offset $40 and $3E are accessed from around PC:103EE
+	// Offset $44 and $42 are accessed from around PC:0FB52
+	// Offset $48 and $46 are accessed from around PC:06776
 
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
 	return state->shared_ram16[offset] & 0xff;
 }
+
 
 static WRITE16_HANDLER( ghox_shared_ram_w )
 {
@@ -811,12 +830,14 @@ static WRITE16_HANDLER( ghox_shared_ram_w )
 	}
 }
 
+
 static WRITE16_HANDLER( fixeight_subcpu_ctrl_w )
 {
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
 	cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, (data & state->v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
+
 
 static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 {
@@ -826,38 +847,87 @@ static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 	}
 }
 
-static WRITE16_DEVICE_HANDLER( fixeighb_oki_bankswitch_w )
+
+static WRITE16_HANDLER( fixeightbl_oki_bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 7;
-		if (data <= 4)
-		{
-			UINT8 *fixeighb_oki = device->machine->region("oki")->base();
-			memcpy(&fixeighb_oki[0x30000], &fixeighb_oki[(data * 0x10000) + 0x40000], 0x10000);
-		}
+		if (data <= 4) memory_set_bank(space->machine, "bank1", data);
 	}
 }
 
-static READ8_HANDLER( v25_dswa_read )
+
+static READ8_HANDLER( v25_dswa_r )
 {
 	return input_port_read(space->machine, "DSWA") ^ 0xff;
 }
 
-static READ8_HANDLER( v25_dswb_read )
+
+static READ8_HANDLER( v25_dswb_r )
 {
 	return input_port_read(space->machine, "DSWB") ^ 0xff;
 }
 
-static READ8_HANDLER( v25_jmpr_read )
+
+static READ8_HANDLER( v25_jmpr_r )
 {
 	return input_port_read(space->machine, "JMPR") ^ 0xff;
+}
+
+
+static READ8_HANDLER( fixeight_region_r )
+{
+	// this must match the eeprom!
+	// however there is no valid value that makes the dumped eeprom boot
+	// this makes me wonder if there are decryption errors, therefore
+	// this code, and the default eeproms use should be considered subject
+	// to change
+
+	if (!strcmp(space->machine->gamedrv->name,"fixeightkt"))	return 0x00;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightk"))	return 0x01;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightht"))	return 0x02;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighth"))	return 0x03;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighttwt"))	return 0x04;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighttw"))	return 0x05;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightat"))	return 0x06;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x07;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightt"))	return 0x08;
+	if (!strcmp(space->machine->gamedrv->name,"fixeight9"))	return 0x09;
+	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x0a;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightu"))	return 0x0b;
+//  if (!strcmp(space->machine->gamedrv->name,"fixeightc")) return 0x0c; // invalid
+//  if (!strcmp(space->machine->gamedrv->name,"fixeightd")) return 0x0d; // invalid
+	if (!strcmp(space->machine->gamedrv->name,"fixeightj"))	return 0x0e;
+	if (!strcmp(space->machine->gamedrv->name,"fixeightjt"))	return 0x0f;
+
+	return 0x00;
 }
 
 
 /***************************************************************************
   Raizing games
 ***************************************************************************/
+
+
+static WRITE8_HANDLER( raizing_z80_bankswitch_w )
+{
+	memory_set_bank(space->machine, "bank1", data & 0x0f);
+}
+
+
+// bgaregga and batrider don't actually have a NMK112, but rather a GAL
+// programmed to bankswitch the sound ROMs in a similar fashion.
+// it may not be a coincidence that the composer and sound designer for
+// these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
+
+static WRITE8_HANDLER( raizing_oki_bankswitch_w )
+{
+	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
+
+	nmk112_okibank_w(nmk112, offset,     data        & 0x0f);
+	nmk112_okibank_w(nmk112, offset + 1, (data >> 4) & 0x0f);
+}
 
 
 static WRITE16_HANDLER( bgaregga_soundlatch_w )
@@ -889,83 +959,15 @@ static WRITE8_HANDLER( bgaregga_E00C_w )
 }
 
 
-static WRITE8_HANDLER( bgaregga_bankswitch_w )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-	int bank = (data & 0x0f) - 10 + 4;
-
-	if (bank != state->current_bank)
-	{
-		state->current_bank = bank;
-		memory_set_bank(space->machine, "bank1", bank);
-	}
-}
-
-
-// bgaregga and batrider don't actually have a NMK112, but rather a GAL
-// programmed to bankswitch the sound ROMs in a similar fashion.
-// it may not be a coincidence that the composer and sound designer for
-// these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
-
-static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
-{
-	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
-
-	nmk112_okibank_w(nmk112, 0,  data		& 0x0f);	// chip 0 bank 0
-	nmk112_okibank_w(nmk112, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
-}
-
-static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
-{
-	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
-
-	nmk112_okibank_w(nmk112, 2,  data		& 0x0f);	// chip 0 bank 2
-	nmk112_okibank_w(nmk112, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
-}
-
-static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
-{
-	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
-
-	nmk112_okibank_w(nmk112, 4,  data		& 0x0f);	// chip 1 bank 0
-	nmk112_okibank_w(nmk112, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
-}
-
-static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
-{
-	nmk112_device *nmk112 = space->machine->device<nmk112_device>("nmk112");
-
-	nmk112_okibank_w(nmk112, 6,  data		& 0x0f);	// chip 1 bank 2
-	nmk112_okibank_w(nmk112, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
-}
-
-
-static WRITE8_HANDLER( batrider_bankswitch_w )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-	int bank = data & 0x0f;
-
-	bank = (bank > 1) ? bank + 2 : bank;
-
-	if (bank != state->current_bank)
-	{
-		state->current_bank = bank;
-		memory_set_bank(space->machine, "bank1", bank);
-	}
-}
-
-
 static READ16_HANDLER( batrider_z80_busack_r )
 {
-	/* Bit 1 returns the status of BUSAK from the Z80.
-       BUSRQ is activated via bit 0x10 on the NVRAM write port.
-       These accesses are made when the 68K wants to read the Z80
-       ROM code. Failure to return the correct status incurrs a Sound Error.
-    */
+	// Bit 0x01 returns the status of BUSAK from the Z80.
+	// These accesses are made when the 68K wants to read the Z80
+	// ROM code. Failure to return the correct status incurrs a Sound Error.
 
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
-	return state->z80_busreq;			/* Loop BUSRQ to BUSAK */
+	return state->z80_busreq;	// Loop BUSRQ to BUSAK
 }
 
 
@@ -975,19 +977,16 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 	{
 		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
-		state->z80_busreq = (data & 0xff);
+		state->z80_busreq = (data & 0x01);	// see batrider_z80_busack_r above
 	}
 }
 
 
-static READ16_HANDLER( raizing_z80rom_r )
+static READ16_HANDLER( batrider_z80rom_r )
 {
-	UINT8 *Z80_ROM_test = (UINT8 *)space->machine->region("audiocpu")->base();
+	UINT8 *Z80 = space->machine->region("audiocpu")->base();
 
-	if (offset < 0x8000)
-		return Z80_ROM_test[offset] & 0xff;
-
-	return Z80_ROM_test[offset + 0x8000] & 0xff;
+	return Z80[offset];
 }
 
 
@@ -1016,33 +1015,33 @@ static WRITE16_HANDLER( batrider_soundlatch2_w )
 }
 
 
-static WRITE16_HANDLER( raizing_unknown_w )
+static WRITE16_HANDLER( batrider_unknown_sound_w )
 {
 	// the 68K writes here when it wants a sound acknowledge IRQ from the Z80
 	// for bbakraid this is on every sound command; for batrider, only on certain commands
 }
 
 
-static WRITE16_HANDLER( raizing_clear_sndirq_w )
+static WRITE16_HANDLER( batrider_clear_sndirq_w )
 {
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	cputag_set_input_line(space->machine, "maincpu", state->sndirq_line, CLEAR_LINE);
+	cpu_set_input_line(state->main_cpu, state->sndirq_line, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( raizing_sndirq_w )
+static WRITE8_HANDLER( batrider_sndirq_w )
 {
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
-	// if raizing_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	cputag_set_input_line(space->machine, "maincpu", state->sndirq_line, HOLD_LINE);
+	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
+	cpu_set_input_line(state->main_cpu, state->sndirq_line, HOLD_LINE);
 }
 
 
-static WRITE8_HANDLER( raizing_clear_nmi_w )
+static WRITE8_HANDLER( batrider_clear_nmi_w )
 {
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
@@ -1050,50 +1049,10 @@ static WRITE8_HANDLER( raizing_clear_nmi_w )
 }
 
 
-/*###################### Battle Bakraid ##############################*/
-
-/* EEPROM contents with Battle Bakraid Unlimited version features unlocked */
-static const UINT8 bbakraid_unlim_default[512] = {
-	0xc2,0x49,0x00,0x07,0xa1,0x20,0x2a,0x2a,0x2a,0x90,0x90,0x90,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x06,0x1a,0x80,0x2a,0x2a,0x2a,0x94,
-	0x94,0x94,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x04,
-	0x93,0xe0,0x2a,0x2a,0x2a,0x98,0x98,0x98,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x02,0x00,0x03,0x0d,0x40,0x2a,0x2a,0x2a,0x9c,0x9c,0x9c,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x01,0x86,0xa0,0x2a,0x2a,
-	0x2a,0xa0,0xa0,0xa0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,
-	0x00,0x07,0xa1,0x20,0x2b,0x2b,0x2b,0x90,0x90,0x90,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x06,0x1a,0x80,0x2b,0x2b,0x2b,0x94,0x94,0x94,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x04,0x93,0xe0,
-	0x2b,0x2b,0x2b,0x98,0x98,0x98,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x02,0x00,0x03,0x0d,0x40,0x2b,0x2b,0x2b,0x9c,0x9c,0x9c,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x01,0x86,0xa0,0x2b,0x2b,0x2b,0xa0,
-	0xa0,0xa0,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x07,
-	0xa1,0x20,0x23,0x23,0x23,0x90,0x90,0x90,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x02,0x00,0x06,0x1a,0x80,0x23,0x23,0x23,0x94,0x94,0x94,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x04,0x93,0xe0,0x23,0x23,
-	0x23,0x98,0x98,0x98,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,
-	0x00,0x03,0x0d,0x40,0x23,0x23,0x23,0x9c,0x9c,0x9c,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x01,0x86,0xa0,0x23,0x23,0x23,0xa0,0xa0,0xa0,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x07,0xa1,0x20,
-	0x3f,0x3f,0x3f,0x90,0x90,0x90,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x02,0x00,0x06,0x1a,0x80,0x3f,0x3f,0x3f,0x94,0x94,0x94,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x04,0x93,0xe0,0x3f,0x3f,0x3f,0x98,
-	0x98,0x98,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x03,
-	0x0d,0x40,0x3f,0x3f,0x3f,0x9c,0x9c,0x9c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x02,0x00,0x01,0x86,0xa0,0x3f,0x3f,0x3f,0xa0,0xa0,0xa0,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x02,0x00,0x04,0xc2,0x49,0xc2,0x49,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x33,0xcf,0x00,0x04,0x00,0x00,0x21,0xd5,
-	0x00,0x05,0x06,0xff,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xff,0xc2,0x49
-};
-
-
-
 static const eeprom_interface bbakraid_93C66_intf =
 {
-	/* Pin 6 of the 93C66 is connected to Gnd!
-       So it's configured for 512 bytes */
+	// Pin 6 of the 93C66 is connected to Gnd!
+	// So it's configured for 512 bytes
 
 	9,			// address bits
 	8,			// data bits
@@ -1106,26 +1065,26 @@ static const eeprom_interface bbakraid_93C66_intf =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
-static READ16_HANDLER( bbakraid_nvram_r )
+
+static READ16_HANDLER( bbakraid_eeprom_r )
 {
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 	eeprom_device *eeprom = space->machine->device<eeprom_device>("eeprom");
 
-	/* Bit 1 returns the status of BUSAK from the Z80.
-       BUSRQ is activated via bit 0x10 on the NVRAM write port.
-       These accesses are made when the 68K wants to read the Z80
-       ROM code. Failure to return the correct status incurrs a Sound Error.
-    */
+	// Bit 0x01 returns the status of BUSAK from the Z80.
+	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
+	// These accesses are made when the 68K wants to read the Z80
+	// ROM code. Failure to return the correct status incurrs a Sound Error.
 
 	int data;
 	data  = ((eeprom_read_bit(eeprom) & 0x01) << 4);
-	data |= ((state->z80_busreq >> 4) & 0x01);	/* Loop BUSRQ to BUSAK */
+	data |= ((state->z80_busreq >> 4) & 0x01);	// Loop BUSRQ to BUSAK
 
 	return data;
 }
 
 
-static WRITE16_HANDLER( bbakraid_nvram_w )
+static WRITE16_HANDLER( bbakraid_eeprom_w )
 {
 	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
 
@@ -1135,14 +1094,7 @@ static WRITE16_HANDLER( bbakraid_nvram_w )
 	if ( ACCESSING_BITS_0_7 )
 		input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
-	state->z80_busreq = data & 0x10;	/* see bbakraid_nvram_r above */
-}
-
-
-static void bbakraid_irqhandler(device_t *device, int state)
-{
-	/* Not used ???  Connected to a test pin (TP082) */
-	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
+	state->z80_busreq = data & 0x10;	// see bbakraid_eeprom_r above
 }
 
 
@@ -1155,15 +1107,15 @@ static INTERRUPT_GEN( bbakraid_snd_interrupt )
 
 static ADDRESS_MAP_START( tekipaki_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x020000, 0x03ffff) AM_ROM							/* extra for Whoopee */
+	AM_RANGE(0x020000, 0x03ffff) AM_ROM						// extra for Whoopee
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x14000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x180010, 0x180011) AM_READ_PORT("DSWB")
 	AM_RANGE(0x180020, 0x180021) AM_READ_PORT("SYS")
-	AM_RANGE(0x180030, 0x180031) AM_READ_PORT("JMPR")			/* CPU 2 busy and Territory Jumper block */
-	AM_RANGE(0x180040, 0x180041) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
+	AM_RANGE(0x180030, 0x180031) AM_READ_PORT("JMPR")			// CPU 2 busy and Region Jumper block
+	AM_RANGE(0x180040, 0x180041) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x180050, 0x180051) AM_READ_PORT("IN1")
 	AM_RANGE(0x180060, 0x180061) AM_READ_PORT("IN2")
 	AM_RANGE(0x180070, 0x180071) AM_WRITE(toaplan2_hd647180_cpu_w)
@@ -1172,12 +1124,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ghox_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_READ(ghox_p2_h_analog_r)	/* Paddle 2 */
+	AM_RANGE(0x040000, 0x040001) AM_READ(ghox_p2_h_analog_r)
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x100000, 0x100001) AM_READ(ghox_p1_h_analog_r)	/* Paddle 1 */
+	AM_RANGE(0x100000, 0x100001) AM_READ(ghox_p1_h_analog_r)
 	AM_RANGE(0x140000, 0x14000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
-	AM_RANGE(0x180000, 0x180001) AM_READWRITE(ghox_mcu_r, ghox_mcu_w)	/* really part of shared RAM */
+	AM_RANGE(0x180000, 0x180001) AM_READWRITE(ghox_mcu_r, ghox_mcu_w)	// really part of shared RAM
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("DSWA")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSWB")
 	AM_RANGE(0x180010, 0x180011) AM_READ_PORT("SYS")
@@ -1195,37 +1147,35 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)
-	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
-	/***** The following locations in 0x30000x are for video controller 1 ******/
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	/***** The following loctions in 0x50000x are for video controller 2 ******/
 	AM_RANGE(0x500000, 0x50000d) AM_DEVREADWRITE("gp9001vdp1", gp9001_vdp_r, gp9001_vdp_w)
-	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)			/* test bit 8 */
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)			// test bit 8
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( kbash_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE( shared_ram_r, shared_ram_w )
 	AM_RANGE(0x208010, 0x208011) AM_READ_PORT("IN1")
 	AM_RANGE(0x208014, 0x208015) AM_READ_PORT("IN2")
 	AM_RANGE(0x208018, 0x208019) AM_READ_PORT("SYS")
 	AM_RANGE(0x20801c, 0x20801d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)			/* test bit 8 */
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)			// test bit 8
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( kbash2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x104000, 0x10401f) AM_RAM			/* Sound related? */
-	AM_RANGE(0x200000, 0x200001) AM_NOP			/* Left over from original code - Sound Number write, Status read */
-	AM_RANGE(0x200002, 0x200003) AM_WRITENOP	/* Left over from original code - Reset Sound */
+	AM_RANGE(0x104000, 0x10401f) AM_RAM			// Sound related?
+	AM_RANGE(0x200000, 0x200001) AM_NOP			// Left over from original code - Sound Number write, Status read
+	AM_RANGE(0x200002, 0x200003) AM_WRITENOP	// Left over from original code - Reset Sound
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSWA")
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("DSWB")
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("JMPR")
@@ -1246,12 +1196,12 @@ static ADDRESS_MAP_START( truxton2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x20000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
-	AM_RANGE(0x402000, 0x4021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
+	AM_RANGE(0x402000, 0x4021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
 	AM_RANGE(0x402200, 0x402fff) AM_RAM
-	AM_RANGE(0x403000, 0x4031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
+	AM_RANGE(0x403000, 0x4031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
 	AM_RANGE(0x403200, 0x403fff) AM_RAM
-	AM_RANGE(0x500000, 0x50ffff) AM_READWRITE(toaplan2_tx_gfxram16_r, toaplan2_tx_gfxram16_w) AM_BASE_MEMBER(toaplan2_state, tx_gfxram16)
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM_WRITE(toaplan2_tx_gfxram16_w) AM_BASE_MEMBER(toaplan2_state, tx_gfxram16)
 	AM_RANGE(0x600000, 0x600001) AM_READ(video_count_r)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
@@ -1261,7 +1211,7 @@ static ADDRESS_MAP_START( truxton2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("SYS")
 	AM_RANGE(0x700010, 0x700011) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x700014, 0x700017) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(toaplan2_coin_word_w)		/* Coin count/lock */
+	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(toaplan2_coin_word_w)
 ADDRESS_MAP_END
 
 
@@ -1270,9 +1220,8 @@ static ADDRESS_MAP_START( pipibibs_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x14000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
-
-	AM_RANGE(0x190000, 0x190fff) AM_READWRITE(z80_shared_r, z80_shared_w)
-	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)		/* Coin count/lock */
+	AM_RANGE(0x190000, 0x190fff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x19c020, 0x19c021) AM_READ_PORT("DSWA")
 	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSWB")
 	AM_RANGE(0x19c028, 0x19c029) AM_READ_PORT("JMPR")
@@ -1285,16 +1234,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
-	AM_RANGE(0x083000, 0x0837ff) AM_DEVREADWRITE("gp9001vdp0", pipibibi_bootleg_spriteram16_r, pipibibi_bootleg_spriteram16_w)	/* SpriteRAM */
-	AM_RANGE(0x083800, 0x087fff) AM_RAM				/* SpriteRAM (unused) */
+	AM_RANGE(0x083000, 0x0837ff) AM_DEVREADWRITE("gp9001vdp0", pipibibi_bootleg_spriteram16_r, pipibibi_bootleg_spriteram16_w)	// SpriteRAM
+	AM_RANGE(0x083800, 0x087fff) AM_RAM				// SpriteRAM (unused)
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM				/* Copy of SpriteRAM ? */
-	//AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP        /* ??? */
-	AM_RANGE(0x180000, 0x182fff) AM_DEVREADWRITE("gp9001vdp0", pipibibi_bootleg_videoram16_r, pipibibi_bootleg_videoram16_w)		/* TileRAM */
+	AM_RANGE(0x120000, 0x120fff) AM_RAM				// Copy of SpriteRAM ?
+//	AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP		// ???
+	AM_RANGE(0x180000, 0x182fff) AM_DEVREADWRITE("gp9001vdp0", pipibibi_bootleg_videoram16_r, pipibibi_bootleg_videoram16_w)	// TileRAM
 	AM_RANGE(0x188000, 0x18800f) AM_DEVWRITE("gp9001vdp0", pipibibi_bootleg_scroll_w)
-	AM_RANGE(0x190002, 0x190003) AM_READ(z80_shared_r)	/* Z80 ready ? */
-	AM_RANGE(0x190010, 0x190011) AM_WRITE(z80_shared_w)	/* Z80 task to perform */
-	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
+	AM_RANGE(0x190002, 0x190003) AM_READ(shared_ram_r)	// Z80 ready ?
+	AM_RANGE(0x190010, 0x190011) AM_WRITE(shared_ram_w)	// Z80 task to perform
+	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x19c020, 0x19c021) AM_READ_PORT("DSWA")
 	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSWB")
 	AM_RANGE(0x19c028, 0x19c029) AM_READ_PORT("JMPR")
@@ -1304,7 +1253,6 @@ static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-/* this one is rather different to the other v25 based ones, shared ram is moved for example */
 static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
@@ -1312,80 +1260,54 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("IN2")
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
-	AM_RANGE(0x280000, 0x28ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)
+	AM_RANGE(0x280000, 0x28ffff) AM_READWRITE( shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
-	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
-	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE(toaplan2_tx_gfxram16_r, toaplan2_tx_gfxram16_w) AM_BASE_MEMBER(toaplan2_state, tx_gfxram16)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(toaplan2_tx_gfxram16_w) AM_BASE_MEMBER(toaplan2_state, tx_gfxram16)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fixeighb_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM		/* 0-$7ffff ?*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* 100000 - 107fff  105000-105xxx 106000-106xxx 108000 - related to sound ?*/
+static ADDRESS_MAP_START( fixeightbl_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM		// 0-7ffff ?
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM		// 100000-107fff  105000-105xxx  106000-106xxx  108000 - related to sound ?
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN1")
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("IN2")
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSWB")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
-	AM_RANGE(0x200014, 0x200015) AM_DEVWRITE("oki", fixeighb_oki_bankswitch_w)	/* Sound banking. Code at $4084c, $5070 */
+	AM_RANGE(0x200014, 0x200015) AM_WRITE(fixeightbl_oki_bankswitch_w)	// Sound banking. Code at $4084c, $5070
 	AM_RANGE(0x200018, 0x200019) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x20001c, 0x20001d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
-	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
-	AM_RANGE(0x800000, 0x87ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("maincpu", 0x80000)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-//  AM_RANGE(0x200000, 0x20ffff) AM_ROM                         /* Sound ROM is here ??? */
+//  AM_RANGE(0x200000, 0x20ffff) AM_NOP // Read at startup by broken ROM checksum code - see notes
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock */
-	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
-
-static READ16_HANDLER( batsugun_share_r )
-{
-	toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-	return state->batsugun_share[offset] | state->batsugun_share[offset]<<8;
-}
-
-static WRITE16_HANDLER( batsugun_share_w )
-{
-#if 0
-	if (ACCESSING_BITS_8_15)
-	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-		state->batsugun_share[offset] = data >> 8;
-	}
-#endif
-
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan2_state *state = space->machine->driver_data<toaplan2_state>();
-
-		state->batsugun_share[offset] = data;
-	}
-}
 
 static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -1393,13 +1315,10 @@ static ADDRESS_MAP_START( batsugun_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	/* Coin count/lock + v25 reset/hold control lines? */
-	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( batsugun_share_r, batsugun_share_w )
-
-	/***** The following in 0x30000x are for video controller 1 ******/
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE( shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	/***** The following in 0x50000x are for video controller 2 ******/
 	AM_RANGE(0x500000, 0x50000d) AM_DEVREADWRITE("gp9001vdp1", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
@@ -1420,15 +1339,15 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("IN3")
 	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("IN4")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
-	AM_RANGE(0x700030, 0x700031) AM_DEVWRITE("oki", oki_bankswitch_w)		/* Sample bank switch */
-	AM_RANGE(0x700034, 0x700035) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
+	AM_RANGE(0x700030, 0x700031) AM_DEVWRITE("oki", oki_bankswitch_w)
+	AM_RANGE(0x700034, 0x700035) AM_WRITE(toaplan2_coin_word_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mahoudai_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(z80_shared_r, z80_shared_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
@@ -1439,11 +1358,11 @@ static ADDRESS_MAP_START( mahoudai_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x401000, 0x4017ff) AM_RAM							/* Unused PaletteRAM */
-	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
+	AM_RANGE(0x401000, 0x4017ff) AM_RAM							// Unused palette RAM
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
-	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1451,9 +1370,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shippumd_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(z80_shared_r, z80_shared_w)
-//  AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP                    /* ??? */
-	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(shippumd_coin_word_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
+//	AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP					// ???
+	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(shippumd_coin_word_w)	// Coin count/lock + oki bankswitch
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
 	AM_RANGE(0x21c028, 0x21c029) AM_READ_PORT("SYS")
@@ -1463,11 +1382,11 @@ static ADDRESS_MAP_START( shippumd_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x401000, 0x4017ff) AM_RAM							/* Unused PaletteRAM */
-	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
+	AM_RANGE(0x401000, 0x4017ff) AM_RAM							// Unused palette RAM
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
-	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1475,7 +1394,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bgaregga_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(z80_shared_r, z80_shared_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
@@ -1486,10 +1405,10 @@ static ADDRESS_MAP_START( bgaregga_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
-	AM_RANGE(0x502000, 0x5021ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
+	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
-	AM_RANGE(0x503000, 0x5031ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(bgaregga_soundlatch_w)
 ADDRESS_MAP_END
@@ -1497,13 +1416,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( batrider_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)	/* Text VideoRAM */
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) AM_SIZE_MEMBER(toaplan2_state, paletteram16_size)
-	AM_RANGE(0x203000, 0x2031ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
-	AM_RANGE(0x203200, 0x2033ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
-	AM_RANGE(0x203400, 0x207fff) AM_READWRITE(raizing_tx_gfxram16_r, raizing_tx_gfxram16_w) /* Main RAM actually */
+	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
+	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) AM_SIZE_MEMBER(toaplan2_state, paletteram_size)
+	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
+	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
+	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(toaplan2_state, mainram16, mainram_overlap_size)
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x37ffff) AM_READ(raizing_z80rom_r)
+	AM_RANGE(0x300000, 0x37ffff) AM_READ(batrider_z80rom_r)
 	AM_RANGE(0x400000, 0x40000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_alt_r, gp9001_vdp_alt_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("SYS-DSW")
@@ -1515,24 +1435,26 @@ static ADDRESS_MAP_START( batrider_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500010, 0x500011) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x500020, 0x500021) AM_WRITE(batrider_soundlatch_w)
 	AM_RANGE(0x500022, 0x500023) AM_WRITE(batrider_soundlatch2_w)
-	AM_RANGE(0x500024, 0x500025) AM_WRITE(raizing_unknown_w)
-	AM_RANGE(0x500026, 0x500027) AM_WRITE(raizing_clear_sndirq_w)
+	AM_RANGE(0x500024, 0x500025) AM_WRITE(batrider_unknown_sound_w)
+	AM_RANGE(0x500026, 0x500027) AM_WRITE(batrider_clear_sndirq_w)
 	AM_RANGE(0x500060, 0x500061) AM_WRITE(batrider_z80_busreq_w)
-	AM_RANGE(0x500080, 0x500081) AM_WRITE(batrider_textdata_decode)
+	AM_RANGE(0x500080, 0x500081) AM_WRITE(batrider_textdata_dma_w)
+	AM_RANGE(0x500082, 0x500083) AM_WRITE(batrider_unknown_dma_w)
 	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE(batrider_objectbank_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbakraid_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_READWRITE(toaplan2_txvideoram16_r, toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)	/* Text VideoRAM */
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) AM_SIZE_MEMBER(toaplan2_state, paletteram16_size)
-	AM_RANGE(0x203000, 0x2031ff) AM_READWRITE(toaplan2_txvideoram16_offs_r, toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
-	AM_RANGE(0x203200, 0x2033ff) AM_READWRITE(toaplan2_txscrollram16_r, toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
-	AM_RANGE(0x203400, 0x207fff) AM_READWRITE(raizing_tx_gfxram16_r, raizing_tx_gfxram16_w)	/* Main RAM actually */
+	// actually 200000 - 20ffff is probably all main RAM, and the text and palette RAM are written via DMA
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(toaplan2_txvideoram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16, tx_vram_size)
+	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) AM_SIZE_MEMBER(toaplan2_state, paletteram_size)
+	AM_RANGE(0x203000, 0x2031ff) AM_RAM_WRITE(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txvideoram16_offs, tx_offs_vram_size)
+	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE(toaplan2_txscrollram16_w) AM_BASE_SIZE_MEMBER(toaplan2_state, txscrollram16, tx_scroll_vram_size)
+	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(toaplan2_state, mainram16, mainram_overlap_size)
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x33ffff) AM_READ(raizing_z80rom_r)
-	AM_RANGE(0x400000, 0x40000d)  AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_alt_r, gp9001_vdp_alt_w)
+	AM_RANGE(0x300000, 0x33ffff) AM_READ(batrider_z80rom_r)
+	AM_RANGE(0x400000, 0x40000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_alt_r, gp9001_vdp_alt_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("SYS-DSW")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW")
@@ -1542,11 +1464,12 @@ static ADDRESS_MAP_START( bbakraid_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500012, 0x500013) AM_READ(soundlatch4_word_r)
 	AM_RANGE(0x500014, 0x500015) AM_WRITE(batrider_soundlatch_w)
 	AM_RANGE(0x500016, 0x500017) AM_WRITE(batrider_soundlatch2_w)
-	AM_RANGE(0x500018, 0x500019) AM_READ(bbakraid_nvram_r)
-	AM_RANGE(0x50001a, 0x50001b) AM_WRITE(raizing_unknown_w)
-	AM_RANGE(0x50001c, 0x50001d) AM_WRITE(raizing_clear_sndirq_w)
-	AM_RANGE(0x50001e, 0x50001f) AM_WRITE(bbakraid_nvram_w)
-	AM_RANGE(0x500080, 0x500081) AM_WRITE(batrider_textdata_decode)
+	AM_RANGE(0x500018, 0x500019) AM_READ(bbakraid_eeprom_r)
+	AM_RANGE(0x50001a, 0x50001b) AM_WRITE(batrider_unknown_sound_w)
+	AM_RANGE(0x50001c, 0x50001d) AM_WRITE(batrider_clear_sndirq_w)
+	AM_RANGE(0x50001e, 0x50001f) AM_WRITE(bbakraid_eeprom_w)
+	AM_RANGE(0x500080, 0x500081) AM_WRITE(batrider_textdata_dma_w)
+	AM_RANGE(0x500082, 0x500083) AM_WRITE(batrider_unknown_dma_w)
 	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE(batrider_objectbank_w)
 ADDRESS_MAP_END
 
@@ -1554,14 +1477,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pipibibs_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(toaplan2_state, z80_shared_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(toaplan2_state, shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raizing_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(toaplan2_state, z80_shared_ram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(toaplan2_state, shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(toaplan2_coin_w)
@@ -1571,12 +1494,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(toaplan2_state, z80_shared_ram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(toaplan2_state, shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xe006, 0xe006) AM_WRITE(raizing_okim6295_bankselect_0)
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(raizing_okim6295_bankselect_1)
-	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(bgaregga_bankswitch_w)
+	AM_RANGE(0xe006, 0xe008) AM_WRITE(raizing_oki_bankswitch_w)
+	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(raizing_z80_bankswitch_w)
 	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(bgaregga_E00C_w)
 	AM_RANGE(0xe01c, 0xe01c) AM_READ(soundlatch_r)
 	AM_RANGE(0xe01d, 0xe01d) AM_READ(bgaregga_E01D_r)
@@ -1594,24 +1516,20 @@ static ADDRESS_MAP_START( batrider_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(raizing_sndirq_w)
-	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE(batrider_sndirq_w)
+	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_WRITE(batrider_bankswitch_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(raizing_okim6295_bankselect_0)
-	AM_RANGE(0xc2, 0xc2) AM_WRITE(raizing_okim6295_bankselect_1)
-	AM_RANGE(0xc4, 0xc4) AM_WRITE(raizing_okim6295_bankselect_2)
-	AM_RANGE(0xc6, 0xc6) AM_WRITE(raizing_okim6295_bankselect_3)
+	AM_RANGE(0x88, 0x88) AM_WRITE(raizing_z80_bankswitch_w)
+	AM_RANGE(0xc0, 0xc6) AM_WRITE(raizing_oki_bankswitch_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbakraid_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM			/* Only 2FFFh valid code */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
+	AM_RANGE(0x0000, 0xbfff) AM_ROM		// No banking? ROM only contains code and data up to 0x28DC
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1620,116 +1538,77 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0x42, 0x42) AM_WRITE(soundlatch4_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(raizing_sndirq_w)
-	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE(batrider_sndirq_w)
+	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 
 
-
 #ifdef USE_HD64x180
 static ADDRESS_MAP_START( hd647180_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xfe00, 0xffff) AM_RAM			/* Internal 512 bytes of RAM */
+	AM_RANGE(0xfe00, 0xffff) AM_RAM		// Internal 512 bytes of RAM
 ADDRESS_MAP_END
 #endif
 
 
-static ADDRESS_MAP_START( V25_kbash_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share) /* 2KB shared with M68K */
+static ADDRESS_MAP_START( v25_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, shared_ram)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( kbash_v25_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_MEMBER(toaplan2_state, shared_ram)
 	AM_RANGE(0x04000, 0x04001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x04002, 0x04002) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( V25_rambased_nooki_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	//AM_RANGE(0x00004, 0x00004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
-ADDRESS_MAP_END
-
-READ8_DEVICE_HANDLER( fixeight_eeprom_r )
-{
-	int bit = eeprom_read_bit(device);
-
-	return bit<<7;
-}
-
-static WRITE8_DEVICE_HANDLER(fixeight_eeprom_w )
-{
-		// latch the bit
-		eeprom_write_bit(device, data & 0x0040);
-
-		// reset line asserted: reset.
-		eeprom_set_cs_line(device, (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
-
-		// clock line asserted: write latch or select next bit to read
-		eeprom_set_clock_line(device, (data & 0x0020) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-static READ8_HANDLER( fixeight_region_r )
-{
-	// this must match the eeprom!
-	// however there is no valid value that makes the dumped eeprom boot
-	// this makes me wonder if there are decryption errors, therefore
-	// this code, and the default eeproms use should be considered subject
-	// to change
-
-	if (!strcmp(space->machine->gamedrv->name,"fixeightkt"))	return 0x00;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightk"))	return 0x01;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightht"))	return 0x02;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighth"))	return 0x03;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighttwt"))	return 0x04;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighttw"))	return 0x05;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightat"))	return 0x06;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x07;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightt"))	return 0x08;
-	if (!strcmp(space->machine->gamedrv->name,"fixeight9"))	return 0x09;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x0a;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightu"))	return 0x0b;
-//  if (!strcmp(space->machine->gamedrv->name,"fixeightc")) return 0x0c; // invalid
-//  if (!strcmp(space->machine->gamedrv->name,"fixeightd")) return 0x0d; // invalid
-	if (!strcmp(space->machine->gamedrv->name,"fixeightj"))	return 0x0e;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightjt"))	return 0x0f;
-
-	return 0x00;
-}
-
-static ADDRESS_MAP_START( V25_fixeight_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fixeight_v25_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00004, 0x00004) AM_READ(fixeight_region_r)
 	AM_RANGE(0x0000a, 0x0000b) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x0000c, 0x0000c) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, batsugun_share)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( V25_fixeight_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_DEVREADWRITE("eeprom", fixeight_eeprom_r, fixeight_eeprom_w)
+	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, shared_ram)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( V25_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswa_read)
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswb_read)
-	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_read)
-	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	/* bit 0 is FAULT according to kbash schematics */
+static ADDRESS_MAP_START( vfive_v25_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x00001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE_MEMBER(toaplan2_state, shared_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( V25_port_abswap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswb_read)
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswa_read)
-	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_read)
-	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	/* bit 0 is FAULT according to kbash schematics */
+
+static ADDRESS_MAP_START( v25_port, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswa_r)
+	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswb_r)
+	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_r)
+	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	// bit 0 is FAULT according to kbash schematic
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( dogyuun_v25_port, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswb_r)
+	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswa_r)
+	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_r)
+	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	// bit 0 is FAULT according to kbash schematic
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( fixeight_v25_port, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READWRITE_PORT("EEPROM")
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( fixeightbl_oki, 0, 8 )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
+
 
 /*****************************************************************************
     Input Port definitions
@@ -1762,12 +1641,7 @@ ADDRESS_MAP_END
 
 
 
-
 static INPUT_PORTS_START( toaplan2 )
-	PORT_START("VBL")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
-
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
@@ -1777,7 +1651,7 @@ static INPUT_PORTS_START( toaplan2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
@@ -1788,7 +1662,7 @@ static INPUT_PORTS_START( toaplan2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -1799,7 +1673,7 @@ static INPUT_PORTS_START( toaplan2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW1:1")
@@ -1812,24 +1686,25 @@ static INPUT_PORTS_START( toaplan2 )
 	PORT_DIPNAME( 0x0008,	0x0000, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(		0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
-	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Modified below */
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x0003,	0x0000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(		0x0003, DEF_STR( Hardest ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( Easy ) )
-	/* Various features on bit mask 0x00fc */
-	PORT_BIT( 0x00fc, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Modified below */
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	// Per-game features on bit mask 0x00fc
+	PORT_BIT( 0x00fc, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
-	PORT_START("JMPR")	/* (6) Territory Jumper block */
-	/* Territory settings on bit mask 0x000f */
-	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Modified below */
-	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_START("JMPR")	// Region jumper block
+	// Region settings on bit mask 0x000f or 0x00f0
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Modified below
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 INPUT_PORTS_END
 
 
@@ -1838,12 +1713,12 @@ static INPUT_PORTS_START( tekipaki )
 	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
-	/* Various features on bit mask 0x000f - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
+	// Various features on bit mask 0x000f - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
 	TOAPLAN2_COINAGE( 0x000f, 0x0002 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0004, DEF_STR( On ) )
@@ -1864,7 +1739,7 @@ static INPUT_PORTS_START( tekipaki )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000f,	0x0002, "Territory" )
+	PORT_DIPNAME( 0x000f,	0x0002, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0007, "USA (Romstar)" )
@@ -1883,12 +1758,12 @@ static INPUT_PORTS_START( ghox )
 	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
-	/* Various features on bit mask 0x000f - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
+	// Various features on bit mask 0x000f - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
 	TOAPLAN2_COINAGE( 0x80000, 0x80000 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "100k only" )
@@ -1907,8 +1782,8 @@ static INPUT_PORTS_START( ghox )
 	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 
 	PORT_MODIFY("JMPR")
-	/* Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board! */
-	PORT_DIPNAME( 0x8000f,	0x80002, "Territory" )
+	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
+	PORT_DIPNAME( 0x8000f,	0x80002, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x80002, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x8000a, "Europe (Nova Apparate GMBH & Co)" )
 	PORT_DIPSETTING(		0x8000d, "Europe (Taito Corporation Japan)" )
@@ -1927,11 +1802,11 @@ static INPUT_PORTS_START( ghox )
 
 	PORT_START("PAD1")		/* Paddle 1 (left-right)  read at $100000 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("PAD2")		/* Paddle 2 (left-right)  read at $040000 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2)
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 INPUT_PORTS_END
 
 
@@ -1948,12 +1823,12 @@ static INPUT_PORTS_START( dogyuun )
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play) )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
-	/* Various features on bit mask 0x000e - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
-	TOAPLAN2_COINAGE( 0x000f, 0x0003 )
+	// Various features on bit mask 0x000e - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x8000, 0x8000 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "400k only" )
@@ -1972,67 +1847,84 @@ static INPUT_PORTS_START( dogyuun )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0030, "Territory" )
-	PORT_DIPSETTING(		0x0030, DEF_STR( Europe ) )
+	// Bit Mask 0x8000 is used here to signify European Coinage for MAME purposes - not read on the real board!
+	// "No speedups": all speedup items in game are replaced with bombs
+	PORT_DIPNAME( 0x80f0,	0x8030, DEF_STR( Region ) )
+	PORT_DIPSETTING(		0x8030, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
-//  PORT_DIPSETTING(        0x0070, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0020, "USA (Atari Games Corp license)" )
-//  PORT_DIPSETTING(        0x00c0, "USA (Atari Games Corp license)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield license); no speedups" )
+	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading license); no speedups" )
+	PORT_DIPSETTING(		0x0060, "Taiwan; no speedups" )
+	PORT_DIPSETTING(		0x0070, "USA; no speedups" )
+	PORT_DIPSETTING(		0x0080, "Southeast Asia (Charterfield license); no speedups" )
+	PORT_DIPSETTING(		0x0090, "Hong Kong (Charterfield license)" )
+	PORT_DIPSETTING(		0x00a0, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x00b0, "Taiwan" )
+	PORT_DIPSETTING(		0x00c0, "USA (Atari Games Corp license); no speedups" )
+	PORT_DIPSETTING(		0x00d0, "Southeast Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x80e0, "Europe; no speedups" )
 	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0080, "South East Asia (Charterfield license)" )
-//  PORT_DIPSETTING(        0x00d0, "South East Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading license)" )
-//  PORT_DIPSETTING(        0x00a0, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield license)" )
-//  PORT_DIPSETTING(        0x0090, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x0060, "Taiwan" )
-//  PORT_DIPSETTING(        0x00b0, "Taiwan" )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Sound ready */
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( dogyuunk )
+static INPUT_PORTS_START( dogyuuna )
 	PORT_INCLUDE( dogyuun )
 
+	PORT_MODIFY("DSWA")
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x00f0, 0x0030 )
+
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0050, "Territory" )
+	// "No speedups": all speedup items in game are replaced with bombs
+	PORT_DIPNAME( 0x00f0,	0x0030, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0030, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
-//  PORT_DIPSETTING(        0x0070, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0020, "USA (Atari Games Corp license)" )
-//  PORT_DIPSETTING(        0x00c0, "USA (Atari Games Corp license)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield license); no speedups" )
+	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading license); no speedups" )
+	PORT_DIPSETTING(		0x0060, "Taiwan; no speedups" )
+	PORT_DIPSETTING(		0x0070, "Taiwan (??????? license); no speedups" )
+	PORT_DIPSETTING(		0x0080, "Southeast Asia (Charterfield license); no speedups" )
+	PORT_DIPSETTING(		0x0090, "Hong Kong (Charterfield license)" )
+	PORT_DIPSETTING(		0x00a0, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x00b0, "Taiwan" )
+	PORT_DIPSETTING(		0x00c0, "Taiwan (??????? license)" )
+	PORT_DIPSETTING(		0x00d0, "Southeast Asia (Charterfield license)" )
+//	PORT_DIPSETTING(		0x00e0, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0080, "South East Asia (Charterfield license)" )
-//  PORT_DIPSETTING(        0x00d0, "South East Asia (Charterfield license)" )
-	PORT_DIPSETTING(		0x0050, "Korea (Unite Trading license)" )
-//  PORT_DIPSETTING(        0x00a0, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x0040, "Hong Kong (Charterfield license)" )
-//  PORT_DIPSETTING(        0x0090, "Hong Kong (Charterfield license)" )
-	PORT_DIPSETTING(		0x0060, "Taiwan" )
-//  PORT_DIPSETTING(        0x00b0, "Taiwan" )
-	//PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )   /* Sound ready */
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( dogyuunt )
 	PORT_INCLUDE( dogyuun )
 
+	PORT_MODIFY("DSWA")
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x00f0, 0x0020 )
+
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0000, "Territory" )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
+	PORT_DIPNAME( 0x00f0,	0x0020, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0020, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x0010, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x0030, "Hong Kong" )
 	PORT_DIPSETTING(		0x0040, "Korea" )
 	PORT_DIPSETTING(		0x0050, "Taiwan" )
-	PORT_DIPSETTING(		0x0060, "South East Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield license)" )
 	PORT_DIPSETTING(		0x0070, "USA (Romstar license)" )
-	PORT_DIPSETTING(		0x0080, "Hong Kong and China (Honest Trading Co. license)" )
-	PORT_DIPSETTING(		0x0090, "Korea (JC Trading Corp. license)" )
+	PORT_DIPSETTING(		0x0080, "Hong Kong (Honest Trading Co. license)" )
+	PORT_DIPSETTING(		0x0090, "Korea (JC Trading Corp license)" )
 	PORT_DIPSETTING(		0x00a0, "USA (Fabtek license)" )
+//	PORT_DIPSETTING(		0x00b0, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x00c0, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x00d0, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x00e0, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( kbash )
 	PORT_INCLUDE( toaplan2 )
@@ -2047,12 +1939,12 @@ static INPUT_PORTS_START( kbash )
 	PORT_DIPNAME( 0x0001,	0x0000, "Continue Mode" )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
-	/* Various features on bit mask 0x000e - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
-	TOAPLAN2_COINAGE( 0x0007, 0x0002 )
+	// Various features on bit mask 0x000e - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x0070, 0x0020 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
@@ -2071,30 +1963,52 @@ static INPUT_PORTS_START( kbash )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0020, "Territory" )
-	PORT_DIPSETTING(		0x00a0, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x0020, "Europe, USA (Atari license)" )
-	PORT_DIPSETTING(		0x0090, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x0010, "USA, Europe (Atari license)" )
+	PORT_DIPNAME( 0x00f0,	0x0020, DEF_STR( Region ) )
+	PORT_DIPSETTING(		0x0020, "Europe, USA (Atari Games license)" )	// European coinage
+	PORT_DIPSETTING(		0x0010, "USA, Europe (Atari Games license)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0060, "South East Asia" )	/*Service Mode lists European Coinage */
 	PORT_DIPSETTING(		0x0030, "Korea" )
 	PORT_DIPSETTING(		0x0040, "Hong Kong" )
+	PORT_DIPSETTING(		0x0050, "Taiwan" )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia" )	// Service Mode wrongly shows European coinage
+//	PORT_DIPSETTING(		0x0070, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x0080, DEF_STR( Unused ) )
+	PORT_DIPSETTING(		0x0090, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x00a0, DEF_STR( Europe ) )	// European coinage
+//	PORT_DIPSETTING(		0x00b0, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x00c0, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x00d0, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x00e0, DEF_STR( Unused ) )	// Service Mode wrongly shows European coinage
+//	PORT_DIPSETTING(		0x00f0, DEF_STR( Unused ) )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kbash2 )
-	PORT_INCLUDE(kbash)
+	PORT_INCLUDE( kbash )
+
+	PORT_MODIFY("DSWA")
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x0007, 0x0002 )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000f,	0x0006, "Territory" )
+	PORT_DIPNAME( 0x000f,	0x0006, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0000, "Japan (Taito Corp license)" )
-	PORT_DIPSETTING(		0x000e, "South East Asia" )	/*Service Mode lists European Coinage */
-	PORT_DIPSETTING(		0x0006, "South East Asia (Charterfield license)" )	/*Service Mode lists European Coinage */
-	PORT_DIPSETTING(		0x000b, "Korea" )
-	PORT_DIPSETTING(		0x0003, "Korea (Unite license)" )
+//	PORT_DIPSETTING(		0x0001, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x0002, DEF_STR( Unused ) )	// European coinage
+	PORT_DIPSETTING(		0x0003, "Korea (Unite Trading license)" )
 	PORT_DIPSETTING(		0x0004, "Hong Kong" )
 	PORT_DIPSETTING(		0x0005, "Taiwan" )
+	PORT_DIPSETTING(		0x0006, "Southeast Asia (Charterfield license)" )	// Service Mode wrongly shows European coinage
+//	PORT_DIPSETTING(		0x0007, DEF_STR( Unused ) )
+	PORT_DIPSETTING(		0x0008, DEF_STR( Japan ) )
+//	PORT_DIPSETTING(		0x0009, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x000a, DEF_STR( Unused ) )	// European coinage
+	PORT_DIPSETTING(		0x000b, "Korea" )
+//	PORT_DIPSETTING(		0x000c, "Hong Kong" )
+//	PORT_DIPSETTING(		0x000d, "Taiwan" )
+	PORT_DIPSETTING(		0x000e, "Southeast Asia" )	// Service Mode wrongly shows European coinage
+//	PORT_DIPSETTING(		0x000f, DEF_STR( Unused ) )
+	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -2102,21 +2016,18 @@ static INPUT_PORTS_START( truxton2 )
 	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Speedup (Cheat)")
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, "Rapid Fire" )				PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
-	/* Various features on bit mask 0x000e - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
-	TOAPLAN2_COINAGE( 0x0007, 0x0002 )
+	// Various features on bit mask 0x000e - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x000f, 0x0002 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, "200k only" )
 	PORT_DIPSETTING(		0x0008, "100k only" )
@@ -2135,14 +2046,23 @@ static INPUT_PORTS_START( truxton2 )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0007,	0x0002, "Territory" )
+	PORT_DIPNAME( 0x000f,	0x0002, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x0006, "South East Asia" )
-	PORT_DIPSETTING(		0x0004, "Korea" )
 	PORT_DIPSETTING(		0x0003, "Hong Kong" )
+	PORT_DIPSETTING(		0x0004, "Korea" )
 	PORT_DIPSETTING(		0x0005, "Taiwan" )
+	PORT_DIPSETTING(		0x0006, "Southeast Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0007, "USA (Romstar license)" )
+	PORT_DIPSETTING(		0x0008, "Hong Kong (Honest Trading Co. license)" )
+	PORT_DIPSETTING(		0x0009, "Korea (JC Trading Corp license)" )
+	PORT_DIPSETTING(		0x000a, "USA (Fabtek license)" )
+//	PORT_DIPSETTING(		0x000b, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x000c, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x000d, DEF_STR( Unused ) )
+//	PORT_DIPSETTING(		0x000e, DEF_STR( Unused ) )
+	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
 INPUT_PORTS_END
 
 
@@ -2150,12 +2070,12 @@ static INPUT_PORTS_START( pipibibs )
 	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
-	/* Various features on bit mask 0x000f - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
+	// Various features on bit mask 0x000f - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
 	TOAPLAN2_COINAGE( 0x0006, 0x0006 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
@@ -2177,7 +2097,7 @@ static INPUT_PORTS_START( pipibibs )
 	PORT_DIPNAME( 0x0008,	0x0000, "Nudity" )
 	PORT_DIPSETTING(		0x0008, DEF_STR( Low ) )
 	PORT_DIPSETTING(		0x0000, "High, but censored" )
-	PORT_DIPNAME( 0x0007,	0x0006, "Territory" )
+	PORT_DIPNAME( 0x0007,	0x0006, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0006, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0007, "Europe (Nova Apparate GMBH & Co)" )
 	PORT_DIPSETTING(		0x0004, DEF_STR( USA ) )
@@ -2190,28 +2110,27 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( whoopee )
-	PORT_INCLUDE(pipibibs)
+	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("JMPR")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(c2map_r, NULL)	/* bit 0x10 sound ready */
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(c2map_r, NULL)	// bit 0x10 sound ready
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( pipibibsbl )
-	PORT_INCLUDE(pipibibs)
-
-	PORT_MODIFY("VBL")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )		/* This video HW doesn't use this VBlank input */
+	PORT_INCLUDE( pipibibs )
 
 	PORT_MODIFY("DSWA")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )	PORT_DIPLOCATION("SW1:2")	/* This video HW doesn't support flip screen */
-	/* Various features on bit mask 0x000d - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
+	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:2")	// This video HW doesn't support flip screen
+	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0002, DEF_STR( On ) )
+	// Various features on bit mask 0x000d - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
 	TOAPLAN2_COINAGE( 0x80000, 0x80000 )
 
 	PORT_MODIFY("JMPR")
-	/* Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board! */
-	PORT_DIPNAME( 0x80007,	0x00007, "Territory" )
+	// Bit Mask 0x80000 is used here to signify European Coinage for MAME purposes - not read on the real board!
+	PORT_DIPNAME( 0x80007,	0x00007, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x00002, DEF_STR( World ) )
 //  PORT_DIPSETTING(        0x00003, DEF_STR( World ) )
 	PORT_DIPSETTING(		0x00007, "World (Ryouta Kikaku)" )
@@ -2224,10 +2143,6 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fixeight )
-	PORT_START("VBL")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
-
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
@@ -2237,7 +2152,7 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
@@ -2248,7 +2163,7 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
@@ -2259,18 +2174,24 @@ static INPUT_PORTS_START( fixeight )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_HIGH)	/* Service input is a push-button marked 'Test SW' */
+	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_HIGH)	// Service input is a pushbutton marked 'Test SW'
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
+
+	PORT_START("EEPROM")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_clock_line)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_write_bit)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
 INPUT_PORTS_END
 
 
@@ -2279,7 +2200,7 @@ static INPUT_PORTS_START( fixeightbl )
 
 	PORT_MODIFY("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_HIGH)	/* Service input is a push-button marked 'Test SW' */
+	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_HIGH)	// Service input is a pushbutton marked 'Test SW'
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
@@ -2290,22 +2211,24 @@ static INPUT_PORTS_START( fixeightbl )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, "Maximum Players" )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0000, "2" )
 	PORT_DIPSETTING(		0x0001, "3" )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )	PORT_DIPLOCATION("SW1:2")	/* This video HW doesn't support flip screen */
-	PORT_DIPNAME( 0x0004,	0x0004, "Shooting style" )		PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(		0x0004, "Semi-auto" )
-	PORT_DIPSETTING(		0x0000, "Fully-auto" )
-	/* Various features on bit mask 0x000a - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
-	TOAPLAN2_COINAGE( 0x000e, 0x0008 )
+	PORT_DIPNAME( 0x0002,	0x0000, DEF_STR( Unused ) )		PORT_DIPLOCATION("SW1:2")	// This video HW doesn't support flip screen
+	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004,	0x0004, "Shooting Style" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(		0x0004, "Semi-Auto" )
+	PORT_DIPSETTING(		0x0000, "Full-Auto" )
+	// Various features on bit mask 0x0008 - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x00ff, 0x00ff )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0000, "500k and every 500k" )
@@ -2322,9 +2245,6 @@ static INPUT_PORTS_START( fixeightbl )
 	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
-
-	PORT_MODIFY("JMPR")
-	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )		/* Doesn't exist? */
 INPUT_PORTS_END
 
 
@@ -2335,12 +2255,12 @@ static INPUT_PORTS_START( grindstm )
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( Cocktail ) )
-	/* Various features on bit mask 0x000e - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
-	TOAPLAN2_COINAGE( 0x000f, 0x0009 )
+	// Various features on bit mask 0x000e - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x00e0, 0x0080 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
@@ -2359,32 +2279,68 @@ static INPUT_PORTS_START( grindstm )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0090, "Territory" )
+	// Code in many places in game tests if region is >= 0xC. Effects on gameplay?
+	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
-//  PORT_DIPSETTING(        0x0080, DEF_STR( Europe ) )
-	PORT_DIPSETTING(		0x00d0, DEF_STR( USA ) )
-//  PORT_DIPSETTING(        0x00b0, DEF_STR( USA ) )
-	PORT_DIPSETTING(		0x00c0, "USA (American Sammy Corporation license)" )
-//  PORT_DIPSETTING(        0x00a0, "USA (American Sammy Corporation license)" )
-	PORT_DIPSETTING(		0x0070, "South East Asia" )
-	PORT_DIPSETTING(		0x0060, "South East Asia (Charterfield license)" )
-//  PORT_DIPSETTING(        0x00f0, "Korea" )
-//  PORT_DIPSETTING(        0x00e0, "Korea" )
-	PORT_DIPSETTING(		0x0010, "Korea" )
-	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x0030, "Hong Kong" )
-	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield license)" )
+//	PORT_DIPSETTING(		0x0080, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x00b0, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x00a0, "USA (American Sammy Corporation license)" )
+	PORT_DIPSETTING(		0x0070, "Southeast Asia" )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield license)" )
 	PORT_DIPSETTING(		0x0050, "Taiwan" )
 	PORT_DIPSETTING(		0x0040, "Taiwan (Anomoto International Inc license)" )
+	PORT_DIPSETTING(		0x0030, "Hong Kong" )
+	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield license)" )
+	PORT_DIPSETTING(		0x0010, "Korea" )
+	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x00d0, "USA; different?" )
+	PORT_DIPSETTING(		0x00c0, "USA (American Sammy Corporation license); different?" )
+	PORT_DIPSETTING(		0x00e0, "Korea; different?" )
+//	PORT_DIPSETTING(		0x00f0, "Korea; different?" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( grindstma )
+	PORT_INCLUDE( grindstm )
+
+	PORT_MODIFY("JMPR")
+	// Code in many places in game tests if region is >= 0xC. Effects on gameplay?
+	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )
+	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
+//	PORT_DIPSETTING(		0x0080, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x00b0, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x00a0, "USA (Atari Games Corp license)" )
+	PORT_DIPSETTING(		0x0070, "Southeast Asia" )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0050, "Taiwan" )
+//	PORT_DIPSETTING(		0x0040, "Taiwan" )
+	PORT_DIPSETTING(		0x0030, "Hong Kong" )
+	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield license)" )
+	PORT_DIPSETTING(		0x0010, "Korea" )
+	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
+	PORT_DIPSETTING(		0x00c0, "Korea; different?" )
+//	PORT_DIPSETTING(		0x00d0, "Korea; different?" )
+//	PORT_DIPSETTING(		0x00e0, "Korea; different?" )
+//	PORT_DIPSETTING(		0x00f0, "Korea; different?" )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( vfive )
-	PORT_INCLUDE(grindstm)
+	PORT_INCLUDE( grindstm )
 
-	PORT_MODIFY("JMPR")		/* (6) Territory Jumper block */
-	/* Territory is forced to Japan in this set. */
-	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_MODIFY("JMPR")
+	// Region is forced to Japan in this set.
+	// Code at $9238 tests bit 7.
+	// (Actually bit 3, but the V25 shifts the jumper byte before storing it in shared RAM)
+	// Runs twice near end of stage 1, once when each of the two boss tanks appears. Effect?
+	PORT_DIPNAME( 0x0070,	0x0000, "Copyright" )
+	PORT_DIPSETTING(		0x0000, "All Rights Reserved" )
+//	PORT_DIPSETTING(		0x0010, "All Rights Reserved" )
+//	PORT_DIPSETTING(		0x0020, "All Rights Reserved" )
+	PORT_DIPSETTING(		0x0030, "Licensed to Taito Corp" )
+	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0080, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -2395,12 +2351,12 @@ static INPUT_PORTS_START( batsugun )
 	PORT_DIPNAME( 0x0001,	0x0000, "Continue Mode" )			PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
-	/* Various features on bit mask 0x000e - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
-	TOAPLAN2_COINAGE( 0x00ff, 0x00ff )	/* Actually European coinage isn't used */
+	// Various features on bit mask 0x000e - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x00ff, 0x00ff )	// European coinage shown in Service Mode but not actually used
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "1500k only" )
@@ -2419,7 +2375,7 @@ static INPUT_PORTS_START( batsugun )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x00f0,	0x0090, "Territory" )
+	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0080, "Europe (Taito Corp license)" )
 	PORT_DIPSETTING(		0x00b0, DEF_STR( USA ) )
@@ -2428,14 +2384,25 @@ static INPUT_PORTS_START( batsugun )
 //  PORT_DIPSETTING(        0x00e0, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x00d0, "Japan (Taito Corp license)" )
 //  PORT_DIPSETTING(        0x00c0, "Japan (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0070, "South East Asia" )
-	PORT_DIPSETTING(		0x0060, "South East Asia (Taito Corp license)" )
-	PORT_DIPSETTING(		0x0010, "Korea" )
-	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
-	PORT_DIPSETTING(		0x0030, "Hong Kong" )
-	PORT_DIPSETTING(		0x0020, "Hong Kong (Taito Corp license)" )
+	PORT_DIPSETTING(		0x0070, "Southeast Asia" )
+	PORT_DIPSETTING(		0x0060, "Southeast Asia (Taito Corp license)" )
 	PORT_DIPSETTING(		0x0050, "Taiwan" )
 	PORT_DIPSETTING(		0x0040, "Taiwan (Taito Corp license)" )
+	PORT_DIPSETTING(		0x0030, "Hong Kong" )
+	PORT_DIPSETTING(		0x0020, "Hong Kong (Taito Corp license)" )
+	PORT_DIPSETTING(		0x0010, "Korea" )
+	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START(batsugunsp)
+	PORT_INCLUDE( batsugun )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	// Full auto fire (not shown in Service Mode)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)	// Full auto fire (not shown in Service Mode)
 INPUT_PORTS_END
 
 
@@ -2451,7 +2418,7 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("IN4")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(4) PORT_8WAY
@@ -2462,18 +2429,18 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START4 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, "Continue Mode" )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, "Discount" )
-	/* Various features on bit mask 0x000e - see above */
-	/* Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above */
-	TOAPLAN2_COINAGE( 0x1C00, 0x0800 )	/* European coinage is shown in service mode, but not used */
+	// Various features on bit mask 0x000e - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
+	TOAPLAN2_COINAGE( 0x1c00, 0x0800 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
@@ -2495,14 +2462,15 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_DIPNAME( 0x2000,	0x0000, "Show All Rights Reserved" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x2000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x1c00,	0x0800, "Territory" )
+	PORT_DIPNAME( 0x1c00,	0x0800, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0800, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0400, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
-	PORT_DIPSETTING(		0x1800, "South East Asia" )
 	PORT_DIPSETTING(		0x0c00, "Korea" )
 	PORT_DIPSETTING(		0x1000, "Hong Kong" )
 	PORT_DIPSETTING(		0x1400, "Taiwan" )
+	PORT_DIPSETTING(		0x1800, "Southeast Asia" )
+//	PORT_DIPSETTING(		0x1c00, DEF_STR( Unused ) )
 	PORT_BIT( 0xc3ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -2514,12 +2482,12 @@ static INPUT_PORTS_START( sstriker )
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
-	/* Various features on bit mask 0x000e - see above */
-	/* Coinage on bit mask 0x00f0 - see RAIZING8_COINAGE above */
+	// Various features on bit mask 0x000e - see above
+	// Coinage on bit mask 0x00f0 - see TOAPLAN2_COINAGE above
 	TOAPLAN2_COINAGE( 0x000e, 0x0004 )
 
 	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
+	// Difficulty on bit mask 0x0003 - see above
 	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
 	PORT_DIPSETTING(		0x0008, "200k only" )
@@ -2538,86 +2506,79 @@ static INPUT_PORTS_START( sstriker )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000e,	0x0004, "Territory" )
+	PORT_DIPNAME( 0x0001,	0x0001, "FBI Logo" )
+	PORT_DIPSETTING(		0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0004, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( USA ) )
-//  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )  /* Wrong Title screen - use Mahoudai*/
-	PORT_DIPSETTING(		0x0006, "South East Asia" )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0006, "Southeast Asia" )
+	PORT_DIPSETTING(		0x0008, "China" )
+	PORT_DIPSETTING(		0x000a, "Korea" )
+	PORT_DIPSETTING(		0x000c, "Hong Kong" )
+	PORT_DIPSETTING(		0x000e, "Taiwan" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( sstrikera )
+	PORT_INCLUDE( sstriker )
+
+	PORT_MODIFY("JMPR")
+	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )
+	PORT_DIPSETTING(		0x0004, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x0002, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0006, "Southeast Asia" )
 	PORT_DIPSETTING(		0x0008, "China" )
 	PORT_DIPSETTING(		0x000a, "Korea (Unite Trading license)" )
 	PORT_DIPSETTING(		0x000c, "Hong Kong" )
 	PORT_DIPSETTING(		0x000e, "Taiwan" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mahoudai )
-	PORT_INCLUDE(sstriker)
+	PORT_INCLUDE( sstriker )
 
 	PORT_MODIFY("JMPR")
-	/* Not used, it seems. This setting forces Japan for Territory */
+	// Effectively unused by this set - see notes
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kingdmgp )
-	PORT_INCLUDE( toaplan2 )
+	PORT_INCLUDE( sstriker )
 
-	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
-	/* Various features on bit mask 0x000e - see above */
-	/* Coinage on bit mask 0x00f0 - see RAIZING8_COINAGE above */
-	TOAPLAN2_COINAGE( 0x000e, 0x0004 )
-
-	PORT_MODIFY("DSWB")
-	/* Difficulty on bit mask 0x0003 - see above */
-	PORT_DIPNAME( 0x000c,	0x0000, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(		0x000c, DEF_STR( None ) )
-	PORT_DIPSETTING(		0x0008, "200k only" )
-	PORT_DIPSETTING(		0x0000, "Every 300k" )
-	PORT_DIPSETTING(		0x0004, "200k and 500k" )
-	PORT_DIPNAME( 0x0030,	0x0000, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(		0x0030, "1" )
-	PORT_DIPSETTING(		0x0020, "2" )
-	PORT_DIPSETTING(		0x0000, "3" )
-	PORT_DIPSETTING(		0x0010, "5" )
-	PORT_DIPNAME( 0x0040,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(		0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(		0x0080, DEF_STR( No ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
+	// The code and lookup tables pertaining to the jumpers are almost identical to sstriker.
+	// However, this set apparently lacks (reachable) code to display the FBI logo,
+	// even though the logo itself is present in the gfx ROMs.
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x000e,	0x0004, "Territory" )
+	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Unused ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(		0x0001, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0004, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( USA ) )
-//  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )  /* Title screen is wrong when set to Japan */
-	PORT_DIPSETTING(		0x0006, "South East Asia" )
+//	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )	// Corrupt title screen and text - use shippumd
+	PORT_DIPSETTING(		0x0006, "Southeast Asia" )
 	PORT_DIPSETTING(		0x0008, "China" )
 	PORT_DIPSETTING(		0x000a, "Korea (Unite Trading license)" )
 	PORT_DIPSETTING(		0x000c, "Hong Kong" )
 	PORT_DIPSETTING(		0x000e, "Taiwan" )
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( shippumd )
-	PORT_INCLUDE(kingdmgp)
+	PORT_INCLUDE( sstriker )
 
 	PORT_MODIFY("JMPR")
-	 /* Title screen is corrupt for anything but Japan setting so this forces it to Japan */
+	// Title screen and text are corrupt for anything but Japan
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( bgaregga )
-	PORT_START("VBL")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
-
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
@@ -2627,7 +2588,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
@@ -2638,7 +2599,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("SYS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -2649,7 +2610,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Unknown/Unused */
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// Unknown/Unused
 
 	PORT_START("DSWA")
 	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:1")
@@ -2674,7 +2635,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_DIPSETTING(		0x0020, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0060, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
-	/* When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur */
+	// When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur
 	PORT_DIPNAME( 0x0020,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(		0x0000, "90 degrees ACW" )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0020, DEF_STR( Normal ) )		PORT_CONDITION("DSWA", 0x001c, PORTCOND_EQUALS, 0x001c)
@@ -2689,7 +2650,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_DIPNAME( 0x0003,	0x0000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(		0x0003, DEF_STR( Hardest ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0001, DEF_STR( Easy ) )
 	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
@@ -2707,10 +2668,10 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_DIPSETTING(		0x0060, DEF_STR( Infinite ) )
 	PORT_DIPSETTING(		0x0070, "Invulnerability (Cheat)" )
 	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(		0x0000, DEF_STR( None ) )		PORT_CONDITION("JMPR",0x0003,PORTCOND_NOTEQUALS,0x0000)	/* Non-Japan */
-	PORT_DIPSETTING(		0x0080, "Every 2000k" )			PORT_CONDITION("JMPR",0x0003,PORTCOND_NOTEQUALS,0x0000)	/* Non-Japan */
-	PORT_DIPSETTING(		0x0080, "1000k and 2000k" )		PORT_CONDITION("JMPR",0x0003,PORTCOND_EQUALS,0x0000)	/* Japan */
-	PORT_DIPSETTING(		0x0000, "Every 1000k" )			PORT_CONDITION("JMPR",0x0003,PORTCOND_EQUALS,0x0000)	/* Japan */
+	PORT_DIPSETTING(		0x0000, DEF_STR( None ) )		PORT_CONDITION("JMPR",0x0003,PORTCOND_NOTEQUALS,0x0000)	// Non-Japan
+	PORT_DIPSETTING(		0x0080, "Every 2000k" )			PORT_CONDITION("JMPR",0x0003,PORTCOND_NOTEQUALS,0x0000)	// Non-Japan
+	PORT_DIPSETTING(		0x0080, "1000k and 2000k" )		PORT_CONDITION("JMPR",0x0003,PORTCOND_EQUALS,0x0000)	// Japan
+	PORT_DIPSETTING(		0x0000, "Every 1000k" )			PORT_CONDITION("JMPR",0x0003,PORTCOND_EQUALS,0x0000)	// Japan
 
 	PORT_START("JMPR")
 	PORT_DIPNAME( 0x0008,	0x0000, "Stage Edit" )
@@ -2719,7 +2680,7 @@ static INPUT_PORTS_START( bgaregga )
 	PORT_DIPNAME( 0x0004,	0x0000, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(		0x0004, DEF_STR( No ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0003,	0x0001, "Territory" )
+	PORT_DIPNAME( 0x0003,	0x0001, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0001, "Europe (German Tuning license)" )
 	PORT_DIPSETTING(		0x0002, "USA (Fabtek license)" )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
@@ -2727,37 +2688,37 @@ static INPUT_PORTS_START( bgaregga )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( bgareghk )
-	PORT_INCLUDE(bgaregga)
+static INPUT_PORTS_START( bgareggahk )
+	PORT_INCLUDE( bgaregga )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0003,	0x0003, "Territory" )
+	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0001, "Austria (German Tuning license)" )
-	/* These two settings end up reporting ROM-0 as BAD */
+	// These two settings end up reporting ROM-0 as BAD
 //  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
 //  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x0003, "Hong Kong (Metrotainment license)" )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( bgaregtw )
-	PORT_INCLUDE(bgaregga)
+static INPUT_PORTS_START( bgareggatw )
+	PORT_INCLUDE( bgaregga )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0003,	0x0003, "Territory" )
+	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0001, "Germany (German Tuning license)" )
-	/* These two settings end up reporting ROM-0 as BAD */
+	// These two settings end up reporting ROM-0 as BAD
 //  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
 //  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(		0x0003, "Taiwan (Liang Hwa license)" )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( bgaregcn )
-	PORT_INCLUDE(bgaregga)
+static INPUT_PORTS_START( bgareggacn )
+	PORT_INCLUDE( bgaregga )
 
 	PORT_MODIFY("JMPR")
-	PORT_DIPNAME( 0x0003,	0x0003, "Territory" )
+	PORT_DIPNAME( 0x0003,	0x0003, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0001, "Denmark (German Tuning license)" )
 	// These two settings end up reporting ROM-0 as BAD
 //  PORT_DIPSETTING(        0x0002, "USA (Fabtek license)" )
@@ -2767,11 +2728,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( batrider )
-	PORT_START("VBL")		/* VBlank */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN")		/* Player Inputs */
+	PORT_START("IN")		// Player Inputs
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -2788,7 +2745,7 @@ static INPUT_PORTS_START( batrider )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSW")		/* DSWA and DSWB */
+	PORT_START("DSW")		// DSWA and DSWB
 	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:1")
 	PORT_DIPNAME( 0x0002,	0x0000, "Credits to Start" )	PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(		0x0000, "1" )					PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
@@ -2796,7 +2753,7 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPNAME( 0x0002,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0002, "90 degrees ACW" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,4,3")
+	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(		0x0018, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(		0x0014, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( 2C_1C ) )
@@ -2814,7 +2771,7 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPSETTING(		0x0020, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0060, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
-	/* When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur */
+	// When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur
 	PORT_DIPNAME( 0x0020,	0x0000, "Hit Score" )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0020, DEF_STR( On ) )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
@@ -2827,12 +2784,12 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPNAME( 0x0300,	0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(		0x0300, DEF_STR( Hardest ) )
 	PORT_DIPSETTING(		0x0200, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0100, DEF_STR( Easy ) )
 	PORT_DIPNAME( 0x0c00,	0x0000, "Timer" )				PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x0c00, DEF_STR( Highest ) )
 	PORT_DIPSETTING(		0x0800, DEF_STR( High ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0400, DEF_STR( Low ) )
 	PORT_DIPNAME( 0x3000,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(		0x3000, "1" )
@@ -2845,10 +2802,10 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPSETTING(		0x0000, "Every 1500k" )
 	PORT_DIPSETTING(		0x4000, "Every 1000k" )
 
-	PORT_START("SYS-DSW")	/* Coin/System and DSWC */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )	/* Service */
+	PORT_START("SYS-DSW")	// Coin/System and DSWC
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )	// Service
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 )	/* Test */
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 )	// Test
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
@@ -2869,8 +2826,8 @@ static INPUT_PORTS_START( batrider )
 	PORT_DIPNAME( 0x1000,	0x0000, "Invulnerability" )			PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x1000, DEF_STR( On ) )
-	/* These Dips are showed only when Coin_A is set to Free_Play, but they work in normal play mode too. */
-	PORT_DIPNAME( 0x2000,	0x0000, "Guest Player" )			PORT_DIPLOCATION("SW3:6")
+	// These dips are shown only when Coin_A is set to Free_Play, but they work in normal play mode too
+	PORT_DIPNAME( 0x2000,	0x0000, "Guest Players" )			PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(		0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x4000,	0x0000, "Player Select" )			PORT_DIPLOCATION("SW3:7")
@@ -2882,12 +2839,12 @@ static INPUT_PORTS_START( batrider )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( batridrj )
+static INPUT_PORTS_START( batriderj )
 	PORT_INCLUDE( batrider )
 
-	PORT_MODIFY("SYS-DSW")	/* Coin/System and DSWC */
-	/* These Dips are showed only when Coin_A is set to Free_Play, but they work in normal play mode too. */
-	PORT_DIPNAME( 0x2000,	0x0000, "Guest Player" )			PORT_DIPLOCATION("SW3:6")
+	PORT_MODIFY("SYS-DSW")	// Coin/System and DSWC
+	// These dips are shown only when Coin_A is set to Free_Play, but they work in normal play mode too
+	PORT_DIPNAME( 0x2000,	0x0000, "Guest Players" )			PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(		0x2000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x4000,	0x0000, "Player Select" )			PORT_DIPLOCATION("SW3:7")
@@ -2900,11 +2857,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( bbakraid )
-	PORT_START("VBL")		/* VBlank */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_VBLANK )
-	PORT_BIT( 0xfffe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("IN")		/* Player Inputs */
+	PORT_START("IN")		// Player Inputs
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -2921,7 +2874,7 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("DSW")		/* DSWA and DSWB */
+	PORT_START("DSW")		// DSWA and DSWB
 	PORT_SERVICE_DIPLOC(0x0001, IP_ACTIVE_HIGH, "SW1:1")
 	PORT_DIPNAME( 0x0002,	0x0000, "Credits to Start" )	PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(		0x0000, "1" )					PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
@@ -2929,7 +2882,7 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPNAME( 0x0002,	0x0000, "Joystick Mode" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)		PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0002, "90 degrees ACW" )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
-	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,4,3")
+	PORT_DIPNAME( 0x001c,	0x0000, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:3,4,5")
 	PORT_DIPSETTING(		0x0018, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(		0x0014, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(		0x0010, DEF_STR( 2C_1C ) )
@@ -2947,7 +2900,7 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPSETTING(		0x0020, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0040, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0060, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_NOTEQUALS, 0x001c)
-	/* When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur */
+	// When Coin_A is set to Free_Play, Coin_A becomes Coin_A and Coin_B, and the following dips occur
 	PORT_DIPNAME( 0x0020,	0x0000, "Hit Score" )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )		PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
 	PORT_DIPSETTING(		0x0020, DEF_STR( On ) )			PORT_CONDITION("DSW", 0x001c, PORTCOND_EQUALS, 0x001c)
@@ -2960,12 +2913,12 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPNAME( 0x0300,	0x0000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(		0x0300, DEF_STR( Hardest ) )
 	PORT_DIPSETTING(		0x0200, DEF_STR( Hard ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0100, DEF_STR( Easy ) )
 	PORT_DIPNAME( 0x0c00,	0x0000, "Timer" )				PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(		0x0c00, DEF_STR( Highest ) )
 	PORT_DIPSETTING(		0x0800, DEF_STR( High ) )
-	PORT_DIPSETTING(		0x0000, DEF_STR( Medium ) )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(		0x0400, DEF_STR( Low ) )
 	PORT_DIPNAME( 0x3000,	0x0000, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(		0x3000, "1" )
@@ -2978,10 +2931,10 @@ static INPUT_PORTS_START( bbakraid )
 	PORT_DIPSETTING(		0x4000, "Every 3000k" )
 	PORT_DIPSETTING(		0x0000, "Every 2000k" )
 
-	PORT_START("SYS-DSW")	/* Coin/System and DSW-3 */
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )	/* Service */
+	PORT_START("SYS-DSW")	// Coin/System and DSW-3
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )	// Service
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 )	/* Test */
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SERVICE2 )	// Test
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
@@ -3080,7 +3033,7 @@ static const gfx_layout batrider_tx_tilelayout =
 	8*32
 };
 
-static const gfx_layout fixeighblayout =
+static const gfx_layout fixeightblayout =
 {
    8,8,
    RGN_FRAC(1,1),
@@ -3104,28 +3057,29 @@ static GFXDECODE_START( t2dualvdp )
 GFXDECODE_END
 
 static GFXDECODE_START( truxton2 )
-	GFXDECODE_ENTRY( "gfx1", 0,       tilelayout            , 0, 0x1000 )
-	GFXDECODE_ENTRY( "gfx1", 0,       spritelayout          , 0, 0x1000 )
-	GFXDECODE_ENTRY( NULL, 0, truxton2_tx_tilelayout,  0, 128 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout            , 0, 0x1000 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout          , 0, 0x1000 )
+	GFXDECODE_ENTRY( NULL,   0, truxton2_tx_tilelayout, 0, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( raizing )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,         0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,       0, 0x1000 )
-	GFXDECODE_ENTRY( "gfx2", 0, raizing_textlayout, 0, 128 )		/* Extra-text layer */
+	GFXDECODE_ENTRY( "gfx2", 0, raizing_textlayout, 0, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( batrider )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,             0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,           0, 0x1000 )
-	GFXDECODE_ENTRY( NULL,           0, batrider_tx_tilelayout, 0,  16 )
+	GFXDECODE_ENTRY( NULL,   0, batrider_tx_tilelayout, 0, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( fixeighb )
+static GFXDECODE_START( fixeightbl )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout     , 0, 0x1000 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout   , 0, 0x1000 )
-	GFXDECODE_ENTRY( "gfx2", 0, fixeighblayout , 0, 128 )
+	GFXDECODE_ENTRY( "gfx2", 0, fixeightblayout, 0, 128 )
 GFXDECODE_END
+
 
 static void irqhandler(device_t *device, int linestate)
 {
@@ -3139,6 +3093,13 @@ static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
+
+
+static void bbakraid_irqhandler(device_t *device, int state)
+{
+	// Not used ???  Connected to a test pin (TP082)
+	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
+}
 
 static const ymz280b_interface ymz280b_config =
 {
@@ -3154,10 +3115,11 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #ifdef USE_HD64x180
-	MCFG_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
 
+	MCFG_MACHINE_START(toaplan2)
 	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
@@ -3195,10 +3157,11 @@ static MACHINE_CONFIG_START( ghox, toaplan2_state )
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #ifdef USE_HD64x180
-	MCFG_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
 	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
 
+	MCFG_MACHINE_START(toaplan2)
 	MCFG_MACHINE_RESET(ghox)
 
 	/* video hardware */
@@ -3286,17 +3249,17 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25 type Toaplan marked CPU ??? */
-	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
-	MCFG_CPU_IO_MAP(V25_port_abswap)
+	MCFG_CPU_PROGRAM_MAP(v25_mem)
+	MCFG_CPU_IO_MAP(dogyuun_v25_port)
 	MCFG_CPU_CONFIG(nitro_config)
 
-	MCFG_MACHINE_RESET(dogyuun)
+	MCFG_MACHINE_START(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
+	MCFG_SCREEN_REFRESH_RATE( (double)(XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(432, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3321,6 +3284,7 @@ static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_START( kbash, toaplan2_state )
 
 	/* basic machine hardware */
@@ -3330,9 +3294,11 @@ static MACHINE_CONFIG_START( kbash, toaplan2_state )
 
 	/* ROM based v25 */
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
-	MCFG_CPU_PROGRAM_MAP(V25_kbash_mem)
-	MCFG_CPU_IO_MAP(V25_port)
+	MCFG_CPU_PROGRAM_MAP(kbash_v25_mem)
+	MCFG_CPU_IO_MAP(v25_port)
 	MCFG_CPU_CONFIG(nitro_config)
+
+	MCFG_MACHINE_START(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3370,7 +3336,7 @@ static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(kbash2_68k_mem)
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3408,13 +3374,13 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(truxton2_68k_mem)
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
+	MCFG_SCREEN_REFRESH_RATE( (double)(XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(432, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3429,6 +3395,17 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 	MCFG_VIDEO_START(truxton2)
 
 	/* sound hardware */
+#ifdef TRUXTON2_STEREO	// music data is stereo...
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+#else	// ...but the hardware is mono
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
@@ -3436,6 +3413,7 @@ static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 
 	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+#endif
 MACHINE_CONFIG_END
 
 
@@ -3451,6 +3429,7 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_MACHINE_START(toaplan2)
 	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
@@ -3480,48 +3459,7 @@ static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( whoopee, toaplan2_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
-	MCFG_CPU_PROGRAM_MAP(tekipaki_68k_mem)
-	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
-
-#ifdef USE_HD64x180
-	MCFG_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
-	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
-#endif
-
-	MCFG_MACHINE_RESET(toaplan2)
-
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(432, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
-	MCFG_SCREEN_UPDATE(toaplan2)
-	MCFG_SCREEN_EOF(toaplan2)
-
-	MCFG_GFXDECODE(toaplan2)
-	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
-
-	MCFG_DEVICE_ADD_VDP0
-
-	MCFG_VIDEO_START(toaplan2)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
-	MCFG_SOUND_CONFIG(ym3812_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_START( pipibibi_bootleg, toaplan2_state )
+static MACHINE_CONFIG_START( pipibibsbl, toaplan2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
@@ -3533,6 +3471,7 @@ static MACHINE_CONFIG_START( pipibibi_bootleg, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_MACHINE_START(toaplan2)
 	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
@@ -3609,15 +3548,11 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25 type Toaplan marked CPU ??? */
-	MCFG_CPU_PROGRAM_MAP(V25_fixeight_mem)
-//  IO map must be different - has eeprom but no dips or jumpers */
+	MCFG_CPU_PROGRAM_MAP(fixeight_v25_mem)
+	MCFG_CPU_IO_MAP(fixeight_v25_port)
 	MCFG_CPU_CONFIG(ts001turbo_config)
-	MCFG_CPU_IO_MAP(V25_fixeight_port)
 
-	MCFG_MACHINE_RESET(batsugun)
-//  MCFG_MACHINE_RESET(toaplan2)
-
-	//  MCFG_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
+	MCFG_MACHINE_START(toaplan2)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
@@ -3625,7 +3560,7 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
+	MCFG_SCREEN_REFRESH_RATE( (double)(XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(432, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3650,14 +3585,14 @@ static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( fixeighb, toaplan2_state )
+static MACHINE_CONFIG_START( fixeightbl, toaplan2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
-	MCFG_CPU_PROGRAM_MAP(fixeighb_68k_mem)
+	MCFG_CPU_PROGRAM_MAP(fixeightbl_68k_mem)
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3670,19 +3605,21 @@ static MACHINE_CONFIG_START( fixeighb, toaplan2_state )
 	MCFG_SCREEN_UPDATE(truxton2)
 	MCFG_SCREEN_EOF(toaplan2)
 
-	MCFG_GFXDECODE(fixeighb)
+	MCFG_GFXDECODE(fixeightbl)
 	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
 
 	MCFG_DEVICE_ADD_VDP0
 
-	MCFG_VIDEO_START(fixeighb)
+	MCFG_VIDEO_START(fixeightbl)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_14MHz/16, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, fixeightbl_oki)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( vfive, toaplan2_state )
 
@@ -3692,27 +3629,27 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25 type Toaplan mark scratched out */
-	MCFG_CPU_PROGRAM_MAP(V25_rambased_nooki_mem)
-	MCFG_CPU_IO_MAP(V25_port)
+	MCFG_CPU_PROGRAM_MAP(vfive_v25_mem)
+	MCFG_CPU_IO_MAP(v25_port)
 	MCFG_CPU_CONFIG(nitro_config)
 
-	MCFG_MACHINE_RESET(vfive)
+	MCFG_MACHINE_START(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* verified on pcb */
+	MCFG_SCREEN_REFRESH_RATE( (double)(XTAL_27MHz / 4) / (432 * 263) )	/* verified on pcb */
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(432, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 	MCFG_SCREEN_UPDATE(toaplan2)
 	MCFG_SCREEN_EOF(toaplan2)
 
-	MCFG_DEVICE_ADD_VDP0
-
 	MCFG_GFXDECODE(toaplan2)
 	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+
+	MCFG_DEVICE_ADD_VDP0
 
 	MCFG_VIDEO_START(toaplan2)
 
@@ -3724,14 +3661,6 @@ static MACHINE_CONFIG_START( vfive, toaplan2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_RESET(batsugun)
-{
-	toaplan2_state *state = machine->driver_data<toaplan2_state>();
-
-	cpu_set_input_line(state->sub_cpu, INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-
 static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 
 	/* basic machine hardware */
@@ -3740,10 +3669,10 @@ static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	MCFG_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25 type Toaplan marked CPU ??? */
-	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
-	MCFG_CPU_IO_MAP(V25_port)
+	MCFG_CPU_PROGRAM_MAP(v25_mem)
+	MCFG_CPU_IO_MAP(v25_port)
 
-	MCFG_MACHINE_RESET(batsugun)
+	MCFG_MACHINE_START(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3782,7 +3711,7 @@ static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(snowbro2_68k_mem)
 	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_START(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3825,6 +3754,7 @@ static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_MACHINE_START(toaplan2)
 	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
@@ -3868,6 +3798,7 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_MACHINE_START(toaplan2)
 	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
@@ -3881,10 +3812,10 @@ static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 	MCFG_SCREEN_UPDATE(truxton2)
 	MCFG_SCREEN_EOF(toaplan2)
 
-	MCFG_DEVICE_ADD_VDP0
-
 	MCFG_GFXDECODE(raizing)
 	MCFG_PALETTE_LENGTH(T2PALETTE_LENGTH)
+
+	MCFG_DEVICE_ADD_VDP0
 
 	MCFG_VIDEO_START(bgaregga)
 
@@ -3922,7 +3853,8 @@ static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
-	MCFG_MACHINE_RESET(bgaregga)
+	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3968,7 +3900,8 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_MACHINE_RESET(bgaregga)
+	MCFG_MACHINE_START(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -4002,6 +3935,7 @@ static MACHINE_CONFIG_START( batrider, toaplan2_state )
 	MCFG_NMK112_ADD("nmk112", batrider_nmk112_intf)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	/* basic machine hardware */
@@ -4016,7 +3950,9 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_MACHINE_START(toaplan2)
 	MCFG_MACHINE_RESET(toaplan2)
+
 	MCFG_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
 
 	/* video hardware */
@@ -4041,15 +3977,7 @@ static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_SOUND_CONFIG(ymz280b_config)
-	MCFG_SOUND_ROUTE(0, "mono", 1.0)
-	MCFG_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( bbakradu, bbakraid )
-
-	MCFG_DEVICE_REMOVE("eeprom")
-	MCFG_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
-	MCFG_EEPROM_DATA(bbakraid_unlim_default, 512)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4125,7 +4053,7 @@ ROM_START( dogyuun )
 ROM_END
 
 
-ROM_START( dogyuunk )
+ROM_START( dogyuuna )
 	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "01.u64", 0x000000, 0x080000, CRC(fe5bd7f4) SHA1(9c725466112a514c9ed0fb074422d291c175c3f4) )
 
@@ -4143,6 +4071,7 @@ ROM_START( dogyuunk )
 	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM Samples */
 	ROM_LOAD( "tp022_2.w30", 0x00000, 0x40000, CRC(043271b3) SHA1(c7eaa929e55dd956579b824ea9d20a1d0129a925) )
 ROM_END
+
 
 ROM_START( dogyuunt )
 	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
@@ -4163,24 +4092,25 @@ ROM_START( dogyuunt )
 	ROM_LOAD( "tp022_2.w30", 0x00000, 0x40000, CRC(043271b3) SHA1(c7eaa929e55dd956579b824ea9d20a1d0129a925) )
 ROM_END
 
+
 ROM_START( kbash )
 	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "kbash01.bin", 0x000000, 0x080000, CRC(2965f81d) SHA1(46f2df30fa92c80ba5a37f75e756424e15534784) )
+	ROM_LOAD16_WORD_SWAP( "tp023_01.bin", 0x000000, 0x080000, CRC(2965f81d) SHA1(46f2df30fa92c80ba5a37f75e756424e15534784) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-004-Dash  TOA PLAN) */
 	/* It's a NEC V25 (PLCC94) (encrypted) */
 
 	ROM_REGION( 0x8000, "audiocpu", 0 )			/* Sound CPU code */
-	ROM_LOAD( "kbash02.bin", 0x0000, 0x8000, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
+	ROM_LOAD( "tp023_02.bin", 0x0000, 0x8000, CRC(4cd882a1) SHA1(7199a5c384918f775f0815e09c46b2a58141814a) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
-	ROM_LOAD( "kbash03.bin", 0x000000, 0x200000, CRC(32ad508b) SHA1(e473489beaf649d3e5236770eb043327e309850c) )
-	ROM_LOAD( "kbash05.bin", 0x200000, 0x200000, CRC(b84c90eb) SHA1(17a1531d884d9a9696d1b25d65f9155f02396e0e) )
-	ROM_LOAD( "kbash04.bin", 0x400000, 0x200000, CRC(e493c077) SHA1(0edcfb70483ad07206695d9283031b85cd198a36) )
-	ROM_LOAD( "kbash06.bin", 0x600000, 0x200000, CRC(9084b50a) SHA1(03b58278619524d2f09a4b1c152d5e057e792a56) )
+	ROM_LOAD( "tp023_3.bin", 0x000000, 0x200000, CRC(32ad508b) SHA1(e473489beaf649d3e5236770eb043327e309850c) )
+	ROM_LOAD( "tp023_5.bin", 0x200000, 0x200000, CRC(b84c90eb) SHA1(17a1531d884d9a9696d1b25d65f9155f02396e0e) )
+	ROM_LOAD( "tp023_4.bin", 0x400000, 0x200000, CRC(e493c077) SHA1(0edcfb70483ad07206695d9283031b85cd198a36) )
+	ROM_LOAD( "tp023_6.bin", 0x600000, 0x200000, CRC(9084b50a) SHA1(03b58278619524d2f09a4b1c152d5e057e792a56) )
 
 	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM Samples */
-	ROM_LOAD( "kbash07.bin", 0x00000, 0x40000, CRC(3732318f) SHA1(f0768459f5ad2dee53d408a0a5ae3a314864e667) )
+	ROM_LOAD( "tp023_7.bin", 0x00000, 0x40000, CRC(3732318f) SHA1(f0768459f5ad2dee53d408a0a5ae3a314864e667) )
 ROM_END
 
 
@@ -4256,6 +4186,7 @@ ROM_START( truxton2 )
 	ROM_LOAD( "tp024_2.bin", 0x00000, 0x80000, CRC(f2f6cae4) SHA1(bb4e8c36531bed97ced4696ca12fd40ede2531aa) )
 ROM_END
 
+
 ROM_START( pipibibs )
 	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "tp025-1.bin", 0x000000, 0x020000, CRC(b2ea8659) SHA1(400431b656dbfbd5a9bc5961c3ea04c4d38b6f77) )
@@ -4269,6 +4200,7 @@ ROM_START( pipibibs )
 	ROM_LOAD( "tp025-3.bin", 0x100000, 0x100000, CRC(7b16101e) SHA1(ae0119bbfa0937d18c4fbb0a3ef7cdc3b9fa6b56) )
 ROM_END
 
+
 ROM_START( pipibibsa )
 	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "tp025-1.alt.bin", 0x000000, 0x020000, CRC(3e522d98) SHA1(043dd76b99e130909e47063d4cc773177a2eaccf) )
@@ -4281,6 +4213,7 @@ ROM_START( pipibibsa )
 	ROM_LOAD( "tp025-4.bin", 0x000000, 0x100000, CRC(ab97f744) SHA1(c1620e614345dbd5c6567e4cb6f55c61b900d0ee) )
 	ROM_LOAD( "tp025-3.bin", 0x100000, 0x100000, CRC(7b16101e) SHA1(ae0119bbfa0937d18c4fbb0a3ef7cdc3b9fa6b56) )
 ROM_END
+
 
 ROM_START( whoopee )
 	ROM_REGION( 0x040000, "maincpu", 0 )			/* Main 68K code */
@@ -4337,8 +4270,8 @@ ROM_END
 // dcba = 3 -> hong kong (taito license)
 // dcba = 4 -> taiwan
 // dcba = 5 -> taiwan (taito license)
-// dcba = 6 -> south east asia
-// dcba = 7 -> south east asia (taito license)
+// dcba = 6 -> southeast asia
+// dcba = 7 -> southeast asia (taito license)
 // dcba = 8 -> europe
 // dcba = 9 -> europe (taito license)
 // dcba = a -> u.s.a.
@@ -4353,7 +4286,6 @@ ROM_START( fixeightkt )
 	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "fixeightkt.nv", 0x00, 0x80, CRC(08fa73ba) SHA1(b7761d3dd3f4485e55c8ef2cf1a840ca771ee2fc) )
 ROM_END
-
 
 ROM_START( fixeightk )
 	ROMS_FIXEIGHT
@@ -4482,11 +4414,10 @@ ROM_START( fixeightbl )
 	ROM_REGION( 0x08000, "gfx2", 0)
 	ROM_LOAD( "4.bin", 0x00000, 0x08000, CRC(a6aca465) SHA1(2b331faeee1832e0adc5218254a99d66331862c6) )
 
-	ROM_REGION( 0x90000, "oki", 0 )			/* ADPCM Samples */
-	ROM_LOAD( "1.bin", 0x00000, 0x30000, CRC(888f19ac) SHA1(d2f4f8b7be7a0fdb95baa0af8930e50e2f875c05) )
-	ROM_CONTINUE(      0x40000, 0x50000 )
+	ROM_REGION( 0x80000, "oki", 0 )			/* ADPCM Samples */
+	ROM_LOAD( "1.bin", 0x00000, 0x80000, CRC(888f19ac) SHA1(d2f4f8b7be7a0fdb95baa0af8930e50e2f875c05) )
 
-	ROM_REGION( 0x8000, "user1", 0 )			/* ??? Some sort of table  - same as in pipibibi*/
+	ROM_REGION( 0x8000, "user1", 0 )			/* ??? Some sort of table  - same as in pipibibsbl */
 	ROM_LOAD( "5.bin", 0x0000, 0x8000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
 ROM_END
 
@@ -4618,15 +4549,15 @@ ROM_END
 For the two sets of Sorcer Striker (World) the only differences
 are 2 bytes plus a corrected checksum for each set:
 
-File Offset     sstriker   sstrikra
+File Offset     sstriker   sstrikera
   0x160            17         0B   <-- Rom checksum value
   0x161            79         6D   <-- Rom checksum value
 
-  0x92C            18         0C   <-- Unknown, but surrounding bytes are 0x18
-  0x92D            18         0C   <-- Unknown, but surrounding bytes are 0x18
+  0x92C            18         0C   <-- Index of copyright strings to display for Korea
+  0x92D            18         0C   <-- Index of copyright strings to display for Korea
 
-So it looks like sstriker was a slightly revised "final" version of the World set.
-sstrikra has been verified on two boards as being correct.
+0C points to the strings "LICENSED TO UNITE TRADING" / "FOR KOREA".
+18 points to a pair of empty strings.
 
 Printed labels for the eproms look like:
 
@@ -4635,13 +4566,12 @@ RA-MA-01
 RAIZING
 
 Both English and Japanese sets use the same labels and numbers for the roms
-even if the roms contain different code / data
-
+even if the roms contain different code / data.
 */
 
 ROM_START( sstriker )
 	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "ra-ma-01_01.u65", 0x000000, 0x080000, CRC(92259f84) SHA1(127e62e407d95efd360bfe2cac9577f326abf6ef) )
+	ROM_LOAD16_WORD_SWAP( "ra-ma_01_01.u65", 0x000000, 0x080000, CRC(708fd51d) SHA1(167186d4cf13af37ec0fa6a59c738c54dbbf3c7c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "ra-ma-01_02.u66", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
@@ -4660,7 +4590,7 @@ ROM_END
 
 ROM_START( sstrikera )
 	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "ra-ma_01_01.u65", 0x000000, 0x080000, CRC(708fd51d) SHA1(167186d4cf13af37ec0fa6a59c738c54dbbf3c7c) )
+	ROM_LOAD16_WORD_SWAP( "ra-ma-01_01.u65", 0x000000, 0x080000, CRC(92259f84) SHA1(127e62e407d95efd360bfe2cac9577f326abf6ef) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "ra-ma-01_02.u66", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
@@ -4741,9 +4671,8 @@ ROM_START( bgaregga )
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f80c2fc2) SHA1(a9aac5c7f5439b6fe8d1b3db1fb02a27cc28fdf6) )
 	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
-	ROM_CONTINUE(        0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
@@ -4764,9 +4693,8 @@ ROM_START( bgareggahk )
 	ROM_LOAD16_BYTE( "prg_0.rom", 0x000000, 0x080000, CRC(26e0019e) SHA1(5197001f5d59246b137e19ed1952a8207b25d4c0) )
 	ROM_LOAD16_BYTE( "prg_1.rom", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
-	ROM_CONTINUE(        0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
@@ -4787,9 +4715,8 @@ ROM_START( bgareggatw )
 	ROM_LOAD16_BYTE( "garegga_prg0.u123", 0x000000, 0x080000, CRC(235b7405) SHA1(a2434801df4231a6b48f6c63f47c202d25a89e79) )
 	ROM_LOAD16_BYTE( "garegga_prg1.u65",  0x000001, 0x080000, CRC(c29ccf6a) SHA1(38806e0b4ff852f4bfefd80c56ca23f71623e275) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
-	ROM_CONTINUE(        0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
@@ -4810,9 +4737,8 @@ ROM_START( bgaregganv )
 	ROM_LOAD16_BYTE( "prg_0.bin", 0x000000, 0x080000, CRC(951ecc07) SHA1(a82e4b59e4a974566e59f3ab2fbae1aec7d88a2b) )
 	ROM_LOAD16_BYTE( "prg_1.bin", 0x000001, 0x080000, CRC(729a60c6) SHA1(cb6f5d138bb82c32910f42d8ee16fa573a23cef3) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
-	ROM_CONTINUE(        0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
@@ -4833,9 +4759,8 @@ ROM_START( bgareggat2 )
 	ROM_LOAD16_BYTE( "prg0", 0x000000, 0x080000, CRC(84094099) SHA1(49fc68a8bcdae4477e20eade9dd569de88b0b798) )
 	ROM_LOAD16_BYTE( "prg1", 0x000001, 0x080000, CRC(46f92fe4) SHA1(62a02cc1dbdc3ac362339aebb62368eb89b06bad) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
-	ROM_CONTINUE(        0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
@@ -4856,9 +4781,8 @@ ROM_START( bgareggacn )
 	ROM_LOAD16_BYTE( "u123", 0x000000, 0x080000, CRC(88a4e66a) SHA1(ca97e564eed0c5e028b937312e55da56400d5c8c) )
 	ROM_LOAD16_BYTE( "u65",  0x000001, 0x080000, CRC(5dea32a3) SHA1(59df6689e3eb5ea9e49a758604d21a64c65ca14d) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
-	ROM_CONTINUE(        0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 
 	ROM_REGION( 0x800000, "gfx1", 0 )
 	ROM_LOAD( "rom4.bin",  0x000000, 0x200000, CRC(b333d81f) SHA1(5481465f1304334fd55798be2f44324c57c2dbcb) )
@@ -4886,7 +4810,7 @@ ROM_END
    01 : USA *
    02 : Europe *
    03 : Asia
-   04 : German
+   04 : German (sic)
    05 : Austria
    06 : Belgium
    07 : Denmark
@@ -4938,20 +4862,18 @@ ROM_END
    ROM_LOAD16_BYTE( "prg0_korea.u22",        0x000000, 0x080000, CRC(d9d8c907) SHA1(69c197f2a41f288913f042de9eb8274c0df3ac27) )
    ROM_LOAD16_BYTE( "prg0_china.u22",        0x000000, 0x080000, CRC(c3b91f7e) SHA1(6b2376c37808dccda296d90ccd7f577ccff4e4dc) )
    ROM_LOAD16_BYTE( "prg0_none.u22",         0x000000, 0x080000, CRC(accf0850) SHA1(d93e4e80443a40c3a9575dbf21927ef0d1a039b9) )
-
  */
 
 
-ROM_START( batrid )
+ROM_START( batrider )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_europe.u22", 0x000000, 0x080000, CRC(91d3e975) SHA1(682885fc17f2424d475c282f239f42faf1aae076) )
 	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
-	ROM_CONTINUE(        0x10000, 0x38000 )
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
@@ -4966,16 +4888,16 @@ ROM_START( batrid )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-ROM_START( batridu )
+
+ROM_START( batrideru )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_usa.u22", 0x000000, 0x080000, CRC(2049d007) SHA1(f2a43547a6fc5083b03c1d59a85abbf6e1ce4cd9) )
 	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
-	ROM_CONTINUE(        0x10000, 0x38000 )
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
@@ -4990,16 +4912,16 @@ ROM_START( batridu )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-ROM_START( batridc )
+
+ROM_START( batriderc )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_china.u22", 0x000000, 0x080000, CRC(c3b91f7e) SHA1(6b2376c37808dccda296d90ccd7f577ccff4e4dc) )
 	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
-	ROM_CONTINUE(        0x10000, 0x38000 )
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
@@ -5014,16 +4936,16 @@ ROM_START( batridc )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-ROM_START( batridj )
+
+ROM_START( batriderj )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0b.u22", 0x000000, 0x080000, CRC(4f3fc729) SHA1(b32d51c254741b82171a86c271679522a7aefd34) )
 	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
 	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
-	ROM_CONTINUE(        0x10000, 0x38000 )
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
@@ -5038,16 +4960,16 @@ ROM_START( batridj )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-ROM_START( batridk )
+
+ROM_START( batriderk )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0_korea.u22", 0x000000, 0x080000, CRC(d9d8c907) SHA1(69c197f2a41f288913f042de9eb8274c0df3ac27) )
-	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
-	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
-	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
+	ROM_LOAD16_BYTE( "prg1b.u23", 0x000001, 0x080000, CRC(8e70b492) SHA1(f84f2039826ae815afb058d71c1dbd190f9d524d) )
+	ROM_LOAD16_BYTE( "prg2.u21" , 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
+	ROM_LOAD16_BYTE( "prg3.u24" , 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
-	ROM_CONTINUE(        0x10000, 0x38000 )
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
@@ -5062,17 +4984,16 @@ ROM_START( batridk )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-/* Version A is older, might have been only released in Japan and Taiwan? */
-ROM_START( batridja )
+/* older version, might have only been released in Japan and Taiwan? */
+ROM_START( batriderja )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f93ea27c) SHA1(41023c2ee1efd70b5aa9c70e1ddd9e5c3d51d68a) )
-	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
+	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
 	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
-	ROM_CONTINUE(        0x10000, 0x38000 )
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
@@ -5087,16 +5008,16 @@ ROM_START( batridja )
 	ROM_LOAD( "rom-6.bin", 0x040000, 0x100000, CRC(2a1c2426) SHA1(8abc3688ffc5ebb94b8d5118d4fa0908f07fe791) )
 ROM_END
 
-ROM_START( batridta )
+
+ROM_START( batridert )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "u22.bin",  0x000000, 0x080000, CRC(b135820e) SHA1(c222887d18a0a3ea0fcc973b95b29d69c86f7ec3) )
-	ROM_LOAD16_BYTE( "u23.bin",  0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
+	ROM_LOAD16_BYTE( "prg1.u23", 0x000001, 0x080000, CRC(8ae7f592) SHA1(8a20ebf85eca621f578d2302c3a3988647b077a7) )
 	ROM_LOAD16_BYTE( "prg2.u21", 0x100000, 0x080000, CRC(bdaa5fbf) SHA1(abd72ac633c0c8e7b4b1d7902c0d6e014ba995fe) )
 	ROM_LOAD16_BYTE( "prg3.u24", 0x100001, 0x080000, CRC(7aa9f941) SHA1(99bdbad7a96d461073b06a53c50fc57c2fd6fc6d) )
 
-	ROM_REGION( 0x48000, "audiocpu", 0 )			/* Sound Z80 code + bank */
-	ROM_LOAD( "snd.u77", 0x00000, 0x08000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
-	ROM_CONTINUE(        0x10000, 0x38000 )
+	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.u77", 0x00000, 0x40000, CRC(56682696) SHA1(a372450d9a6d535123dfc31d8116074b168ab646) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "rom-1.bin", 0x000000, 0x400000, CRC(0df69ca2) SHA1(49670347ebd7e1067ff988cf842b275b7ee7b5f7) )
@@ -5163,16 +5084,15 @@ Notes:
 
 
 
-ROM_START( bkraidu )
+ROM_START( bbakraid )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0u022_usa.bin", 0x000000, 0x080000, CRC(95fb2ffd) SHA1(c7f502f3945249573b66226e8bacc6a9bc230693) )
 	ROM_LOAD16_BYTE( "prg1u023.new", 0x000001, 0x080000, CRC(4ae9aa64) SHA1(45fdf72141c4c9f24a38d4218c65874799b9c868) )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code */
-	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
-	ROM_CONTINUE(             0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code */
+	ROM_LOAD( "sndu0720.bin", 0x00000, 0x20000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "gfxu0510.bin", 0x000000, 0x400000, CRC(9cca3446) SHA1(1123f8b8bfbe59a2c572cdf61f1ad27ff37f0f0d) )
@@ -5184,19 +5104,21 @@ ROM_START( bkraidu )
 	ROM_LOAD( "rom6.829", 0x000000, 0x400000, CRC(8848b4a0) SHA1(e0dce136c5d5a4c1a92b863e57848cd5927d06f1) )
 	ROM_LOAD( "rom7.830", 0x400000, 0x400000, CRC(d6224267) SHA1(5c9b7b13effbef9f707811f84bfe50ca85e605e3) )
 	ROM_LOAD( "rom8.831", 0x800000, 0x400000, CRC(a101dfb0) SHA1(4b729b0d562e09df35438e9e6b457b8de2690a6e) )
+
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "eeprom-bbakraid-new.bin", 0x000, 0x200, CRC(35c9275a) SHA1(1282034adf3c7a24545fd273729867058dc93027) )
 ROM_END
 
 
-ROM_START( bkraiduj )
+ROM_START( bbakraidj )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0u022.new", 0x000000, 0x080000, CRC(fa8d38d3) SHA1(aba91d87a8a62d3fe1139b4437b16e2f844264ad) )
 	ROM_LOAD16_BYTE( "prg1u023.new", 0x000001, 0x080000, CRC(4ae9aa64) SHA1(45fdf72141c4c9f24a38d4218c65874799b9c868) )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code */
-	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
-	ROM_CONTINUE(             0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code */
+	ROM_LOAD( "sndu0720.bin", 0x00000, 0x20000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "gfxu0510.bin", 0x000000, 0x400000, CRC(9cca3446) SHA1(1123f8b8bfbe59a2c572cdf61f1ad27ff37f0f0d) )
@@ -5208,19 +5130,21 @@ ROM_START( bkraiduj )
 	ROM_LOAD( "rom6.829", 0x000000, 0x400000, CRC(8848b4a0) SHA1(e0dce136c5d5a4c1a92b863e57848cd5927d06f1) )
 	ROM_LOAD( "rom7.830", 0x400000, 0x400000, CRC(d6224267) SHA1(5c9b7b13effbef9f707811f84bfe50ca85e605e3) )
 	ROM_LOAD( "rom8.831", 0x800000, 0x400000, CRC(a101dfb0) SHA1(4b729b0d562e09df35438e9e6b457b8de2690a6e) )
+
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "eeprom-bbakraid-new.bin", 0x000, 0x200, CRC(35c9275a) SHA1(1282034adf3c7a24545fd273729867058dc93027) )
 ROM_END
 
 
-ROM_START( bkraidj )
+ROM_START( bbakraidja )
 	ROM_REGION( 0x200000, "maincpu", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0u022.bin", 0x000000, 0x080000, CRC(0dd59512) SHA1(c6a4e6aa49c6ac3b04ae62a0a4cc8084ae048381) )
 	ROM_LOAD16_BYTE( "prg1u023.bin", 0x000001, 0x080000, CRC(fecde223) SHA1(eb5ac0eda49b4b0f3d25d8a8bb356e77a453d3a7) )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x40000, "audiocpu", 0 )			/* Sound Z80 code */
-	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
-	ROM_CONTINUE(             0x10000, 0x18000 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code */
+	ROM_LOAD( "sndu0720.bin", 0x00000, 0x20000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 
 	ROM_REGION( 0x1000000, "gfx1", 0 )
 	ROM_LOAD( "gfxu0510.bin", 0x000000, 0x400000, CRC(9cca3446) SHA1(1123f8b8bfbe59a2c572cdf61f1ad27ff37f0f0d) )
@@ -5232,32 +5156,36 @@ ROM_START( bkraidj )
 	ROM_LOAD( "rom6.829", 0x000000, 0x400000, CRC(8848b4a0) SHA1(e0dce136c5d5a4c1a92b863e57848cd5927d06f1) )
 	ROM_LOAD( "rom7.830", 0x400000, 0x400000, CRC(d6224267) SHA1(5c9b7b13effbef9f707811f84bfe50ca85e605e3) )
 	ROM_LOAD( "rom8.831", 0x800000, 0x400000, CRC(a101dfb0) SHA1(4b729b0d562e09df35438e9e6b457b8de2690a6e) )
+
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "eeprom-bbakraid.bin", 0x000, 0x200, CRC(7f97d347) SHA1(3096c399019924dbb7d6673483f6a011f89467c6) )
 ROM_END
 
 
-/* The following is in order of Toaplan Board/game numbers */
-/* See list at top of file */
+// The following is in order of Toaplan Board/game numbers
+// See list at top of file
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+//  ( YEAR  NAME        PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS )
+GAME( 1991, tekipaki,   0,        tekipaki, tekipaki, 0,        ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghox,       0,        ghox,     ghox,     0,        ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghoxj,      ghox,     ghox,     ghox,     0,        ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_SUPPORTS_SAVE )
-GAME( 1992, dogyuunt, dogyuun,  dogyuun,  dogyuunt, T2_V25,   ROT270, "Toaplan", "Dogyuun (test location version)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,    0,        dogyuun,  dogyuun,  dogyuun,  ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuuna,   dogyuun,  dogyuun,  dogyuuna, dogyuun,  ROT270, "Toaplan", "Dogyuun (older set)", GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunt,   dogyuun,  dogyuun,  dogyuunt, dogyuun,  ROT270, "Toaplan", "Dogyuun (test location version)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_SUPPORTS_SAVE )
+GAME( 1993, kbash,      0,        kbash,    kbash,    0,        ROT0,   "Toaplan", "Knuckle Bash", GAME_SUPPORTS_SAVE )
 
-GAME( 1999, kbash2,   0,        kbash2,   kbash2,   T2_noZ80, ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1999, kbash2,     0,        kbash2,   kbash2,   0,        ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan", "Truxton II / Tatsujin Oh", GAME_SUPPORTS_SAVE )
+GAME( 1992, truxton2,   0,        truxton2, truxton2, 0,        ROT270, "Toaplan", "Truxton II / Tatsujin Oh", GAME_SUPPORTS_SAVE )
 
-GAME( 1991, pipibibs,  0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, pipibibsa, pipibibs, pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, whoopee,   pipibibs, whoopee,  whoopee,  T2_Z180,  ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Whoopee!! board)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
-GAME( 1991, pipibibsbl,pipibibs, pipibibi_bootleg, pipibibsbl, pipibibsbl, ROT0,   "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibs,   0,        pipibibs, pipibibs, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibsa,  pipibibs, pipibibs, pipibibs, 0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, whoopee,    pipibibs, tekipaki, whoopee,  0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Teki Paki hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
+
+GAME( 1991, pipibibsbl, pipibibs, pipibibsbl, pipibibsbl, pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", GAME_SUPPORTS_SAVE )
 
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
 // todo: something could be wrong here, because the _dumped_ eeprom doesn't work..
@@ -5276,45 +5204,45 @@ GAME( 1992, fixeightut, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan
 GAME( 1992, fixeightj,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Japan)",  GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightjt, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Japan, Taito license)",  GAME_SUPPORTS_SAVE )
 
-GAME( 1992, fixeightbl, fixeight, fixeighb, fixeightbl, fixeighb, ROT270, "bootleg", "FixEight (Korea, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightbl, fixeight, fixeightbl, fixeightbl, fixeightbl, ROT270, "bootleg", "FixEight (Korea, bootleg)", GAME_SUPPORTS_SAVE )
 
-GAME( 1992, grindstm, vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer", GAME_SUPPORTS_SAVE )
-GAME( 1992, grindstma,vfive,    vfive,    grindstm, vfive,    ROT270, "Toaplan", "Grind Stormer (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1993, vfive,    0,        vfive,    vfive,    vfive,    ROT270, "Toaplan", "V-Five (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstm,   0,        vfive,    grindstm,   vfive,   ROT270, "Toaplan", "Grind Stormer", GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstma,  grindstm, vfive,    grindstma,  vfive,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_SUPPORTS_SAVE )
+GAME( 1993, vfive,      grindstm, vfive,    vfive,      vfive,   ROT270, "Toaplan", "V-Five (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, batsugun,  0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
-GAME( 1993, batsuguna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1993, batsugunsp,batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugun,   0,        batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
+GAME( 1993, batsuguna,  batsugun, batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugunsp, batsugun, batsugun, batsugunsp, dogyuun, ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, snowbro2, 0,        snowbro2, snowbro2, T2_noZ80, ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
+GAME( 1994, snowbro2,   0,        snowbro2, snowbro2,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, mahoudai, 0,        mahoudai, mahoudai, T2_Z80,   ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1993, sstriker, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World)" , GAME_SUPPORTS_SAVE ) // from korean board
-GAME( 1993, sstrikera,mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World, alt)" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1993, sstriker,   0,        mahoudai, sstriker,   0,       ROT270, "Raizing", "Sorcer Striker" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1993, sstrikera,  sstriker, mahoudai, sstrikera,  0,       ROT270, "Raizing", "Sorcer Striker (Unite Trading license)" , GAME_SUPPORTS_SAVE ) // from korean board
+GAME( 1993, mahoudai,   sstriker, mahoudai, mahoudai,   0,       ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, shippumd, 0,        shippumd, shippumd, T2_Z80,   ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1994, kingdmgp, shippumd, shippumd, kingdmgp, T2_Z80,   ROT270, "Raizing / Eighting", "Kingdom Grandprix (World)" , GAME_SUPPORTS_SAVE ) // from korean board, missing letters on credits screen but this is correct
+GAME( 1994, kingdmgp,   0,        shippumd, kingdmgp,   0,       ROT270, "Raizing / Eighting", "Kingdom Grandprix", GAME_SUPPORTS_SAVE ) // from korean board, missing letters on credits screen but this is correct
+GAME( 1994, shippumd,   kingdmgp, shippumd, shippumd,   0,       ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1996, bgaregga,   0,        bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bgareggahk, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bgareggatw, bgaregga, bgaregga, bgaregtw, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", GAME_SUPPORTS_SAVE )
-GAME( 1996, bgaregganv, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays New Version only when set to HK
-GAME( 1996, bgareggat2, bgaregga, bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
-GAME( 1996, bgareggacn, bgaregga, bgaregga, bgaregcn, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
+GAME( 1996, bgaregga,   0,        bgaregga, bgaregga,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgareggahk, bgaregga, bgaregga, bgareggahk, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgareggatw, bgaregga, bgaregga, bgareggatw, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Taiwan / Germany) (Thu Feb 1 1996)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgaregganv, bgaregga, bgaregga, bgareggahk, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays New Version only when set to HK
+GAME( 1996, bgareggat2, bgaregga, bgaregga, bgaregga,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
+GAME( 1996, bgareggacn, bgaregga, bgaregga, bgareggacn, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
 
 // these are all based on Version B, even if only the Japan version states 'version B'
-GAME( 1998, batrid,   0,        batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batridu,  batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (U.S.A.) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batridc,  batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batridj,  batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batridk,  batrid,   batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-// version A is older code
-GAME( 1998, batridja, batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - A Version (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batridta, batrid,   batrider, batridrj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - A Version (Taiwan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batrider,   0,        batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batrideru,  batrider, batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (USA) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batriderc,  batrider, batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batriderj,  batrider, batrider, batriderj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batriderk,  batrider, batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+// older revision of the code
+GAME( 1998, batriderja, batrider, batrider, batriderj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batridert,  batrider, batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
 
 // Battle Bakraid
-// the 'unlimited' version is a newer revision of the code.
-GAME( 1999, bkraidu,  0,        bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (U.S.A.) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
-GAME( 1999, bkraiduj, bkraidu,  bbakradu, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
+// the 'unlimited' version is a newer revision of the code
+GAME( 1999, bbakraid,   0,        bbakraid, bbakraid,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (USA) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bbakraidj,  bbakraid, bbakraid, bbakraid,  bbakraid, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1999, bkraidj,  bkraidu,  bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bbakraidja, bbakraid, bbakraid, bbakraid,  bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
