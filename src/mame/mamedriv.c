@@ -10640,6 +10640,7 @@ Other Sun games
 	DRIVER( m_ccelbr )
 	DRIVER( m_gmball )
 	DRIVER( m_grtecp )	/* 199? */
+	DRIVER( m_blsbys )	/* BwB */
 
 	/* MPU5 */
 	DRIVER( m_honmon )

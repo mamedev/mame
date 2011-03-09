@@ -570,8 +570,8 @@ static WRITE8_HANDLER( reel34_w )
 	bfm_sc2_state *state = space->machine->driver_data<bfm_sc2_state>();
 	state->reel34_latch = data;
 
-	if ( stepper_update(2, data   ) ) state->reel_changed |= 0x04;
-	if ( stepper_update(3, data>>4) ) state->reel_changed |= 0x08;
+	if ( stepper_update(2, data&0x0f ) ) state->reel_changed |= 0x04;
+	if ( stepper_update(3, (data>>4)&0x0f) ) state->reel_changed |= 0x08;
 
 	if ( stepper_optic_state(2) ) state->optic_pattern |=  0x04;
 	else                          state->optic_pattern &= ~0x04;
@@ -589,8 +589,8 @@ static WRITE8_HANDLER( reel56_w )
 	bfm_sc2_state *state = space->machine->driver_data<bfm_sc2_state>();
 	state->reel56_latch = data;
 
-	if ( stepper_update(4, data   ) ) state->reel_changed |= 0x10;
-	if ( stepper_update(5, data>>4) ) state->reel_changed |= 0x20;
+	if ( stepper_update(4, data&0x0f   ) ) state->reel_changed |= 0x10;
+	if ( stepper_update(5, (data>>4)&0x0f) ) state->reel_changed |= 0x20;
 
 	if ( stepper_optic_state(4) ) state->optic_pattern |=  0x10;
 	else                          state->optic_pattern &= ~0x10;
@@ -2660,8 +2660,8 @@ static WRITE8_HANDLER( reel12_w )
 	bfm_sc2_state *state = space->machine->driver_data<bfm_sc2_state>();
 	state->reel12_latch = data;
 
-	if ( stepper_update(0, data   ) ) state->reel_changed |= 0x01;
-	if ( stepper_update(1, data>>4) ) state->reel_changed |= 0x02;
+	if ( stepper_update(0, data&0x0f   ) ) state->reel_changed |= 0x01;
+	if ( stepper_update(1, (data>>4))&0x0f ) state->reel_changed |= 0x02;
 
 	if ( stepper_optic_state(0) ) state->optic_pattern |=  0x01;
 	else                          state->optic_pattern &= ~0x01;

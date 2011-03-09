@@ -202,8 +202,8 @@ static READ8_HANDLER( irqlatch_r )
 static WRITE8_HANDLER( reel12_w )
 {
 	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
-	if ( stepper_update(0, data>>4) ) state->reel_changed |= 0x01;
-	if ( stepper_update(1, data   ) ) state->reel_changed |= 0x02;
+	if ( stepper_update(0, (data>>4)&0x0f) ) state->reel_changed |= 0x01;
+	if ( stepper_update(1, data&0x0f   ) ) state->reel_changed |= 0x02;
 
 	if ( stepper_optic_state(0) ) state->optic_pattern |=  0x01;
 	else                          state->optic_pattern &= ~0x01;
@@ -218,8 +218,8 @@ static WRITE8_HANDLER( reel12_w )
 static WRITE8_HANDLER( reel34_w )
 {
 	bfmsys85_state *state = space->machine->driver_data<bfmsys85_state>();
-	if ( stepper_update(2, data>>4) ) state->reel_changed |= 0x04;
-	if ( stepper_update(3, data   ) ) state->reel_changed |= 0x08;
+	if ( stepper_update(2, (data>>4)&0x0f) ) state->reel_changed |= 0x04;
+	if ( stepper_update(3, data&0x0f   ) ) state->reel_changed |= 0x08;
 
 	if ( stepper_optic_state(2) ) state->optic_pattern |=  0x04;
 	else                          state->optic_pattern &= ~0x04;

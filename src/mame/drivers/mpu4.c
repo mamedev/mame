@@ -27,19 +27,32 @@ See http://agemame.mameworld.info/techinfo/mpu4.php for Information.
 The MPU4 BOARD is the driver board, originally designed to run Fruit Machines made by the Barcrest Group, but later
 licensed to other firms as a general purpose unit (even some old Photo-Me booths used the unit).
 
-This original board uses a ~1.72 Mhz 6809B CPU, and a number of PIA6821 chips for multiplexing inputs and the like.
+This board uses a ~1.72 Mhz 6809B CPU, and a number of PIA6821 chips for multiplexing inputs and the like.
 
-A 6840PTM is used for internal timing, one of it's functions is to act with an AY8913 chip as a crude analogue sound device.
-(Data is transmitted through a PIA, with a square wave from the PTM being used as the alarm sound generator)
+To some extent, the hardware feels like a revision of the MPU3 design, integrating into the base unit features that were
+previously added through expansion ports. However, there is no backwards compatibility, and the entire memory map has been
+reworked.
+ 
+Like MPU3, a 6840PTM is used for internal timing, and other miscellaneous control functions, including as a crude analogue sound device
+(a square wave from the PTM being used as the alarm sound generator). However, the main sound functionality is provided by
+dedicated hardware (an AY8913).
 
 A MPU4 GAME CARD (cartridge) plugs into the MPU4 board containing the game, and a protection PAL (the 'characteriser').
 This PAL, as well as protecting the games, also controlled some of the lamp address matrix for many games, and acted as
 an anti-tampering device which helped to prevent the hacking of certain titles in a manner which broke UK gaming laws.
 
-One of the advantages of the hardware setup was that the developer could change the nature of the game card
-up to a point, adding extra lamp support, different amounts of RAM, and (in many cases) an OKI MSM6376 or Yamaha synth chip
-and related PIA and PTM for improved audio (This was eventually made the only way to generate sound in MOD4 of the hardware,
-when the AY8913 was removed from the main board)
+Like MPU3, over the years developers have added more capabilities through the spare inputs and outputs provided. These provided
+support for more reels, lamps and LEDs through daughtercards.
+Several solutions were released depending on the manufacturer of the machine, all are emulated here.
+ 
+In later revisions of the main board (MOD4 onwards), the AY8913 was removed entirely, as two official alternatives for sound had been produced.
+In one, a YM2413 is built into the gameboard, and in the other an OKI MSM6376 is interfaced with a PIA and PTM to allow sophisticated
+sampled sound.
+
+The lamping and input handling side of the machine rely entirely on a column by column 'strobe' system, with lights and LEDs selected in turn.
+In the inputs there are two orange connectors (sampled every 8ms) and two black ones (sampled every 16ms), giving 32 multiplexed inputs.
+
+In addition there are two auxiliary ports taht can be accessed separately to these and are bidirectional
 
 --- Preliminary MPU4 Memorymap  ---
 
@@ -197,12 +210,15 @@ IRQ line connected to CPU
  1000-FFFF | R | D D D D D D D D | ROM (can be bank switched by 0x850 in 8 banks of 64 k ) (NV)
 -----------+---+-----------------+--------------------------------------------------------------------------
 
-TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
-      - Distinguish door switches using manual
-      - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device)
-      - Any reel using the remote meter drive (CB2) slips backwards due to timing mismatches, a better method
-      is needed to combine the data. This eventually leads to spin alarms i.e Flo's move in Great Escape
-      - Add a BwB game with characteriser.
+TODO: - Distinguish door switches using manual
+      - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device emulation)
+	  - It seems that the MPU4 core program relies on some degree of persistence when switching strobes and handling
+	  writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs
+	  For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything*
+      - Flo's move in Great Escape gives spin alarms - need a different opto setting for reverse spin reels?
+      - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
+	  - Fix MSM6376 - We're triggering 'contact MAMEDEV' since we need all features of the chip,
+	  including dynamic sample rate adjustment and BEEP.
 ***********************************************************************************************************/
 #include "emu.h"
 #include "machine/6821pia.h"
@@ -228,7 +244,7 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #define LOG_CHR_FULL(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
 #define LOG_IC3(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
 #define LOG_IC8(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
-#define LOG_SS(x)	do { if (1) logerror x; } while (0)
+#define LOG_SS(x)	do { if (MPU4VERBOSE) logerror x; } while (0)
 
 #include "video/awpvid.h"		//Fruit Machines Only
 #include "connect4.lh"
@@ -238,10 +254,6 @@ TODO: - Fix lamp timing, MAME doesn't update fast enough to see everything
 #define MPU4_MASTER_CLOCK (6880000)
 
 static TIMER_CALLBACK( ic24_timeout );
-
-/* 32 multiplexed inputs - but a further 8 possible per AUX.
-Two connectors 'orange' (sampled every 8ms) and 'black' (sampled every 16ms)
-Each connector carries two banks of eight inputs and two enable signals */
 
 
 static const UINT8 reel_mux_table[8]= {0,4,2,6,1,5,3,7};//include 7, although I don't think it's used
@@ -254,13 +266,13 @@ static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 #define SIX_REEL_1TO8  4	/* Two reels on the meter drives*/
 #define SIX_REEL_5TO8  5	/* Like FIVE_REEL_5TO8, but with an extra reel elsewhere*/
 #define SEVEN_REEL     6	/* Mainly club machines, significant reworking of reel hardware*/
+#define FLUTTERBOX     7	/* Will you start the fans, please!  A fan using a reel mux-like setup, but not actually a reel*/
 
 #define NO_EXTENDER			0	/* As originally designed */
 #define SMALL_CARD			1
 #define LARGE_CARD_A		2 //96 Lamps
 #define LARGE_CARD_B		3 // 96 Lamps, 16 LEDs - as used by BwB
 #define LARGE_CARD_C		4 //Identical to B, no built in LED support
-
 
 #define CARD_A			1
 #define CARD_B			2
@@ -272,6 +284,7 @@ static const UINT8 reel_mux_table7[8]= {3,1,5,6,4,2,0,7};
 #define HOPPER_DUART_C		3
 #define HOPPER_NONDUART_A	4
 #define HOPPER_NONDUART_B	5
+
 /* Lookup table for CHR data */
 
 struct mpu4_chr_table
@@ -280,6 +293,7 @@ struct mpu4_chr_table
 	UINT8 response;
 };
 
+/* Video stuff */
 struct ef9369_t
 {
 	UINT32 addr;
@@ -320,6 +334,7 @@ public:
 	int IC23GA;
 	int prot_col;
 	int lamp_col;
+	int init_col;
 	int reel_flag;
 	int ic23_active;
 	int led_lamp;
@@ -330,9 +345,8 @@ public:
 	int input_strobe;
 	UINT8 lamp_strobe;
 	UINT8 lamp_strobe2;
-	UINT8 lamp_data;
+	UINT8 led_strobe;
 	UINT8 ay_data;
-	UINT8 Lamps[224];
 	int optic_pattern;
 	int active_reel;
 	int remote_meter;
@@ -343,10 +357,11 @@ public:
 	int lamp_sense;
 	int card_live;
 	int led_extender;
+	int bwb_bank;
 	int hopper;
 	const mpu4_chr_table* current_chr_table;
-	UINT8 led_segs[40];
 
+	//Video
 	UINT8 m6840_irq_state;
 	UINT8 m6850_irq_state;
 	UINT8 scn2674_irq_state;
@@ -423,74 +438,7 @@ with settings like this in the majority of cases.
 8 display enables (pins 10 - 17)
 */
 
-
-
-/* Process lamp and LED data for output system */
-static void mpu4_draw_led(UINT8 id, UINT8 value)
-{
-	output_set_digit_value(id,value);
-}
-
-
-static void draw_lamps(mpu4_state *state)
-{
-	int i,j;
-
-	for (i = 0; i < 8; i++)
-	{
-		output_set_lamp_value((8*state->input_strobe)+i, (state->Lamps[(8*state->input_strobe)+i]));
-		output_set_lamp_value((8*state->input_strobe)+i+64, (state->Lamps[(8*state->input_strobe)+i+64]));
-	}
-	if (state->lamp_extender)
-	{
-		for (j = 0; j < 6; j++)
-		{
-			output_set_lamp_value((6*state->input_strobe)+128+j, (state->Lamps[(6*state->input_strobe)+128+j]));
-			output_set_lamp_value((6*state->input_strobe)+176+j, (state->Lamps[(6*state->input_strobe)+176+j]));
-		}
-	}
-}
-
-static void update_lamps(mpu4_state *state)
-{
-	int i,j;
-
-	for (i = 0; i < 8; i++)
-	{
-		state->Lamps[(8*state->input_strobe)+i]    = (state->lamp_strobe  & (1 << i)) != 0;
-		state->Lamps[(8*state->input_strobe)+i+64] = (state->lamp_strobe2 & (1 << i)) != 0;
-	}
-
-	if (state->led_lamp)
-	{
-		/* Some games (like Connect 4) use 'programmable' LED displays, built from light display lines. */
-		UINT8 pled_segs[2] = {0,0};
-
-		static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 133 };
-		static const int lamps2[8] = { 114, 115, 116, 117, 112, 113, 118, 119 };
-
-		for (i = 0; i < 8; i++)
-		{
-			if (output_get_lamp_value(lamps1[i])) pled_segs[0] |= (1 << i);
-			if (output_get_lamp_value(lamps2[i])) pled_segs[1] |= (1 << i);
-		}
-
-		mpu4_draw_led(8, pled_segs[0]);
-		mpu4_draw_led(9, pled_segs[1]);
-	}
-
-	draw_lamps(state);
-	mpu4_draw_led(state->input_strobe, state->led_segs[state->input_strobe]);
-	if (state->led_extender)
-	{
-		for (j = 0; j < 5; j++)
-		{
-			mpu4_draw_led(((8*state->input_strobe)+8+j), state->led_segs[((8*state->input_strobe)+8+j)]);
-		}
-	}
-}
-
-static void lamp_extend_small(mpu4_state *state, int data)
+static void lamp_extend_small(int data)
 {
 	int lamp_strobe_ext,column,i;
 	column = data & 0x07;
@@ -500,7 +448,7 @@ static void lamp_extend_small(mpu4_state *state, int data)
 	{
 		for (i = 0; i < 5; i++)
 		{
-			state->Lamps[(5*column)+i+128]    = (lamp_strobe_ext  & (1 << i)) != 0;
+			output_set_lamp_value((5*column)+i+128,((lamp_strobe_ext  & (1 << i)) != 0));
 		}
     }
 }
@@ -529,7 +477,7 @@ static void lamp_extend_largea(mpu4_state *state, int data,int column,int active
 		{
 			for (i = 0; i < 6; i++)
 			{
-				state->Lamps[(lampbase)+i]    = (data  & (1 << i)) != 0;
+				output_set_lamp_value(lampbase+i,(data  & (1 << i)) != 0);
 			}
 		}
     }
@@ -561,10 +509,10 @@ static void lamp_extend_largebc(mpu4_state *state, int data,int column,int activ
 		{
 			for (i = 0; i < 6; i++)
 			{
-				state->Lamps[(lampbase)+i]    = (data  & (1 << i)) != 0;
+				output_set_lamp_value(lampbase+i,(data  & (1 << i)) != 0);
 			}
 		}
-	state->last_b7 = byte7;
+		state->last_b7 = byte7;
 	}
 	else
 	{
@@ -574,32 +522,21 @@ static void lamp_extend_largebc(mpu4_state *state, int data,int column,int activ
 
 static void led_write_latch(mpu4_state *state, int latch, int data, int column)
 {
-	int diff;
+	int diff,i;
 
 	diff = (latch ^ state->last_latch) & latch;
-	column = 7 - column;
+	column = 7 - column; // like main board, these are wired up in reverse
 	data = ~data;//inverted?
 
-	if ( diff & 1 )
+	for(i=0; i<5; i++)
 	{
-		state->led_segs[column] = data;
+		if (diff & (1<<i))
+		{
+			column += (i*8);
+		}
 	}
-	if ( diff & 2 )
-	{
-		state->led_segs[8+column] = data;
-	}
-	if ( diff & 4 )
-	{
-		state->led_segs[16+column] = data;
-	}
-	if ( diff & 8 )
-	{
-		state->led_segs[24+column] = data;
-	}
-	if ( diff & 16 )
-	{
-		state->led_segs[32+column] = data;
-	}
+	output_set_digit_value(column, data);
+
 	state->last_latch = diff;
 }
 
@@ -614,7 +551,7 @@ static void update_meters(mpu4_state *state)
 		// Change nothing
 		break;
 		case FIVE_REEL_5TO8:
-		stepper_update(4, (data >> 4));
+		stepper_update(4, ((data >> 4) & 0x0f));
 		data = (data & 0x0F); //Strip reel data from meter drives, leaving active elements
 		awp_draw_reel(4);
 		break;
@@ -645,6 +582,9 @@ static void update_meters(mpu4_state *state)
 		data = 0x00; //Strip all reel data from meter drives
 		awp_draw_reel(0);
 		break;
+		case FLUTTERBOX: //The backbox fan assembly fits in a reel unit sized box, wired to the remote meter pin, so we can handle it here
+		output_set_value("flutterbox", data & 0x80);
+		data &= ~0x80; //Strip flutterbox data from meter drives
 	}
 
 	MechMtr_update(7, (data & 0x80));
@@ -683,7 +623,7 @@ static MACHINE_RESET( mpu4 )
 
 	state->lamp_strobe    = 0;
 	state->lamp_strobe2   = 0;
-	state->lamp_data      = 0;
+	state->led_strobe     = 0;
 
 	state->IC23GC    = 0;
 	state->IC23GB    = 0;
@@ -799,26 +739,63 @@ static const ptm6840_interface ptm_ic2_intf =
 static WRITE8_DEVICE_HANDLER( pia_ic3_porta_w )
 {
 	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	int i;
 	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", device->machine->describe_context(),data));
 
 	if(state->ic23_active)
-	{
-		state->lamp_strobe = data;
+	{	
+		if (state->lamp_strobe != state->input_strobe)
+		{
+			// Because of the nature of the lamping circuit, there is an element of persistance
+			// As a consequence, the lamp column data can change before the input strobe without
+			// causing the relevant lamps to black out.
+
+			for (i = 0; i < 8; i++)
+			{
+				output_set_lamp_value((8*state->input_strobe)+i, ((data  & (1 << i)) !=0));
+			}
+			state->lamp_strobe = state->input_strobe;
+		}
 	}
 }
-
 
 static WRITE8_DEVICE_HANDLER( pia_ic3_portb_w )
 {
 	mpu4_state *state = device->machine->driver_data<mpu4_state>();
+	int i;
 	LOG_IC3(("%s: IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", device->machine->describe_context(),data));
 
 	if(state->ic23_active)
 	{
-		state->lamp_strobe2 = data;
+		if (state->lamp_strobe2 != state->input_strobe)
+		{
+			for (i = 0; i < 8; i++)
+			{
+				output_set_lamp_value((8*state->input_strobe)+i+64, ((data  & (1 << i)) !=0));
+			}
+			state->lamp_strobe2 = state->input_strobe;
+		}
+
+		if (state->led_lamp)
+		{
+			/* Some games (like Connect 4) use 'programmable' LED displays, built from light display lines in section 2. */
+			/* These are mostly low-tech machines, where such wiring proved cheaper than an extender card */
+			UINT8 pled_segs[2] = {0,0};
+
+			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 133 };
+			static const int lamps2[8] = { 114, 115, 116, 117, 112, 113, 118, 119 };
+
+			for (i = 0; i < 8; i++)
+			{
+				if (output_get_lamp_value(lamps1[i])) pled_segs[0] |= (1 << i);
+				if (output_get_lamp_value(lamps2[i])) pled_segs[1] |= (1 << i);
+			}
+
+			output_set_digit_value(8,pled_segs[0]);
+			output_set_digit_value(9,pled_segs[1]);
+		}
 	}
 }
-
 
 static WRITE_LINE_DEVICE_HANDLER( pia_ic3_ca2_w )
 {
@@ -872,13 +849,13 @@ static void ic23_update(mpu4_state *state)
 			if (state->IC23G1)
 			{
 				if ( state->IC23GA ) state->input_strobe |= 0x01;
-				else          state->input_strobe &= ~0x01;
+				else				 state->input_strobe &= ~0x01;
 
 				if ( state->IC23GB ) state->input_strobe |= 0x02;
-				else          state->input_strobe &= ~0x02;
+				else		         state->input_strobe &= ~0x02;
 
 				if ( state->IC23GC ) state->input_strobe |= 0x04;
-				else          state->input_strobe &= ~0x04;
+				else				 state->input_strobe &= ~0x04;
 			}
 		}
 	}
@@ -934,7 +911,13 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_porta_w )
 	if(state->ic23_active)
 	{
 		if (((state->lamp_extender == NO_EXTENDER)||(state->lamp_extender == SMALL_CARD)||(state->lamp_extender == LARGE_CARD_C))&& (state->led_extender == NO_EXTENDER))
-		state->led_segs[state->input_strobe] = data;
+		{
+			if(state->led_strobe != state->input_strobe)
+			{
+				output_set_digit_value(7 - state->input_strobe,data);
+			}
+			state->led_strobe = state->input_strobe;
+		}
 	}
 }
 
@@ -955,7 +938,6 @@ static WRITE8_DEVICE_HANDLER( pia_ic4_portb_w )
 	}
 }
 
-
 static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 {
 	mpu4_state *state = device->machine->driver_data<mpu4_state>();
@@ -973,16 +955,16 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 	if (!state->reel_mux)
 	{
 		if ( state->optic_pattern & 0x01 ) state->ic4_input_b |=  0x40; /* reel A tab */
-		else                        state->ic4_input_b &= ~0x40;
+		else							   state->ic4_input_b &= ~0x40;
 
 		if ( state->optic_pattern & 0x02 ) state->ic4_input_b |=  0x20; /* reel B tab */
-		else                        state->ic4_input_b &= ~0x20;
+		else							   state->ic4_input_b &= ~0x20;
 
 		if ( state->optic_pattern & 0x04 ) state->ic4_input_b |=  0x10; /* reel C tab */
-		else                        state->ic4_input_b &= ~0x10;
+		else							   state->ic4_input_b &= ~0x10;
 
 		if ( state->optic_pattern & 0x08 ) state->ic4_input_b |=  0x08; /* reel D tab */
-		else                        state->ic4_input_b &= ~0x08;
+		else							   state->ic4_input_b &= ~0x08;
 
 	}
 	else
@@ -997,7 +979,7 @@ static READ8_DEVICE_HANDLER( pia_ic4_portb_r )
 		}
 	}
 	if ( state->signal_50hz )			state->ic4_input_b |=  0x04; /* 50 Hz */
-	else	                    state->ic4_input_b &= ~0x04;
+	else								state->ic4_input_b &= ~0x04;
 
 	if (state->ic4_input_b & 0x02)
 	{
@@ -1081,40 +1063,40 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 {
 	mpu4_state *state = device->machine->driver_data<mpu4_state>();
-	device_t *pia_ic4 = device->machine->device("pia_ic5");
+	device_t *pia_ic4 = device->machine->device("pia_ic4");
 	if (state->hopper == HOPPER_NONDUART_A)
 	{
 		//hopper1_drive_sensor(data&0x10);
 	}
 	switch (state->lamp_extender)
 	{
-	case NO_EXTENDER:
+		case NO_EXTENDER:
 		if (state->led_extender == CARD_B)
 		{
 			led_write_latch(state, data & 0x1f, pia6821_get_output_a(pia_ic4),state->input_strobe);
 		}
 		else if ((state->led_extender != CARD_A)||(state->led_extender != NO_EXTENDER))
 		{
-			state->led_segs[(state->input_strobe+8)] = data;
+			output_set_digit_value((state->input_strobe+8),data);
 		}
 		break;
-	case SMALL_CARD:
+		case SMALL_CARD:
 		if(state->ic23_active)
 		{
-			lamp_extend_small(state, data);
+			lamp_extend_small(data);
 		}
 		break;
-	case LARGE_CARD_A:
+		case LARGE_CARD_A:
 		lamp_extend_largea(state,data,state->input_strobe,state->ic23_active);
 		break;
-	case LARGE_CARD_B:
+		case LARGE_CARD_B:
 		lamp_extend_largebc(state,data,state->input_strobe,state->ic23_active);
 		if ((state->ic23_active) && state->card_live)
 		{
-			state->led_segs[(8*(state->last_b7 >>7))+state->input_strobe] = (~data);
+			output_set_digit_value(((8*(state->last_b7 >>7))+state->input_strobe),~data);
 		}
 		break;
-	case LARGE_CARD_C:
+		case LARGE_CARD_C:
 		lamp_extend_largebc(state,data,state->input_strobe,state->ic23_active);
 		break;
 	}
@@ -1134,6 +1116,76 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 		awp_draw_reel(2);
 	}
 
+		if (mame_stricmp(device->machine->gamedrv->name, "m_gmball") == 0)
+	{
+		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
+		provide a truly fair hi-lo gamble for an AWP machine. Functionally, it consists of
+		a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
+		holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
+		hole it's currently in, to land in another. Landing in the same hole cause the machine to
+		refire the ball. The ball detection is done by the high	4 bytes of AUX1. 
+		Here we call the MAME RNG, clamping it to 16 values, with the unused
+		values effectively asking the machine to 'roll again'. We then trigger the switches corresponding to
+		the correct number. This appears to be the best way of making the game fair, short of simulating
+		the physics of a bouncing ball ;)*/
+		if (data & 0x0f)
+		{
+			switch (device->machine->rand() & 0xf)
+			{
+			case 0x00:
+			default:
+			break;// stay where we are if we roll a zero, or roll more than 12
+			case 0x01:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0x50;
+			break;
+			case 0x02:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0x90;
+			break;
+			case 0x03:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0x20;
+			break;
+			case 0x04:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0xb0;
+			break;
+			case 0x05:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0x00;
+			break;
+			case 0x06:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0x30;
+			break;
+			case 0x07:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0xa0;
+			break;
+			case 0x08:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0xd0;
+			break;
+			case 0x09:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0xd0;
+			break;
+			case 0x0a:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0x10;
+			break;
+			case 0xb:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0x80;
+			break;
+			case 0xc:
+			state->aux1_input = (state->aux1_input & 0x0f);
+			state->aux1_input|= 0x40;
+			break;
+			}
+		}
+	}
 }
 
 static WRITE8_DEVICE_HANDLER( pia_ic5_portb_w )
@@ -1148,6 +1200,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_portb_w )
 	{
 		// led_write_latch(state, data & 0x07, pia_get_output_a(pia_ic4),state->input_strobe)
 	}
+	
 }
 static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 {
@@ -1546,7 +1599,7 @@ static const pia6821_interface pia_ic8_intf =
 	DEVCB_LINE(cpu0_irq)				/* IRQB */
 };
 
-
+// universal sampled sound program card PCB 683077
 // Sampled sound card, using a PIA and PTM for timing and data handling
 static WRITE8_DEVICE_HANDLER( pia_gb_porta_w )
 {
@@ -1604,6 +1657,16 @@ static WRITE_LINE_DEVICE_HANDLER( pia_gb_ca2_w )
 //  reset line
 }
 
+static WRITE_LINE_DEVICE_HANDLER( pia_gb_cb2_w )
+{
+	mpu4_state *mstate = device->machine->driver_data<mpu4_state>();
+	//Some BWB games use this to drive the bankswitching
+	if (mstate->bwb_bank)
+	{
+		memory_set_bank(device->machine, "bank1",state);
+	}
+}
+
 static const pia6821_interface pia_ic4ss_intf =
 {
 	DEVCB_NULL,		/* port A in */
@@ -1615,7 +1678,7 @@ static const pia6821_interface pia_ic4ss_intf =
 	DEVCB_HANDLER(pia_gb_porta_w),		/* port A out */
 	DEVCB_HANDLER(pia_gb_portb_w),		/* port B out */
 	DEVCB_LINE(pia_gb_ca2_w),		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(pia_gb_cb2_w),		/* line CB2 out */
 	DEVCB_NULL,		/* IRQA */
 	DEVCB_NULL		/* IRQB */
 };
@@ -1631,7 +1694,7 @@ freq = (1720000/((t3L+1)(t3H+1)))*[(t3H(T3L+1)+1)/(2(t1+1))]
 where [] means rounded up integer,
 t3L is the LSB of Clock 3,
 t3H is the MSB of Clock 3,
-and t1 is the figure added to clock 1.
++and t1 is the initial value in clock 1.
 
 The sample speed divisor is f/300
 */
@@ -1989,18 +2052,7 @@ static INPUT_PORTS_START( gamball )
 	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
 
 	PORT_START("AUX1")
-	PORT_DIPNAME( 0x10, 0x00, "AUX105" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x20, 0x00, "AUX106" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x40, 0x00, "AUX107" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On  ) )
-	PORT_DIPNAME( 0x80, 0x00, "AUX108" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On  ) )
+	PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_SPECIAL)//Handled by Gamball unit
 
 	PORT_START("AUX2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SPECIAL)
@@ -2025,6 +2077,30 @@ static const stepper_interface barcrest_opto1_interface =
 	BARCREST_48STEP_REEL,
 	4,
 	12,
+	0x00
+};
+
+static const stepper_interface barcrest_opto2_interface =
+{
+	BARCREST_48STEP_REEL,
+	92,
+	3,
+	0x00
+};
+
+static const stepper_interface barcrest_opto3_interface =
+{
+	BARCREST_48STEP_REEL,
+	0,
+	5,
+	0x00
+};
+
+static const stepper_interface bwb_opto1_interface =
+{
+	BARCREST_48STEP_REEL,
+	96,
+	3,
 	0x00
 };
 
@@ -2200,6 +2276,84 @@ static READ8_HANDLER( characteriser_r )
 	return 0;
 }
 
+/*
+BwB Characteriser (CHR)
+
+The BwB method of protection is considerably different to the Barcrest one, with any
+incorrect behaviour manifesting in ridiculously large payouts.
+
+In fact, the software seems deliberately designed to mislead, but is (fortunately for
+us) prone to similar weaknesses that allow a per game solution.
+ 
+*/
+
+
+static WRITE8_HANDLER( bwb_characteriser_w )
+{
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	int x;
+	int call=data;
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(space->cpu),offset,data));
+	if (!state->current_chr_table)
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+
+	if (offset == 0)//initialisation is always at 0x800
+	{
+		{
+			if (call == 0)
+			{
+				state->init_col =0;
+			}
+			else
+			{
+				for (x = state->init_col; x < 64; x++)
+				{
+					if	(state->current_chr_table[(x)].call == call)
+					{
+						state->init_col = x;
+						LOG_CHR_FULL(("BwB Characteriser init column %02X\n",state->init_col));
+						break;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		for (x = state->prot_col; x < 64;)
+		{
+			x++;
+			if	(state->current_chr_table[(x)].call == call)
+			{
+				state->prot_col = x;
+				LOG_CHR(("BwB Characteriser init column %02X\n",state->prot_col));
+				break;
+			}
+		}
+	}
+}
+
+static READ8_HANDLER( bwb_characteriser_r )
+{
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	if (!state->current_chr_table)
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+
+	LOG_CHR(("Characteriser read offset %02X \n",offset));
+
+
+	if (offset ==0)
+	{
+		LOG_CHR(("Characteriser read data %02X \n",state->current_chr_table[state->init_col].response));
+		return state->current_chr_table[state->init_col].response;
+	}
+	else
+	{
+		LOG_CHR(("Characteriser read BwB data %02X \n",state->current_chr_table[state->prot_col].response));
+		return state->current_chr_table[state->prot_col].response;
+	}
+}
+
 static const mpu4_chr_table ccelbr_data[72] = {
 {0x00, 0x00},{0x1a, 0x84},{0x04, 0x8c},{0x10, 0xb8},{0x18, 0x74},{0x0f, 0x80},{0x13, 0x1c},{0x1b, 0xb4},
 {0x03, 0xd8},{0x07, 0x74},{0x17, 0x00},{0x1d, 0xd4},{0x36, 0xc8},{0x35, 0x78},{0x2b, 0xa4},{0x28, 0x4c},
@@ -2248,6 +2402,28 @@ static const mpu4_chr_table oldtmr_data[72] = {
 {0x00, 0x00},{0x01, 0x00},{0x04, 0x00},{0x09, 0x00},{0x10, 0x00},{0x19, 0x10},{0x24, 0x00},{0x31, 0x00}
 };
 
+static const mpu4_chr_table blsbys_data[72] = {
+{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x2e, 0x36},{0x20, 0x42},
+{0x0f, 0x27},{0x24, 0x42},{0x3c, 0x09},{0x2c, 0x01},{0x01, 0x1d},{0x1d, 0x40},{0x40, 0xd2},{0xd2, 0x01},
+{0x01, 0xf9},{0xb1, 0x41},{0x41, 0x1c},{0x1c, 0x01},{0x01, 0xf9},{0x04, 0x54},{0x54, 0x02},{0x02, 0x00},
+{0x00, 0x00},{0x00, 0x2e},{0x2e, 0x20},{0x20, 0x0f},{0x0f, 0x24},{0x24, 0x3c},{0x3c, 0x39},{0x3c, 0xc9},
+{0xc9, 0x05},{0x05, 0x04},{0x04, 0x54},{0x54, 0x02},{0x02, 0x00},{0x00, 0x00},{0x00, 0x2e},{0x2e, 0x20},
+{0x20, 0x0f},{0x0f, 0x24},{0x24, 0x3c},{0x3c, 0x39},{0x3c, 0x36},{0x36, 0x00},{0x42, 0x04},{0x27, 0x04},
+{0x42, 0x0c},{0x09, 0x0c},{0x42, 0x1c},{0x27, 0x14},{0x42, 0x2c},{0x42, 0x5c},{0x09, 0x2c},
+//All this may be garbage - it never gets called, but is in the ROM (?)
+{0x0A, 0x00},
+{0x31, 0x20},{0x34, 0x90}, {0x1e, 0x40},{0x04, 0x90},{0x01, 0xe4},{0x0c, 0xf4},{0x18, 0x64},{0x19, 0x10},
+{0x00, 0x00},{0x01, 0x00},{0x04, 0x00},{0x09, 0x00},{0x10, 0x00},{0x19, 0x10},{0x24, 0x00},{0x31, 0x00}
+};
+
+// set percentage and other options. 2e 20 0f
+// PAL Codes
+// 0   1   2  3  4  5  6  7  8 
+// 42  2E 20 0F 24 3C 36 27 09
+   //      6  0  7  0  8  0  7  0  0  8
+//request 36 42 27 42 09 42 27 42 42 09
+//verify  00 04 04 0C 0C 1C 14 2C 5C 2C
+
 static DRIVER_INIT (m_oldtmr)
 {
 	mpu4_state *state = machine->driver_data<mpu4_state>();
@@ -2294,6 +2470,20 @@ static DRIVER_INIT (m_grtecp)
 	state->current_chr_table = grtecp_data;
 }
 
+static DRIVER_INIT (m_blsbys)
+{
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->bwb_bank=1;
+	state->reel_mux=FIVE_REEL_5TO8;
+
+	stepper_config(machine, 0, &bwb_opto1_interface);
+	stepper_config(machine, 1, &bwb_opto1_interface);
+	stepper_config(machine, 2, &bwb_opto1_interface);
+	stepper_config(machine, 3, &bwb_opto1_interface);
+	stepper_config(machine, 4, &bwb_opto1_interface);
+	state->current_chr_table = blsbys_data;
+}
+
 static DRIVER_INIT (mpu4tst2)
 {
 	mpu4_state *state = machine->driver_data<mpu4_state>();
@@ -2325,14 +2515,12 @@ static TIMER_DEVICE_CALLBACK( gen_50hz )
     falling edges of the pulse are used means the timer actually gives a 100Hz
     oscillating signal.*/
 	state->signal_50hz = state->signal_50hz?0:1;
-	update_lamps(state);
 	pia6821_ca1_w(timer.machine->device("pia_ic4"), state->signal_50hz);	/* signal is connected to IC4 CA1 */
 
 	if (state->signal_50hz)
 	{
 		update_meters(state);
 	}
-
 }
 
 static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2385,6 +2573,32 @@ static ADDRESS_MAP_START( mod4_oki_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 
+	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
+
+	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("ptm_ic3ss", ptm6840_read, ptm6840_write)  // 6840PTM on sampled sound board
+
+//  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) //Runs hoppers
+
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_read, ptm6840_write)/* PTM6840 IC2 */
+
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_r, pia6821_w)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_r, pia6821_w)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_r, pia6821_w)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_r, pia6821_w)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_r, pia6821_w)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_r, pia6821_w)		/* PIA6821 IC8 */
+
+	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	// 64k  paged ROM (4 pages)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mpu4_bwb_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+ 
+	AM_RANGE(0x0800, 0x083F) AM_READWRITE(bwb_characteriser_r,bwb_characteriser_w)// Game selects a random value within this range
+
+	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)
+
+	AM_RANGE(0x0858, 0x0858) AM_WRITE(bankswitch_w)	// write bank (rom page select)
 	AM_RANGE(0x0880, 0x0883) AM_DEVREADWRITE("pia_ic4ss", pia6821_r,pia6821_w)      // PIA6821 on sampled sound board
 
 	AM_RANGE(0x08c0, 0x08c7) AM_DEVREADWRITE("ptm_ic3ss", ptm6840_read, ptm6840_write)  // 6840PTM on sampled sound board
@@ -2502,9 +2716,18 @@ static MACHINE_CONFIG_DERIVED( mpu4dutch, mod4oki )
 	MCFG_MACHINE_START(mpu4dutch)					// main mpu4 board initialisation
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED(bwboki, mod4oki )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mpu4_bwb_map)				// setup read and write memorymap
+MACHINE_CONFIG_END
+
 ROM_START( m_oldtmr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dot11.bin",  0x00000, 0x10000,  CRC(da095666) SHA1(bc7654dc9da1f830a43f925db8079f27e18bb61e))
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "snd.p1",  0x000000, 0x080000,  NO_DUMP )
+	ROM_LOAD( "snd.p2",  0x080000, 0x080000,  NO_DUMP )
 ROM_END
 
 ROM_START( m_ccelbr )
@@ -2545,13 +2768,23 @@ ROM_START( m_grtecp )
 	ROM_REGION( 0x200000, "msm6376", 0 )
 	ROM_LOAD( "an2snd.p1",  0x000000, 0x080000,  CRC(5394e9ae) SHA1(86ccd8531fc87f34d3c5482ba7e5a2c06ea69491) )
 	ROM_LOAD( "an2snd.p2",  0x080000, 0x080000,  CRC(109ace1f) SHA1(9f0e8065186beb61ed50fea834de2d91e68db953) )
-
 ROM_END
+
+ROM_START( m_blsbys )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD("bbprog.bin",  0x00000, 0x20000,  CRC(c262cfda) SHA1(f004895e0dd3f8420683927915554e19e41bd20b))
+
+	ROM_REGION( 0x200000, "msm6376", 0 )
+	ROM_LOAD( "bbsnd.p1",  0x000000, 0x080000,  CRC(715c9e95) SHA1(6a0c9c63e56cfc21bf77cf29c1b844b8e0844c1e) )
+	ROM_LOAD( "bbsnd.p2",  0x080000, 0x080000,  CRC(594a87f8) SHA1(edfef7d08fab41fb5814c92930f08a565371eae1) )
+ROM_END
+
 //    year,  name,    parent,  machine,  input,   init,     monitor,company,        fullname,                     flags
 GAME( 198?,  m_oldtmr,0,      mpu4dutch,mpu4,	  m_oldtmr, ROT0,   "Barcrest",		"Old Timer",				  GAME_NOT_WORKING|GAME_NO_SOUND|GAME_REQUIRES_ARTWORK )
 GAME( 198?,  m_ccelbr,0,      mpu4mod2, mpu4,	  m_ccelbr, ROT0,   "Barcrest",		"Club Celebration",			  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
 GAMEL(198?,  m_gmball,0,      mod4yam,  gamball,  m_gmball, ROT0,   "Barcrest",     "Gamball",					  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_gamball )//Mechanical ball launcher
-GAMEL(198?,  m_grtecp,0,      mod4oki, mpu4,	  m_grtecp, ROT0,   "Barcrest",		"Andy's Great Escape",		  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_mpu4ext )//5 reel meter mux
+GAMEL(198?,  m_grtecp,0,      mod4oki,  mpu4,	  m_grtecp, ROT0,   "Barcrest",		"Andy's Great Escape",		  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK,layout_mpu4ext )//5 reel meter mux
+GAME(199?,   m_blsbys,0,	  bwboki,   mpu4,	  m_blsbys, ROT0,   "Barcrest",		"Blues Boys (Version 6)",	  GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
 
 //SWP
 GAMEL(1989?,connect4,        0, mpu4mod2,   connect4,   connect4,   ROT0, "Dolbeck Systems","Connect 4",GAME_IMPERFECT_GRAPHICS|GAME_REQUIRES_ARTWORK,layout_connect4 )

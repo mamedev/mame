@@ -1183,7 +1183,7 @@ static WRITE16_HANDLER( jpmioawp_w )
 		{
 			for (i=0; i<2; i++)
 			{
-				stepper_update(i, (data >> (i + 4)& 0x0F ));
+				stepper_update(i+4, (data >> (i + 4)& 0x0F ));
 			}
 			break;
 		}

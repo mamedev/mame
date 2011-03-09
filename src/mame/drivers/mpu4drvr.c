@@ -201,6 +201,8 @@ TODO:
 static READ16_HANDLER( characteriser16_r );
 static WRITE16_HANDLER( characteriser16_w );
 
+static READ16_HANDLER( bwb_characteriser16_r );
+static WRITE16_HANDLER( bwb_characteriser16_w );
 
 /*************************************
  *
@@ -232,7 +234,6 @@ static void update_mpu68_interrupts(running_machine *machine)
 }
 
 /* Communications with 6809 board */
-/* Clock values are currently unknown, and are derived from the 68k board.*/
 
 static READ_LINE_DEVICE_HANDLER( m6809_acia_rx_r )
 {
@@ -1945,7 +1946,7 @@ static MACHINE_RESET( mpu4_vid )
 
 	state->lamp_strobe    = 0;
 	state->lamp_strobe2   = 0;
-	state->lamp_data      = 0;
+	state->led_strobe     = 0;
 
 	state->IC23GC    = 0;
 	state->IC23GB    = 0;
@@ -2035,9 +2036,10 @@ static ADDRESS_MAP_START( bwbvid_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xe05000, 0xe05001) //AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
 	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
+	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_read, ptm6840_write, 0xff)
+	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bwbvid5_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2051,14 +2053,14 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
 	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xe05000, 0xe05001) //AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_stat_r, acia6850_ctrl_w, 0xff)
 	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_data_r, acia6850_data_w, 0xff)
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_read, ptm6840_write, 0xff)
 	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_r, pia6821_w, 0xff)
 	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREADWRITE8("6840ptm_ic3ss", ptm6840_read, ptm6840_write, 0xff)
+	AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
-//
+
 /* Deal 'Em */
 /* Deal 'Em was designed as an enhanced gamecard, to fit into an existing MPU4 cabinet
 It's an unoffical addon, and does all its work through the existing 6809 CPU.
@@ -2297,16 +2299,15 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	{
 	/*  if (state->scn2674_display_enabled) ? */
 		{
+			state->scn2674_status_register |= 0x10;
 			if (state->scn2674_irq_mask&0x10)
 			{
 				LOGSTUFF(("vblank irq\n"));
 				state->scn2674_irq_state = 1;
-				update_mpu68_interrupts(timer.machine);
-
 				state->scn2674_irq_register |= 0x10;
+				update_mpu68_interrupts(timer.machine);
 			}
 		}
-		state->scn2674_status_register |= 0x10;
 	}
 
 //  printf("scanline %d\n",current_scanline);
@@ -2551,6 +2552,84 @@ static READ16_HANDLER( characteriser16_r )
 }
 
 
+/*
+BwB Characteriser (CHR)
+
+The BwB method of protection is considerably different to the Barcrest one, with any
+incorrect behaviour manifesting in ridiculously large payouts.
+
+In fact, the software seems deliberately designed to mislead, but is (fortunately for
+us) prone to similar weaknesses that allow a per game solution.
+ 
+*/
+
+
+static WRITE16_HANDLER( bwb_characteriser16_w )
+{
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	int x;
+	int call=data &0xff;
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(space->cpu),offset,data));
+	if (!state->current_chr_table)
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+
+	if (offset == 0)//initialisation is always at 0x800
+	{
+		{
+			if (call == 0)
+			{
+				state->init_col =0;
+			}
+			else
+			{
+				for (x = state->init_col; x < 64; x++)
+				{
+					if	(state->current_chr_table[(x)].call == call)
+					{
+						state->init_col = x;
+						LOG_CHR_FULL(("BwB Characteriser init column %02X\n",state->init_col));
+						break;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		for (x = state->prot_col; x < 64;)
+		{
+			x++;
+			if	(state->current_chr_table[(x)].call == call)
+			{
+				state->prot_col = x;
+				LOG_CHR(("BwB Characteriser init column %02X\n",state->prot_col));
+				break;
+			}
+		}
+	}
+}
+
+static READ16_HANDLER( bwb_characteriser16_r )
+{
+	mpu4_state *state = space->machine->driver_data<mpu4_state>();
+	if (!state->current_chr_table)
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(space->cpu));
+
+	LOG_CHR(("Characteriser read offset %02X \n",offset));
+
+
+	if (offset ==0)
+	{
+		LOG_CHR(("Characteriser read data %02X \n",state->current_chr_table[state->init_col].response));
+		return state->current_chr_table[state->init_col].response;
+	}
+	else
+	{
+		LOG_CHR(("Characteriser read BwB data %02X \n",state->current_chr_table[state->prot_col].response));
+		return state->current_chr_table[state->prot_col].response;
+	}
+}
+
 static const mpu4_chr_table adders_data[64] = {
 	{0x00, 0x00}, {0x1A, 0x8C}, {0x04, 0x64}, {0x10, 0x84}, {0x18, 0x84}, {0x0F, 0xC4}, {0x13, 0x84}, {0x1B, 0x84},
 	{0x03, 0x9C}, {0x07, 0xF4}, {0x17, 0x04}, {0x1D, 0xCC}, {0x36, 0x24}, {0x35, 0x84}, {0x2B, 0xC4}, {0x28, 0x94},
@@ -2694,6 +2773,20 @@ static const mpu4_chr_table quidgrid_data[64] = {
 	{0x0D, 0x04}, {0x1F, 0x64}, {0x16, 0x24}, {0x05, 0x64}, {0x13, 0x24}, {0x1C, 0x64}, {0x02, 0x74}, {0x00, 0x00}
 };
 
+static const mpu4_chr_table prizeinv_data[72] = {
+{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x00, 0x00},{0x2e, 0x36},{0x20, 0x42},
+{0x0f, 0x27},{0x24, 0x42},{0x3c, 0x09},{0x2c, 0x01},{0x01, 0x1d},{0x1d, 0x40},{0x40, 0xd2},{0xd2, 0x01},
+{0x01, 0xf9},{0xb1, 0x41},{0x41, 0x1c},{0x1c, 0x01},{0x01, 0xf9},{0x04, 0x54},{0x54, 0x02},{0x02, 0x00},
+{0x00, 0x00},{0x00, 0x2e},{0x2e, 0x20},{0x20, 0x0f},{0x0f, 0x24},{0x24, 0x3c},{0x3c, 0x39},{0x3c, 0xc9},
+{0xc9, 0x05},{0x05, 0x04},{0x04, 0x54},{0x54, 0x02},{0x02, 0x00},{0x00, 0x00},{0x00, 0x2e},{0x2e, 0x20},
+{0x20, 0x0f},{0x0f, 0x24},{0x24, 0x3c},{0x3c, 0x39},{0x3c, 0x36},{0x36, 0x00},{0x42, 0x04},{0x27, 0x04},
+{0x42, 0x0c},{0x09, 0x0c},{0x42, 0x1c},{0x27, 0x14},{0x42, 0x2c},{0x42, 0x5c},{0x09, 0x2c},
+//All this may be garbage - the ROM table seems endless
+{0x0A, 0x00},
+{0x31, 0x20},{0x34, 0x90}, {0x1e, 0x40},{0x04, 0x90},{0x01, 0xe4},{0x0c, 0xf4},{0x18, 0x64},{0x19, 0x10},
+{0x00, 0x00},{0x01, 0x00},{0x04, 0x00},{0x09, 0x00},{0x10, 0x00},{0x19, 0x10},{0x24, 0x00},{0x31, 0x00}
+};
+
 static DRIVER_INIT (adders)
 {
 	mpu4_state *state = machine->driver_data<mpu4_state>();
@@ -2721,12 +2814,14 @@ static DRIVER_INIT (crmaze2)
 static DRIVER_INIT (crmaze3)
 {
 	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->reel_mux = FLUTTERBOX;
 	state->current_chr_table = crmaze3_data;
 }
 
 static DRIVER_INIT (crmaze3a)
 {
 	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->reel_mux = FLUTTERBOX;
 	state->current_chr_table = crmaze3a_data;
 }
 
@@ -2744,7 +2839,6 @@ static DRIVER_INIT (mating)
 
 	state->current_chr_table = mating_data;
 }
-
 
 static DRIVER_INIT (skiltrek)
 {
@@ -2782,7 +2876,11 @@ static DRIVER_INIT (quidgrid)
 	state->current_chr_table = quidgrid_data;
 }
 
-
+static DRIVER_INIT (prizeinv)
+{
+	mpu4_state *state = machine->driver_data<mpu4_state>();
+	state->current_chr_table = prizeinv_data;
+}
 
 ROM_START( dealem )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )
@@ -3389,9 +3487,9 @@ GAME( 199?,  quidgrid2d,quidgrid, mpu4_vid, mpu4,     quidgrid, ROT0, "Barcrest"
 
 /* Games below are newer BwB games and use their own BIOS ROMs and hardware setups*/
 GAME( 199?,  vgpoker,   0,        vgpoker,  mpu4,     0,        ROT0, "BwB",			"Vegas Poker (prototype, release 2)",								GAME_NOT_WORKING )
-GAME( 199?,  prizeinv,  0,        bwbvid, mpu4,     0,        ROT0, "BwB",			"Prize Space Invaders (20\" v1.1)",									GAME_NOT_WORKING )
-GAME( 199?,  blox,      0,        bwbvid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0)",														GAME_NOT_WORKING )
-GAME( 199?,  bloxd,     blox,     bwbvid, mpu4,     0,        ROT0, "BwB",			"Blox (v2.0, Datapak)",												GAME_NOT_WORKING )
-GAME( 1996,  renoreel,  0,        bwbvid5,  mpu4,     0,		ROT0, "BwB",			"Reno Reels (20p/10GBP Cash, release A)",										GAME_NOT_WORKING )
-GAME( 199?,  redhtpkr,  0,        bwbvid,   mpu4,     0,	    ROT0, "BwB",			"Red Hot Poker (20p/10GBP Cash, release 3)",									GAME_NOT_WORKING )
-GAME( 199?,  bwbtetrs,  0,        bwbvid,   mpu4,     0,	    ROT0, "BwB",			"BwB Tetris v 2.2",									GAME_NOT_WORKING )
+GAME( 199?,  prizeinv,  0,        bwbvid,	mpu4,     prizeinv, ROT0, "BwB",			"Prize Space Invaders (20\" v1.1)",									GAME_NOT_WORKING )
+GAME( 199?,  blox,      0,        bwbvid,	mpu4,     0,        ROT0, "BwB",			"Blox (v2.0)",														GAME_NOT_WORKING )
+GAME( 199?,  bloxd,     blox,     bwbvid,	mpu4,     0,        ROT0, "BwB",			"Blox (v2.0, Datapak)",												GAME_NOT_WORKING )
+GAME( 1996,  renoreel,  0,        bwbvid5,  mpu4,     0,		ROT0, "BwB",			"Reno Reels (20p/10GBP Cash, release A)",							GAME_NOT_WORKING )
+GAME( 199?,  redhtpkr,  0,        bwbvid,   mpu4,     0,	    ROT0, "BwB",			"Red Hot Poker (20p/10GBP Cash, release 3)",						GAME_NOT_WORKING )
+GAME( 199?,  bwbtetrs,  0,        bwbvid,   mpu4,     0,	    ROT0, "BwB",			"BwB Tetris v 2.2",													GAME_NOT_WORKING )
