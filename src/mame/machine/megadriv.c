@@ -4529,6 +4529,13 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 			{
 				dest[dstoffset+1] = data >>8;
 				dest[dstoffset+0] = data&0xff;
+
+				if (destination==DMA_WRAM)
+				{
+					if (segacd_ram_mode==RAM_MODE_2MEG)
+						segacd_mark_tiles_dirty(space->machine, dstoffset/2);
+
+				}
 			}
 		}
 
@@ -4824,8 +4831,6 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 // so probably don't change instantly...
 //
 
-
-
 static TIMER_CALLBACK( segacd_dmna_ret_timer_callback )
 {
 
@@ -4856,8 +4861,6 @@ static TIMER_CALLBACK( segacd_dmna_ret_timer_callback )
 		printf("huh? %d %d\n", segacd_dmna, segacd_ret);
 	}
 }
-
-
 
 
 static READ16_HANDLER( scd_a12002_memory_mode_r )
@@ -4893,9 +4896,13 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_8_15 )
 	segacd_ram_writeprotect_bits = data;
 }
 
+
 static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 {
+	segacd_4meg_prgbank = (data&0x00c0)>>6;
 
+
+#if 1
 	//if (data&0x0001) printf("ret bit set (invalid? can't set from main68k?)\n");
 	if (data&0x0002)
 	{
@@ -4923,8 +4930,8 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 			printf("dmna bit in mode 1\n");
 		}
 	}
+#endif
 
-	segacd_4meg_prgbank = (data&0x00c0)>>6;
 }
 
 
@@ -4939,7 +4946,10 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 		scd_a12002_memory_mode_w_0_7(space, 0, data&0xff);
 }
 
+
+
 // can't read the bank?
+
 static READ16_HANDLER( segacd_sub_memory_mode_r )
 {
 	space->machine->scheduler().synchronize();
@@ -4958,11 +4968,12 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_8_15 )
 	/* setting write protect bits from sub-cpu has no effect? */
 }
 
-
 WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 {
 	segacd_memory_priority_mode = (data&0x0018)>>3;
 
+
+#if 1
 	if (data&0x0001)
 	{
 		//printf("ret bit set\n");
@@ -5034,7 +5045,7 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 			}
 		}
 	}
-
+#endif
 
 }
 
@@ -5940,6 +5951,19 @@ void segacd_init_main_cpu( running_machine* machine )
 }
 
 
+static timer_device* scd_dma_timer;
+
+static TIMER_DEVICE_CALLBACK( scd_dma_timer_callback )
+{
+	// todo: accurate timing of this!
+
+	#define RATE 256
+	if (sega_cd_connected)
+		CDC_Do_DMA(timer.machine, RATE);
+
+	scd_dma_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
+}
+
 
 static MACHINE_RESET( segacd )
 {
@@ -5982,6 +6006,8 @@ static MACHINE_RESET( segacd )
 
 	hock_cmd = 0;
 	stopwatch_timer = machine->device<timer_device>("sw_timer");
+
+	scd_dma_timer->adjust(attotime::zero);
 }
 
 
@@ -6076,7 +6102,7 @@ static READ16_HANDLER( segacd_sub_dataram_part2_r )
 {
 	if (segacd_ram_mode==RAM_MODE_2MEG)
 	{
-		printf("ILLEGAL segacd_sub_dataram_part2_r in mode 0\n"); // not mapepd to anything in mode 0
+		printf("ILLEGAL segacd_sub_dataram_part2_r in mode 0\n"); // not mapped to anything in mode 0
 		return 0x0000;
 	}
 	else if (segacd_ram_mode==RAM_MODE_1MEG)
@@ -8957,11 +8983,6 @@ static TIMER_DEVICE_CALLBACK( render_timer_callback )
 	if (genesis_scanline_counter>=0 && genesis_scanline_counter<megadrive_visible_scanlines)
 	{
 		genesis_render_scanline(timer.machine, genesis_scanline_counter);
-
-		// put this one a timer instead?
-		#define RATE 256
-		if (sega_cd_connected)
-			CDC_Do_DMA(timer.machine, RATE);
 	}
 }
 
@@ -9608,7 +9629,6 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 MACHINE_CONFIG_END
 
 
-
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
@@ -9625,6 +9645,9 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
+
+	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
+
 
 	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
@@ -9736,6 +9759,8 @@ static void megadriv_init_common(running_machine *machine)
 		printf("Sega CD secondary 68k cpu found '%s'\n", _segacd_68k_cpu->tag() );
 		sega_cd_connected = 1;
 		segacd_init_main_cpu(machine);
+		scd_dma_timer = machine->device<timer_device>("scd_dma_timer");
+
 	}
 
 	_svp_cpu = machine->device<cpu_device>("svp");
