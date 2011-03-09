@@ -263,7 +263,7 @@ ADDRESS_MAP_END
 /*******************************************************************************/
 
 static ADDRESS_MAP_START( sound3_m660_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_command3_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITENOP /* ? - probably clear IRQ */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
