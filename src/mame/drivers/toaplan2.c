@@ -5168,8 +5168,8 @@ ROM_END
 //  ( YEAR  NAME        PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS )
 GAME( 1991, tekipaki,   0,        tekipaki, tekipaki, 0,        ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1991, ghox,       0,        ghox,     ghox,     0,        ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1991, ghoxj,      ghox,     ghox,     ghox,     0,        ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghox,       0,        ghox,     ghox,     0,        ROT270, "Toaplan", "Ghox (spinner)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghoxj,      ghox,     ghox,     ghox,     0,        ROT270, "Toaplan", "Ghox (joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1992, dogyuun,    0,        dogyuun,  dogyuun,  dogyuun,  ROT270, "Toaplan", "Dogyuun", GAME_SUPPORTS_SAVE )
 GAME( 1992, dogyuuna,   dogyuun,  dogyuun,  dogyuuna, dogyuun,  ROT270, "Toaplan", "Dogyuun (older set)", GAME_SUPPORTS_SAVE )
@@ -5190,19 +5190,19 @@ GAME( 1991, pipibibsbl, pipibibs, pipibibsbl, pipibibsbl, pipibibsbl, ROT0, "boo
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
 // todo: something could be wrong here, because the _dumped_ eeprom doesn't work..
 GAME( 1992, fixeight,   0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Europe)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightt,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Europe, Taito license)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightkt, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Korea, Taito license)",  GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightk,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Korea)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightht, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Hong Kong, Taito license)",  GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeighth,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Hong Kong)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeighttwt,fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Taiwan, Taito license)",  GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeighttw, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Taiwan)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightat, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Southeast Asia, Taito license)",  GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeighta,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Southeast Asia)",  GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightu,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (USA)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightut, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (USA, Taito license)",  GAME_SUPPORTS_SAVE )
 GAME( 1992, fixeightj,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Japan)",  GAME_SUPPORTS_SAVE )
-GAME( 1992, fixeightjt, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight (Japan, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightt,  fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Europe, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightkt, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Korea, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightht, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Hong Kong, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeighttwt,fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Taiwan, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightat, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Southeast Asia, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightut, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (USA, Taito license)",  GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeightjt, fixeight, fixeight, fixeight, fixeight, ROT270, "Toaplan (Taito license)", "FixEight (Japan, Taito license)",  GAME_SUPPORTS_SAVE )
 
 GAME( 1992, fixeightbl, fixeight, fixeightbl, fixeightbl, fixeightbl, ROT270, "bootleg", "FixEight (Korea, bootleg)", GAME_SUPPORTS_SAVE )
 
@@ -5212,15 +5212,15 @@ GAME( 1993, vfive,      grindstm, vfive,    vfive,      vfive,   ROT270, "Toapla
 
 GAME( 1993, batsugun,   0,        batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
 GAME( 1993, batsuguna,  batsugun, batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1993, batsugunsp, batsugun, batsugun, batsugunsp, dogyuun, ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugunsp, batsugun, batsugun, batsugunsp, dogyuun, ROT270, "Toaplan", "Batsugun - Special Ver.", GAME_SUPPORTS_SAVE )
 
 GAME( 1994, snowbro2,   0,        snowbro2, snowbro2,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 
-GAME( 1993, sstriker,   0,        mahoudai, sstriker,   0,       ROT270, "Raizing", "Sorcer Striker" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
-GAME( 1993, sstrikera,  sstriker, mahoudai, sstrikera,  0,       ROT270, "Raizing", "Sorcer Striker (Unite Trading license)" , GAME_SUPPORTS_SAVE ) // from korean board
+GAME( 1993, sstriker,   0,        mahoudai, sstriker,   0,       ROT270, "Raizing", "Sorcer Striker (set 1)" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1993, sstrikera,  sstriker, mahoudai, sstrikera,  0,       ROT270, "Raizing", "Sorcer Striker (set 2)" , GAME_SUPPORTS_SAVE ) // from Korean board
 GAME( 1993, mahoudai,   sstriker, mahoudai, mahoudai,   0,       ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
 
-GAME( 1994, kingdmgp,   0,        shippumd, kingdmgp,   0,       ROT270, "Raizing / Eighting", "Kingdom Grandprix", GAME_SUPPORTS_SAVE ) // from korean board, missing letters on credits screen but this is correct
+GAME( 1994, kingdmgp,   0,        shippumd, kingdmgp,   0,       ROT270, "Raizing / Eighting", "Kingdom Grandprix", GAME_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
 GAME( 1994, shippumd,   kingdmgp, shippumd, shippumd,   0,       ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
 
 GAME( 1996, bgaregga,   0,        bgaregga, bgaregga,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
@@ -5234,10 +5234,10 @@ GAME( 1996, bgareggacn, bgaregga, bgaregga, bgareggacn, bgaregga, ROT270, "Raizi
 GAME( 1998, batrider,   0,        batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 GAME( 1998, batrideru,  batrider, batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (USA) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 GAME( 1998, batriderc,  batrider, batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (China) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
-GAME( 1998, batriderj,  batrider, batrider, batriderj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batriderj,  batrider, batrider, batriderj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, B version) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 GAME( 1998, batriderk,  batrider, batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
 // older revision of the code
-GAME( 1998, batriderja, batrider, batrider, batriderj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batriderja, batrider, batrider, batriderj, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan, older version) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
 GAME( 1998, batridert,  batrider, batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Taiwan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
 
 // Battle Bakraid
