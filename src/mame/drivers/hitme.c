@@ -414,7 +414,7 @@ static INPUT_PORTS_START( hitme )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )				/* Time out counter (TOC1) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )					/* Aux 2 dipswitch - Unused*/
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )					/* Aux 2 dipswitch - Unused */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )					/* Always high */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)	/* P4 Stand button */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)	/* P4 Hit button */
@@ -454,6 +454,61 @@ static INPUT_PORTS_START( hitme )
 	PORT_ADJUSTER(50, "Card Width")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( super21 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Hblank */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )				/* Always high */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)	/* P4 Stand button */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)	/* P4 Hit button */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)	/* P4 Ante button */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Time out counter (*TO) */
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )				/* Aux 2 dipswitch? */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)	/* P3 Stand button */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)	/* P3 Hit button */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)	/* P3 Ante button */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Time out counter (*TO) */
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )				/* Aux 1 dipswitch? */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Hblank */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)	/* P2 Stand button */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	/* P2 Hit button */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	/* P2 Ante button */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Time out counter (*TO) */
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )				/* Time out counter (TOC1) */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )				/* Aux 2 dipswitch? */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)	/* P1 Stand button */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	/* P1 Hit button */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* P1 Ante button */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Time out counter (*TO) */
+
+	PORT_START("IN4")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN5") // bit 2 is chip/bet related, but also causes gfx glitches when set
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	/* this is actually a variable resistor */
+	PORT_START("R3")
+	PORT_ADJUSTER(30, "Game Speed")
+
+	/* this is actually a variable resistor */
+	PORT_START("WIDTH")
+	PORT_ADJUSTER(50, "Card Width")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( barricad )
 	PORT_START("IN0")
@@ -489,7 +544,7 @@ static INPUT_PORTS_START( barricad )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )						/* Time out counter (TOC1) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )						/* Always high */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )						/* Aux 2 dipswitch - Unused*/
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )						/* Aux 2 dipswitch - Unused */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT  ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
@@ -571,7 +626,7 @@ All chips we read as 82s141 - guessed becuase of 24 pin pinout and 512x8 rom acc
 ROM_START( hitme )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
 	ROM_LOAD( "hm2-0.b7", 0x0000, 0x0200, CRC(1b94caad) SHA1(30987e5cb0d55f3666dd63f04132a0e65988caea) )
-	ROM_LOAD( "hm-2-2.c7", 0x0200, 0x0200, CRC(fa7e8c33) SHA1(2d04635cee32d49cccd9a9a855b3a2be4295c2a5) )
+	ROM_LOAD( "hm-2-2.c7",0x0200, 0x0200, CRC(fa7e8c33) SHA1(2d04635cee32d49cccd9a9a855b3a2be4295c2a5) )
 	ROM_LOAD( "hm1-4.d7", 0x0400, 0x0200, CRC(10dd4581) SHA1(eaa7c9e75f79befc8abf0bd0913bbf15dd04230e) )
 	ROM_LOAD( "hm1-6.e7", 0x0600, 0x0200, CRC(18e4c83c) SHA1(bce987da371b7946262d7dff65f61ff2fcb55bf6) )
 	ROM_LOAD( "hm2-8.f7", 0x0800, 0x0200, CRC(f28983f8) SHA1(89167cf41ba71d90cd6133751158bb99bfc5e829) )
@@ -591,7 +646,6 @@ ROM_START( hitme1 )
 	ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
 ROM_END
 
-
 ROM_START( m21 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
 	ROM_LOAD( "mirco1.bin", 0x0000, 0x0200, CRC(aa796ad7) SHA1(2908bdb4ab17a2f5bc4da2f957906bf2b57afa50) )
@@ -603,6 +657,17 @@ ROM_START( m21 )
 	ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
 ROM_END
 
+ROM_START( super21 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
+	ROM_LOAD( "1.h1", 0x0000, 0x0200, CRC(cecf2224) SHA1(794d7b9f2533f7c00bbe1c7b3d37eb08c25a09bb) )
+	ROM_LOAD( "3.h2", 0x0200, 0x0200, CRC(eb62ea5f) SHA1(e4b9fafe2cab5a31549504ce430eadc230e3da39) )
+	ROM_LOAD( "2.j1", 0x0400, 0x0200, CRC(fea88bf2) SHA1(a18081cecd29c7929e589c5fda7ba1033ef8e7c3) )
+	ROM_LOAD( "4.j2", 0x0600, 0x0200, CRC(63238ddb) SHA1(7197640e758d7ef93c659eeea098424d3aa50314) )
+	ROM_LOAD( "5.k2", 0x0800, 0x0200, CRC(89983131) SHA1(c22c02a3bff0a61c5f341f1c2b3b37150ad2c1e3) )
+
+	ROM_REGION( 0x0400, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "7.h6", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
+ROM_END
 
 ROM_START( barricad )
    ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
@@ -614,7 +679,6 @@ ROM_START( barricad )
    ROM_REGION( 0x0400, "gfx1", 0 )
    ROM_LOAD( "550805.7h",   0x0000, 0x0200, CRC(35197599) SHA1(3c49af89b1bc1d495e1d6265ff3feaf33c56facb) )
 ROM_END
-
 
 ROM_START( brickyrd )
    ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
@@ -635,8 +699,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, hitme,    0,        hitme,    hitme,    0, ROT0, "RamTek", "Hit Me (set 1)",  GAME_SUPPORTS_SAVE )
+GAME( 1976, hitme,    0,        hitme,    hitme,    0, ROT0, "RamTek", "Hit Me (set 1)",  GAME_SUPPORTS_SAVE )	// 05/1976
 GAME( 1976, hitme1,   hitme,    hitme,    hitme,    0, ROT0, "RamTek", "Hit Me (set 2)",  GAME_SUPPORTS_SAVE )
-GAME( 1976, m21,      hitme,    hitme,    hitme,    0, ROT0, "Mirco",  "21 (Mirco)", GAME_SUPPORTS_SAVE )
+GAME( 1976, m21,      hitme,    hitme,    hitme,    0, ROT0, "Mirco Games",  "21 (Mirco)", GAME_SUPPORTS_SAVE )	// 08/1976, licensed?
+GAME( 1978, super21,  0,        hitme,    super21,  0, ROT0, "Mirco Games",  "Super Twenty One", GAME_SUPPORTS_SAVE )
 GAME( 1976, barricad, 0,        barricad, barricad, 0, ROT0, "RamTek", "Barricade",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1976, brickyrd, barricad, barricad, barricad, 0, ROT0, "RamTek", "Brickyard",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
