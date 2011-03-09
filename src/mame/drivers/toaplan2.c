@@ -5212,7 +5212,7 @@ GAME( 1993, vfive,      grindstm, vfive,    vfive,      vfive,   ROT270, "Toapla
 
 GAME( 1993, batsugun,   0,        batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun", GAME_SUPPORTS_SAVE )
 GAME( 1993, batsuguna,  batsugun, batsugun, batsugun,   dogyuun, ROT270, "Toaplan", "Batsugun (older set)", GAME_SUPPORTS_SAVE )
-GAME( 1993, batsugunsp, batsugun, batsugun, batsugunsp, dogyuun, ROT270, "Toaplan", "Batsugun - Special Ver.", GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugunsp, batsugun, batsugun, batsugunsp, dogyuun, ROT270, "Toaplan", "Batsugun - Special Version", GAME_SUPPORTS_SAVE )
 
 GAME( 1994, snowbro2,   0,        snowbro2, snowbro2,   0,       ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 
