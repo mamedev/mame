@@ -627,5 +627,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY             FULLNAME      FLAGS...                           LAYOUT  */
-GAMEL( 1981, mpoker,   0,      mpoker,   mpoker,   0,     ROT0, "Merit Industries", "Multi-Poker", GAME_WRONG_COLORS | GAME_NO_SOUND, layout_mpoker )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY  FULLNAME      FLAGS...                           LAYOUT  */
+GAMEL( 1981, mpoker,   0,      mpoker,   mpoker,   0,     ROT0, "Merit", "Multi-Poker", GAME_WRONG_COLORS | GAME_NO_SOUND, layout_mpoker )

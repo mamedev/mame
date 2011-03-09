@@ -1276,7 +1276,7 @@ ROM_START(suprbowl)
 ROM_END
 
 
-GAME( 1986, bullseye, 0,		by35, by35, by35, ROT0, "Grand Products Inc.","301/Bullseye", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1986, bullseye, 0,		by35, by35, by35, ROT0, "Grand Products","301/Bullseye", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1984, blakpyra, 0,		by35, by35, by35, ROT0, "Bally","Black Pyramid", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1983, bmx,	  0,		by35, by35, by35, ROT0, "Bally","BMX", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1981, centaur,  0,		by35, by35, by35, ROT0, "Bally","Centaur", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

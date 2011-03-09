@@ -441,7 +441,7 @@ ROM_START( berenstn )
 ROM_END
 
 
-GAME( 1982, tugboat,  0, tugboat, tugboat,  0, ROT90, "ETM", "Tugboat",    GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, noahsark, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech", "Noah's Ark", GAME_IMPERFECT_GRAPHICS )
-GAME( 1984, berenstn, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech", "The Berenstain Bears in Big Paw's Cave", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
+GAME( 1982, tugboat,  0, tugboat, tugboat,  0, ROT90, "Enter-Tech, Ltd.", "Tugboat",    GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, noahsark, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech, Ltd.", "Noah's Ark", GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, berenstn, 0, tugboat, noahsark, 0, ROT90, "Enter-Tech, Ltd.", "The Berenstain Bears in Big Paw's Cave", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
 

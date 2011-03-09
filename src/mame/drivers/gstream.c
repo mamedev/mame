@@ -638,4 +638,4 @@ static DRIVER_INIT( gstream )
 }
 
 
-GAME( 2002, gstream, 0, gstream, gstream, gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, gstream, 0, gstream, gstream, gstream, ROT270, "Oriental Soft", "G-Stream G2020", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

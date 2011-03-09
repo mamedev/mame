@@ -2939,5 +2939,5 @@ GAME( 1987, lottofun,   0,        lottofun,            lottofun, lottofun, ROT0,
 /* 2nd Generation Williams hardware with tilemaps */
 GAME( 1983, mysticm,    0,        mysticm,             mysticm,  mysticm,  ROT0,   "Williams", "Mystic Marathon", GAME_SUPPORTS_SAVE )
 GAME( 1984, tshoot,     0,        tshoot,              tshoot,   tshoot,   ROT0,   "Williams", "Turkey Shoot", GAME_SUPPORTS_SAVE )
-GAME( 1984, inferno,    0,        williams2_extra_ram, inferno,  inferno,  ROT0,   "Williams", "Inferno", GAME_SUPPORTS_SAVE )
+GAME( 1984, inferno,    0,        williams2_extra_ram, inferno,  inferno,  ROT0,   "Williams", "Inferno (Williams)", GAME_SUPPORTS_SAVE )
 GAME( 1986, joust2,     0,        joust2,              joust2,   joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (set 1)", GAME_SUPPORTS_SAVE )

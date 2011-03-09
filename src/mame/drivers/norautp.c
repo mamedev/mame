@@ -3529,7 +3529,7 @@ GAME(  1986, drhla,    0,       drhl,     norautp,  0,   ROT0, "Drews Inc.",    
 GAME(  1982, ssjkrpkr, 0,       ssjkrpkr, norautp,  ssa, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     GAME_NOT_WORKING )
 
 /* The following one also has a custom 68705 MCU */
-GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,   ROT0, "Micro Manufacturing Inc.",    "Turbo Poker 2",                    GAME_NOT_WORKING )
+GAME(  1993, tpoker2,  0,       dphltest, norautp,  0,   ROT0, "Micro Manufacturing",         "Turbo Poker 2",                    GAME_NOT_WORKING )
 
 
 /************************************ unknown sets ************************************/

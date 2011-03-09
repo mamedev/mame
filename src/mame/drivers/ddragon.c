@@ -2113,11 +2113,11 @@ GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon2, ROT0, "Technos 
 GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", GAME_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
-GAME( 1991, tstrike,  0,        darktowr, tstrike,  darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Thunder Strike (Newer)", GAME_SUPPORTS_SAVE )
-GAME( 1991, tstrikea, tstrike,  darktowr, tstrike,  darktowr, ROT0, "Game Room", "Thunder Strike (Older)", GAME_SUPPORTS_SAVE )
-GAME( 1992, ddungeon, 0,        darktowr, ddungeon, darktowr, ROT0, "Game Room", "Dangerous Dungeons", GAME_SUPPORTS_SAVE )
-GAME( 1992, ddungeone,ddungeon, darktowr, ddungeon, darktowr, ROT0, "East Coast Coin Company (Melbourne)", "Dangerous Dungeons (East Coast Coin Company)", GAME_SUPPORTS_SAVE )
-GAME( 1992, darktowr, 0,        darktowr, darktowr, darktowr, ROT0, "Game Room", "Dark Tower", GAME_SUPPORTS_SAVE )
+GAME( 1991, tstrike,  0,        darktowr, tstrike,  darktowr, ROT0, "East Coast Coin Company", "Thunder Strike (set 1)", GAME_SUPPORTS_SAVE ) // same manufacturer as The Game Room?
+GAME( 1991, tstrikea, tstrike,  darktowr, tstrike,  darktowr, ROT0, "The Game Room", "Thunder Strike (set 2, older)", GAME_SUPPORTS_SAVE )
+GAME( 1992, ddungeon, 0,        darktowr, ddungeon, darktowr, ROT0, "The Game Room", "Dangerous Dungeons (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1992, ddungeone,ddungeon, darktowr, ddungeon, darktowr, ROT0, "East Coast Coin Company", "Dangerous Dungeons (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1992, darktowr, 0,        darktowr, darktowr, darktowr, ROT0, "The Game Room", "Dark Tower", GAME_SUPPORTS_SAVE )
 
 /* these run on their own board, but are basically the same game. Toffy even has 'dangerous dungeons' text in it */
 GAME( 1993, toffy,    0,        toffy,    toffy,    toffy,    ROT0, "Midas", "Toffy", GAME_SUPPORTS_SAVE )

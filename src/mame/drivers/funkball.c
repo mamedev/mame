@@ -1,4 +1,4 @@
-// dgPix 'VRender 2 Beta Rev4' hardware
+// dgPIX 'VRender 2 Beta Rev4' hardware
 // MEDIAGX CPU + 3dFX VooDoo chipset
 
 /***************************************************************************
@@ -116,4 +116,4 @@ ROM_START( funkball )
 ROM_END
 
 
-GAME(1998, funkball, 0, funkball, funkball, 0, ROT0, "dgPix", "Funky Ball", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(1998, funkball, 0, funkball, funkball, 0, ROT0, "dgPIX Entertainment Inc.", "Funky Ball", GAME_NO_SOUND|GAME_NOT_WORKING)

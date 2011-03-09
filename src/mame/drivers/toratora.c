@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Tora Tora (c) 1980 GamePlan
+Tora Tora (c) 1980 Game Plan
 
 driver by Nicola Salmoria
 
@@ -455,4 +455,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, toratora, 0, toratora, toratora, 0, ROT90, "GamePlan", "Tora Tora (prototype?)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, toratora, 0, toratora, toratora, 0, ROT90, "Game Plan", "Tora Tora (prototype?)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -317,4 +317,4 @@ ROM_END
 
 
 GAME( 1999, funybubl, 0,        funybubl, funybubl, 0, ROT0, "In Chang Electronic Co", "Funny Bubble", GAME_SUPPORTS_SAVE )
-GAME( 1999, funybublc,funybubl, funybubl, funybubl, 0, ROT0, "Comad Industry Co Ltd",  "Funny Bubble (Comad version)", GAME_SUPPORTS_SAVE )
+GAME( 1999, funybublc,funybubl, funybubl, funybubl, 0, ROT0, "Comad", "Funny Bubble (Comad version)", GAME_SUPPORTS_SAVE )

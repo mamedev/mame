@@ -1192,11 +1192,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, killcom,  0,        gameplan, killcom,  0, ROT0,   "GamePlan (Centuri license)", "Killer Comet", GAME_SUPPORTS_SAVE )
-GAME( 1980, megatack, 0,        gameplan, megatack, 0, ROT0,   "GamePlan (Centuri license)", "Megatack", GAME_SUPPORTS_SAVE )
-GAME( 1981, challeng, 0,        gameplan, challeng, 0, ROT0,   "GamePlan (Centuri license)", "Challenger", GAME_SUPPORTS_SAVE )
-GAME( 1981, kaos,     0,        gameplan, kaos,     0, ROT270, "GamePlan",                   "Kaos", GAME_SUPPORTS_SAVE )
-GAME( 1982, leprechn, 0,        leprechn, leprechn, 0, ROT0,   "Tong Electronic",            "Leprechaun", GAME_SUPPORTS_SAVE )
-GAME( 1982, potogold, leprechn, leprechn, potogold, 0, ROT0,   "GamePlan",                   "Pot of Gold", GAME_SUPPORTS_SAVE )
-GAME( 1982, leprechp, leprechn, leprechn, potogold, 0, ROT0,   "Tong Electronic",            "Leprechaun (Pacific Polytechnical license)", GAME_SUPPORTS_SAVE )
-GAME( 1982, piratetr, 0,        leprechn, piratetr, 0, ROT0,   "Tong Electronic",            "Pirate Treasure", GAME_SUPPORTS_SAVE )
+GAME( 1980, killcom,  0,        gameplan, killcom,  0, ROT0,   "Game Plan (Centuri license)", "Killer Comet", GAME_SUPPORTS_SAVE )
+GAME( 1980, megatack, 0,        gameplan, megatack, 0, ROT0,   "Game Plan (Centuri license)", "Megatack", GAME_SUPPORTS_SAVE )
+GAME( 1981, challeng, 0,        gameplan, challeng, 0, ROT0,   "Game Plan (Centuri license)", "Challenger", GAME_SUPPORTS_SAVE )
+GAME( 1981, kaos,     0,        gameplan, kaos,     0, ROT270, "Game Plan", "Kaos", GAME_SUPPORTS_SAVE )
+GAME( 1982, leprechn, 0,        leprechn, leprechn, 0, ROT0,   "Tong Electronic", "Leprechaun", GAME_SUPPORTS_SAVE )
+GAME( 1982, potogold, leprechn, leprechn, potogold, 0, ROT0,   "Tong Electronic (Game Plan license)", "Pot of Gold", GAME_SUPPORTS_SAVE )
+GAME( 1982, leprechp, leprechn, leprechn, potogold, 0, ROT0,   "Tong Electronic (Pacific Polytechnical license)", "Leprechaun (Pacific)", GAME_SUPPORTS_SAVE )
+GAME( 1982, piratetr, 0,        leprechn, piratetr, 0, ROT0,   "Tong Electronic", "Pirate Treasure", GAME_SUPPORTS_SAVE )

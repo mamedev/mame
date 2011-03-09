@@ -1449,4 +1449,4 @@ GAME( 19??, borntofi,  0,        borntofi, borntofi, 0, ROT0,  "International Ga
 GAME( 19??, fantland,  0,        fantland, fantland, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 19??, fantlanda, fantland, fantland, fantland, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, 0, ROT0,  "International Games",       "Wheels Runner",        GAME_SUPPORTS_SAVE )
-GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, 0, ROT90, "Electronics Devices Italy", "Galaxy Gunners",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, 0, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

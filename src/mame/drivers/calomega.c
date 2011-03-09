@@ -4026,9 +4026,9 @@ GAME( 198?, comg903d, 0,        sys903,   stand903, standard, ROT0, "Cal Omega I
 GAME( 198?, comg905d, 0,        sys905,   stand905, standard, ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                          GAME_NOT_WORKING )
 
 /****** Unofficial / 3rd part games *******/
-GAME( 1982, elgrande, 0,        s903mod,  elgrande, elgrande, ROT0, "Tuni Electro Service / E.T. Marketing", "El Grande - 5 Card Draw (New)",                             0 )
-GAME( 1983, jjpoker,  0,        s903mod,  jjpoker,  jjpoker,  ROT0, "Enter-Tech (ETL)",                      "Jackpot Joker Poker (set 1)",                               0 )
-GAME( 1983, jjpokerb, jjpoker,  s903mod,  jjpoker,  jjpoker,  ROT0, "Enter-Tech (ETL)",                      "Jackpot Joker Poker (set 2)",                               0 )
+GAME( 1982, elgrande, 0,        s903mod,  elgrande, elgrande, ROT0, "Enter-Tech, Ltd. / Tuni Electro Service","El Grande - 5 Card Draw (New)",                            0 )
+GAME( 1983, jjpoker,  0,        s903mod,  jjpoker,  jjpoker,  ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 1)",                               0 )
+GAME( 1983, jjpokerb, jjpoker,  s903mod,  jjpoker,  jjpoker,  ROT0, "Enter-Tech, Ltd.",                      "Jackpot Joker Poker (set 2)",                               0 )
 GAME( 1988, ssipkr24, 0,        s903mod,  ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v2.4)",                                          0 )
 GAME( 1988, ssipkr30, ssipkr24, s903mod,  ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v3.0)",                                          0 )
 GAME( 1990, ssipkr40, ssipkr24, s903mod,  ssipkr,   jjpoker,  ROT0, "SSI",                                   "SSI Poker (v4.0)",                                          0 )

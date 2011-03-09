@@ -114,8 +114,8 @@ ROM_START(wolfman)
 	ROM_LOAD("memoriac.bin", 0x4000, 0x2000, CRC(468f16f0) SHA1(66ce0464d82331cfc0ac1f6fbd871066e4e57262))
 ROM_END
 
-GAME( 1987, odisea,   0, peyper, peyper, peyper, ROT0, "Peyper (Spain)", "Odisea Paris-Dakar",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME( 1987, wolfman,  0, peyper, peyper, peyper, ROT0, "Peyper (Spain)", "Wolf Man",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1987, odisea,   0, peyper, peyper, peyper, ROT0, "Peyper", "Odisea Paris-Dakar",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME( 1987, wolfman,  0, peyper, peyper, peyper, ROT0, "Peyper", "Wolf Man",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1985, odin_dlx, 0, peyper, peyper, peyper, ROT0, "Sonic", "Odin De Luxe",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1986, solarwap, 0, peyper, peyper, peyper, ROT0, "Sonic", "Solar Wars (Sonic)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME( 1987, poleposn, 0, peyper, peyper, peyper, ROT0, "Sonic", "Pole Position (Sonic)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
