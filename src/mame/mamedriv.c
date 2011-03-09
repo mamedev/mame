@@ -3065,7 +3065,8 @@ V-V                           TP-027
 	DRIVER( sfa3 )		/* 04/09/1998 (c) 1998 (USA) */
 	DRIVER( sfa3u )		/* 04/09/1998 (c) 1998 (USA) */
 	DRIVER( sfa3ur1 )	/* 29/06/1998 (c) 1998 (USA) */
-	DRIVER( sfa3h )		/* 29/06/1998 (c) 1998 (Hispanic) */
+	DRIVER( sfa3h )		/* 04/09/1998 (c) 1998 (Hispanic) */
+	DRIVER( sfa3hr1 )	/* 29/06/1998 (c) 1998 (Hispanic) */
 	DRIVER( sfa3b )		/* 29/06/1998 (c) 1998 (Brazil) */
 	DRIVER( sfz3j )		/* 04/09/1998 (c) 1998 (Japan) */
 	DRIVER( sfz3jr1 )	/* 27/07/1998 (c) 1998 (Japan) */
