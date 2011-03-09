@@ -6215,9 +6215,8 @@ GAME( 1982, tazmania,  0,        scobra,   tazmania,  scobra,   ROT90,  "Stern E
     CPU/Video Board: A969 (Has various wire mods)
     Sound Board:     A970
 */
-GAME( 1982, anteater,  0,        anteater, anteater,  anteater, ROT90,  "Stern Electronics (Tago license)", "Anteater", GAME_SUPPORTS_SAVE )
-
-GAME( 1982, calipso,   0,        scobra,   calipso,   calipso,  ROT90,  "Stern Electronics (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
+GAME( 1982, anteater,  0,        anteater, anteater,  anteater, ROT90,  "Tago Electronics", "Anteater", GAME_SUPPORTS_SAVE ) // sold as conversion kit
+GAME( 1982, calipso,   0,        scobra,   calipso,   calipso,  ROT90,  "Tago Electronics", "Calipso",  GAME_SUPPORTS_SAVE ) // sold as conversion kit
 
 /*
     Lost Tomb
