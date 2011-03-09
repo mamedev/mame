@@ -3367,7 +3367,7 @@ GAME(2003,	simpprty_400,simpprty,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern"
 GAME(2003,	simpprty_204,simpprty,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Simpsons Pinball Party, The (2.04)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2003,	simpnew,	simpprty,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Simpsons Pinball Party, The (ARM7 Sound Board)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2003,	simpprtg,	0,			whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Simpsons Pinball Party, The (5.00 Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(2003,	simpprtg_400,simpprtyg, whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Simpsons Pinball Party, The (4.00 Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(2003,	simpprtg_400,simpprtg,  whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Simpsons Pinball Party, The (4.00 Germany)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2003,	simpprtl,	0,			whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Simpsons Pinball Party, The (5.00 Spain)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2003,	simpprtl_400,simpprtl,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Simpsons Pinball Party, The (4.00 Spain)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
 GAME(2003,	simpprtl_204,simpprtl,	whitestar,	whitestar,	whitestar,	ROT0,	"Stern",	"Simpsons Pinball Party, The (2.04 Spain)",				GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
