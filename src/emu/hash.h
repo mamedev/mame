@@ -73,6 +73,7 @@ class hash_base
 public:
     // construction/destruction
     hash_base(char id, const char *name, UINT8 length, UINT8 *bufptr);
+    virtual ~hash_base() { }
 
     // operators
     bool operator==(const hash_base &rhs) const { return (m_length == rhs.m_length && memcmp(m_bufptr, rhs.m_bufptr, m_length) == 0); }
