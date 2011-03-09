@@ -933,6 +933,9 @@ INLINE UINT32 m68ki_ic_readimm16(m68ki_cpu_core *m68k, UINT32 address)
 	{
 		return m68k->memory.readimm16(address);
 	}
+
+	// this can't happen, but Apple GCC insists
+	return 0;
 }
 
 /* Handles all immediate reads, does address error check, function code setting,
