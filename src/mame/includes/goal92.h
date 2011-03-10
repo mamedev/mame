@@ -16,7 +16,8 @@ public:
 	UINT16 *    tx_data;
 	UINT16 *    scrollram;
 //  UINT16 *    paletteram; // this currently use generic palette handling
-//  UINT16 *    spriteram;  // this currently use generic buffered spriteram
+	UINT16 *    spriteram;
+	UINT16 *    buffered_spriteram;
 
 	/* video-related */
 	tilemap_t     *bg_layer, *fg_layer, *tx_layer;

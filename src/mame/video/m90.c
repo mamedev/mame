@@ -140,25 +140,26 @@ VIDEO_START( dynablsb )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	m90_state *state = machine->driver_data<m90_state>();
+	UINT16 *spriteram = state->video_data + 0xee00/2;;
 	int offs;
 
 	for (offs = 0x1f2/2; offs >= 0; offs -= 3)
 	{
 		int x,y,sprite,colour,fx,fy,y_multi,i;
 
-		sprite = state->spriteram[offs+1];
-		colour = (state->spriteram[offs+0] >> 9) & 0x0f;
+		sprite = spriteram[offs+1];
+		colour = (spriteram[offs+0] >> 9) & 0x0f;
 
-		y = state->spriteram[offs+0] & 0x1ff;
-		x = state->spriteram[offs+2] & 0x1ff;
+		y = spriteram[offs+0] & 0x1ff;
+		x = spriteram[offs+2] & 0x1ff;
 
 		x = x - 16;
 		y = 512 - y;
 
-		fx = (state->spriteram[offs+2] >> 8) & 0x02;
-		fy = (state->spriteram[offs+0] >> 8) & 0x80;
+		fx = (spriteram[offs+2] >> 8) & 0x02;
+		fy = (spriteram[offs+0] >> 8) & 0x80;
 
-		y_multi = 1 << ((state->spriteram[offs+0] & 0x6000) >> 13);
+		y_multi = 1 << ((spriteram[offs+0] & 0x6000) >> 13);
 		y -= 16 * y_multi;
 
 		for (i = 0;i < y_multi;i++)
@@ -192,12 +193,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	m90_state *state = machine->driver_data<m90_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
 
-	while ((offs < machine->generic.spriteram_size/2) & (spriteram16[offs+0] != 0x8000))
+	while ((offs < state->spriteram_size/2) & (spriteram16[offs+0] != 0x8000))
 	{
 		last_sprite = offs;
 		offs += 4;
@@ -231,11 +233,12 @@ static void bomblord_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 
 static void dynablsb_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	m90_state *state = machine->driver_data<m90_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
-	while ((offs < machine->generic.spriteram_size/2) & (spriteram16[offs+0] != 0xffff))
+	while ((offs < state->spriteram_size/2) & (spriteram16[offs+0] != 0xffff))
 	{
 		last_sprite = offs;
 		offs += 4;
@@ -321,8 +324,6 @@ SCREEN_UPDATE( m90 )
 	}
 	state->last_pf1=pf1_base;
 	state->last_pf2=pf2_base;
-
-	state->spriteram=state->video_data+0xee00/2;
 
 	/* Setup scrolling */
 	if (state->video_control_data[5]&0x20)

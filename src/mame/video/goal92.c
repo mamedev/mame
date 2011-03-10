@@ -94,7 +94,8 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
+	goal92_state *state = machine->driver_data<goal92_state>();
+	UINT16 *buffered_spriteram16 = state->buffered_spriteram;
 	int offs, fx, fy, x, y, color, sprite;
 
 	for (offs = 3; offs <= 0x400 - 5; offs += 4)
@@ -143,8 +144,8 @@ VIDEO_START( goal92 )
 	state->fg_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16, 16, 32, 32);
 	state->tx_layer = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
-	machine->generic.buffered_spriteram.u16 = auto_alloc_array(machine, UINT16, 0x400 * 2);
-	state_save_register_global_pointer(machine, machine->generic.buffered_spriteram.u16, 0x400 * 2);
+	state->buffered_spriteram = auto_alloc_array(machine, UINT16, 0x400 * 2);
+	state_save_register_global_pointer(machine, state->buffered_spriteram, 0x400 * 2);
 
 	tilemap_set_transparent_pen(state->bg_layer, 15);
 	tilemap_set_transparent_pen(state->fg_layer, 15);
@@ -189,5 +190,6 @@ SCREEN_UPDATE( goal92 )
 
 SCREEN_EOF( goal92 )
 {
-	memcpy(machine->generic.buffered_spriteram.u16, machine->generic.spriteram.u16, 0x400 * 2);
+	goal92_state *state = machine->driver_data<goal92_state>();
+	memcpy(state->buffered_spriteram, state->spriteram, 0x400 * 2);
 }

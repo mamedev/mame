@@ -26,6 +26,9 @@ public:
 	UINT16 *majtitle_rowscrollram;
 	UINT32 raster_irq_position;
 	UINT16 *spriteram;
+	UINT16 *spriteram2;
+	UINT16 *buffered_spriteram;
+	size_t spriteram_size;
 	tilemap_t *fg_tilemap;
 	tilemap_t *bg_tilemap;
 	INT32 scrollx1;

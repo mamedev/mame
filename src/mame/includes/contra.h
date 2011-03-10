@@ -12,7 +12,8 @@ public:
 
 	/* memory pointers */
 	UINT8 *        spriteram;
-	UINT8 *        spriteram_2;
+	UINT8 *        buffered_spriteram;
+	UINT8 *        buffered_spriteram_2;
 	UINT8 *        paletteram;
 	UINT8 *        bg_vram;
 	UINT8 *        bg_cram;

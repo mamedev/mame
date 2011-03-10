@@ -501,7 +501,8 @@ void dec0_i8751_reset(running_machine *machine)
 
 static WRITE16_HANDLER( sprite_mirror_w )
 {
-	COMBINE_DATA(&space->machine->generic.spriteram.u16[offset]);
+	dec0_state *state = space->machine->driver_data<dec0_state>();
+	COMBINE_DATA(&state->spriteram[offset]);
 }
 
 /******************************************************************************/

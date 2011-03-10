@@ -30,6 +30,7 @@ public:
 	pf_layer_info pf_layer[4];
 	UINT16 control[0x10];
 	UINT16 *spriteram;
+	UINT16 *buffered_spriteram;
 };
 
 

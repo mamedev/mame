@@ -41,6 +41,7 @@ public:
 	UINT16 pf3_control_0[4];
 	UINT16 pf3_control_1[4];
 	UINT16 *spriteram;
+	UINT16 *buffered_spriteram;
 	UINT16 pri;
 	int buffer[0x20];
 };

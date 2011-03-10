@@ -7,6 +7,7 @@ public:
 	UINT32 bankaddress;
 	UINT16 *video_data;
 	UINT16 *spriteram;
+	size_t spriteram_size;
 	UINT16 video_control_data[8];
 	tilemap_t *pf1_layer;
 	tilemap_t *pf2_layer;

@@ -172,8 +172,8 @@ VIDEO_START( contra )
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	state->spriteram = auto_alloc_array(machine, UINT8, 0x800);
-	state->spriteram_2 = auto_alloc_array(machine, UINT8, 0x800);
+	state->buffered_spriteram = auto_alloc_array(machine, UINT8, 0x800);
+	state->buffered_spriteram_2 = auto_alloc_array(machine, UINT8, 0x800);
 
 	state->bg_clip = machine->primary_screen->visible_area();
 	state->bg_clip.min_x += 40;
@@ -186,8 +186,8 @@ VIDEO_START( contra )
 
 	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 
-	state->save_pointer(NAME(state->spriteram), 0x800);
-	state->save_pointer(NAME(state->spriteram_2), 0x800);
+	state->save_pointer(NAME(state->buffered_spriteram), 0x800);
+	state->save_pointer(NAME(state->buffered_spriteram_2), 0x800);
 }
 
 
@@ -253,9 +253,9 @@ WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(state->spriteram, space->machine->generic.spriteram.u8 + 0x800, 0x800);
+			memcpy(state->buffered_spriteram, state->spriteram + 0x800, 0x800);
 		else
-			memcpy(state->spriteram, space->machine->generic.spriteram.u8, 0x800);
+			memcpy(state->buffered_spriteram, state->spriteram, 0x800);
 	}
 
 	if (offset == 6)
@@ -278,9 +278,9 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 	if (offset == 3)
 	{
 		if ((data & 0x8) == 0)
-			memcpy(state->spriteram_2, space->machine->generic.spriteram.u8 + 0x2800, 0x800);
+			memcpy(state->buffered_spriteram_2, state->spriteram + 0x2800, 0x800);
 		else
-			memcpy(state->spriteram_2, space->machine->generic.spriteram.u8 + 0x2000, 0x800);
+			memcpy(state->buffered_spriteram_2, state->spriteram + 0x2000, 0x800);
 	}
 	if (offset == 6)
 	{
@@ -309,9 +309,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	const UINT8 *source;
 
 	if (bank == 0)
-		source = state->spriteram;
+		source = state->buffered_spriteram;
 	else
-		source = state->spriteram_2;
+		source = state->buffered_spriteram_2;
 
 	k007121_sprites_draw(k007121, bitmap, cliprect, machine->gfx[bank], machine->colortable, source, base_color, 40, 0, (UINT32)-1);
 }

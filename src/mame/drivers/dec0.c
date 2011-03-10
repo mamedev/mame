@@ -297,7 +297,7 @@ static ADDRESS_MAP_START( dec0_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(dec0_paletteram_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE(dec0_paletteram_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)									/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_GENERIC(spriteram)								/* Sprites */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)								/* Sprites */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( robocop_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( slyspy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x301000, 0x3017ff) AM_WRITE(dec0_pf3_data_w) AM_BASE_MEMBER(dec0_state, pf3_data)
 
 	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)	/* Sly spy main ram */
-	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE_GENERIC(spriteram)	/* Sprites */
+	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)	/* Sprites */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
@@ -358,7 +358,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( midres_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(midres_controls_r)
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( secretab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x301000, 0x3017ff) AM_RAM_WRITE(dec0_pf3_data_w) AM_BASE_MEMBER(dec0_state, pf3_data)
 	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE_MEMBER(dec0_state, ram) /* Sly spy main ram */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE_GENERIC(spriteram) /* Sprites */
+	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram) /* Sprites */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( automat_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( automat_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w)				// NEW
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)				/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_GENERIC(spriteram)			/* Sprites */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)			/* Sprites */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( automat_adpcm_w )

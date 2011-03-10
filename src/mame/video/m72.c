@@ -115,7 +115,7 @@ static void register_savestate(running_machine *machine)
 	state->save_item(NAME(state->scrolly1));
 	state->save_item(NAME(state->scrollx2));
 	state->save_item(NAME(state->scrolly2));
-	state->save_pointer(NAME(state->spriteram), machine->generic.spriteram_size/2);
+	state->save_pointer(NAME(state->buffered_spriteram), state->spriteram_size/2);
 }
 
 
@@ -125,7 +125,7 @@ VIDEO_START( m72 )
 	state->bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	state->spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->buffered_spriteram = auto_alloc_array(machine, UINT16, state->spriteram_size/2);
 
 	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(state->fg_tilemap,1,0x00ff,0xff01);
@@ -136,7 +136,7 @@ VIDEO_START( m72 )
 	//tilemap_set_transmask(state->bg_tilemap,2,0x0001,0xfffe);
 	tilemap_set_transmask(state->bg_tilemap,2,0x0007,0xfff8);
 
-	memset(state->spriteram,0,machine->generic.spriteram_size);
+	memset(state->buffered_spriteram,0,state->spriteram_size);
 
 	tilemap_set_scrolldx(state->fg_tilemap,0,0);
 	tilemap_set_scrolldy(state->fg_tilemap,-128,16);
@@ -153,7 +153,7 @@ VIDEO_START( rtype2 )
 	state->bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	state->spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->buffered_spriteram = auto_alloc_array(machine, UINT16, state->spriteram_size/2);
 
 	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(state->fg_tilemap,1,0x00ff,0xff01);
@@ -163,7 +163,7 @@ VIDEO_START( rtype2 )
 	tilemap_set_transmask(state->bg_tilemap,1,0x00ff,0xff00);
 	tilemap_set_transmask(state->bg_tilemap,2,0x0001,0xfffe);
 
-	memset(state->spriteram,0,machine->generic.spriteram_size);
+	memset(state->buffered_spriteram,0,state->spriteram_size);
 
 	tilemap_set_scrolldx(state->fg_tilemap,4,0);
 	tilemap_set_scrolldy(state->fg_tilemap,-128,16);
@@ -194,7 +194,7 @@ VIDEO_START( majtitle )
 	state->bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
 	state->fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	state->spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->buffered_spriteram = auto_alloc_array(machine, UINT16, state->spriteram_size/2);
 
 	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(state->fg_tilemap,1,0x00ff,0xff01);
@@ -204,7 +204,7 @@ VIDEO_START( majtitle )
 	tilemap_set_transmask(state->bg_tilemap,1,0x00ff,0xff00);
 	tilemap_set_transmask(state->bg_tilemap,2,0x0001,0xfffe);
 
-	memset(state->spriteram,0,machine->generic.spriteram_size);
+	memset(state->buffered_spriteram,0,state->spriteram_size);
 
 	tilemap_set_scrolldx(state->fg_tilemap,4,0);
 	tilemap_set_scrolldy(state->fg_tilemap,-128,16);
@@ -221,7 +221,7 @@ VIDEO_START( hharry )
 	state->bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
 
-	state->spriteram = auto_alloc_array(machine, UINT16, machine->generic.spriteram_size/2);
+	state->buffered_spriteram = auto_alloc_array(machine, UINT16, state->spriteram_size/2);
 
 	tilemap_set_transmask(state->fg_tilemap,0,0xffff,0x0001);
 	tilemap_set_transmask(state->fg_tilemap,1,0x00ff,0xff01);
@@ -231,7 +231,7 @@ VIDEO_START( hharry )
 	tilemap_set_transmask(state->bg_tilemap,1,0x00ff,0xff00);
 	tilemap_set_transmask(state->bg_tilemap,2,0x0001,0xfffe);
 
-	memset(state->spriteram,0,machine->generic.spriteram_size);
+	memset(state->buffered_spriteram,0,state->spriteram_size);
 
 	tilemap_set_scrolldx(state->fg_tilemap,4,0);
 	tilemap_set_scrolldy(state->fg_tilemap,-128,16);
@@ -346,7 +346,7 @@ WRITE16_HANDLER( m72_dmaon_w )
 {
 	m72_state *state = space->machine->driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
-		memcpy(state->spriteram,space->machine->generic.spriteram.u16,space->machine->generic.spriteram_size);
+		memcpy(state->buffered_spriteram, state->spriteram, state->spriteram_size);
 }
 
 
@@ -421,23 +421,24 @@ WRITE16_HANDLER( majtitle_gfx_ctrl_w )
 static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	m72_state *state = machine->driver_data<m72_state>();
+	UINT16 *spriteram = state->buffered_spriteram;
 	int offs;
 
 	offs = 0;
-	while (offs < machine->generic.spriteram_size/2)
+	while (offs < state->spriteram_size/2)
 	{
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
 
 
-		code = state->spriteram[offs+1];
-		color = state->spriteram[offs+2] & 0x0f;
-		sx = -256+(state->spriteram[offs+3] & 0x3ff);
-		sy = 384-(state->spriteram[offs+0] & 0x1ff);
-		flipx = state->spriteram[offs+2] & 0x0800;
-		flipy = state->spriteram[offs+2] & 0x0400;
+		code = spriteram[offs+1];
+		color = spriteram[offs+2] & 0x0f;
+		sx = -256+(spriteram[offs+3] & 0x3ff);
+		sy = 384-(spriteram[offs+0] & 0x1ff);
+		flipx = spriteram[offs+2] & 0x0800;
+		flipy = spriteram[offs+2] & 0x0400;
 
-		w = 1 << ((state->spriteram[offs+2] & 0xc000) >> 14);
-		h = 1 << ((state->spriteram[offs+2] & 0x3000) >> 12);
+		w = 1 << ((spriteram[offs+2] & 0xc000) >> 14);
+		h = 1 << ((spriteram[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
 		if (flip_screen_get(machine))
@@ -473,10 +474,11 @@ static void m72_draw_sprites(running_machine *machine, bitmap_t *bitmap,const re
 
 static void majtitle_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT16 *spriteram16_2 = machine->generic.spriteram2.u16;
+	m72_state *state = machine->driver_data<m72_state>();
+	UINT16 *spriteram16_2 = state->spriteram2;
 	int offs;
 
-	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
+	for (offs = 0;offs < state->spriteram_size;offs += 4)
 	{
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
 

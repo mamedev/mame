@@ -145,7 +145,7 @@ VIDEO_START( m107 )
 			tilemap_set_transparent_pen(layer->tmap, 0);
 	}
 
-	state->spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	state->buffered_spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 }
 
 /*****************************************************************************/
@@ -153,6 +153,7 @@ VIDEO_START( m107 )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	m107_state *state = machine->driver_data<m107_state>();
+	UINT16 *spriteram = state->buffered_spriteram;
 	int offs;
 	UINT8 *rom = machine->region("user1")->base();
 
@@ -160,24 +161,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int x,y,sprite,colour,fx,fy,y_multi,i,s_ptr,pri_mask;
 
-		pri_mask = (!(state->spriteram[offs+2]&0x80)) ? 2 : 0;
+		pri_mask = (!(spriteram[offs+2]&0x80)) ? 2 : 0;
 
-		y=state->spriteram[offs+0];
-		x=state->spriteram[offs+3];
+		y=spriteram[offs+0];
+		x=spriteram[offs+3];
 		x&=0x1ff;
 		y&=0x1ff;
 
 		if (x==0 || y==0) continue; /* offscreen */
 
-		sprite=state->spriteram[offs+1]&0x7fff;
+		sprite=spriteram[offs+1]&0x7fff;
 
 		x = x - 16;
 		y = 384 - 16 - y;
 
-		colour=state->spriteram[offs+2]&0x7f;
-		fx=(state->spriteram[offs+2]>>8)&0x1;
-		fy=(state->spriteram[offs+2]>>8)&0x2;
-		y_multi=(state->spriteram[offs+0]>>11)&0x3;
+		colour=spriteram[offs+2]&0x7f;
+		fx=(spriteram[offs+2]>>8)&0x1;
+		fy=(spriteram[offs+2]>>8)&0x2;
+		y_multi=(spriteram[offs+0]>>11)&0x3;
 
 		if (state->spritesystem == 0)
 		{
@@ -381,7 +382,7 @@ WRITE16_HANDLER( m107_spritebuffer_w )
 //      logerror("%04x: buffered spriteram\n",cpu_get_pc(space->cpu));
 		state->sprite_display	= (!(data & 0x1000));
 
-		memcpy(state->spriteram,space->machine->generic.spriteram.u16,0x1000);
+		memcpy(state->buffered_spriteram, state->spriteram, 0x1000);
 	}
 }
 

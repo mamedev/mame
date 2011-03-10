@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynablsb_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_BASE_SIZE_MEMBER(m90_state, spriteram, spriteram_size)
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE_MEMBER(m90_state, video_data)
 	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bomblord_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_BASE_SIZE_MEMBER(m90_state, spriteram, spriteram_size)
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m90_video_w) AM_BASE_MEMBER(m90_state, video_data)
 	AM_RANGE(0xe0000, 0xe03ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM

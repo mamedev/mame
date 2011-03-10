@@ -104,7 +104,7 @@ Todo:
 WRITE16_HANDLER( dec0_update_sprites_w )
 {
 	dec0_state *state = space->machine->driver_data<dec0_state>();
-	memcpy(state->spriteram,space->machine->generic.spriteram.u16,0x800);
+	memcpy(state->buffered_spriteram,state->spriteram,0x800);
 }
 
 /******************************************************************************/
@@ -137,16 +137,17 @@ WRITE16_HANDLER( dec0_paletteram_b_w )
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
 {
 	dec0_state *state = machine->driver_data<dec0_state>();
+	UINT16 *spriteram = state->buffered_spriteram;
 	int offs;
 
 	for (offs = 0;offs < 0x400;offs += 4)
 	{
 		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
 
-		y = state->spriteram[offs];
+		y = spriteram[offs];
 		if ((y&0x8000) == 0) continue;
 
-		x = state->spriteram[offs+2];
+		x = spriteram[offs+2];
 		colour = x >> 12;
 		if ((colour & pri_mask) != pri_val) continue;
 
@@ -158,7 +159,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 		multi = (1 << ((y & 0x1800) >> 11)) - 1;	/* 1x, 2x, 4x, 8x height */
 											/* multi = 0   1   3   7 */
 
-		sprite = state->spriteram[offs+1] & 0x0fff;
+		sprite = spriteram[offs+1] & 0x0fff;
 
 		x = x & 0x01ff;
 		y = y & 0x01ff;
@@ -722,14 +723,14 @@ VIDEO_START( dec0_nodma )
 	state->pf3_tilemap_1 = tilemap_create(machine, get_pf3_tile_info,tile_shape1_scan,    16,16, 32, 32);
 	state->pf3_tilemap_2 = tilemap_create(machine, get_pf3_tile_info,tile_shape2_scan,    16,16, 16, 64);
 
-	state->spriteram=machine->generic.spriteram.u16;
+	state->buffered_spriteram = state->spriteram;
 }
 
 VIDEO_START( dec0 )
 {
 	dec0_state *state = machine->driver_data<dec0_state>();
 	VIDEO_START_CALL(dec0_nodma);
-	state->spriteram=auto_alloc_array(machine, UINT16, 0x800/2);
+	state->buffered_spriteram = auto_alloc_array(machine, UINT16, 0x800/2);
 }
 
 /******************************************************************************/
