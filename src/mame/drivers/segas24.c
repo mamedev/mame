@@ -337,6 +337,7 @@ Notes:
 #include "sound/ym2151.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
+#include "machine/nvram.h"
 #include "video/segaic24.h"
 #include "includes/segas24.h"
 
@@ -1066,18 +1067,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static NVRAM_HANDLER(system24)
-{
-	if(!track_size || !file)
-		return;
-	if(read_or_write)
-		file->write(machine->region("floppy")->base(), 2*track_size);
-	else
-		file->read(machine->region("floppy")->base(), 2*track_size);
-}
-
 static MACHINE_START( system24 )
 {
+	if (track_size)
+		machine->device<nvram_device>("floppy_nvram")->set_base(machine->region("floppy")->base(), 2*track_size);
+
 	UINT8 *usr1 = machine->region("romboard")->base();
 	if (usr1)
 	{
@@ -1813,7 +1807,7 @@ static MACHINE_CONFIG_START( system24, driver_device )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )
-	MCFG_NVRAM_HANDLER(system24)
+	MCFG_NVRAM_ADD_NO_FILL("floppy_nvram")
 MACHINE_CONFIG_END
 
 

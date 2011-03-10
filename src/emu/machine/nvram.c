@@ -187,6 +187,10 @@ void nvram_device::nvram_default()
 		case nvram_device_config::DEFAULT_CUSTOM:
 			m_custom_handler(*this, m_base, m_length);
 			break;
+
+		// none - do nothing
+		case nvram_device_config::DEFAULT_NONE:
+			break;
 	}
 }
 

@@ -22,6 +22,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
+#include "machine/nvram.h"
 #include "includes/nb1413m3.h"		// needed for mahjong input controller
 #include "sound/3812intf.h"
 #include "sound/dac.h"
@@ -36,19 +37,6 @@ Notes:
 #define DAC_WRITE	dac_w
 #endif
 
-
-static NVRAM_HANDLER( nbmj9195 )
-{
-	nbmj9195_state *state = machine->driver_data<nbmj9195_state>();
-	if (read_or_write)
-		file->write(state->nvram, state->nvram_size);
-	else {
-		if (file)
-			file->read(state->nvram, state->nvram_size);
-		else
-			memset(state->nvram, 0, state->nvram_size);
-	}
-}
 
 static WRITE8_HANDLER( nbmj9195_soundbank_w )
 {
@@ -721,7 +709,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sailorws_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(nbmj9195_state, nvram) AM_SIZE_MEMBER(nbmj9195_state, nvram_size)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjuraden_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -733,7 +721,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( koinomp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(nbmj9195_state, nvram) AM_SIZE_MEMBER(nbmj9195_state, nvram_size)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngpgal_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3199,7 +3187,7 @@ static MACHINE_CONFIG_DERIVED( janbari, NBMJDRV1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(patimono_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3210,7 +3198,7 @@ static MACHINE_CONFIG_DERIVED( mmehyou, NBMJDRV1 )
 	MCFG_CPU_PROGRAM_MAP(koinomp_map)
 	MCFG_CPU_IO_MAP(mmehyou_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3221,7 +3209,7 @@ static MACHINE_CONFIG_DERIVED( ultramhm, NBMJDRV1 )
 	MCFG_CPU_PROGRAM_MAP(koinomp_map)
 	MCFG_CPU_IO_MAP(koinomp_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3263,7 +3251,7 @@ static MACHINE_CONFIG_DERIVED( pachiten, NBMJDRV1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pachiten_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -3279,7 +3267,7 @@ static MACHINE_CONFIG_DERIVED( sailorwr, NBMJDRV1 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sailorwr_io_map)
 
-	MCFG_NVRAM_HANDLER(nbmj9195)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 

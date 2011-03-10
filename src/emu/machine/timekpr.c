@@ -5,6 +5,7 @@
     Various ST Microelectronics timekeeper SRAM implementations:
         - M48T02
         - M48T35
+        - M48T37
         - M48T58
         - MK48T08
 
@@ -34,14 +35,16 @@
 
 #define SECONDS_ST ( 0x80 )
 
-#define DAY_FT ( 0x40 ) /* not emulated */
+#define DAY_FT ( 0x40 ) /* M48T37 - not emulated */
 #define DAY_CEB ( 0x20 ) /* M48T35/M48T58 */
 #define DAY_CB ( 0x10 ) /* M48T35/M48T58 */
 
 #define DATE_BLE ( 0x80 ) /* M48T58: not emulated */
 #define DATE_BL ( 0x40 ) /* M48T58: not emulated */
 
-#define FLAGS_BL ( 0x10 ) /* MK48T08: not emulated */
+#define FLAGS_BL ( 0x10 ) /* MK48T08/M48T37: not emulated */
+#define FLAGS_AF ( 0x40 ) /* M48T37: not emulated */
+#define FLAGS_WDF ( 0x80 ) /* M48T37: not emulated */
 
 #define TIMEKPR_DEV_DERIVED_CTOR(devtype) \
 	devtype##_device::devtype##_device(running_machine &_machine, const devtype##_device_config &config) \
@@ -164,11 +167,13 @@ static int counter_from_ram( UINT8 *data, int offset )
 
 const device_type M48T02 = m48t02_device_config::static_alloc_device_config;
 const device_type M48T35 = m48t35_device_config::static_alloc_device_config;
+const device_type M48T37 = m48t37_device_config::static_alloc_device_config;
 const device_type M48T58 = m48t58_device_config::static_alloc_device_config;
 const device_type MK48T08 = mk48t08_device_config::static_alloc_device_config;
 
 TIMEKPR_DERIVE(m48t02, "M48T02", "m48t02")
 TIMEKPR_DERIVE(m48t35, "M48T35", "m48t35")
+TIMEKPR_DERIVE(m48t37, "M48T37", "m48t37")
 TIMEKPR_DERIVE(m48t58, "M48T58", "m48t58")
 TIMEKPR_DERIVE(mk48t08, "MK48T08", "mk48t08")
 
@@ -190,8 +195,6 @@ timekeeper_device::timekeeper_device(running_machine &_machine, const timekeeper
 
 void timekeeper_device::device_start()
 {
-	emu_timer *timer;
-	attotime duration;
 	system_time systime;
 
 	/* validate some basic stuff */
@@ -227,9 +230,8 @@ void timekeeper_device::device_start()
 	save_item( NAME(m_century) );
 	save_pointer( NAME(m_data), m_size );
 
-	timer = m_machine.scheduler().timer_alloc( FUNC(timekeeper_tick_callback), (void *)this );
-	duration = attotime::from_seconds(1);
-	timer->adjust( duration, 0, duration );
+	emu_timer *timer = timer_alloc();
+	timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 }
 
 void m48t02_device::device_start()
@@ -261,6 +263,23 @@ void m48t35_device::device_start()
 	m_offset_year = 0x7fff;
 	m_offset_century = -1;
 	m_offset_flags = -1;
+	m_size = 0x8000;
+
+	timekeeper_device::device_start();
+}
+
+void m48t37_device::device_start()
+{
+	m_offset_control = 0x7ff8;
+	m_offset_seconds = 0x7ff9;
+	m_offset_minutes = 0x7ffa;
+	m_offset_hours = 0x7ffb;
+	m_offset_day = 0x7ffc;
+	m_offset_date = 0x7ffd;
+	m_offset_month = 0x7ffe;
+	m_offset_year = 0x7fff;
+	m_offset_century = 0x7ff1;
+	m_offset_flags = 0x7ff0;
 	m_size = 0x8000;
 
 	timekeeper_device::device_start();
@@ -307,6 +326,7 @@ void mk48t08_device::device_start()
 void timekeeper_device::device_reset() { }
 void m48t02_device::device_reset() { }
 void m48t35_device::device_reset() { }
+void m48t37_device::device_reset() { }
 void m48t58_device::device_reset() { }
 void mk48t08_device::device_reset() { }
 
@@ -336,12 +356,7 @@ void timekeeper_device::counters_from_ram()
 	m_century = counter_from_ram( m_data, m_offset_century );
 }
 
-TIMER_CALLBACK( timekeeper_device::timekeeper_tick_callback )
-{
-    reinterpret_cast<timekeeper_device *>(ptr)->timekeeper_tick();
-}
-
-void timekeeper_device::timekeeper_tick()
+void timekeeper_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	if( ( m_seconds & SECONDS_ST ) != 0 ||
 		( m_control & CONTROL_W ) != 0 )
@@ -431,21 +446,22 @@ void timekeeper_device::write(UINT16 offset, UINT8 data)
 			m_day = ( m_day & ~DAY_CEB ) | ( data & DAY_CEB );
 		}
 	}
-	else if( offset == m_offset_date && type() == M48T58 )
-	{
-		data &= ~DATE_BL;
-	}
-	else if( offset == m_offset_flags && type() == MK48T08 )
-	{
-		data &= ~FLAGS_BL;
-	}
 
 	m_data[ offset ] = data;
 }
 
 UINT8 timekeeper_device::read(UINT16 offset)
 {
-	return m_data[ offset ];
+	UINT8 result = m_data[ offset ];
+	if( offset == m_offset_date && type() == M48T58 )
+	{
+		result &= ~DATE_BL;
+	}
+	else if( offset == m_offset_flags && (type() == MK48T08 || type() == M48T37) )
+	{
+		result = 0;
+	}
+	return result;
 }
 
 //-------------------------------------------------
@@ -463,6 +479,10 @@ void timekeeper_device::nvram_default()
 	{
 		memset( m_data, 0xff, m_size );
 	}
+
+	if ( m_offset_flags >= 0 )
+		m_data[ m_offset_flags ] = 0;
+	counters_to_ram();
 }
 
 

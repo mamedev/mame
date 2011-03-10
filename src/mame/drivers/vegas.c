@@ -276,6 +276,7 @@
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "audio/dcs.h"
+#include "machine/timekpr.h"
 #include "machine/idectrl.h"
 #include "machine/midwayic.h"
 #include "machine/smc91c9x.h"
@@ -458,8 +459,10 @@ class vegas_state : public driver_device
 {
 public:
 	vegas_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  timekeeper(*this, "timekeeper") { }
 
+	required_device<m48t37_device> timekeeper;
 	UINT32 *rambase;
 	UINT32 *rombase;
 	size_t ramsize;
@@ -478,8 +481,6 @@ public:
 	UINT8 sio_led_state;
 	UINT8 pending_analog_read;
 	UINT8 cmos_unlocked;
-	UINT32 *timekeeper_nvram;
-	size_t timekeeper_nvram_size;
 	device_t *voodoo;
 	UINT8 dcs_idma_cs;
 	int count;
@@ -611,7 +612,14 @@ static WRITE32_HANDLER( timekeeper_w )
 	vegas_state *state = space->machine->driver_data<vegas_state>();
 	if (state->cmos_unlocked)
 	{
-		COMBINE_DATA(&state->timekeeper_nvram[offset]);
+		if ((mem_mask & 0x000000ff) != 0)
+			state->timekeeper->write(offset * 4 + 0, data >> 0);
+		if ((mem_mask & 0x0000ff00) != 0)
+			state->timekeeper->write(offset * 4 + 1, data >> 8);
+		if ((mem_mask & 0x00ff0000) != 0)
+			state->timekeeper->write(offset * 4 + 2, data >> 16);
+		if ((mem_mask & 0xff000000) != 0)
+			state->timekeeper->write(offset * 4 + 3, data >> 24);
 		if (offset*4 >= 0x7ff0)
 			if (LOG_TIMEKEEPER) logerror("timekeeper_w(%04X & %08X) = %08X\n", offset*4, mem_mask, data);
 		state->cmos_unlocked = 0;
@@ -621,61 +629,21 @@ static WRITE32_HANDLER( timekeeper_w )
 }
 
 
-INLINE UINT8 make_bcd(UINT8 data)
-{
-	return ((data / 10) << 4) | (data % 10);
-}
-
-
 static READ32_HANDLER( timekeeper_r )
 {
 	vegas_state *state = space->machine->driver_data<vegas_state>();
-	UINT32 result = state->timekeeper_nvram[offset];
-
-	/* upper bytes are a realtime clock */
-	if ((offset*4) >= 0x7ff0)
-	{
-		/* get the time */
-		system_time systime;
-		space->machine->base_datetime(systime);
-
-		/* return portions thereof */
-		switch (offset*4)
-		{
-			case 0x7ff0:
-				result &= 0x00ff0000;
-				result |= (make_bcd(systime.local_time.year) / 100) << 8;
-				break;
-			case 0x7ff4:
-				break;
-			case 0x7ff8:
-				result &= 0x000000ff;
-				result |= make_bcd(systime.local_time.second) << 8;
-				result |= make_bcd(systime.local_time.minute) << 16;
-				result |= make_bcd(systime.local_time.hour) << 24;
-				break;
-			case 0x7ffc:
-				result = systime.local_time.weekday + 1;
-				result |= 0x40;		/* frequency test */
-				result |= make_bcd(systime.local_time.mday) << 8;
-				result |= make_bcd(systime.local_time.month + 1) << 16;
-				result |= make_bcd(systime.local_time.year % 100) << 24;
-				break;
-		}
-	}
+	UINT32 result = 0xffffffff;
+	if ((mem_mask & 0x000000ff) != 0)
+		result = (result & ~0x000000ff) | (state->timekeeper->read(offset * 4 + 0) << 0);
+	if ((mem_mask & 0x0000ff00) != 0)
+		result = (result & ~0x0000ff00) | (state->timekeeper->read(offset * 4 + 1) << 8);
+	if ((mem_mask & 0x00ff0000) != 0)
+		result = (result & ~0x00ff0000) | (state->timekeeper->read(offset * 4 + 2) << 16);
+	if ((mem_mask & 0xff000000) != 0)
+		result = (result & ~0xff000000) | (state->timekeeper->read(offset * 4 + 3) << 24);
+	if (offset*4 >= 0x7ff0)
+		if (LOG_TIMEKEEPER) logerror("timekeeper_r(%04X & %08X) = %08X\n", offset*4, mem_mask, result);
 	return result;
-}
-
-
-static NVRAM_HANDLER( timekeeper_save )
-{
-	vegas_state *state = machine->driver_data<vegas_state>();
-	if (read_or_write)
-		file->write(state->timekeeper_nvram, state->timekeeper_nvram_size);
-	else if (file)
-		file->read(state->timekeeper_nvram, state->timekeeper_nvram_size);
-	else
-		memset(state->timekeeper_nvram, 0xff, state->timekeeper_nvram_size);
 }
 
 
@@ -2260,7 +2228,7 @@ static MACHINE_CONFIG_START( vegascore, vegas_state )
 
 	MCFG_MACHINE_START(vegas)
 	MCFG_MACHINE_RESET(vegas)
-	MCFG_NVRAM_HANDLER(timekeeper_save)
+	MCFG_M48T37_ADD("timekeeper")
 
 	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MCFG_IDE_BUS_MASTER_SPACE("maincpu", PROGRAM)
@@ -2504,14 +2472,9 @@ ROM_END
 
 static void init_common(running_machine *machine, int ioasic, int serialnum)
 {
-	vegas_state *state = machine->driver_data<vegas_state>();
 	/* initialize the subsystems */
 	midway_ioasic_init(machine, ioasic, serialnum, 80, ioasic_irq);
 	midway_ioasic_set_auto_ack(1);
-
-	/* allocate RAM for the timekeeper */
-	state->timekeeper_nvram_size = 0x8000;
-	state->timekeeper_nvram = auto_alloc_array(machine, UINT32, state->timekeeper_nvram_size/4);
 }
 
 

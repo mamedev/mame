@@ -194,6 +194,7 @@ NOTE: On CTRG2-B, The "A" lines start at "A1". If you trace this on an
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/neogeo.h"
+#include "machine/nvram.h"
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
@@ -535,22 +536,6 @@ static CUSTOM_INPUT( get_calendar_status )
  *  NVRAM (Save RAM)
  *
  *************************************/
-
-static NVRAM_HANDLER( neogeo )
-{
-	if (read_or_write)
-		/* save the SRAM settings */
-		file->write(save_ram, 0x2000);
-	else
-	{
-		/* load the SRAM settings */
-		if (file)
-			file->read(save_ram, 0x2000);
-		else
-			memset(save_ram, 0, 0x10000);
-	}
-}
-
 
 static void set_save_ram_unlock( running_machine *machine, UINT8 data )
 {
@@ -1058,6 +1043,9 @@ static MACHINE_START( neogeo )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 
+	/* configure NVRAM */
+	machine->device<nvram_device>("saveram")->set_base(save_ram, 0x2000);
+
 	/* set the BIOS bank */
 	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine->region("mainbios")->base());
 
@@ -1355,7 +1343,7 @@ static MACHINE_CONFIG_START( neogeo, neogeo_state )
 
 	MCFG_MACHINE_START(neogeo)
 	MCFG_MACHINE_RESET(neogeo)
-	MCFG_NVRAM_HANDLER(neogeo)
+	MCFG_NVRAM_ADD_0FILL("saveram")
 	MCFG_MEMCARD_HANDLER(neogeo)
 
 	/* video hardware */
