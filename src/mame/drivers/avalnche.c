@@ -8,8 +8,8 @@
         * Avalanche
         * Catch (prototype)
 
-    Known issues:
-        * Catch has bad sound and inverted colors, different memmap?
+    TODO:
+        * Catch discrete sound
 
 ****************************************************************************
 
@@ -18,10 +18,10 @@
                     2000-2FFF       R       INPUTS
                     3000-3FFF       W       WATCHDOG
                     4000-4FFF       W       OUTPUTS
-                    5000-5FFF       W       SOUND LEVEL
+                    5000-5FFF       W       NOISE SOUND LEVEL (not in Catch)
                     6000-7FFF       R       PROGRAM ROM
                     8000-DFFF               UNUSED
-                    E000-FFFF               PROGRAM ROM (Remapped)
+                    E000-FFFF               PROGRAM ROM (remapped)
 
     If you have any questions about how this driver works, don't hesitate to
     ask.  - Mike Balfour (mab22@po.cwru.edu)
@@ -39,23 +39,9 @@
 #define MASTER_CLOCK XTAL_12_096MHz
 
 
-
 /*************************************
  *
- *  Interrupt generation
- *
- *************************************/
-
-static INTERRUPT_GEN( avalnche_interrupt )
-{
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
-
-/*************************************
- *
- *  Video system
+ *  Video update
  *
  *************************************/
 
@@ -92,44 +78,38 @@ static SCREEN_UPDATE( avalnche )
 }
 
 
+/*************************************
+ *
+ *  CPU memory handlers
+ *
+ *************************************/
+
 static WRITE8_HANDLER( avalance_video_invert_w )
 {
 	avalnche_state *state = space->machine->driver_data<avalnche_state>();
 	state->avalance_video_inverted = data & 0x01;
 }
 
-
-
-/*************************************
- *
- *  Lamp handling
- *
- *************************************/
+static WRITE8_HANDLER( catch_coin_counter_w )
+{
+	coin_counter_w(space->machine, 0, data & 1);
+	coin_counter_w(space->machine, 1, data & 2);
+}
 
 static WRITE8_HANDLER( avalance_credit_1_lamp_w )
 {
-	set_led_status(space->machine, 0, data & 0x01);
+	set_led_status(space->machine, 0, data & 1);
 }
-
 
 static WRITE8_HANDLER( avalance_credit_2_lamp_w )
 {
-	set_led_status(space->machine, 1, data & 0x01);
+	set_led_status(space->machine, 1, data & 1);
 }
-
 
 static WRITE8_HANDLER( avalance_start_lamp_w )
 {
-	set_led_status(space->machine, 2, data & 0x01);
+	set_led_status(space->machine, 2, data & 1);
 }
-
-
-
-/*************************************
- *
- *  Main CPU memory handlers
- *
- *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
@@ -149,6 +129,23 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( catch_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_MEMBER(avalnche_state, videoram, videoram_size)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
+	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
+	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READNOP
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
+//	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE("discrete", avalnche_attract_enable_w) /* It is attract_enable just like avalnche, but not hooked up yet. */
+	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)
+	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_2_lamp_w)
+	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_WRITE(catch_audio_w)
+	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE(avalance_start_lamp_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_WRITE(catch_coin_counter_w)
+	AM_RANGE(0x7000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -208,7 +205,7 @@ static INPUT_PORTS_START( cascade )
 	PORT_DIPSETTING(    0x08, "2500 Points" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( catchp )
+static INPUT_PORTS_START( catch )
 	PORT_INCLUDE( avalnche )
 
 	PORT_MODIFY("IN0")
@@ -231,12 +228,16 @@ static INPUT_PORTS_START( catchp )
 INPUT_PORTS_END
 
 
-
 /*************************************
  *
  *  Machine driver
  *
  *************************************/
+
+static INTERRUPT_GEN( avalnche_interrupt )
+{
+	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+}
 
 static MACHINE_START( avalnche )
 {
@@ -279,6 +280,17 @@ static MACHINE_CONFIG_START( avalnche, avalnche_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( catch, avalnche )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(catch_map)
+
+	/* sound hardware... */
+	MCFG_DEVICE_REMOVE("discrete")
+	MCFG_DEVICE_REMOVE("mono")
+
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -319,7 +331,6 @@ ROM_START( catchp )
 ROM_END
 
 
-
 /*************************************
  *
  *  Game drivers
@@ -328,4 +339,4 @@ ROM_END
 
 GAMEL( 1978, avalnche, 0,        avalnche, avalnche, 0, ROT0, "Atari", "Avalanche", GAME_SUPPORTS_SAVE, layout_avalnche )
 GAMEL( 1978, cascade,  avalnche, avalnche, cascade,  0, ROT0, "bootleg? (Sidam)", "Cascade", GAME_SUPPORTS_SAVE, layout_avalnche )
-GAME ( 1977, catchp,   0,        avalnche, catchp,   0, ROT0, "Atari", "Catch (prototype)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // pre-production board, evolved into Avalanche
+GAME ( 1977, catchp,   0,        catch,    catch,    0, ROT0, "Atari", "Catch (prototype)", GAME_SUPPORTS_SAVE | GAME_NO_SOUND ) // pre-production board, evolved into Avalanche

@@ -8,7 +8,7 @@
 #include "sound/discrete.h"
 
 
-/* Discrete Sound Input Nodes */
+/* Avalanche Discrete Sound Input Nodes */
 #define AVALNCHE_AUD0_EN			NODE_01
 #define AVALNCHE_AUD1_EN			NODE_02
 #define AVALNCHE_AUD2_EN			NODE_03
@@ -16,9 +16,8 @@
 #define AVALNCHE_ATTRACT_EN			NODE_05
 
 
-
 /***************************************************************************
-  avalnche_noise_amplitude_w
+  Avalanche memory audio output handlers
 ***************************************************************************/
 
 WRITE8_DEVICE_HANDLER( avalnche_noise_amplitude_w )
@@ -26,12 +25,10 @@ WRITE8_DEVICE_HANDLER( avalnche_noise_amplitude_w )
 	discrete_sound_w(device, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
 }
 
-
 WRITE8_DEVICE_HANDLER( avalnche_attract_enable_w )
 {
 	discrete_sound_w(device, AVALNCHE_ATTRACT_EN, data & 0x01);
 }
-
 
 WRITE8_DEVICE_HANDLER( avalnche_audio_w )
 {
@@ -55,10 +52,9 @@ WRITE8_DEVICE_HANDLER( avalnche_audio_w )
 }
 
 
-
-/************************************************************************/
-/* avalnche Sound System Analog emulation                               */
-/************************************************************************/
+/***************************************************************************
+  Avalanche sound system analog emulation
+***************************************************************************/
 
 static const discrete_lfsr_desc avalnche_lfsr={
 	DISC_CLK_IS_FREQ,
@@ -126,3 +122,14 @@ DISCRETE_SOUND_START(avalnche)
 
 	DISCRETE_OUTPUT(NODE_90, 65534.0/(725.6+750.2+750.2+1000.0))
 DISCRETE_SOUND_END
+
+
+/***************************************************************************
+  Catch memory audio output handlers
+***************************************************************************/
+
+WRITE8_HANDLER( catch_audio_w )
+{
+	/* Different from avalnche, it plays a sound (offset 0/1/2) on data bit 0 rising edge.
+	There's no indication that the game silences sound, it's probably done automatically. */
+}
