@@ -794,9 +794,9 @@ void adsp21xx_device::alu_op_ar(int op)
 			/* ABS X */
 			xop = ALU_GETXREG_UNSIGNED(xop);
 			res = (xop & 0x8000) ? -xop : xop;
+			CLR_FLAGS;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
-			CLR_S;
 			if (xop & 0x8000) SET_S;
 			break;
 		default:
@@ -920,9 +920,9 @@ void adsp21xx_device::alu_op_ar_const(int op)
 			/* ABS X */
 			xop = ALU_GETXREG_UNSIGNED(xop);
 			res = (xop & 0x8000) ? -xop : xop;
+			CLR_FLAGS;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
-			CLR_S;
 			if (xop & 0x8000) SET_S;
 			break;
 		default:
@@ -1058,9 +1058,9 @@ void adsp21xx_device::alu_op_af(int op)
 			/* ABS X */
 			xop = ALU_GETXREG_UNSIGNED(xop);
 			res = (xop & 0x8000) ? -xop : xop;
+			CLR_FLAGS;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
-			CLR_S;
 			if (xop & 0x8000) SET_S;
 			break;
 		default:
@@ -1181,9 +1181,9 @@ void adsp21xx_device::alu_op_af_const(int op)
 			/* ABS X */
 			xop = ALU_GETXREG_UNSIGNED(xop);
 			res = (xop & 0x8000) ? -xop : xop;
+			CLR_FLAGS;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
-			CLR_S;
 			if (xop & 0x8000) SET_S;
 			break;
 		default:
@@ -1316,9 +1316,9 @@ void adsp21xx_device::alu_op_none(int op)
 			/* ABS X */
 			xop = ALU_GETXREG_UNSIGNED(xop);
 			res = (xop & 0x8000) ? -xop : xop;
+			CLR_FLAGS;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
-			CLR_S;
 			if (xop & 0x8000) SET_S;
 			break;
 	}
