@@ -136,6 +136,7 @@ extern UINT16 *namcos2_68k_roz_ram;
 
 /*----------- defined in machine/namcos2.c -----------*/
 
+extern void (*namcos2_kickstart)(running_machine *machine, int internal);
 extern int namcos2_gametype;
 
 MACHINE_START( namcos2 );

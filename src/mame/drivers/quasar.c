@@ -76,19 +76,19 @@ Sound Board 1b11107
 
 static WRITE8_HANDLER( video_page_select_w )
 {
-	cvs_state *state = space->machine->driver_data<cvs_state>();
+	quasar_state *state = space->machine->driver_data<quasar_state>();
 	state->page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( io_page_select_w )
 {
-	cvs_state *state = space->machine->driver_data<cvs_state>();
+	quasar_state *state = space->machine->driver_data<quasar_state>();
 	state->io_page = offset & 0x03;
 }
 
 static WRITE8_HANDLER( quasar_video_w )
 {
-	cvs_state *state = space->machine->driver_data<cvs_state>();
+	quasar_state *state = space->machine->driver_data<quasar_state>();
 
 	switch (state->page)
 	{
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( quasar_video_w )
 
 static READ8_HANDLER( quasar_IO_r )
 {
-	cvs_state *state = space->machine->driver_data<cvs_state>();
+	quasar_state *state = space->machine->driver_data<quasar_state>();
 	UINT8 ans = 0;
 
 	switch (state->io_page)
@@ -117,7 +117,7 @@ static READ8_HANDLER( quasar_IO_r )
 
 static WRITE8_HANDLER( quasar_bullet_w )
 {
-	cvs_state *state = space->machine->driver_data<cvs_state>();
+	quasar_state *state = space->machine->driver_data<quasar_state>();
 	state->bullet_ram[offset] = (data ^ 0xff);
 }
 
@@ -146,11 +146,11 @@ static READ8_HANDLER( audio_t1_r )
 
 static ADDRESS_MAP_START( quasar, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE_MEMBER(cvs_state, bullet_ram)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE_MEMBER(quasar_state, bullet_ram)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, quasar_video_w) AM_BASE_MEMBER(cvs_state, video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, quasar_video_w) AM_BASE_MEMBER(quasar_state, video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x4000, 0x53ff) AM_ROM
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( quasar_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, quasar_sh_command_w)
 	AM_RANGE(S2650_CTRL_PORT,  S2650_CTRL_PORT) AM_READ(cvs_collision_r) AM_WRITENOP
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE_MEMBER(cvs_state, fo_state)
+	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE_MEMBER(quasar_state, fo_state)
 ADDRESS_MAP_END
 
 /*************************************
@@ -338,7 +338,7 @@ static const s2636_interface s2636_2_config =
 
 static MACHINE_START( quasar )
 {
-	cvs_state *state = machine->driver_data<cvs_state>();
+	quasar_state *state = machine->driver_data<quasar_state>();
 
 	MACHINE_START_CALL(cvs);
 
@@ -350,7 +350,7 @@ static MACHINE_START( quasar )
 
 static MACHINE_RESET( quasar )
 {
-	cvs_state *state = machine->driver_data<cvs_state>();
+	quasar_state *state = machine->driver_data<quasar_state>();
 
 	MACHINE_RESET_CALL(cvs);
 
@@ -359,7 +359,7 @@ static MACHINE_RESET( quasar )
 	state->io_page = 8;
 }
 
-static MACHINE_CONFIG_START( quasar, cvs_state )
+static MACHINE_CONFIG_START( quasar, quasar_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */

@@ -9,10 +9,10 @@
 
 
 #include "emu.h"
-#include "includes/rampart.h"
 #include "includes/arcadecl.h"
 
 
+static void arcadecl_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 
 /*************************************
  *
@@ -58,7 +58,7 @@ VIDEO_START( arcadecl )
 		0,					/* resulting value to indicate "special" */
 		0,					/* callback routine for special entries */
 	};
-	rampart_state *state = machine->driver_data<rampart_state>();
+	arcadecl_state *state = machine->driver_data<arcadecl_state>();
 
 	/* initialize the motion objects */
 	atarimo_init(machine, 0, &modesc);
@@ -79,10 +79,10 @@ VIDEO_START( arcadecl )
 
 SCREEN_UPDATE( arcadecl )
 {
-	rampart_state *state = screen->machine->driver_data<rampart_state>();
+	arcadecl_state *state = screen->machine->driver_data<arcadecl_state>();
 
 	/* draw the playfield */
-	rampart_bitmap_render(screen->machine, bitmap, cliprect);
+	arcadecl_bitmap_render(screen->machine, bitmap, cliprect);
 
 	/* draw and merge the MO */
 	if (state->has_mo)
@@ -110,4 +110,33 @@ SCREEN_UPDATE( arcadecl )
 			}
 	}
 	return 0;
+}
+
+
+
+/*************************************
+ *
+ *  Bitmap rendering
+ *
+ *************************************/
+
+static void arcadecl_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	arcadecl_state *state = machine->driver_data<arcadecl_state>();
+	int x, y;
+
+	/* update any dirty scanlines */
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		const UINT16 *src = &state->bitmap[256 * y];
+		UINT16 *dst = BITMAP_ADDR16(bitmap, y, 0);
+
+		/* regenerate the line */
+		for (x = cliprect->min_x & ~1; x <= cliprect->max_x; x += 2)
+		{
+			int bits = src[(x - 8) / 2];
+			dst[x + 0] = bits >> 8;
+			dst[x + 1] = bits & 0xff;
+		}
+	}
 }

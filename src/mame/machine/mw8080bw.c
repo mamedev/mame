@@ -108,7 +108,6 @@ MACHINE_START( mw8080bw )
 	state->sn1 = machine->device("sn1");
 	state->sn2 = machine->device("sn2");
 	state->discrete = machine->device("discrete");
-	state->speaker = machine->device("speaker");
 	state->mb14241 = machine->device("mb14241");
 }
 

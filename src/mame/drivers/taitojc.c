@@ -352,7 +352,6 @@ Notes:
 #include "emu.h"
 #include "cpu/tms32051/tms32051.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/taito_f3.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/es5506.h"
 #include "machine/eeprom.h"
@@ -764,12 +763,13 @@ static WRITE32_HANDLER(dsp_shared_w)
 
 static READ32_HANDLER(f3_share_r)
 {
+	taitojc_state *state = space->machine->driver_data<taitojc_state>();
 	switch (offset & 3)
 	{
-		case 0: return (f3_shared_ram[(offset/4)] <<  0) & 0xff000000;
-		case 1: return (f3_shared_ram[(offset/4)] <<  8) & 0xff000000;
-		case 2: return (f3_shared_ram[(offset/4)] << 16) & 0xff000000;
-		case 3: return (f3_shared_ram[(offset/4)] << 24) & 0xff000000;
+		case 0: return (state->f3_shared_ram[(offset/4)] <<  0) & 0xff000000;
+		case 1: return (state->f3_shared_ram[(offset/4)] <<  8) & 0xff000000;
+		case 2: return (state->f3_shared_ram[(offset/4)] << 16) & 0xff000000;
+		case 3: return (state->f3_shared_ram[(offset/4)] << 24) & 0xff000000;
 	}
 
 	return 0;
@@ -777,14 +777,15 @@ static READ32_HANDLER(f3_share_r)
 
 static WRITE32_HANDLER(f3_share_w)
 {
+	taitojc_state *state = space->machine->driver_data<taitojc_state>();
 	UINT32 d = (data >> 24) & 0xff;
 
 	switch (offset & 3)
 	{
-		case 0: f3_shared_ram[(offset/4)] &= ~0xff000000; f3_shared_ram[(offset/4)] |= d << 24; break;
-		case 1: f3_shared_ram[(offset/4)] &= ~0x00ff0000; f3_shared_ram[(offset/4)] |= d << 16; break;
-		case 2: f3_shared_ram[(offset/4)] &= ~0x0000ff00; f3_shared_ram[(offset/4)] |= d <<  8; break;
-		case 3: f3_shared_ram[(offset/4)] &= ~0x000000ff; f3_shared_ram[(offset/4)] |= d <<  0; break;
+		case 0: state->f3_shared_ram[(offset/4)] &= ~0xff000000; state->f3_shared_ram[(offset/4)] |= d << 24; break;
+		case 1: state->f3_shared_ram[(offset/4)] &= ~0x00ff0000; state->f3_shared_ram[(offset/4)] |= d << 16; break;
+		case 2: state->f3_shared_ram[(offset/4)] &= ~0x0000ff00; state->f3_shared_ram[(offset/4)] |= d <<  8; break;
+		case 3: state->f3_shared_ram[(offset/4)] &= ~0x000000ff; state->f3_shared_ram[(offset/4)] |= d <<  0; break;
 	}
 }
 
@@ -811,7 +812,7 @@ static ADDRESS_MAP_START( taitojc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06600010, 0x06600013) AM_NOP		// unknown
 	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
 	AM_RANGE(0x06800000, 0x06801fff) AM_NOP		// unknown
-	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w)
+	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE_MEMBER(taitojc_state,f3_shared_ram)
 	//AM_RANGE(0x06c00000, 0x06c0ffff) AM_RAM
 	AM_RANGE(0x06e00000, 0x06e0ffff) AM_WRITE(jc_output_w)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_BASE_MEMBER(taitojc_state,main_ram)
@@ -1352,8 +1353,6 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( taitojc )
 {
 	taitojc_state *state = machine->driver_data<taitojc_state>();
-
-	f3_shared_ram = auto_alloc_array(machine, UINT32, 0x800/4);
 
 	state->polygon_fifo = auto_alloc_array(machine, UINT16, POLYGON_FIFO_SIZE);
 }

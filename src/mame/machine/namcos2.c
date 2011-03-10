@@ -12,7 +12,6 @@ Namco System II
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m6805.h"
-#include "includes/namcos21.h"
 #include "includes/namcos2.h"
 #include "machine/nvram.h"
 
@@ -21,6 +20,7 @@ static void InitC148(void);
 
 static emu_timer *namcos2_posirq_timer;
 
+void (*namcos2_kickstart)(running_machine *machine, int internal);
 int namcos2_gametype;
 
 static unsigned mFinalLapProtCount;
@@ -105,6 +105,7 @@ ResetAllSubCPUs( running_machine *machine, int state )
 
 MACHINE_START( namcos2 )
 {
+	namcos2_kickstart = NULL;
 	namcos2_eeprom = auto_alloc_array(machine, UINT8, namcos2_eeprom_size);
 	machine->device<nvram_device>("nvram")->set_base(namcos2_eeprom, namcos2_eeprom_size);
 	namcos2_posirq_timer = machine->scheduler().timer_alloc(FUNC(namcos2_posirq_tick));
@@ -576,12 +577,12 @@ ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 				/* Suspend execution */
 				cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 			}
-			if (IsSystem21())
+			if (namcos2_kickstart != NULL)
 			{
 				//printf( "dspkick=0x%x\n", data );
 				if (data & 0x04)
 				{
-					namcos21_kickstart(space->machine, 1);
+					(*namcos2_kickstart)(space->machine, 1);
 				}
 			}
 		}

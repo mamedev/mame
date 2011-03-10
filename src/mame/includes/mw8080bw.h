@@ -49,21 +49,6 @@ public:
 	UINT8       port_3_last_extra;
 
 	/* misc game specific */
-	emu_timer   *schaser_effect_555_timer;
-	attotime    schaser_effect_555_time_remain;
-	INT32       schaser_effect_555_time_remain_savable;
-	int         schaser_effect_555_is_low;
-	int         schaser_explosion;
-	int         schaser_last_effect;
-	UINT8       polaris_cloud_speed;
-	UINT8       polaris_cloud_pos;
-	UINT8       schaser_background_disable;
-	UINT8       schaser_background_select;
-	UINT8       c8080bw_flip_screen;
-	UINT8       color_map;
-	UINT8       screen_red;
-
-
 	UINT16      phantom2_cloud_counter;
 	UINT8       invaders_flip_screen;
 	UINT8       rev_shift_res;
@@ -85,7 +70,6 @@ public:
 	device_t *samples;
 	device_t *samples1;
 	device_t *samples2;
-	device_t *speaker;
 	device_t *sn1;
 	device_t *sn2;
 	device_t *sn;
@@ -93,18 +77,11 @@ public:
 };
 
 
-/*----------- defined in drivers/mw8080bw.c -----------*/
-
-MACHINE_CONFIG_EXTERN( mw8080bw_root );
-MACHINE_CONFIG_EXTERN( invaders );
-extern const char layout_invaders[];
-
 #define SEAWOLF_GUN_PORT_TAG			("GUN")
 
 #define TORNBASE_CAB_TYPE_UPRIGHT_OLD	(0)
 #define TORNBASE_CAB_TYPE_UPRIGHT_NEW	(1)
 #define TORNBASE_CAB_TYPE_COCKTAIL		(2)
-UINT8 tornbase_get_cabinet_type(running_machine *machine);
 
 #define DESERTGU_GUN_X_PORT_TAG			("GUNX")
 #define DESERTGU_GUN_Y_PORT_TAG			("GUNY")
@@ -113,14 +90,6 @@ UINT8 tornbase_get_cabinet_type(running_machine *machine);
 #define INVADERS_P1_CONTROL_PORT_TAG	("CONTP1")
 #define INVADERS_P2_CONTROL_PORT_TAG	("CONTP2")
 
-/* for games in 8080bw.c */
-#define CABINET_PORT_TAG                  "CAB"
-
-
-CUSTOM_INPUT( invaders_in1_control_r );
-CUSTOM_INPUT( invaders_in2_control_r );
-
-int invaders_is_cabinet_cocktail(running_machine *machine);
 
 #define BLUESHRK_SPEAR_PORT_TAG			("IN0")
 
@@ -143,6 +112,19 @@ int invaders_is_cabinet_cocktail(running_machine *machine);
 	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) \
 	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) ) \
 	PORT_CONFSETTING(    0x01, DEF_STR( Cocktail ) )
+
+/*----------- defined in drivers/mw8080bw.c -----------*/
+
+MACHINE_CONFIG_EXTERN( mw8080bw_root );
+MACHINE_CONFIG_EXTERN( invaders );
+extern const char layout_invaders[];
+
+UINT8 tornbase_get_cabinet_type(running_machine *machine);
+
+CUSTOM_INPUT( invaders_in1_control_r );
+CUSTOM_INPUT( invaders_in2_control_r );
+
+int invaders_is_cabinet_cocktail(running_machine *machine);
 
 
 /*----------- defined in machine/mw8080bw.c -----------*/
@@ -240,58 +222,6 @@ WRITE8_DEVICE_HANDLER( invad2ct_audio_2_w );
 WRITE8_DEVICE_HANDLER( invad2ct_audio_3_w );
 WRITE8_DEVICE_HANDLER( invad2ct_audio_4_w );
 
-/*----------- defined in audio/8080bw.c -----------*/
-
-MACHINE_START( extra_8080bw_sh );
-
-WRITE8_HANDLER( invadpt2_sh_port_1_w );
-WRITE8_HANDLER( invadpt2_sh_port_2_w );
-
-WRITE8_HANDLER( spcewars_sh_port_w );
-
-WRITE8_HANDLER( lrescue_sh_port_1_w );
-WRITE8_HANDLER( lrescue_sh_port_2_w );
-extern const samples_interface lrescue_samples_interface;
-
-WRITE8_HANDLER( cosmo_sh_port_2_w );
-
-WRITE8_HANDLER( ballbomb_sh_port_1_w );
-WRITE8_HANDLER( ballbomb_sh_port_2_w );
-
-WRITE8_HANDLER( indianbt_sh_port_1_w );
-WRITE8_HANDLER( indianbt_sh_port_2_w );
-WRITE8_DEVICE_HANDLER( indianbt_sh_port_3_w );
-DISCRETE_SOUND_EXTERN( indianbt );
-
-WRITE8_DEVICE_HANDLER( polaris_sh_port_1_w );
-WRITE8_DEVICE_HANDLER( polaris_sh_port_2_w );
-WRITE8_DEVICE_HANDLER( polaris_sh_port_3_w );
-DISCRETE_SOUND_EXTERN( polaris );
-
-MACHINE_RESET( schaser_sh );
-MACHINE_START( schaser_sh );
-WRITE8_HANDLER( schaser_sh_port_1_w );
-WRITE8_HANDLER( schaser_sh_port_2_w );
-extern const sn76477_interface schaser_sn76477_interface;
-DISCRETE_SOUND_EXTERN( schaser );
-
-WRITE8_HANDLER( rollingc_sh_port_w );
-
-WRITE8_HANDLER( invrvnge_sh_port_w );
-
-WRITE8_HANDLER( lupin3_sh_port_1_w );
-WRITE8_HANDLER( lupin3_sh_port_2_w );
-
-WRITE8_HANDLER( schasercv_sh_port_1_w );
-WRITE8_HANDLER( schasercv_sh_port_2_w );
-
-WRITE8_HANDLER( yosakdon_sh_port_1_w );
-WRITE8_HANDLER( yosakdon_sh_port_2_w );
-
-WRITE8_HANDLER( shuttlei_sh_port_1_w );
-WRITE8_HANDLER( shuttlei_sh_port_2_w );
-
-
 /*----------- defined in video/mw8080bw.c -----------*/
 
 SCREEN_UPDATE( mw8080bw );
@@ -302,21 +232,3 @@ SCREEN_UPDATE( phantom2 );
 SCREEN_EOF( phantom2 );
 
 SCREEN_UPDATE( invaders );
-
-
-/*----------- defined in video/8080bw.c -----------*/
-
-MACHINE_START( extra_8080bw_vh );
-
-SCREEN_UPDATE( invadpt2 );
-SCREEN_UPDATE( ballbomb );
-SCREEN_UPDATE( schaser );
-SCREEN_UPDATE( schasercv );
-SCREEN_UPDATE( rollingc );
-SCREEN_UPDATE( polaris );
-SCREEN_UPDATE( lupin3 );
-SCREEN_UPDATE( cosmo );
-SCREEN_UPDATE( indianbt );
-SCREEN_UPDATE( shuttlei );
-SCREEN_UPDATE( sflush );
-

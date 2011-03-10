@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "sound/es5506.h"
-#include "includes/taito_f3.h"
 #include "taito_en.h"
 
 static int counter,vector_reg,imr_status;
@@ -8,6 +7,7 @@ static UINT16 es5510_dsp_ram[0x200];
 static UINT32	es5510_gpr[0xc0];
 static UINT32	es5510_gpr_latch;
 static int timer_mode,m68681_imr;
+static UINT32 *f3_shared_ram;
 
 //static int es_tmp=1;
 
@@ -20,18 +20,26 @@ enum { TIMER_SINGLESHOT, TIMER_PULSE };
 
 static READ16_HANDLER(f3_68000_share_r)
 {
-	if ((offset&3)==0) return (f3_shared_ram[offset/4]&0xff000000)>>16;
-	if ((offset&3)==1) return (f3_shared_ram[offset/4]&0x00ff0000)>>8;
-	if ((offset&3)==2) return (f3_shared_ram[offset/4]&0x0000ff00)>>0;
-	return (f3_shared_ram[offset/4]&0x000000ff)<<8;
+	switch (offset & 3)
+	{
+	case 0: return (f3_shared_ram[offset/4]&0xff000000)>>16;
+	case 1: return (f3_shared_ram[offset/4]&0x00ff0000)>>8;
+	case 2: return (f3_shared_ram[offset/4]&0x0000ff00)>>0;
+	case 3: return (f3_shared_ram[offset/4]&0x000000ff)<<8;
+	}
+
+	return 0;
 }
 
 static WRITE16_HANDLER(f3_68000_share_w)
 {
-	if ((offset&3)==0) f3_shared_ram[offset/4]=(f3_shared_ram[offset/4]&0x00ffffff)|((data&0xff00)<<16);
-	else if ((offset&3)==1) f3_shared_ram[offset/4]=(f3_shared_ram[offset/4]&0xff00ffff)|((data&0xff00)<<8);
-	else if ((offset&3)==2) f3_shared_ram[offset/4]=(f3_shared_ram[offset/4]&0xffff00ff)|((data&0xff00)<<0);
-	else f3_shared_ram[offset/4]=(f3_shared_ram[offset/4]&0xffffff00)|((data&0xff00)>>8);
+	switch (offset & 3)
+	{
+	case 0: f3_shared_ram[offset/4] = (f3_shared_ram[offset/4]&0x00ffffff)|((data&0xff00)<<16);
+	case 1: f3_shared_ram[offset/4] = (f3_shared_ram[offset/4]&0xff00ffff)|((data&0xff00)<<8);
+	case 2: f3_shared_ram[offset/4] = (f3_shared_ram[offset/4]&0xffff00ff)|((data&0xff00)<<0);
+	case 3: f3_shared_ram[offset/4] = (f3_shared_ram[offset/4]&0xffffff00)|((data&0xff00)>>8);
+	}
 }
 
 static WRITE16_HANDLER( f3_es5505_bank_w )
@@ -262,6 +270,8 @@ SOUND_RESET( taito_f3_soundsystem_reset )
 	/* reset CPU to catch any banking of startup vectors */
 	machine->device("audiocpu")->reset();
 	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+
+	f3_shared_ram = (UINT32 *)memory_get_shared(*machine, "f3_shared");
 }
 
 static const es5505_interface es5505_taito_f3_config =

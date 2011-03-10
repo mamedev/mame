@@ -1,7 +1,6 @@
 /* video/namcofl.c */
 
 #include "emu.h"
-#include "includes/namconb1.h"
 #include "includes/namcoic.h"
 #include "includes/namcos2.h"
 #include "includes/namcofl.h"
@@ -120,7 +119,7 @@ static int FLobjcode2tile( running_machine *machine, int code )
 
 VIDEO_START( namcofl )
 {
-	namco_tilemap_init( machine, NAMCONB1_TILEGFX, machine->region(NAMCONB1_TILEMASKREGION)->base(), TilemapCB );
-	namco_obj_init(machine,NAMCONB1_SPRITEGFX,0x0,FLobjcode2tile);
-	namco_roz_init(machine,NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
+	namco_tilemap_init( machine, NAMCOFL_TILEGFX, machine->region(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
+	namco_obj_init(machine,NAMCOFL_SPRITEGFX,0x0,FLobjcode2tile);
+	namco_roz_init(machine,NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
 }

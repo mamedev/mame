@@ -123,10 +123,11 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
-#include "includes/megasys1.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "machine/jalcrpt.h"
+#include "includes/megasys1.h"
 
 
 /* Variables only used here: */
@@ -3548,115 +3549,6 @@ ROM_START( tshingen )
 	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
 	ROM_LOAD( "ts.bpr",        0x0000, 0x0200, CRC(85b30ac4) SHA1(b03f577ceb0f26b67453ffa52ef61fea76a93184) )
 ROM_END
-
-
-/*************************************
- *
- *  Code Decryption
- *
- *************************************/
-
-void phantasm_rom_decode(running_machine *machine, const char *region)
-{
-	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
-	int i,		size	=	machine->region(region)->bytes();
-	if (size > 0x40000)	size = 0x40000;
-
-	for (i = 0 ; i < size/2 ; i++)
-	{
-		UINT16 x,y;
-
-		x = RAM[i];
-
-// [0] def0 189a bc56 7234
-// [1] fdb9 7531 eca8 6420
-// [2] 0123 4567 ba98 fedc
-#define BITSWAP_0	BITSWAP16(x,0xd,0xe,0xf,0x0,0x1,0x8,0x9,0xa,0xb,0xc,0x5,0x6,0x7,0x2,0x3,0x4)
-#define BITSWAP_1	BITSWAP16(x,0xf,0xd,0xb,0x9,0x7,0x5,0x3,0x1,0xe,0xc,0xa,0x8,0x6,0x4,0x2,0x0)
-#define BITSWAP_2	BITSWAP16(x,0x0,0x1,0x2,0x3,0x4,0x5,0x6,0x7,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc)
-
-		if		(i < 0x08000/2)	{ if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
-		else if	(i < 0x10000/2)	{ y = BITSWAP_2; }
-		else if	(i < 0x18000/2)	{ if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
-		else if	(i < 0x20000/2)	{ y = BITSWAP_1; }
-		else					{ y = BITSWAP_2; }
-
-#undef	BITSWAP_0
-#undef	BITSWAP_1
-#undef	BITSWAP_2
-
-		RAM[i] = y;
-	}
-
-}
-
-void astyanax_rom_decode(running_machine *machine, const char *region)
-{
-	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
-	int i,		size	=	machine->region(region)->bytes();
-	if (size > 0x40000)	size = 0x40000;
-
-	for (i = 0 ; i < size/2 ; i++)
-	{
-		UINT16 x,y;
-
-		x = RAM[i];
-
-// [0] def0 a981 65cb 7234
-// [1] fdb9 7531 8ace 0246
-// [2] 4567 0123 ba98 fedc
-
-#define BITSWAP_0	BITSWAP16(x,0xd,0xe,0xf,0x0,0xa,0x9,0x8,0x1,0x6,0x5,0xc,0xb,0x7,0x2,0x3,0x4)
-#define BITSWAP_1	BITSWAP16(x,0xf,0xd,0xb,0x9,0x7,0x5,0x3,0x1,0x8,0xa,0xc,0xe,0x0,0x2,0x4,0x6)
-#define BITSWAP_2	BITSWAP16(x,0x4,0x5,0x6,0x7,0x0,0x1,0x2,0x3,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc)
-
-		if		(i < 0x08000/2)	{ if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
-		else if	(i < 0x10000/2)	{ y = BITSWAP_2; }
-		else if	(i < 0x18000/2)	{ if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
-		else if	(i < 0x20000/2)	{ y = BITSWAP_1; }
-		else					{ y = BITSWAP_2; }
-
-#undef	BITSWAP_0
-#undef	BITSWAP_1
-#undef	BITSWAP_2
-
-		RAM[i] = y;
-	}
-}
-
-void rodland_rom_decode(running_machine *machine, const char *region)
-{
-	UINT16	*RAM	=	(UINT16 *) machine->region(region)->base();
-	int i,		size	=	machine->region(region)->bytes();
-	if (size > 0x40000)	size = 0x40000;
-
-	for (i = 0 ; i < size/2 ; i++)
-	{
-		UINT16 x,y;
-
-		x = RAM[i];
-
-// [0] d0a9 6ebf 5c72 3814  [1] 4567 0123 ba98 fedc
-// [2] fdb9 ce07 5318 a246  [3] 4512 ed3b a967 08fc
-#define BITSWAP_0	BITSWAP16(x,0xd,0x0,0xa,0x9,0x6,0xe,0xb,0xf,0x5,0xc,0x7,0x2,0x3,0x8,0x1,0x4);
-#define BITSWAP_1	BITSWAP16(x,0x4,0x5,0x6,0x7,0x0,0x1,0x2,0x3,0xb,0xa,0x9,0x8,0xf,0xe,0xd,0xc);
-#define	BITSWAP_2	BITSWAP16(x,0xf,0xd,0xb,0x9,0xc,0xe,0x0,0x7,0x5,0x3,0x1,0x8,0xa,0x2,0x4,0x6);
-#define	BITSWAP_3	BITSWAP16(x,0x4,0x5,0x1,0x2,0xe,0xd,0x3,0xb,0xa,0x9,0x6,0x7,0x0,0x8,0xf,0xc);
-
-		if		(i < 0x08000/2)	{	if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
-		else if	(i < 0x10000/2)	{	if ( (i | (0x248/2)) != i ) {y = BITSWAP_2;} else {y = BITSWAP_3;} }
-		else if	(i < 0x18000/2)	{	if ( (i | (0x248/2)) != i ) {y = BITSWAP_0;} else {y = BITSWAP_1;} }
-		else if	(i < 0x20000/2)	{ y = BITSWAP_1; }
-		else					{ y = BITSWAP_3; }
-
-#undef	BITSWAP_0
-#undef	BITSWAP_1
-#undef	BITSWAP_2
-#undef	BITSWAP_3
-
-		RAM[i] = y;
-	}
-}
 
 
 static void rodlandj_gfx_unmangle(running_machine *machine, const char *region)

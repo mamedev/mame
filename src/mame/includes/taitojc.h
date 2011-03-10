@@ -40,6 +40,7 @@ public:
 
 	poly_manager *poly;
 
+	UINT32 *f3_shared_ram;
 	UINT32 *main_ram;
 	UINT16 *dsp_shared_ram;
 	UINT32 *palette_ram;

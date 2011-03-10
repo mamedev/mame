@@ -31,4 +31,3 @@ WRITE8_HANDLER( mappy_videoram_w );
 WRITE8_HANDLER( mappy_scroll_w );
 READ8_HANDLER( superpac_flipscreen_r );
 WRITE8_HANDLER( superpac_flipscreen_w );
-void mappy_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram, int xoffs, int yoffs, int transcolor);

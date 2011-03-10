@@ -29,7 +29,6 @@ public:
 	UINT8 *    cvs_4_bit_dac_data;
 	UINT8 *    tms5110_ctl_data;
 	UINT8 *    dac3_state;
-	UINT8 *    effectram;	// quasar
 
 	/* video-related */
 	struct cvs_star stars[CVS_MAX_STARS];
@@ -40,7 +39,6 @@ public:
 	int        total_stars;
 	int        stars_on;
 	UINT8      scroll_reg;
-	UINT8      effectcontrol;	// quasar
 	int        stars_scroll;
 
 	/* misc */
@@ -50,8 +48,6 @@ public:
 	UINT8      character_banking_mode;
 	UINT16     character_ram_page_start;
 	UINT16     speech_rom_bit_address;
-
-	UINT8      page, io_page;	// quasar
 
 	/* devices */
 	device_t *maincpu;
@@ -70,6 +66,18 @@ public:
                                                by allocating twice the amount,
                                                we can use the same gfx_layout */
 };
+
+class quasar_state : public cvs_state
+{
+public:
+	quasar_state(running_machine &machine, const driver_device_config_base &config)
+		: cvs_state(machine, config) { }
+
+	UINT8 *    effectram;
+	UINT8      effectcontrol;
+	UINT8      page, io_page;
+};
+
 
 /*----------- defined in drivers/cvs.c -----------*/
 

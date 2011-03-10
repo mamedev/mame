@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "includes/mcr.h"
+#include "includes/mcr3.h"
 
 
 
@@ -17,7 +18,7 @@
 
 /* Spy Hunter hardware extras */
 UINT8 spyhunt_sprite_color_mask;
-INT16 spyhunt_scrollx, spyhunt_scrolly;
+static INT16 spyhunt_scrollx, spyhunt_scrolly;
 INT16 spyhunt_scroll_offset;
 
 UINT8 *spyhunt_alpharam;
@@ -45,7 +46,7 @@ static tilemap_t *alpha_tilemap;
 #ifdef UNUSED_FUNCTION
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	mcr_state *state = machine->driver_data<mcr_state>();
+	mcr3_state *state = machine->driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
@@ -57,7 +58,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( mcrmono_get_bg_tile_info )
 {
-	mcr_state *state = machine->driver_data<mcr_state>();
+	mcr3_state *state = machine->driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
@@ -75,7 +76,7 @@ static TILEMAP_MAPPER( spyhunt_bg_scan )
 
 static TILE_GET_INFO( spyhunt_get_bg_tile_info )
 {
-	mcr_state *state = machine->driver_data<mcr_state>();
+	mcr3_state *state = machine->driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
@@ -172,7 +173,7 @@ WRITE8_HANDLER( mcr3_paletteram_w )
 
 WRITE8_HANDLER( mcr3_videoram_w )
 {
-	mcr_state *state = space->machine->driver_data<mcr_state>();
+	mcr3_state *state = space->machine->driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
@@ -181,7 +182,7 @@ WRITE8_HANDLER( mcr3_videoram_w )
 
 WRITE8_HANDLER( spyhunt_videoram_w )
 {
-	mcr_state *state = space->machine->driver_data<mcr_state>();
+	mcr3_state *state = space->machine->driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
@@ -192,6 +193,29 @@ WRITE8_HANDLER( spyhunt_alpharam_w )
 {
 	spyhunt_alpharam[offset] = data;
 	tilemap_mark_tile_dirty(alpha_tilemap, offset);
+}
+
+
+WRITE8_HANDLER( spyhunt_scroll_value_w )
+{
+	switch (offset)
+	{
+		case 0:
+			/* low 8 bits of horizontal scroll */
+			spyhunt_scrollx = (spyhunt_scrollx & ~0xff) | data;
+			break;
+
+		case 1:
+			/* upper 3 bits of horizontal scroll and upper 1 bit of vertical scroll */
+			spyhunt_scrollx = (spyhunt_scrollx & 0xff) | ((data & 0x07) << 8);
+			spyhunt_scrolly = (spyhunt_scrolly & 0xff) | ((data & 0x80) << 1);
+			break;
+
+		case 2:
+			/* low 8 bits of vertical scroll */
+			spyhunt_scrolly = (spyhunt_scrolly & ~0xff) | data;
+			break;
+	}
 }
 
 

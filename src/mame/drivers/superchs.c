@@ -38,7 +38,6 @@
 #include "video/taitoic.h"
 #include "machine/eeprom.h"
 #include "sound/es5506.h"
-#include "includes/taito_f3.h"
 #include "audio/taito_en.h"
 
 #include "superchs.lh"
@@ -236,7 +235,7 @@ static ADDRESS_MAP_START( superchs_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(superchs_state, shared_ram)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM AM_BASE(&f3_shared_ram)
+	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM AM_SHARE("f3_shared")
 	AM_RANGE(0x300000, 0x300007) AM_READWRITE(superchs_input_r, superchs_input_w)	/* eerom etc. */
 	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)	/* stick int request */
 ADDRESS_MAP_END

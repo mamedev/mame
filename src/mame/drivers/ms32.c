@@ -168,7 +168,7 @@ Super Strong Warriors
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
 #include "sound/ymf271.h"
-#include "machine/ms32crpt.h"
+#include "machine/jalcrpt.h"
 #include "includes/ms32.h"
 
 

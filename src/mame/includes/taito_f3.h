@@ -51,7 +51,6 @@ public:
 
 /*----------- defined in drivers/taito_f3.c -----------*/
 
-extern UINT32 *f3_shared_ram;
 extern int f3_game;
 
 /*----------- defined in video/taito_f3.c -----------*/

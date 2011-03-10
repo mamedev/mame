@@ -43,7 +43,6 @@
 #include "sound/okim6295.h"
 
 static UINT32 coin_word[2], *f3_ram;
-UINT32 *f3_shared_ram;
 int f3_game;
 
 
@@ -164,7 +163,7 @@ static ADDRESS_MAP_START( f3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x630000, 0x63ffff) AM_RAM_WRITE(f3_pivot_w) AM_BASE(&f3_pivot_ram)
 	AM_RANGE(0x660000, 0x66000f) AM_WRITE(f3_control_0_w)
 	AM_RANGE(0x660010, 0x66001f) AM_WRITE(f3_control_1_w)
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_BASE(&f3_shared_ram)
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("f3_shared")
 	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
 	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
 ADDRESS_MAP_END

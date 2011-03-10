@@ -6,7 +6,6 @@
 
 #include "machine/atarigen.h"
 
-/* shared with arcadecl hardware */
 class rampart_state : public atarigen_state
 {
 public:
@@ -22,5 +21,3 @@ public:
 
 VIDEO_START( rampart );
 SCREEN_UPDATE( rampart );
-
-void rampart_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);

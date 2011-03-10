@@ -633,7 +633,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( wunit, midwxunit_state )
+static MACHINE_CONFIG_START( wunit, midwunit_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 50000000)
 	MCFG_CPU_CONFIG(tms_config)

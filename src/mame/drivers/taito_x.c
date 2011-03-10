@@ -321,6 +321,14 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/cchip.h"
 
 
+class taitox_state : public seta_state
+{
+public:
+	taitox_state(running_machine &machine, const driver_device_config_base &config)
+		: seta_state(machine, config) { }
+
+	int banknum;
+};
 
 static READ16_HANDLER( superman_dsw_input_r )
 {
@@ -397,16 +405,16 @@ static WRITE16_HANDLER( kyustrkr_input_w )
 
 static void reset_sound_region(running_machine *machine)
 {
-	seta_state *state = machine->driver_data<seta_state>();
+	taitox_state *state = machine->driver_data<taitox_state>();
 
-	memory_set_bankptr(machine,  "bank2", machine->region("audiocpu")->base() + (state->taitox_banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  "bank2", machine->region("audiocpu")->base() + (state->banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	seta_state *state = space->machine->driver_data<seta_state>();
+	taitox_state *state = space->machine->driver_data<taitox_state>();
 
-	state->taitox_banknum = (data - 1) & 3;
+	state->banknum = (data - 1) & 3;
 	reset_sound_region(space->machine);
 }
 
@@ -425,8 +433,8 @@ static ADDRESS_MAP_START( superman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900802, 0x900803) AM_READWRITE(cchip1_ctrl_r, cchip1_ctrl_w)
 	AM_RANGE(0x900c00, 0x900c01) AM_WRITE(cchip1_bank_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram)	// Sprites Y
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram2)	// Sprites Code + X + Attr
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(taitox_state, spriteram)	// Sprites Y
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(taitox_state, spriteram2)	// Sprites Code + X + Attr
 	AM_RANGE(0xf00000, 0xf03fff) AM_RAM			/* Main RAM */
 ADDRESS_MAP_END
 
@@ -439,8 +447,8 @@ static ADDRESS_MAP_START( daisenpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram)	// Sprites Y
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram2)	// Sprites Code + X + Attr
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(taitox_state, spriteram)	// Sprites Y
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(taitox_state, spriteram2)	// Sprites Code + X + Attr
 	AM_RANGE(0xf00000, 0xf03fff) AM_RAM			/* Main RAM */
 ADDRESS_MAP_END
 
@@ -453,8 +461,8 @@ static ADDRESS_MAP_START( gigandes_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram)	// Sprites Y
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram2)	// Sprites Code + X + Attr
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(taitox_state, spriteram)	// Sprites Y
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(taitox_state, spriteram2)	// Sprites Code + X + Attr
 	AM_RANGE(0xf00000, 0xf03fff) AM_RAM			/* Main RAM */
 ADDRESS_MAP_END
 
@@ -467,8 +475,8 @@ static ADDRESS_MAP_START( ballbros_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
 	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram)	// Sprites Y
-	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram2)	// Sprites Code + X + Attr
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(taitox_state, spriteram)	// Sprites Y
+	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(taitox_state, spriteram2)	// Sprites Code + X + Attr
 	AM_RANGE(0xf00000, 0xf03fff) AM_RAM			/* Main RAM */
 ADDRESS_MAP_END
 
@@ -894,10 +902,10 @@ static STATE_POSTLOAD( taitox_postload )
 
 static MACHINE_START( taitox )
 {
-	seta_state *state = machine->driver_data<seta_state>();
+	taitox_state *state = machine->driver_data<taitox_state>();
 
-	state->taitox_banknum = -1;
-	state->save_item(NAME(state->taitox_banknum));
+	state->banknum = -1;
+	state->save_item(NAME(state->banknum));
 	machine->state().register_postload(taitox_postload, NULL);
 }
 
@@ -909,7 +917,7 @@ static const tc0140syt_interface taitox_tc0140syt_intf =
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( superman, seta_state )
+static MACHINE_CONFIG_START( superman, taitox_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -951,7 +959,7 @@ static MACHINE_CONFIG_START( superman, seta_state )
 	MCFG_TC0140SYT_ADD("tc0140syt", taitox_tc0140syt_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daisenpu, seta_state )
+static MACHINE_CONFIG_START( daisenpu, taitox_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -990,7 +998,7 @@ static MACHINE_CONFIG_START( daisenpu, seta_state )
 	MCFG_TC0140SYT_ADD("tc0140syt", taitox_tc0140syt_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gigandes, seta_state )
+static MACHINE_CONFIG_START( gigandes, taitox_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz? */
@@ -1031,7 +1039,7 @@ static MACHINE_CONFIG_START( gigandes, seta_state )
 	MCFG_TC0140SYT_ADD("tc0140syt", taitox_tc0140syt_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ballbros, seta_state )
+static MACHINE_CONFIG_START( ballbros, taitox_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz? */

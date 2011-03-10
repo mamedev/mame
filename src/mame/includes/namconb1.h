@@ -1,10 +1,3 @@
-/*----------- defined in drivers/namconb1.c -----------*/
-
-extern UINT32 *namconb1_spritebank32;
-extern UINT32 *namconb1_tilebank32;
-
-/*----------- defined in video/namconb1.c -----------*/
-
 #define NAMCONB1_HTOTAL		(288)	/* wrong */
 #define NAMCONB1_HBSTART	(288)
 #define NAMCONB1_VTOTAL		(262)	/* needs to be checked */
@@ -19,6 +12,13 @@ extern UINT32 *namconb1_tilebank32;
 #define NAMCONB1_TILEGFX		0
 #define NAMCONB1_SPRITEGFX		1
 #define NAMCONB1_ROTGFX			2
+
+/*----------- defined in drivers/namconb1.c -----------*/
+
+extern UINT32 *namconb1_spritebank32;
+extern UINT32 *namconb1_tilebank32;
+
+/*----------- defined in video/namconb1.c -----------*/
 
 SCREEN_UPDATE( namconb1 );
 VIDEO_START( namconb1 );

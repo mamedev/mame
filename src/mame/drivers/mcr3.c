@@ -108,6 +108,7 @@
 #include "audio/mcr.h"
 #include "machine/nvram.h"
 #include "includes/mcr.h"
+#include "includes/mcr3.h"
 
 #include "turbotag.lh"
 
@@ -133,6 +134,25 @@ static UINT8 maxrpm_last_shift;
 static INT8 maxrpm_p1_shift;
 static INT8 maxrpm_p2_shift;
 
+
+
+static WRITE8_HANDLER( mcrmono_control_port_w )
+{
+	/*
+        Bit layout is as follows:
+            D7 = n/c
+            D6 = cocktail flip
+            D5 = n/c
+            D4 = n/c
+            D3 = n/c
+            D2 = n/c
+            D1 = n/c
+            D0 = coin meter 1
+    */
+
+	coin_counter_w(space->machine, 0, (data >> 0) & 1);
+	mcr_cocktail_flip = (data >> 6) & 1;
+}
 
 
 /*************************************
@@ -482,7 +502,7 @@ static ADDRESS_MAP_START( mcrmono_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xea00, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr3_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_BASE_MEMBER(mcr3_state, videoram)
 	AM_RANGE(0xf800, 0xffff) AM_ROM		/* schematics show a 2716 @ 2B here, but nobody used it */
 ADDRESS_MAP_END
 
@@ -512,7 +532,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spyhunt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE_MEMBER(mcr3_state, videoram)
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_BASE(&spyhunt_alpharam)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -524,7 +544,7 @@ static ADDRESS_MAP_START( spyhunt_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS
-	AM_RANGE(0x84, 0x86) AM_WRITE(mcr_scroll_value_w)
+	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
@@ -1073,11 +1093,13 @@ GFXDECODE_END
  *
  *************************************/
 
-/* Core MCR3 system with no sound */
-static MACHINE_CONFIG_START( mcr3_base, mcr_state )
+/* Core MCR monoboard system with no sound */
+static MACHINE_CONFIG_START( mcrmono, mcr3_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(mcrmono_map)
+	MCFG_CPU_IO_MAP(mcrmono_portmap)
 	MCFG_CPU_CONFIG(mcr_daisy_chain)
 	MCFG_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
@@ -1097,32 +1119,16 @@ static MACHINE_CONFIG_START( mcr3_base, mcr_state )
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*16, 30*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
-	MCFG_SCREEN_UPDATE(mcr)
+	MCFG_SCREEN_UPDATE(mcr3)
 
 	MCFG_GFXDECODE(mcr3)
 	MCFG_PALETTE_LENGTH(64)
 
-	MCFG_VIDEO_START(mcr)
+	MCFG_VIDEO_START(mcrmono)
 MACHINE_CONFIG_END
 
 
 /*************************************/
-
-
-/* Core MCR monoboard system with no sound */
-static MACHINE_CONFIG_DERIVED( mcrmono, mcr3_base )
-
-	/* basic machine hardware */
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mcrmono_map)
-	MCFG_CPU_IO_MAP(mcrmono_portmap)
-
-	/* video hardware */
-	MCFG_VIDEO_START(mcrmono)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE(mcr3)
-MACHINE_CONFIG_END
 
 
 /* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Chip Squeak */
@@ -1145,7 +1151,7 @@ MACHINE_CONFIG_END
 
 
 /* Core scrolling system with SSIO sound */
-static MACHINE_CONFIG_DERIVED( mcrscroll, mcr3_base )
+static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
 
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(mcr_ssio)

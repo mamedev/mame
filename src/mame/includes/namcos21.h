@@ -15,11 +15,6 @@ public:
 };
 
 
-/*----------- defined in drivers/namcos21.c -----------*/
-
-extern void namcos21_kickstart(running_machine *, int);
-
-
 /*----------- defined in video/namcos21.c -----------*/
 
 extern void namcos21_ClearPolyFrameBuffer( void );

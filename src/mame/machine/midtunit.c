@@ -9,7 +9,6 @@
 #include "cpu/m6809/m6809.h"
 #include "audio/williams.h"
 #include "audio/dcs.h"
-#include "includes/midyunit.h"
 #include "includes/midtunit.h"
 
 
@@ -414,7 +413,7 @@ static READ16_HANDLER( jdredd_hack_r )
 
 static void init_tunit_generic(running_machine *machine, int sound)
 {
-	offs_t gfx_chunk = midyunit_gfx_rom_size / 4;
+	offs_t gfx_chunk = midtunit_gfx_rom_size / 4;
 	UINT8 *base;
 	int i;
 
@@ -423,12 +422,12 @@ static void init_tunit_generic(running_machine *machine, int sound)
 
 	/* load the graphics ROMs -- quadruples */
 	base = machine->region("gfx1")->base();
-	for (i = 0; i < midyunit_gfx_rom_size; i += 4)
+	for (i = 0; i < midtunit_gfx_rom_size; i += 4)
 	{
-		midyunit_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
-		midyunit_gfx_rom[i + 1] = base[1 * gfx_chunk + i / 4];
-		midyunit_gfx_rom[i + 2] = base[2 * gfx_chunk + i / 4];
-		midyunit_gfx_rom[i + 3] = base[3 * gfx_chunk + i / 4];
+		midtunit_gfx_rom[i + 0] = base[0 * gfx_chunk + i / 4];
+		midtunit_gfx_rom[i + 1] = base[1 * gfx_chunk + i / 4];
+		midtunit_gfx_rom[i + 2] = base[2 * gfx_chunk + i / 4];
+		midtunit_gfx_rom[i + 3] = base[3 * gfx_chunk + i / 4];
 	}
 
 	/* load sound ROMs and set up sound handlers */

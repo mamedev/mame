@@ -25,7 +25,6 @@
 #include "audio/williams.h"
 #include "audio/dcs.h"
 #include "machine/nvram.h"
-#include "includes/midyunit.h"
 #include "includes/midtunit.h"
 
 
@@ -55,7 +54,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x01d01020, 0x01d0103f) AM_READWRITE(midtunit_sound_r, midtunit_sound_w)
 	AM_RANGE(0x01d81060, 0x01d8107f) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x01f00000, 0x01f0001f) AM_WRITE(midtunit_control_w)
-	AM_RANGE(0x02000000, 0x07ffffff) AM_READ(midtunit_gfxrom_r) AM_BASE((UINT16 **)&midyunit_gfx_rom) AM_SIZE(&midyunit_gfx_rom_size)
+	AM_RANGE(0x02000000, 0x07ffffff) AM_READ(midtunit_gfxrom_r) AM_BASE((UINT16 **)&midtunit_gfx_rom) AM_SIZE(&midtunit_gfx_rom_size)
 	AM_RANGE(0x1f800000, 0x1fffffff) AM_ROM AM_REGION("user1", 0)	/* mirror used by MK */
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)

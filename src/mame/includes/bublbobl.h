@@ -13,10 +13,6 @@ public:
 	size_t   videoram_size;
 	size_t   objectram_size;
 
-	/* missb2.c also needs the following */
-	UINT8 *  bgvram;
-	UINT8 *  bg_paletteram;
-
 	/* video-related */
 	int      video_enable;
 

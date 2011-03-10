@@ -22,11 +22,22 @@ OKI M6295 sound ROM dump is bad.
 #include "includes/bublbobl.h"
 
 
+class missb2_state : public bublbobl_state
+{
+public:
+	missb2_state(running_machine &machine, const driver_device_config_base &config)
+		: bublbobl_state(machine, config) { }
+
+	UINT8 *  bgvram;
+	UINT8 *  bg_paletteram;
+};
+
+
 /* Video Hardware */
 
 static SCREEN_UPDATE( missb2 )
 {
-	bublbobl_state *state = screen->machine->driver_data<bublbobl_state>();
+	missb2_state *state = screen->machine->driver_data<missb2_state>();
 	int offs;
 	int sx, sy, xc, yc;
 	int gfx_num, gfx_attr, gfx_offs;
@@ -127,7 +138,7 @@ INLINE void bg_changecolor_RRRRGGGGBBBBxxxx( running_machine *machine, pen_t col
 
 static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 {
-	bublbobl_state *state = space->machine->driver_data<bublbobl_state>();
+	missb2_state *state = space->machine->driver_data<missb2_state>();
 	state->bg_paletteram[offset] = data;
 	bg_changecolor_RRRRGGGGBBBBxxxx(space->machine, offset / 2, state->bg_paletteram[offset | 1] | (state->bg_paletteram[offset & ~1] << 8));
 }
@@ -148,8 +159,8 @@ static WRITE8_HANDLER( missb2_bg_bank_w )
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, videoram, videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, objectram, objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(missb2_state, videoram, videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(missb2_state, objectram, objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(bublbobl_sound_command_w)
@@ -173,11 +184,11 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")	// ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")	// ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM			// banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_MEMBER(bublbobl_state, bg_paletteram)
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_MEMBER(missb2_state, bg_paletteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM			// main ???
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(missb2_bg_bank_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP
-	AM_RANGE(0xd003, 0xd003) AM_RAM AM_BASE_MEMBER(bublbobl_state, bgvram)
+	AM_RANGE(0xd003, 0xd003) AM_RAM AM_BASE_MEMBER(missb2_state, bgvram)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -418,7 +429,7 @@ static INTERRUPT_GEN( missb2_interrupt )
 
 static MACHINE_START( missb2 )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	missb2_state *state = machine->driver_data<missb2_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
@@ -433,14 +444,14 @@ static MACHINE_START( missb2 )
 
 static MACHINE_RESET( missb2 )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	missb2_state *state = machine->driver_data<missb2_state>();
 
 	state->sound_nmi_enable = 0;
 	state->pending_nmi = 0;
 	state->sound_status = 0;
 }
 
-static MACHINE_CONFIG_START( missb2, bublbobl_state )
+static MACHINE_CONFIG_START( missb2, missb2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
@@ -571,7 +582,7 @@ static void configure_banks( running_machine* machine )
 
 static DRIVER_INIT( missb2 )
 {
-	bublbobl_state *state = machine->driver_data<bublbobl_state>();
+	missb2_state *state = machine->driver_data<missb2_state>();
 
 	configure_banks(machine);
 	state->video_enable = 0;

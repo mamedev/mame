@@ -195,20 +195,19 @@ actual code sent to the hardware.
 #include "includes/megasys1.h"
 
 /* Variables defined here, that have to be shared: */
-tilemap_t *megasys1_tmap[3];
-
 UINT16 *megasys1_scrollram[3];
 UINT16 *megasys1_objectram, *megasys1_vregs, *megasys1_ram;
 
-int megasys1_scrollx[3], megasys1_scrolly[3];
-int megasys1_active_layers;
-int megasys1_bits_per_color_code;
+static int megasys1_scrollx[3], megasys1_scrolly[3];
+static int megasys1_active_layers;
+static int megasys1_bits_per_color_code;
 
 static int megasys1_scroll_flag[3];
 static int megasys1_sprite_bank;
 static int megasys1_screen_flag, megasys1_sprite_flag;
 static int megasys1_8x8_scroll_factor[3], megasys1_16x16_scroll_factor[3];
 
+static tilemap_t *megasys1_tmap[3];
 static tilemap_t *megasys1_tilemap[3][2][4];
 
 /* Variables defined in driver: */
@@ -419,7 +418,7 @@ static void create_tilemaps(running_machine *machine)
 	}
 }
 
-void megasys1_set_vreg_flag(int which, int data)
+static void megasys1_set_vreg_flag(int which, int data)
 {
 	if (megasys1_scroll_flag[which] != data)
 	{

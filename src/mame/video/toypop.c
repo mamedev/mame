@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mappy.h"
 #include "includes/toypop.h"
 
 /***************************************************************************
@@ -223,11 +222,69 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap)
 ***************************************************************************/
 
 
+void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT8 *spriteram_base)
+{
+	UINT8 *spriteram = spriteram_base + 0x780;
+	UINT8 *spriteram_2 = spriteram + 0x800;
+	UINT8 *spriteram_3 = spriteram_2 + 0x800;
+	int offs;
+	enum { xoffs = -31, yoffs = -8 };
+
+	for (offs = 0;offs < 0x80;offs += 2)
+	{
+		/* is it on? */
+		if ((spriteram_3[offs+1] & 2) == 0)
+		{
+			static const UINT8 gfx_offs[2][2] =
+			{
+				{ 0, 1 },
+				{ 2, 3 }
+			};
+			int sprite = spriteram[offs];
+			int color = spriteram[offs+1];
+			int sx = spriteram_2[offs+1] + 0x100 * (spriteram_3[offs+1] & 1) - 40 + xoffs;
+			int sy = 256 - spriteram_2[offs] + yoffs + 1;	// sprites are buffered and delayed by one scanline
+			int flipx = (spriteram_3[offs] & 0x01);
+			int flipy = (spriteram_3[offs] & 0x02) >> 1;
+			int sizex = (spriteram_3[offs] & 0x04) >> 2;
+			int sizey = (spriteram_3[offs] & 0x08) >> 3;
+			int x,y;
+
+			sprite &= ~sizex;
+			sprite &= ~(sizey << 1);
+
+			sy -= 16 * sizey;
+			sy = (sy & 0xff) - 32;	// fix wraparound
+
+			if (flip_screen_get(machine))
+			{
+				flipx ^= 1;
+				flipy ^= 1;
+				sy += 40;
+			}
+
+			for (y = 0;y <= sizey;y++)
+			{
+				for (x = 0;x <= sizex;x++)
+				{
+					drawgfx_transmask(bitmap,cliprect,machine->gfx[1],
+						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
+						color,
+						flipx,flipy,
+						sx + 16*x,sy + 16*y,
+						colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, 0xff));
+				}
+			}
+		}
+	}
+}
+
+
 SCREEN_UPDATE( toypop )
 {
 	toypop_state *state = screen->machine->driver_data<toypop_state>();
 	draw_background(screen->machine, bitmap);
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
-	mappy_draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, -31, -8, 0xff);
+	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram);
 	return 0;
 }

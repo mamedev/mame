@@ -31,7 +31,7 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/ms32crpt.h"
+#include "machine/jalcrpt.h"
 #include "includes/tetrisp2.h"
 
 

@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "profiler.h"
 #include "cpu/tms34010/tms34010.h"
-#include "includes/midyunit.h"
 #include "includes/midtunit.h"
 
 
@@ -41,6 +40,8 @@ enum
 
 
 /* graphics-related variables */
+       UINT8 *	midtunit_gfx_rom;
+       size_t	midtunit_gfx_rom_size;
        UINT8	midtunit_gfx_rom_large;
 static UINT16	midtunit_control;
 
@@ -129,7 +130,7 @@ VIDEO_START( midxunit )
 
 READ16_HANDLER( midtunit_gfxrom_r )
 {
-	UINT8 *base = &midyunit_gfx_rom[gfxbank_offset[(offset >> 21) & 1]];
+	UINT8 *base = &midtunit_gfx_rom[gfxbank_offset[(offset >> 21) & 1]];
 	offset = (offset & 0x01fffff) * 2;
 	return base[offset] | (base[offset + 1] << 8);
 }
@@ -137,7 +138,7 @@ READ16_HANDLER( midtunit_gfxrom_r )
 
 READ16_HANDLER( midwunit_gfxrom_r )
 {
-	UINT8 *base = &midyunit_gfx_rom[gfxbank_offset[0]];
+	UINT8 *base = &midtunit_gfx_rom[gfxbank_offset[0]];
 	offset *= 2;
 	return base[offset] | (base[offset + 1] << 8);
 }
@@ -356,7 +357,7 @@ typedef void (*dma_draw_func)(void);
 #define DMA_DRAW_FUNC_BODY(name, bitsperpixel, extractor, xflip, skip, scale, zero, nonzero) \
 {																				\
 	int height = dma_state.height << 8;											\
-	UINT8 *base = midyunit_gfx_rom;													\
+	UINT8 *base = midtunit_gfx_rom;													\
 	UINT32 offset = dma_state.offset;											\
 	UINT16 pal = dma_state.palette;												\
 	UINT16 color = pal | dma_state.color;										\

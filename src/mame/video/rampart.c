@@ -9,6 +9,7 @@
 #include "includes/rampart.h"
 
 
+static void rampart_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect);
 
 /*************************************
  *
@@ -107,7 +108,7 @@ SCREEN_UPDATE( rampart )
  *
  *************************************/
 
-void rampart_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void rampart_bitmap_render(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	rampart_state *state = machine->driver_data<rampart_state>();
 	int x, y;

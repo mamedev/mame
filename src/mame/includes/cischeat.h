@@ -4,6 +4,17 @@ public:
 	cischeat_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	UINT16 *scrollram[3];
+	UINT16 *objectram;
+	UINT16 *vregs;
+	UINT16 *ram;
+	tilemap_t *tmap[3];
+	tilemap_t *tilemap[3][2][4];
+	int scrollx[3], scrolly[3];
+	int active_layers;
+	int bits_per_color_code;
+	int scroll_flag[3];
+
 	UINT16 *rom_1;
 	UINT16 *rom_2;
 	UINT16 *rom_3;
@@ -30,6 +41,10 @@ READ16_HANDLER( scudhamm_analog_r );
 
 
 /*----------- defined in video/cischeat.c -----------*/
+
+WRITE16_HANDLER( cischeat_scrollram_0_w );
+WRITE16_HANDLER( cischeat_scrollram_1_w );
+WRITE16_HANDLER( cischeat_scrollram_2_w );
 
 READ16_HANDLER( bigrun_vregs_r );
 READ16_HANDLER( cischeat_vregs_r );

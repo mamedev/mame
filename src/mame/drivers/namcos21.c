@@ -1523,6 +1523,12 @@ static const c140_interface C140_interface_typeB =
 	C140_TYPE_SYSTEM21_B
 };
 
+static MACHINE_START( namcos21 )
+{
+	MACHINE_START_CALL( namcos2 );
+	namcos2_kickstart = namcos21_kickstart;
+}
+
 static MACHINE_CONFIG_START( s21base, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MCFG_CPU_PROGRAM_MAP(namcos21_68k_master)
@@ -1553,7 +1559,7 @@ static MACHINE_CONFIG_START( s21base, namcos21_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
-	MCFG_MACHINE_START(namcos2)
+	MCFG_MACHINE_START(namcos21)
 	MCFG_MACHINE_RESET(namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1625,7 +1631,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos2)
+	MCFG_MACHINE_START(namcos21)
 	MCFG_MACHINE_RESET(namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -1684,7 +1690,7 @@ static MACHINE_CONFIG_START( winrun_c140_typeB, namcos21_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
-	MCFG_MACHINE_START(namcos2)
+	MCFG_MACHINE_START(namcos21)
 	MCFG_MACHINE_RESET(namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
