@@ -888,7 +888,10 @@ discrete_sound_device::discrete_sound_device(running_machine &_machine, const di
 
 discrete_device::~discrete_device(void)
 {
-	osd_work_queue_free(m_queue);
+	if (m_queue)
+	{
+		osd_work_queue_free(m_queue);
+	}
 
 	if (m_profiling)
 	{
