@@ -112,7 +112,8 @@ $8000 - $ffff   ROM
 
 /********************************************************************************************/
 
-static struct renegade_adpcm_state
+typedef struct _renegade_adpcm_state renegade_adpcm_state;
+struct _renegade_adpcm_state
 {
 	adpcm_state adpcm;
 	sound_stream *stream;
@@ -120,11 +121,21 @@ static struct renegade_adpcm_state
 	UINT8 nibble;
 	UINT8 playing;
 	UINT8 *base;
-} renegade_adpcm;
+};
+
+DECLARE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
+
+INLINE renegade_adpcm_state *get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == RENEGADE_ADPCM);
+
+	return (renegade_adpcm_state *)downcast<legacy_device_base *>(device)->token();
+}
 
 static STREAM_UPDATE( renegade_adpcm_callback )
 {
-	struct renegade_adpcm_state *state = (struct renegade_adpcm_state *)param;
+	renegade_adpcm_state *state = (renegade_adpcm_state *)param;
 	stream_sample_t *dest = outputs[0];
 
 	while (state->playing && samples > 0)
@@ -151,11 +162,10 @@ static STREAM_UPDATE( renegade_adpcm_callback )
 
 static DEVICE_START( renegade_adpcm )
 {
-	running_machine *machine = device->machine;
-	struct renegade_adpcm_state *state = &renegade_adpcm;
+	renegade_adpcm_state *state = get_safe_token(device);
 	state->playing = 0;
 	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock(), state, renegade_adpcm_callback);
-	state->base = machine->region("adpcm")->base();
+	state->base = device->machine->region("adpcm")->base();
 	state->adpcm.reset();
 }
 
@@ -163,6 +173,9 @@ DEVICE_GET_INFO( renegade_adpcm )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(renegade_adpcm_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(renegade_adpcm);break;
 
@@ -172,12 +185,12 @@ DEVICE_GET_INFO( renegade_adpcm )
 	}
 }
 
-DECLARE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
 DEFINE_LEGACY_SOUND_DEVICE(RENEGADE_ADPCM, renegade_adpcm);
 
 
-static WRITE8_HANDLER( adpcm_play_w )
+static WRITE8_DEVICE_HANDLER( adpcm_play_w )
 {
+	renegade_adpcm_state *state = get_safe_token(device);
 	int offs = (data - 0x2c) * 0x2000;
 	int len = 0x2000 * 2;
 
@@ -187,13 +200,13 @@ static WRITE8_HANDLER( adpcm_play_w )
 
 	if (offs >= 0 && offs+len <= 0x20000)
 	{
-		renegade_adpcm.stream->update();
-		renegade_adpcm.adpcm.reset();
+		state->stream->update();
+		state->adpcm.reset();
 
-		renegade_adpcm.current = offs;
-		renegade_adpcm.end = offs + len/2;
-		renegade_adpcm.nibble = 4;
-		renegade_adpcm.playing = 1;
+		state->current = offs;
+		state->end = offs + len/2;
+		state->nibble = 4;
+		state->playing = 1;
 	}
 	else
 		logerror("out of range adpcm command: 0x%02x\n", data);
@@ -681,7 +694,7 @@ static ADDRESS_MAP_START( renegade_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_play_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("adpcm", adpcm_play_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym3526_r,ym3526_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* adpcm related? stereo pan? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM

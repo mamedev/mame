@@ -288,7 +288,7 @@ static TIMER_CALLBACK( tubep_scanline_callback )
 	if (scanline == 16)
 	{
 		logerror("/nmi CPU#3\n");
-		tubep_vblank_end(machine); /* switch buffered sprite RAM state->page */
+		tubep_vblank_end(machine); /* switch buffered sprite RAM page */
 		cputag_set_input_line(machine, "mcu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
@@ -474,7 +474,7 @@ static TIMER_CALLBACK( rjammer_scanline_callback )
 	if (scanline == 16)
 	{
 		logerror("/nmi CPU#3\n");
-		tubep_vblank_end(machine); /* switch buffered sprite RAM state->page */
+		tubep_vblank_end(machine); /* switch buffered sprite RAM page */
 		cputag_set_input_line(machine, "mcu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */

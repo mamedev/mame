@@ -237,7 +237,7 @@ WRITE8_HANDLER( HuC6270_data_w )
 			}
 			break;
 	}
-	logerror("%04x: unknown write to  state->VDC_register %02x (%02x) at %02x\n",cpu_get_pc(space->cpu),state->VDC_register,data,offset);
+	logerror("%04x: unknown write to  VDC_register %02x (%02x) at %02x\n",cpu_get_pc(space->cpu),state->VDC_register,data,offset);
 }
 
 /******************************************************************************/

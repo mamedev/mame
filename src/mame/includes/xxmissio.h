@@ -1,8 +1,22 @@
-/*----------- defined in video/xxmissio.c -----------*/
+class xxmissio_state : public driver_device
+{
+public:
+	xxmissio_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT8 *xxmissio_bgram;
-extern UINT8 *xxmissio_fgram;
-extern UINT8 *xxmissio_spriteram;
+	UINT8 status;
+	UINT8 *bgram;
+	UINT8 *fgram;
+	UINT8 *spriteram;
+	tilemap_t *bg_tilemap;
+	tilemap_t *fg_tilemap;
+	UINT8 xscroll;
+	UINT8 yscroll;
+	UINT8 flipscreen;
+};
+
+
+/*----------- defined in video/xxmissio.c -----------*/
 
 VIDEO_START( xxmissio );
 SCREEN_UPDATE( xxmissio );

@@ -28,9 +28,8 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "includes/naughtyb.h"
 
-/* it uses the same palette layout as in naughtyb */
-PALETTE_INIT( naughtyb );
 
 static int palreg = 0;
 static int gfx_bank = 0;

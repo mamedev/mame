@@ -157,7 +157,7 @@ SCREEN_UPDATE( namconb1 )
 }
 
 static int
-NB1objcode2tile( int code )
+NB1objcode2tile( running_machine *machine, int code )
 {
 	int bank = nth_word32( namconb1_spritebank32, code>>11 );
 	return (code&0x7ff) + bank*0x800;
@@ -200,7 +200,7 @@ SCREEN_UPDATE( namconb2 )
 }
 
 static int
-NB2objcode2tile( int code )
+NB2objcode2tile( running_machine *machine, int code )
 {
 	int bank = nth_byte32( namconb1_spritebank32, (code>>11)&0xf );
 	code &= 0x7ff;

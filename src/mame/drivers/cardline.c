@@ -22,19 +22,31 @@
 
 #include "cardline.lh"
 
-static int cardline_video;
-static UINT8 *videoram;
-static UINT8 *colorram;
+
+class cardline_state : public driver_device
+{
+public:
+	cardline_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int video;
+	UINT8 *videoram;
+	UINT8 *colorram;
+	int var;
+};
+
+
 
 #define DRAW_TILE(machine, offset, transparency) drawgfx_transpen(bitmap, cliprect, machine->gfx[0],\
-					(videoram[index+offset] | (colorram[index+offset]<<8))&0x3fff,\
-					(colorram[index+offset]&0x80)>>7,\
+					(state->videoram[index+offset] | (state->colorram[index+offset]<<8))&0x3fff,\
+					(state->colorram[index+offset]&0x80)>>7,\
 					0,0,\
 					x<<3, y<<3,\
 					transparency?transparency:(UINT32)-1);
 
 static SCREEN_UPDATE( cardline )
 {
+	cardline_state *state = screen->machine->driver_data<cardline_state>();
 	int x,y;
 	bitmap_fill(bitmap,cliprect,0);
 	for(y=0;y<32;y++)
@@ -42,13 +54,13 @@ static SCREEN_UPDATE( cardline )
 		for(x=0;x<64;x++)
 		{
 			int index=y*64+x;
-			if(cardline_video&1)
+			if(state->video&1)
 			{
 				DRAW_TILE(screen->machine,0,0);
 				DRAW_TILE(screen->machine,0x800,1);
 			}
 
-			if(cardline_video&2)
+			if(state->video&2)
 			{
 				DRAW_TILE(screen->machine,0x1000,0);
 				DRAW_TILE(screen->machine,0x1800,1);
@@ -60,27 +72,30 @@ static SCREEN_UPDATE( cardline )
 
 static WRITE8_HANDLER(vram_w)
 {
-	offset+=0x1000*((cardline_video&2)>>1);
-	videoram[offset]=data;
+	cardline_state *state = space->machine->driver_data<cardline_state>();
+	offset+=0x1000*((state->video&2)>>1);
+	state->videoram[offset]=data;
 }
 
 static WRITE8_HANDLER(attr_w)
 {
-	offset+=0x1000*((cardline_video&2)>>1);
-	colorram[offset]=data;
+	cardline_state *state = space->machine->driver_data<cardline_state>();
+	offset+=0x1000*((state->video&2)>>1);
+	state->colorram[offset]=data;
 }
 
 static WRITE8_HANDLER(video_w)
 {
-	cardline_video=data;
+	cardline_state *state = space->machine->driver_data<cardline_state>();
+	state->video=data;
 }
 
 static READ8_HANDLER(unk_r)
 {
-	static int var=0;
-	var^=0x10;
-	//printf("var %d\n",var);
-	return var;
+	cardline_state *state = space->machine->driver_data<cardline_state>();
+	state->var^=0x10;
+	//printf("var %d\n",state->var);
+	return state->var;
 }
 
 static WRITE8_HANDLER(lamps_w)
@@ -113,8 +128,8 @@ static ADDRESS_MAP_START( mem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2840, 0x2840) AM_NOP
 	AM_RANGE(0x2880, 0x2880) AM_NOP
 	AM_RANGE(0x3003, 0x3003) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_BASE(&videoram)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_BASE(&colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_BASE_MEMBER(cardline_state, videoram)
+	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_BASE_MEMBER(cardline_state, colorram)
 	/* Ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(unk_r, video_w)
 ADDRESS_MAP_END
@@ -192,7 +207,7 @@ static PALETTE_INIT(cardline)
 	}
 }
 
-static MACHINE_CONFIG_START( cardline, driver_device )
+static MACHINE_CONFIG_START( cardline, cardline_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32,12000000)

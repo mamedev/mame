@@ -1470,7 +1470,7 @@ static READ64_HANDLER( model3_sys_r )
 			else logerror("m3_sys: Unk sys_r @ 0x10: mask = %x\n", (UINT32)mem_mask);
 			break;
 		case 0x18/8:
-//          printf("read state->irq_state %x (PC %x)\n", state->irq_state, cpu_get_pc(space->cpu));
+//          printf("read irq_state %x (PC %x)\n", state->irq_state, cpu_get_pc(space->cpu));
 			return (UINT64)state->irq_state<<56 | 0xff000000;
 			break;
 	}

@@ -137,7 +137,8 @@ HT-01B
 
 static READ8_HANDLER( thepit_colorram_r )
 {
-	return thepit_colorram[offset];
+	thepit_state *state = space->machine->driver_data<thepit_state>();
+	return state->colorram[offset];
 }
 
 static WRITE8_HANDLER( thepit_sound_enable_w )
@@ -149,10 +150,10 @@ static WRITE8_HANDLER( thepit_sound_enable_w )
 static ADDRESS_MAP_START( thepit_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_colorram_w) AM_BASE(&thepit_colorram)
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_videoram_w) AM_BASE(&thepit_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE(&thepit_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&thepit_spriteram) AM_SIZE(&thepit_spriteram_size)
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_colorram_w) AM_BASE_MEMBER(thepit_state, colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_videoram_w) AM_BASE_MEMBER(thepit_state, videoram)
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(thepit_state, attributesram)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(thepit_state, spriteram) AM_SIZE_MEMBER(thepit_state, spriteram_size)
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
@@ -170,10 +171,10 @@ static ADDRESS_MAP_START( intrepid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE(thepit_colorram_r, thepit_colorram_w) /* mirror for intrepi2 */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(thepit_videoram_w) AM_BASE(&thepit_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(thepit_colorram_w) AM_BASE(&thepit_colorram)
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE(&thepit_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(&thepit_spriteram) AM_SIZE(&thepit_spriteram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(thepit_videoram_w) AM_BASE_MEMBER(thepit_state, videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(thepit_colorram_w) AM_BASE_MEMBER(thepit_state, colorram)
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(thepit_state, attributesram)
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(thepit_state, spriteram) AM_SIZE_MEMBER(thepit_state, spriteram_size)
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
@@ -630,7 +631,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_CONFIG_START( thepit, driver_device )
+static MACHINE_CONFIG_START( thepit, thepit_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
@@ -1012,22 +1013,20 @@ ROM_END
     Romar Triv questions read handler
 */
 
-static int question_address = 0;
-static int question_rom = 0;
-static int remap_address[16];
 
 static READ8_HANDLER( rtriv_question_r )
 {
+	thepit_state *state = space->machine->driver_data<thepit_state>();
 	// Set-up the remap table for every 16 bytes
 	if((offset & 0xc00) == 0x800)
 	{
-		remap_address[offset & 0x0f] = ((offset & 0xf0) >> 4) ^ 0x0f;
+		state->remap_address[offset & 0x0f] = ((offset & 0xf0) >> 4) ^ 0x0f;
 	}
 	// Select which rom to read and the high 5 bits of address
 	else if((offset & 0xc00) == 0x400)
 	{
-		question_rom = (offset & 0x70) >> 4;
-		question_address = ((offset & 0x80) << 3) | ((offset & 0x0f) << 11);
+		state->question_rom = (offset & 0x70) >> 4;
+		state->question_address = ((offset & 0x80) << 3) | ((offset & 0x0f) << 11);
 	}
 	// Read the actual byte from question roms
 	else if((offset & 0xc00) == 0xc00)
@@ -1035,7 +1034,7 @@ static READ8_HANDLER( rtriv_question_r )
 		UINT8 *ROM = space->machine->region("user1")->base();
 		int real_address;
 
-		real_address = (0x8000 * question_rom) | question_address | (offset & 0x3f0) | remap_address[offset & 0x0f];
+		real_address = (0x8000 * state->question_rom) | state->question_address | (offset & 0x3f0) | state->remap_address[offset & 0x0f];
 
 		return ROM[real_address];
 	}

@@ -62,11 +62,6 @@ Note:
 #include "includes/srmp2.h"
 #include "machine/nvram.h"
 
-static struct
-{
-	int reset,ff_event,ff_1,protcheck[4],protlatch[4];
-}iox;
-
 /***************************************************************************
 
   Interrupt(s)
@@ -90,6 +85,9 @@ static INTERRUPT_GEN( srmp2_interrupt )
 
 static MACHINE_START( srmp2 )
 {
+	srmp2_state *state = machine->driver_data<srmp2_state>();
+	iox_t &iox = state->iox;
+
 	iox.reset = 0x1f;
 	iox.ff_event = -1;
 	iox.ff_1 = 0x00;
@@ -102,6 +100,9 @@ static MACHINE_START( srmp2 )
 
 static MACHINE_START( srmp3 )
 {
+	srmp2_state *state = machine->driver_data<srmp2_state>();
+	iox_t &iox = state->iox;
+
 	iox.reset = 0xc8;
 	iox.ff_event = 0xef;
 	iox.ff_1 = -1;
@@ -113,6 +114,9 @@ static MACHINE_START( srmp3 )
 
 static MACHINE_START( rmgoldyh )
 {
+	srmp2_state *state = machine->driver_data<srmp2_state>();
+	iox_t &iox = state->iox;
+
 	iox.reset = 0xc8;
 	iox.ff_event = 0xff;
 	iox.ff_1 = -1;
@@ -285,6 +289,8 @@ static UINT8 iox_key_matrix_calc(running_machine *machine,UINT8 p_side)
 static READ8_HANDLER( iox_mux_r )
 {
 	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	iox_t &iox = state->iox;
+
 	/* first off check any pending protection value */
 	{
 		int i;
@@ -294,21 +300,21 @@ static READ8_HANDLER( iox_mux_r )
 			if(iox.protcheck[i] == -1)
 				continue; //skip
 
-			if(state->iox_data == iox.protcheck[i])
+			if(iox.data == iox.protcheck[i])
 			{
-				state->iox_data = 0; //clear write latch
+				iox.data = 0; //clear write latch
 				return iox.protlatch[i];
 			}
 		}
 	}
 
-	if(state->iox_ff == 0)
+	if(iox.ff == 0)
 	{
-		if(state->iox_mux != 1 && state->iox_mux != 2 && state->iox_mux != 4)
+		if(iox.mux != 1 && iox.mux != 2 && iox.mux != 4)
 			return 0xff; //unknown command
 
 		/* both side checks */
-		if(state->iox_mux == 1)
+		if(iox.mux == 1)
 		{
 			UINT8 p1_side = iox_key_matrix_calc(space->machine,0);
 			UINT8 p2_side = iox_key_matrix_calc(space->machine,4);
@@ -320,7 +326,7 @@ static READ8_HANDLER( iox_mux_r )
 		}
 
 		/* check individual input side */
-		return iox_key_matrix_calc(space->machine,(state->iox_mux == 2) ? 0 : 4);
+		return iox_key_matrix_calc(space->machine,(iox.mux == 2) ? 0 : 4);
 	}
 
 	return input_port_read(space->machine,"SERVICE") & 0xff;
@@ -334,6 +340,7 @@ static READ8_HANDLER( iox_status_r )
 static WRITE8_HANDLER( iox_command_w )
 {
 	srmp2_state *state = space->machine->driver_data<srmp2_state>();
+	iox_t &iox = state->iox;
 	/*
     bit wise command port apparently
     0x01: selects both sides
@@ -341,23 +348,24 @@ static WRITE8_HANDLER( iox_command_w )
     0x04: selects p2 side
     */
 
-	state->iox_mux = data;
-	state->iox_ff = 0; // this also set flip flop back to 0
+	iox.mux = data;
+	iox.ff = 0; // this also set flip flop back to 0
 }
 
 static WRITE8_HANDLER( iox_data_w )
 {
 	srmp2_state *state = space->machine->driver_data<srmp2_state>();
-	state->iox_data = data;
+	iox_t &iox = state->iox;
+	iox.data = data;
 
 	if(data == iox.reset && iox.reset != -1) //resets device
-		state->iox_ff = 0;
+		iox.ff = 0;
 
 	if(data == iox.ff_event && iox.ff_event != -1) // flip flop event
-		state->iox_ff ^= 1;
+		iox.ff ^= 1;
 
 	if(data == iox.ff_1 && iox.ff_1 != -1) // set flip flop to 1
-		state->iox_ff = 1;
+		iox.ff = 1;
 }
 
 static WRITE8_HANDLER( srmp3_rombank_w )

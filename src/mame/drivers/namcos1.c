@@ -347,8 +347,6 @@ C - uses sub board with support for player 3 and 4 controls
 #include "machine/nvram.h"
 #include "includes/namcos1.h"
 
-static int dac0_value, dac1_value, dac0_gain, dac1_gain;
-
 
 /**********************************************************************/
 
@@ -385,41 +383,46 @@ static WRITE8_HANDLER( namcos1_coin_w )
 
 static void namcos1_update_DACs(running_machine *machine)
 {
-	dac_signed_data_16_w(machine->device("dac"),0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	dac_signed_data_16_w(machine->device("dac"),0x8000 + (state->dac0_value * state->dac0_gain) + (state->dac1_value * state->dac1_gain));
 }
 
-void namcos1_init_DACs(void)
+void namcos1_init_DACs(running_machine *machine)
 {
-	dac0_value = 0;
-	dac1_value = 0;
-	dac0_gain=0x80;
-	dac1_gain=0x80;
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	state->dac0_value = 0;
+	state->dac1_value = 0;
+	state->dac0_gain=0x80;
+	state->dac1_gain=0x80;
 }
 
 static WRITE8_HANDLER( namcos1_dac_gain_w )
 {
+	namcos1_state *state = space->machine->driver_data<namcos1_state>();
 	int value;
 
 	/* DAC0 (bits 0,2) */
 	value = (data & 1) | ((data >> 1) & 2); /* GAIN0,GAIN1 */
-	dac0_gain = 0x20 * (value+1);
+	state->dac0_gain = 0x20 * (value+1);
 
 	/* DAC1 (bits 3,4) */
 	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
-	dac1_gain = 0x20 * (value+1);
+	state->dac1_gain = 0x20 * (value+1);
 
 	namcos1_update_DACs(space->machine);
 }
 
 static WRITE8_HANDLER( namcos1_dac0_w )
 {
-	dac0_value = data - 0x80; /* shift zero point */
+	namcos1_state *state = space->machine->driver_data<namcos1_state>();
+	state->dac0_value = data - 0x80; /* shift zero point */
 	namcos1_update_DACs(space->machine);
 }
 
 static WRITE8_HANDLER( namcos1_dac1_w )
 {
-	dac1_value = data - 0x80; /* shift zero point */
+	namcos1_state *state = space->machine->driver_data<namcos1_state>();
+	state->dac1_value = data - 0x80; /* shift zero point */
 	namcos1_update_DACs(space->machine);
 }
 
@@ -1078,7 +1081,7 @@ static const namco_interface namco_config =
     LPF info : Fco = 3.3KHz , g = -12dB/oct
 */
 
-static MACHINE_CONFIG_START( ns1, driver_device )
+static MACHINE_CONFIG_START( ns1, namcos1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809,49152000/32)

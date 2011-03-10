@@ -1,4 +1,32 @@
 
+class bagman_state : public driver_device
+{
+public:
+	bagman_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 ls259_buf[8];
+	UINT8 p1_res;
+	UINT8 p1_old_val;
+	UINT8 p2_res;
+	UINT8 p2_old_val;
+	UINT8 *videoram;
+	UINT8 *colorram;
+	UINT8 *video_enable;
+
+	/*table holds outputs of all ANDs (after AND map)*/
+	UINT8 andmap[64];
+
+	/*table holds inputs (ie. not x, x, not q, q) to the AND map*/
+	UINT8 columnvalue[32];
+
+	/*8 output pins (actually 6 output and 2 input/output)*/
+	UINT8 outvalue[8];
+
+	tilemap_t *bg_tilemap;
+};
+
+
 /*----------- timings -----------*/
 
 #define BAGMAN_MAIN_CLOCK	XTAL_18_432MHz
@@ -27,10 +55,6 @@ WRITE8_HANDLER( bagman_pal16r6_w );
 
 
 /*----------- defined in video/bagman.c -----------*/
-
-extern UINT8 *bagman_videoram;
-extern UINT8 *bagman_colorram;
-extern UINT8 *bagman_video_enable;
 
 WRITE8_HANDLER( bagman_videoram_w );
 WRITE8_HANDLER( bagman_colorram_w );

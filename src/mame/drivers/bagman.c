@@ -66,35 +66,32 @@ DIP locations verified for:
 #include "sound/tms5110.h"
 #include "includes/bagman.h"
 
-//static int speech_rom_address = 0;
-
-static UINT8 ls259_buf[8] = {0,0,0,0,0,0,0,0};
-
 
 static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 {
+	bagman_state *state = device->machine->driver_data<bagman_state>();
 	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
-	if (ls259_buf[offset] != (data&1) )
+	if (state->ls259_buf[offset] != (data&1) )
 	{
-		ls259_buf[offset] = data&1;
+		state->ls259_buf[offset] = data&1;
 
 		switch (offset)
 		{
 		case 0:
 		case 1:
 		case 2:
-			tmsprom_bit_w(device, 0, 7 - ((ls259_buf[0]<<2) | (ls259_buf[1]<<1) | (ls259_buf[2]<<0)));
+			tmsprom_bit_w(device, 0, 7 - ((state->ls259_buf[0]<<2) | (state->ls259_buf[1]<<1) | (state->ls259_buf[2]<<0)));
 			break;
 		case 3:
-			tmsprom_enable_w(device, ls259_buf[offset]);
+			tmsprom_enable_w(device, state->ls259_buf[offset]);
 			break;
 		case 4:
-			tmsprom_rom_csq_w(device, 0, ls259_buf[offset]);
+			tmsprom_rom_csq_w(device, 0, state->ls259_buf[offset]);
 			break;
 		case 5:
-			tmsprom_rom_csq_w(device, 1, ls259_buf[offset]);
+			tmsprom_rom_csq_w(device, 1, state->ls259_buf[offset]);
 			break;
 		}
 	}
@@ -116,14 +113,14 @@ static WRITE8_DEVICE_HANDLER( bagman_interrupt_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE(&bagman_videoram)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE(&bagman_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, videoram)
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE_MEMBER(bagman_state, colorram)
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagman_pal16r6_r)
 	//AM_RANGE(0xa800, 0xa805) AM_READ(bagman_ls259_r) /*just for debugging purposes*/
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("maincpu", bagman_interrupt_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE(&bagman_video_enable)
+	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, video_enable)
 	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
 	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
@@ -145,15 +142,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE(&bagman_videoram)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE(&bagman_colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, videoram)
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE_MEMBER(bagman_state, colorram)
 	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_SIZE_GENERIC(spriteram)	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE(&bagman_video_enable)
+	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, video_enable)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
 
@@ -381,42 +378,44 @@ static const ay8910_interface ay8910_config =
    I don't know if the following is correct, there can possbily be multiple solutions for the same problem. */
 static READ8_DEVICE_HANDLER( dial_input_p1_r )
 {
-	static UINT8 res,dial_val,old_val;
+	bagman_state *state = device->machine->driver_data<bagman_state>();
+	UINT8 dial_val;
 
 	dial_val = input_port_read(device->machine, "DIAL_P1");
 
-	if(res != 0x60)
-		res = 0x60;
-	else if(dial_val > old_val)
-		res = 0x40;
-	else if(dial_val < old_val)
-		res = 0x20;
+	if(state->p1_res != 0x60)
+		state->p1_res = 0x60;
+	else if(dial_val > state->p1_old_val)
+		state->p1_res = 0x40;
+	else if(dial_val < state->p1_old_val)
+		state->p1_res = 0x20;
 	else
-		res = 0x60;
+		state->p1_res = 0x60;
 
-	old_val = dial_val;
+	state->p1_old_val = dial_val;
 
-	return (input_port_read(device->machine, "P1") & 0x9f) | (res);
+	return (input_port_read(device->machine, "P1") & 0x9f) | (state->p1_res);
 }
 
 static READ8_DEVICE_HANDLER( dial_input_p2_r )
 {
-	static UINT8 res,dial_val,old_val;
+	bagman_state *state = device->machine->driver_data<bagman_state>();
+	UINT8 dial_val;
 
 	dial_val = input_port_read(device->machine, "DIAL_P2");
 
-	if(res != 0x60)
-		res = 0x60;
-	else if(dial_val > old_val)
-		res = 0x40;
-	else if(dial_val < old_val)
-		res = 0x20;
+	if(state->p2_res != 0x60)
+		state->p2_res = 0x60;
+	else if(dial_val > state->p2_old_val)
+		state->p2_res = 0x40;
+	else if(dial_val < state->p2_old_val)
+		state->p2_res = 0x20;
 	else
-		res = 0x60;
+		state->p2_res = 0x60;
 
-	old_val = dial_val;
+	state->p2_old_val = dial_val;
 
-	return (input_port_read(device->machine, "P2") & 0x9f) | (res);
+	return (input_port_read(device->machine, "P2") & 0x9f) | (state->p2_res);
 }
 
 static const ay8910_interface ay8910_dial_config =
@@ -468,7 +467,7 @@ static const tms5110_interface bagman_tms5110_interface =
 	DEVCB_NULL										/* rom clock - Only used to drive the data lines */
 };
 
-static MACHINE_CONFIG_START( bagman, driver_device )
+static MACHINE_CONFIG_START( bagman, bagman_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -505,7 +504,7 @@ static MACHINE_CONFIG_START( bagman, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pickin, driver_device )
+static MACHINE_CONFIG_START( pickin, bagman_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -558,7 +557,7 @@ z80
 */
 
 
-static MACHINE_CONFIG_START( botanic, driver_device )
+static MACHINE_CONFIG_START( botanic, bagman_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -931,8 +930,9 @@ ROM_END
 
 static DRIVER_INIT( bagnarda )
 {
+	bagman_state *state = machine->driver_data<bagman_state>();
 	/* initialize video enable because it's not done in the code */
-	*bagman_video_enable = 1;
+	*state->video_enable = 1;
 }
 
 GAME( 1982, bagman,	   0,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Bagman", 0 )

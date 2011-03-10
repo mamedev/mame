@@ -171,19 +171,15 @@ Super Strong Warriors
 #include "machine/ms32crpt.h"
 #include "includes/ms32.h"
 
-static UINT8 *ms32_nvram_8;
-
-static UINT32 *ms32_mahjong_input_select;
-
-static UINT32 to_main;
 
 /********** READ INPUTS **********/
 
 static CUSTOM_INPUT( mahjong_ctrl_r )
 {
+	ms32_state *state = field->port->machine->driver_data<ms32_state>();
 	UINT32 mj_input;
 
-	switch (ms32_mahjong_input_select[0])
+	switch (state->mahjong_input_select[0])
 	{
 		case 0x01:
 			mj_input = input_port_read(field->port->machine, "MJ0");
@@ -231,7 +227,8 @@ static WRITE32_HANDLER( ms32_sound_w )
 
 static READ32_HANDLER( ms32_sound_r )
 {
-	return to_main^0xff;
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->to_main^0xff;
 }
 
 static WRITE32_HANDLER( reset_sub_w )
@@ -245,26 +242,110 @@ static WRITE32_HANDLER( reset_sub_w )
 /********** MEMORY MAP **********/
 
 
-static READ8_HANDLER(   ms32_nvram_r8 )    { return ms32_nvram_8[offset]; }
-static WRITE8_HANDLER(  ms32_nvram_w8 )    { ms32_nvram_8[offset] = data; }
-static READ8_HANDLER(   ms32_priram_r8 )   { return ms32_priram_8[offset]; }
-static WRITE8_HANDLER(  ms32_priram_w8 )   { ms32_priram_8[offset] = data; }
-static READ16_HANDLER(  ms32_palram_r16 )  { return ms32_palram_16[offset]; }
-static WRITE16_HANDLER( ms32_palram_w16 )  { COMBINE_DATA(&ms32_palram_16[offset]); }
-static READ16_HANDLER(  ms32_rozram_r16 )  { return ms32_rozram_16[offset]; }
-static WRITE16_HANDLER( ms32_rozram_w16 )  { COMBINE_DATA(&ms32_rozram_16[offset]); tilemap_mark_tile_dirty(ms32_roz_tilemap,offset/2); }
-static READ16_HANDLER(  ms32_lineram_r16 ) { return ms32_lineram_16[offset]; }
-static WRITE16_HANDLER( ms32_lineram_w16 ) { COMBINE_DATA(&ms32_lineram_16[offset]); }
-static READ16_HANDLER(  ms32_sprram_r16 )  { return ms32_sprram_16[offset]; }
-static WRITE16_HANDLER( ms32_sprram_w16 )  { COMBINE_DATA(&ms32_sprram_16[offset]); }
-static READ16_HANDLER(  ms32_txram_r16 )   { return ms32_txram_16[offset]; }
-static WRITE16_HANDLER( ms32_txram_w16 )   { COMBINE_DATA(&ms32_txram_16[offset]); tilemap_mark_tile_dirty(ms32_tx_tilemap,offset/2); }
-static READ16_HANDLER(  ms32_bgram_r16 )   { return ms32_bgram_16[offset]; }
-static WRITE16_HANDLER( ms32_bgram_w16 )   { COMBINE_DATA(&ms32_bgram_16[offset]); tilemap_mark_tile_dirty(ms32_bg_tilemap,offset/2); tilemap_mark_tile_dirty(ms32_bg_tilemap_alt,offset/2); }
+static READ8_HANDLER(   ms32_nvram_r8 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->nvram_8[offset];
+}
+
+static WRITE8_HANDLER(  ms32_nvram_w8 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	state->nvram_8[offset] = data;
+}
+
+static READ8_HANDLER(   ms32_priram_r8 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->priram_8[offset];
+}
+
+static WRITE8_HANDLER(  ms32_priram_w8 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	state->priram_8[offset] = data;
+}
+
+static READ16_HANDLER(  ms32_palram_r16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->palram_16[offset];
+}
+
+static WRITE16_HANDLER( ms32_palram_w16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	COMBINE_DATA(&state->palram_16[offset]);
+}
+
+static READ16_HANDLER(  ms32_rozram_r16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->rozram_16[offset];
+}
+
+static WRITE16_HANDLER( ms32_rozram_w16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	COMBINE_DATA(&state->rozram_16[offset]);
+	tilemap_mark_tile_dirty(state->roz_tilemap,offset/2);
+}
+
+static READ16_HANDLER(  ms32_lineram_r16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->lineram_16[offset];
+}
+
+static WRITE16_HANDLER( ms32_lineram_w16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	COMBINE_DATA(&state->lineram_16[offset]);
+}
+
+static READ16_HANDLER(  ms32_sprram_r16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->sprram_16[offset];
+}
+
+static WRITE16_HANDLER( ms32_sprram_w16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	COMBINE_DATA(&state->sprram_16[offset]);
+}
+
+static READ16_HANDLER(  ms32_txram_r16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->txram_16[offset];
+}
+
+static WRITE16_HANDLER( ms32_txram_w16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	COMBINE_DATA(&state->txram_16[offset]);
+	tilemap_mark_tile_dirty(state->tx_tilemap,offset/2);
+}
+
+static READ16_HANDLER(  ms32_bgram_r16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->bgram_16[offset];
+}
+
+static WRITE16_HANDLER( ms32_bgram_w16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	COMBINE_DATA(&state->bgram_16[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(state->bg_tilemap_alt,offset/2);
+}
 
 static WRITE32_HANDLER( pip_w )
 {
-	ms32_tilemaplayoutcontrol = data;
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	state->tilemaplayoutcontrol = data;
 
 	if ((data) && (data != 1))
 		popmessage("fce00a7c = %02x",data);
@@ -288,7 +369,7 @@ static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* txram is 16-bit wide, 0x4000 in size */
 	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* bgram is 16-bit wide, 0x4000 in size */
 /*  AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
-	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_BASE(&ms32_mainram)                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
+	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_BASE_MEMBER(ms32_state, mainram)                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
 	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK("bank1")                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
 
 	/* todo: clean up the mapping of these */
@@ -302,21 +383,30 @@ static ADDRESS_MAP_START( ms32_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_BASE(&ms32_fce00000) /* registers not ram? */
 	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
 	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE(ms32_brightness_w)	// global brightness control
-/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_BASE(&ms32_roz_ctrl)		/* roz control registers */
-/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_BASE(&ms32_tx_scroll)	/* tx layer scroll */
-/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_BASE(&ms32_bg_scroll)	/* bg layer scroll */
+/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_BASE_MEMBER(ms32_state, roz_ctrl)		/* roz control registers */
+/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_BASE_MEMBER(ms32_state, tx_scroll)	/* tx layer scroll */
+/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_BASE_MEMBER(ms32_state, bg_scroll)	/* bg layer scroll */
 	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)	// ??? layer related? seems to be always 0
 //  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
 	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
-	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE(&ms32_mahjong_input_select)
+	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE_MEMBER(ms32_state, mahjong_input_select)
 ADDRESS_MAP_END
 
 
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use it's own memory map */
 
-static WRITE16_HANDLER( ms32_extra_w16 )  { COMBINE_DATA(&f1superb_extraram_16[offset]); tilemap_mark_tile_dirty(ms32_extra_tilemap,offset/2); }
-static READ16_HANDLER(  ms32_extra_r16 )  { return f1superb_extraram_16[offset]; }
+static WRITE16_HANDLER( ms32_extra_w16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	COMBINE_DATA(&state->f1superb_extraram_16[offset]);
+	tilemap_mark_tile_dirty(state->extra_tilemap,offset/2);
+}
+static READ16_HANDLER( ms32_extra_r16 )
+{
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	return state->f1superb_extraram_16[offset];
+}
 
 static void irq_raise(running_machine *machine, int level);
 
@@ -1205,28 +1295,30 @@ GFXDECODE_END
    10 - 6d4 - big, vbl?
 */
 
-static UINT16 irqreq;
 
 static IRQ_CALLBACK(irq_callback)
 {
+	ms32_state *state = device->machine->driver_data<ms32_state>();
 	int i;
-	for(i=15; i>=0 && !(irqreq & (1<<i)); i--);
-	irqreq &= ~(1<<i);
-	if(!irqreq)
+	for(i=15; i>=0 && !(state->irqreq & (1<<i)); i--);
+	state->irqreq &= ~(1<<i);
+	if(!state->irqreq)
 		cpu_set_input_line(device, 0, CLEAR_LINE);
 	return i;
 }
 
 static void irq_init(running_machine *machine)
 {
-	irqreq = 0;
+	ms32_state *state = machine->driver_data<ms32_state>();
+	state->irqreq = 0;
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)
 {
-	irqreq |= (1<<level);
+	ms32_state *state = machine->driver_data<ms32_state>();
+	state->irqreq |= (1<<level);
 	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 }
 
@@ -1282,7 +1374,8 @@ static WRITE8_HANDLER( ms32_snd_bank_w )
 
 static WRITE8_HANDLER( to_main_w )
 {
-	to_main=data;
+	ms32_state *state = space->machine->driver_data<ms32_state>();
+	state->to_main=data;
 	irq_raise(space->machine, 1);
 }
 
@@ -1313,7 +1406,7 @@ static MACHINE_RESET( ms32 )
 
 /********** MACHINE DRIVER **********/
 
-static MACHINE_CONFIG_START( ms32, driver_device )
+static MACHINE_CONFIG_START( ms32, ms32_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
@@ -2125,14 +2218,16 @@ ROM_END
 
 static void configure_banks(running_machine *machine)
 {
-	state_save_register_global(machine, to_main);
+	ms32_state *state = machine->driver_data<ms32_state>();
+	state_save_register_global(machine, state->to_main);
 	memory_configure_bank(machine, "bank4", 0, 16, machine->region("audiocpu")->base() + 0x14000, 0x4000);
 	memory_configure_bank(machine, "bank5", 0, 16, machine->region("audiocpu")->base() + 0x14000, 0x4000);
 }
 
 static DRIVER_INIT( ms32_common )
 {
-	ms32_nvram_8 = auto_alloc_array(machine, UINT8, 0x2000);
+	ms32_state *state = machine->driver_data<ms32_state>();
+	state->nvram_8 = auto_alloc_array(machine, UINT8, 0x2000);
 	configure_banks(machine);
 }
 

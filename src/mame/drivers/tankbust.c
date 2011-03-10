@@ -23,11 +23,11 @@ To do:
 
 
 //port A of ay8910#0
-static int latch;
 
 static TIMER_CALLBACK( soundlatch_callback )
 {
-	latch = param;
+	tankbust_state *state = machine->driver_data<tankbust_state>();
+	state->latch = param;
 }
 
 static WRITE8_HANDLER( tankbust_soundlatch_w )
@@ -37,17 +37,18 @@ static WRITE8_HANDLER( tankbust_soundlatch_w )
 
 static READ8_DEVICE_HANDLER( tankbust_soundlatch_r )
 {
-	return latch;
+	tankbust_state *state = device->machine->driver_data<tankbust_state>();
+	return state->latch;
 }
 
 //port B of ay8910#0
-static UINT32 timer1 = 0;
 static READ8_DEVICE_HANDLER( tankbust_soundtimer_r )
 {
+	tankbust_state *state = device->machine->driver_data<tankbust_state>();
 	int ret;
 
-	timer1++;
-	ret = timer1;
+	state->timer1++;
+	ret = state->timer1;
 	return ret;
 }
 
@@ -60,18 +61,18 @@ static TIMER_CALLBACK( soundirqline_callback )
 }
 
 
-static int e0xx_data[8] = { 0,0,0,0, 0,0,0,0 };
 
 static WRITE8_HANDLER( tankbust_e0xx_w )
 {
-	e0xx_data[offset] = data;
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	state->e0xx_data[offset] = data;
 
 #if 0
 	popmessage("e0: %x %x (%x cnt) %x %x %x %x",
-		e0xx_data[0], e0xx_data[1],
-		e0xx_data[2], e0xx_data[3],
-		e0xx_data[4], e0xx_data[5],
-		e0xx_data[6] );
+		state->e0xx_data[0], state->e0xx_data[1],
+		state->e0xx_data[2], state->e0xx_data[3],
+		state->e0xx_data[4], state->e0xx_data[5],
+		state->e0xx_data[6] );
 #endif
 
 	switch (offset)
@@ -107,7 +108,8 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 
 static READ8_HANDLER( debug_output_area_r )
 {
-	return e0xx_data[offset];
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	return state->e0xx_data[offset];
 }
 
 
@@ -170,20 +172,20 @@ static READ8_HANDLER( read_from_unmapped_memory )
 }
 #endif
 
-static UINT8 variable_data;
 static READ8_HANDLER( some_changing_input )
 {
-	variable_data += 8;
-	return variable_data;
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	state->variable_data += 8;
+	return state->variable_data;
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_BASE(&tankbust_videoram)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_BASE(&tankbust_colorram)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tankbust_txtram_r, tankbust_txtram_w) AM_BASE(&tankbust_txtram)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_BASE_MEMBER(tankbust_state, videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_BASE_MEMBER(tankbust_state, colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tankbust_txtram_r, tankbust_txtram_w) AM_BASE_MEMBER(tankbust_state, txtram)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xe000, 0xe007) AM_READWRITE(debug_output_area_r, tankbust_e0xx_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("INPUTS") AM_WRITE(tankbust_yscroll_w)
@@ -318,11 +320,12 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_RESET( tankbust )
 {
-	variable_data = 0x11;
+	tankbust_state *state = machine->driver_data<tankbust_state>();
+	state->variable_data = 0x11;
 }
 
 
-static MACHINE_CONFIG_START( tankbust, driver_device )
+static MACHINE_CONFIG_START( tankbust, tankbust_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)	/* Verified on PCB */

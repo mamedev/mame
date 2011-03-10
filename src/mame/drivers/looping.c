@@ -87,7 +87,6 @@ L056-6    9A          "      "      VLI-8-4 7A         "
 #define VBEND				(16)
 #define VBSTART				(224+16)
 
-static UINT8 *cop_io;
 
 /*************************************
  *
@@ -105,12 +104,15 @@ public:
 	UINT8 *		videoram;
 	UINT8 *		colorram;
 	UINT8 *		spriteram;
+	UINT8 *		cop_io;
 
 	/* tilemaps */
 	tilemap_t *	bg_tilemap;
 
 	/* sound state */
 	UINT8		sound[8];
+
+	int		last;
 };
 
 
@@ -402,10 +404,10 @@ static WRITE8_DEVICE_HANDLER( speech_enable_w )
 
 static WRITE8_HANDLER( ballon_enable_w )
 {
-static int last;
-	if (last != data)
+	looping_state *state = space->machine->driver_data<looping_state>();
+	if (state->last != data)
 		mame_printf_debug("ballon_enable_w = %d\n", data);
-	last = data;
+	state->last = data;
 }
 
 
@@ -438,18 +440,21 @@ static WRITE8_HANDLER( plr2_w )
 
 static READ8_HANDLER( cop_io_r )
 {
+	//looping_state *state = space->machine->driver_data<looping_state>();
 	// if (offset == 1) return space->machine->rand() & 0x01;
-	return 1; // cop_io[offset];
+	return 1; // state->cop_io[offset];
 }
 
 static WRITE8_HANDLER( cop_io_w )
 {
-	cop_io[offset] = data;
+	looping_state *state = space->machine->driver_data<looping_state>();
+	state->cop_io[offset] = data;
 if (offset == 0) logerror("%02x  ",data);
 }
 
 static READ8_HANDLER( protection_r )
 {
+	looping_state *state = space->machine->driver_data<looping_state>();
 //        The code reads ($7002) ($7004) alternately
 //        The result must change at least once every 10 reads
 //        A read from ($34b0 + result) must == $01
@@ -468,7 +473,7 @@ static READ8_HANDLER( protection_r )
 //        cop write randomly fc (unfortunatly) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
 
 	// missing something
-	if(cop_io[0] != 0xfc) return cop_io[0];
+	if(state->cop_io[0] != 0xfc) return state->cop_io[0];
 	return 0xff;
 }
 
@@ -882,11 +887,12 @@ ROM_END
 
 static DRIVER_INIT( looping )
 {
+	looping_state *state = machine->driver_data<looping_state>();
 	int length = machine->region("maincpu")->bytes();
 	UINT8 *rom = machine->region("maincpu")->base();
 	int i;
 
-	cop_io = auto_alloc_array(machine, UINT8, 0x08);
+	state->cop_io = auto_alloc_array(machine, UINT8, 0x08);
 
 	/* bitswap the TMS9995 ROMs */
 	for (i = 0; i < length; i++)

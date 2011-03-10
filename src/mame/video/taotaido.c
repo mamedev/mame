@@ -11,25 +11,15 @@ zooming might be wrong (only used on title logo?)
 #include "emu.h"
 #include "includes/taotaido.h"
 
-UINT16 *taotaido_spriteram;
-UINT16 *taotaido_spriteram2;
-UINT16 *taotaido_scrollram;
-UINT16 *taotaido_bgram;
-
-static UINT16 taotaido_sprite_character_bank_select[8];
-static UINT16 taotaido_video_bank_select[8];
-static tilemap_t *bg_tilemap;
-
-static UINT16 *taotaido_spriteram_old, *taotaido_spriteram_older;
-static UINT16 *taotaido_spriteram2_old, *taotaido_spriteram2_older;
 
 /* sprite tile codes 0x4000 - 0x7fff get remapped according to the content of these registers */
 WRITE16_HANDLER( taotaido_sprite_character_bank_select_w )
 {
+	taotaido_state *state = space->machine->driver_data<taotaido_state>();
 	if(ACCESSING_BITS_8_15)
-		taotaido_sprite_character_bank_select[offset*2] = data >> 8;
+		state->sprite_character_bank_select[offset*2] = data >> 8;
 	if(ACCESSING_BITS_0_7)
-		taotaido_sprite_character_bank_select[offset*2+1] = data &0xff;
+		state->sprite_character_bank_select[offset*2+1] = data &0xff;
 }
 
 /* sprites are like the other video system / psikyo games, we can merge this with aerofgt and plenty of other
@@ -37,6 +27,7 @@ WRITE16_HANDLER( taotaido_sprite_character_bank_select_w )
 
 static void draw_sprite(running_machine *machine, UINT16 spriteno, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	taotaido_state *state = machine->driver_data<taotaido_state>();
 	/*- SPR RAM Format -**
 
       4 words per sprite
@@ -50,7 +41,7 @@ static void draw_sprite(running_machine *machine, UINT16 spriteno, bitmap_t *bit
 
 	int x,y;
 
-	UINT16 *source = &taotaido_spriteram_older[spriteno*4];
+	UINT16 *source = &state->spriteram_older[spriteno*4];
 	const gfx_element *gfx = machine->gfx[0];
 
 
@@ -89,7 +80,7 @@ static void draw_sprite(running_machine *machine, UINT16 spriteno, bitmap_t *bit
 			/* this indirection is a bit different to the other video system games */
 			int realtile;
 
-			realtile = taotaido_spriteram2_older[tile&0x7fff];
+			realtile = state->spriteram2_older[tile&0x7fff];
 
 			if (realtile > 0x3fff)
 			{
@@ -98,7 +89,7 @@ static void draw_sprite(running_machine *machine, UINT16 spriteno, bitmap_t *bit
 				block = (realtile & 0x3800)>>11;
 
 				realtile &= 0x07ff;
-				realtile |= taotaido_sprite_character_bank_select[block] * 0x800;
+				realtile |= state->sprite_character_bank_select[block] * 0x800;
 			}
 
 			if (xflip) sx = ((xpos + xzoom * (xsize - x) / 2 + 16) & 0x1ff) - 16;
@@ -120,9 +111,10 @@ static void draw_sprite(running_machine *machine, UINT16 spriteno, bitmap_t *bit
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	taotaido_state *state = machine->driver_data<taotaido_state>();
 	/* first part of sprite ram is the list of sprites to draw, terminated with 0x4000 */
-	UINT16 *source = taotaido_spriteram_older;
-	UINT16 *finish = taotaido_spriteram_older + 0x2000/2;
+	UINT16 *source = state->spriteram_older;
+	UINT16 *finish = state->spriteram_older + 0x2000/2;
 
 	while( source<finish )
 	{
@@ -139,6 +131,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 WRITE16_HANDLER( taotaido_tileregs_w )
 {
+	taotaido_state *state = space->machine->driver_data<taotaido_state>();
 	switch (offset)
 	{
 		case 0: // would normally be x scroll?
@@ -154,27 +147,29 @@ WRITE16_HANDLER( taotaido_tileregs_w )
 		case 6:
 		case 7:
 			if(ACCESSING_BITS_8_15)
-				taotaido_video_bank_select[(offset-4)*2] = data >> 8;
+				state->video_bank_select[(offset-4)*2] = data >> 8;
 			if(ACCESSING_BITS_0_7)
-				taotaido_video_bank_select[(offset-4)*2+1] = data &0xff;
-				tilemap_mark_all_tiles_dirty(bg_tilemap);
+				state->video_bank_select[(offset-4)*2+1] = data &0xff;
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 			break;
 	}
 }
 
 WRITE16_HANDLER( taotaido_bgvideoram_w )
 {
-	COMBINE_DATA(&taotaido_bgram[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	taotaido_state *state = space->machine->driver_data<taotaido_state>();
+	COMBINE_DATA(&state->bgram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 static TILE_GET_INFO( taotaido_bg_tile_info )
 {
-	int code = taotaido_bgram[tile_index]&0x01ff;
-	int bank = (taotaido_bgram[tile_index]&0x0e00)>>9;
-	int col  = (taotaido_bgram[tile_index]&0xf000)>>12;
+	taotaido_state *state = machine->driver_data<taotaido_state>();
+	int code = state->bgram[tile_index]&0x01ff;
+	int bank = (state->bgram[tile_index]&0x0e00)>>9;
+	int col  = (state->bgram[tile_index]&0xf000)>>12;
 
-	code |= taotaido_video_bank_select[bank]*0x200;
+	code |= state->video_bank_select[bank]*0x200;
 
 	SET_TILE_INFO(
 			1,
@@ -191,20 +186,22 @@ static TILEMAP_MAPPER( taotaido_tilemap_scan_rows )
 
 VIDEO_START(taotaido)
 {
-	bg_tilemap = tilemap_create(machine, taotaido_bg_tile_info,taotaido_tilemap_scan_rows,     16,16,128,64);
+	taotaido_state *state = machine->driver_data<taotaido_state>();
+	state->bg_tilemap = tilemap_create(machine, taotaido_bg_tile_info,taotaido_tilemap_scan_rows,     16,16,128,64);
 
-	taotaido_spriteram_old = auto_alloc_array(machine, UINT16, 0x2000/2);
-	taotaido_spriteram_older = auto_alloc_array(machine, UINT16, 0x2000/2);
+	state->spriteram_old = auto_alloc_array(machine, UINT16, 0x2000/2);
+	state->spriteram_older = auto_alloc_array(machine, UINT16, 0x2000/2);
 
-	taotaido_spriteram2_old = auto_alloc_array(machine, UINT16, 0x10000/2);
-	taotaido_spriteram2_older = auto_alloc_array(machine, UINT16, 0x10000/2);
+	state->spriteram2_old = auto_alloc_array(machine, UINT16, 0x10000/2);
+	state->spriteram2_older = auto_alloc_array(machine, UINT16, 0x10000/2);
 }
 
 
 SCREEN_UPDATE(taotaido)
 {
-//  tilemap_set_scrollx(bg_tilemap,0,(taotaido_scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
-//  tilemap_set_scrolly(bg_tilemap,0,(taotaido_scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
+	taotaido_state *state = screen->machine->driver_data<taotaido_state>();
+//  tilemap_set_scrollx(state->bg_tilemap,0,(state->scrollram[0x380/2]>>4)); // the values put here end up being wrong every other frame
+//  tilemap_set_scrolly(state->bg_tilemap,0,(state->scrollram[0x382/2]>>4)); // the values put here end up being wrong every other frame
 
 	/* not amazingly efficient however it should be functional for row select and linescroll */
 	int line;
@@ -220,10 +217,10 @@ SCREEN_UPDATE(taotaido)
 	{
 		clip.min_y = clip.max_y = line;
 
-		tilemap_set_scrollx(bg_tilemap,0,((taotaido_scrollram[(0x00+4*line)/2])>>4)+30);
-		tilemap_set_scrolly(bg_tilemap,0,((taotaido_scrollram[(0x02+4*line)/2])>>4)-line);
+		tilemap_set_scrollx(state->bg_tilemap,0,((state->scrollram[(0x00+4*line)/2])>>4)+30);
+		tilemap_set_scrolly(state->bg_tilemap,0,((state->scrollram[(0x02+4*line)/2])>>4)-line);
 
-		tilemap_draw(bitmap,&clip,bg_tilemap,0,0);
+		tilemap_draw(bitmap,&clip,state->bg_tilemap,0,0);
 	}
 
 	draw_sprites(screen->machine, bitmap,cliprect);
@@ -232,11 +229,12 @@ SCREEN_UPDATE(taotaido)
 
 SCREEN_EOF( taotaido )
 {
+	taotaido_state *state = machine->driver_data<taotaido_state>();
 	/* sprites need to be delayed by 2 frames? */
 
-	memcpy(taotaido_spriteram2_older,taotaido_spriteram2_old,0x10000);
-	memcpy(taotaido_spriteram2_old,taotaido_spriteram2,0x10000);
+	memcpy(state->spriteram2_older,state->spriteram2_old,0x10000);
+	memcpy(state->spriteram2_old,state->spriteram2,0x10000);
 
-	memcpy(taotaido_spriteram_older,taotaido_spriteram_old,0x2000);
-	memcpy(taotaido_spriteram_old,taotaido_spriteram,0x2000);
+	memcpy(state->spriteram_older,state->spriteram_old,0x2000);
+	memcpy(state->spriteram_old,state->spriteram,0x2000);
 }

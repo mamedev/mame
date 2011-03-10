@@ -36,6 +36,12 @@ public:
 
 	UINT8 drawmode_table[16];
 	UINT8 empty_tile[16*16];
+	int hf_posy;
+	int hf_posx;
+	int tc16_posy;
+	int tc16_posx;
+	int tc32_posy;
+	int tc32_posx;
 };
 
 

@@ -36,7 +36,6 @@ static void turbo_update_samples(turbo_state *state, device_t *samples)
 
 
 #if (DISCRETE_TEST)
-static int last_sound_a;
 
 static TIMER_CALLBACK( update_sound_a )
 {
@@ -110,12 +109,12 @@ WRITE8_DEVICE_HANDLER( turbo_sound_a_w )
 
 #else
 
-	if (((data ^ last_sound_a) & 0x1e) && (last_sound_a & 0x1e) != 0x1e)
+	if (((data ^ state->last_sound_a) & 0x1e) && (state->last_sound_a & 0x1e) != 0x1e)
 		space->machine->scheduler().timer_set(attotime::from_hz(20000), FUNC(update_sound_a), data);
 	else
 		update_sound_a(data);
 
-	last_sound_a = data;
+	state->last_sound_a = data;
 
 #endif
 }

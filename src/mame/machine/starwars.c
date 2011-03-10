@@ -234,8 +234,8 @@ static void run_mproc(running_machine *machine)
 		IP6_0  = state->PROM_MAS[state->MPA];
 
 #if (MATHDEBUG)
-		mame_printf_debug("\n(state->MPA:%x), Strobe: %x, IP7: %d, IP6_0:%x\n",state->MPA, IP15_8, IP7, IP6_0);
-		mame_printf_debug("(state->BIC: %x), state->A: %x, state->B: %x, state->C: %x, state->ACC: %x\n",state->BIC,state->A,state->B,state->C,state->ACC);
+		mame_printf_debug("\n(MPA:%x), Strobe: %x, IP7: %d, IP6_0:%x\n",state->MPA, IP15_8, IP7, IP6_0);
+		mame_printf_debug("(BIC: %x), A: %x, B: %x, C: %x, ACC: %x\n",state->BIC,state->A,state->B,state->C,state->ACC);
 #endif
 
 		/* construct the current RAM address */

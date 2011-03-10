@@ -1562,7 +1562,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic8_portb_w )
 static WRITE_LINE_DEVICE_HANDLER( pia_ic8_ca2_w )
 {
 	mpu4_state *drvstate = device->machine->driver_data<mpu4_state>();
-	LOG_IC8(("%s: IC8 PIA write CA2 (drvstate->input_strobe bit 2 / LED C) %02X\n", device->machine->describe_context(), state & 0xFF));
+	LOG_IC8(("%s: IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", device->machine->describe_context(), state & 0xFF));
 
 	drvstate->IC23GC = state;
 	ic23_update(drvstate);

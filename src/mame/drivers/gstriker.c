@@ -178,28 +178,24 @@ Frequencies: 68k is XTAL_32MHZ/2
 ******************************************************************************/
 
 
-//UINT16 *gs_videoram3;
-//UINT16 *gs_mixer_regs;
-static UINT16 dmmy_8f_ret;
-
-
 /*** MISC READ / WRITE HANDLERS **********************************************/
 
 static READ16_HANDLER(dmmy_8f)
 {
-	dmmy_8f_ret = ~dmmy_8f_ret;
-	return dmmy_8f_ret;
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	state->dmmy_8f_ret = ~state->dmmy_8f_ret;
+	return state->dmmy_8f_ret;
 }
 
 /*** SOUND RELATED ***********************************************************/
 
-static int pending_command;
 
 static WRITE16_HANDLER( sound_command_w )
 {
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		pending_command = 1;
+		state->pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -208,13 +204,15 @@ static WRITE16_HANDLER( sound_command_w )
 #if 0
 static READ16_HANDLER( pending_command_r )
 {
-	return pending_command;
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	return state->pending_command;
 }
 #endif
 
 static WRITE8_HANDLER( gs_sh_pending_command_clear_w )
 {
-	pending_command = 0;
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	state->pending_command = 0;
 }
 
 static WRITE8_HANDLER( gs_sh_bankswitch_w )
@@ -280,15 +278,14 @@ static const ym2610_interface ym2610_config =
 
 /*** MEMORY LAYOUTS **********************************************************/
 
-static UINT16 *work_ram;
 
 
 static ADDRESS_MAP_START( gstriker_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE(&MB60553_0_vram)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE(&CG10103_0_vram)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE(&VS920A_0_vram)
-	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE(&gstriker_lineram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE_MEMBER(gstriker_state, MB60553[0].vram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_MEMBER(gstriker_state, CG10103[0].vram)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE_MEMBER(gstriker_state, VS920A[0].vram)
+	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE_MEMBER(gstriker_state, lineram)
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
@@ -302,7 +299,7 @@ static ADDRESS_MAP_START( gstriker_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20008e, 0x20008f) AM_READ(dmmy_8f)
 	AM_RANGE(0x2000a0, 0x2000a1) AM_WRITE(sound_command_w)
 
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(&work_ram)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(gstriker_state, work_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -322,10 +319,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vgoal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE(&MB60553_0_vram)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE(&CG10103_0_vram)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE(&VS920A_0_vram)
-	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE(&gstriker_lineram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(MB60553_0_vram_w) AM_BASE_MEMBER(gstriker_state, MB60553[0].vram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_MEMBER(gstriker_state, CG10103[0].vram)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(VS920A_0_vram_w) AM_BASE_MEMBER(gstriker_state, VS920A[0].vram)
+	AM_RANGE(0x181000, 0x181fff) AM_RAM AM_BASE_MEMBER(gstriker_state, lineram)
 	AM_RANGE(0x1c0000, 0x1c4fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x200000, 0x20000f) AM_RAM_WRITE(MB60553_0_regs_w)
 	AM_RANGE(0x200040, 0x20005f) AM_RAM //AM_BASE(&gs_mixer_regs)
@@ -338,7 +335,7 @@ static ADDRESS_MAP_START( vgoal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20008e, 0x20008f) AM_READ(dmmy_8f)
 
 	AM_RANGE(0x2000a0, 0x2000a1) AM_WRITE(sound_command_w)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(&work_ram)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(gstriker_state, work_ram)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
@@ -546,7 +543,7 @@ INPUT_PORTS_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-static MACHINE_CONFIG_START( gstriker, driver_device )
+static MACHINE_CONFIG_START( gstriker, gstriker_state )
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(gstriker_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -585,7 +582,7 @@ static MACHINE_CONFIG_DERIVED( twrldc94, gstriker )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vgoal, driver_device )
+static MACHINE_CONFIG_START( vgoal, gstriker_state )
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(vgoal_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -830,34 +827,34 @@ the zooming.To use it,you should use Player 2 Start button to show the test scre
 or to advance into the tests.
 ******************************************************************************************/
 #define PC(_num_)\
-work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
-work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
+state->work_ram[0x000/2] = (_num_ & 0xffff0000) >> 16;\
+state->work_ram[0x002/2] = (_num_ & 0x0000ffff) >> 0;
 
-static int gametype = 0;
-static UINT16 mcu_data = 0;
 
 static WRITE16_HANDLER( twrldc94_mcu_w )
 {
-	mcu_data = data;
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	state->mcu_data = data;
 }
 
 static READ16_HANDLER( twrldc94_mcu_r )
 {
-	return mcu_data;
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	return state->mcu_data;
 }
 
-static UINT16 prot_reg[2] = {0,0}; // current,last
 static WRITE16_HANDLER( twrldc94_prot_reg_w )
 {
-	prot_reg[1] = prot_reg[0];
-	prot_reg[0] = data;
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
+	state->prot_reg[1] = state->prot_reg[0];
+	state->prot_reg[0] = data;
 
-	if( ((prot_reg[1] & 2) == 2) && ((prot_reg[0] & 2) == 0) )
+	if( ((state->prot_reg[1] & 2) == 2) && ((state->prot_reg[0] & 2) == 0) )
 	{
-		switch( gametype )
+		switch( state->gametype )
 		{
 			case 1:
-				switch(mcu_data)
+				switch(state->mcu_data)
 				{
 					#define NULL_SUB 0x0000828E
 					case 0x53: PC(0x0000a4c); break; // boot -> main loop
@@ -917,19 +914,19 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 					case 0x6f: PC(NULL_SUB); break;
 
 					default:
-						popmessage("Unknown MCU CMD %04x",mcu_data);
+						popmessage("Unknown MCU CMD %04x",state->mcu_data);
 						PC(NULL_SUB);
 						break;
 				}
 				break;
 
 			case 2:
-				switch(mcu_data)
+				switch(state->mcu_data)
 				{
 					case 0x53: PC(0x00000a5c); break; // POST
 
 					default:
-						popmessage("Unknown MCU CMD %04x",mcu_data);
+						popmessage("Unknown MCU CMD %04x",state->mcu_data);
 						PC(NULL_SUB);
 						break;
 				}
@@ -937,7 +934,7 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 
 
 			case 3:
-				switch(mcu_data)
+				switch(state->mcu_data)
 				{
 					case 0x33: PC(0x00063416); break; // *after game over, is this right?
 					case 0x3d: PC(0x0006275C); break; // after sprite ram init, team select
@@ -950,7 +947,7 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 					case 0x79: PC(0x0006072E); break; // after select, start match
 
 					default:
-						popmessage("Unknown MCU CMD %04x",mcu_data);
+						popmessage("Unknown MCU CMD %04x",state->mcu_data);
 						PC(0x00000586); // rts
 						break;
 				}
@@ -961,11 +958,12 @@ static WRITE16_HANDLER( twrldc94_prot_reg_w )
 
 static READ16_HANDLER( twrldc94_prot_reg_r )
 {
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
 	// bit 0 is for debugging vgoalsoc?
 	// Setting it results in a hang with a digit displayed on screen
 	// For twrldc94, it just disables sound.
 
-	return prot_reg[0];
+	return state->prot_reg[0];
 }
 
 /*
@@ -979,15 +977,15 @@ static READ16_HANDLER( twrldc94_prot_reg_r )
 
     The tick count is usually set to 0x3c => it's driven off vblank?
 */
-//work_ram[ (0xffe900 - 0xffc00) ]
-#define COUNTER1_ENABLE work_ram[0x2900/2] >> 8
-#define COUNTER2_ENABLE (work_ram[0x2900/2] & 0xff)
-#define TICK_1 work_ram[0x2908/2]
-#define TICKCOUNT_1 work_ram[0x290a/2]
-#define TICK_2 work_ram[0x290c/2]
-#define TICKCOUNT_3 work_ram[0x290e/2]
-#define COUNTER_1 work_ram[0x2928/2]
-#define COUNTER_2 work_ram[0x292a/2]
+//state->work_ram[ (0xffe900 - 0xffc00) ]
+#define COUNTER1_ENABLE state->work_ram[0x2900/2] >> 8
+#define COUNTER2_ENABLE (state->work_ram[0x2900/2] & 0xff)
+#define TICK_1 state->work_ram[0x2908/2]
+#define TICKCOUNT_1 state->work_ram[0x290a/2]
+#define TICK_2 state->work_ram[0x290c/2]
+#define TICKCOUNT_3 state->work_ram[0x290e/2]
+#define COUNTER_1 state->work_ram[0x2928/2]
+#define COUNTER_2 state->work_ram[0x292a/2]
 static READ16_HANDLER( vbl_toggle_r )
 {
 	return 0xff;
@@ -995,6 +993,7 @@ static READ16_HANDLER( vbl_toggle_r )
 
 static WRITE16_HANDLER( vbl_toggle_w )
 {
+	gstriker_state *state = space->machine->driver_data<gstriker_state>();
 	if( COUNTER1_ENABLE == 1 )
 	{
 		TICK_1 = (TICK_1 - 1) & 0xff;	// 8bit
@@ -1018,9 +1017,10 @@ static WRITE16_HANDLER( vbl_toggle_w )
 
 static void mcu_init( running_machine *machine )
 {
-	dmmy_8f_ret = 0xFFFF;
-	pending_command = 0;
-	mcu_data = 0;
+	gstriker_state *state = machine->driver_data<gstriker_state>();
+	state->dmmy_8f_ret = 0xFFFF;
+	state->pending_command = 0;
+	state->mcu_data = 0;
 
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_r);
@@ -1031,19 +1031,22 @@ static void mcu_init( running_machine *machine )
 
 static DRIVER_INIT( twrldc94 )
 {
-	gametype = 1;
+	gstriker_state *state = machine->driver_data<gstriker_state>();
+	state->gametype = 1;
 	mcu_init( machine );
 }
 
 static DRIVER_INIT( twrldc94a )
 {
-	gametype = 2;
+	gstriker_state *state = machine->driver_data<gstriker_state>();
+	state->gametype = 2;
 	mcu_init( machine );
 }
 
 static DRIVER_INIT( vgoalsoc )
 {
-	gametype = 3;
+	gstriker_state *state = machine->driver_data<gstriker_state>();
+	state->gametype = 3;
 	mcu_init( machine );
 
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200090, 0x200091, 0, 0, vbl_toggle_w); // vblank toggle

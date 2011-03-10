@@ -570,22 +570,24 @@ A trojan could be used on the board to verify the exact behaviour.
 
 *****************************************************************************/
 
-static int hf_posy, hf_posx;
 
 static WRITE8_HANDLER( hardflags_scrollx_w )
 {
-	hf_posx = (hf_posx & ~0xff) | data;
+	snk_state *state = space->machine->driver_data<snk_state>();
+	state->hf_posx = (state->hf_posx & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( hardflags_scrolly_w )
 {
-	hf_posy = (hf_posy & ~0xff) | data;
+	snk_state *state = space->machine->driver_data<snk_state>();
+	state->hf_posy = (state->hf_posy & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( hardflags_scroll_msb_w )
 {
-	hf_posx = (hf_posx & 0xff) | ((data & 0x80) << 1);
-	hf_posy = (hf_posy & 0xff) | ((data & 0x40) << 2);
+	snk_state *state = space->machine->driver_data<snk_state>();
+	state->hf_posx = (state->hf_posx & 0xff) | ((data & 0x80) << 1);
+	state->hf_posy = (state->hf_posy & 0xff) | ((data & 0x40) << 2);
 
 	// low 6 bits might indicate radius, but it's not clear
 }
@@ -597,8 +599,8 @@ static int hardflags_check(running_machine *machine, int num)
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
-	int dx = (x - hf_posx) & 0x1ff;
-	int dy = (y - hf_posy) & 0x1ff;
+	int dx = (x - state->hf_posx) & 0x1ff;
+	int dy = (y - state->hf_posy) & 0x1ff;
 
 	if (dx > 0x20 && dx <= 0x1e0 && dy > 0x20 && dy <= 0x1e0)
 		return 0;
@@ -652,34 +654,38 @@ A trojan could be used on the board to verify the exact behaviour.
 
 *****************************************************************************/
 
-static int tc16_posy, tc16_posx, tc32_posy, tc32_posx;
 
 static WRITE8_HANDLER( turbocheck16_1_w )
 {
-	tc16_posy = (tc16_posy & ~0xff) | data;
+	snk_state *state = space->machine->driver_data<snk_state>();
+	state->tc16_posy = (state->tc16_posy & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( turbocheck16_2_w )
 {
-	tc16_posx = (tc16_posx & ~0xff) | data;
+	snk_state *state = space->machine->driver_data<snk_state>();
+	state->tc16_posx = (state->tc16_posx & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( turbocheck32_1_w )
 {
-	tc32_posy = (tc32_posy & ~0xff) | data;
+	snk_state *state = space->machine->driver_data<snk_state>();
+	state->tc32_posy = (state->tc32_posy & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( turbocheck32_2_w )
 {
-	tc32_posx = (tc32_posx & ~0xff) | data;
+	snk_state *state = space->machine->driver_data<snk_state>();
+	state->tc32_posx = (state->tc32_posx & ~0xff) | data;
 }
 
 static WRITE8_HANDLER( turbocheck_msb_w )
 {
-	tc16_posx = (tc16_posx & 0xff) | ((data & 0x80) << 1);
-	tc16_posy = (tc16_posy & 0xff) | ((data & 0x40) << 2);
-	tc32_posx = (tc32_posx & 0xff) | ((data & 0x80) << 1);
-	tc32_posy = (tc32_posy & 0xff) | ((data & 0x40) << 2);
+	snk_state *state = space->machine->driver_data<snk_state>();
+	state->tc16_posx = (state->tc16_posx & 0xff) | ((data & 0x80) << 1);
+	state->tc16_posy = (state->tc16_posy & 0xff) | ((data & 0x40) << 2);
+	state->tc32_posx = (state->tc32_posx & 0xff) | ((data & 0x80) << 1);
+	state->tc32_posy = (state->tc32_posy & 0xff) | ((data & 0x40) << 2);
 
 	// low 6 bits might indicate radius, but it's not clear
 }
@@ -691,8 +697,8 @@ static int turbofront_check(running_machine *machine, int small, int num)
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
-	int dx = (x - (small ? tc16_posx : tc32_posx)) & 0x1ff;
-	int dy = (y - (small ? tc16_posy : tc32_posy)) & 0x1ff;
+	int dx = (x - (small ? state->tc16_posx : state->tc32_posx)) & 0x1ff;
+	int dy = (y - (small ? state->tc16_posy : state->tc32_posy)) & 0x1ff;
 
 	if (dx > 0x20 && dx <= 0x1e0 && dy > 0x20 && dy <= 0x1e0)
 		return 0;

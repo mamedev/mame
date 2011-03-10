@@ -124,11 +124,6 @@ CopyVisiblePolyFrameBuffer( bitmap_t *bitmap, const rectangle *clip, int zlo, in
 	}
 } /* CopyVisiblePolyFrameBuffer */
 
-static int objcode2tile( int code )
-{ /* callback for sprite drawing code in namcoic.c */
-	return code;
-} /* objcode2tile */
-
 VIDEO_START( namcos21 )
 {
 	namcos21_state *state = machine->driver_data<namcos21_state>();
@@ -140,7 +135,7 @@ VIDEO_START( namcos21 )
 	namco_obj_init(machine,
 		0,		/* gfx bank */
 		0xf,	/* reverse palette mapping */
-		objcode2tile );
+		NULL );
 } /* VIDEO_START( namcos21 ) */
 
 static void

@@ -142,17 +142,12 @@ static UINT16 *rsoSharedRAM;
 static UINT32 led_mst;	//Diagnostic LEDs
 static UINT32 led_slv;
 
-static int objcode2tile( int code )
-{ /* callback for sprite drawing code in namcoic.c */
-	return code;
-} /* objcode2tile */
-
 static VIDEO_START(gal3)
 {
 	namco_obj_init(machine,
 		0,		/* gfx bank */
 		0xf,	/* reverse palette mapping */
-		objcode2tile );
+		NULL );
 
 }
 

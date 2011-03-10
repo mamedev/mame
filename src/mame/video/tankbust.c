@@ -5,16 +5,6 @@
 #include "emu.h"
 #include "includes/tankbust.h"
 
-/*
-*   variables
-*/
-
-UINT8 * tankbust_videoram;
-UINT8 * tankbust_colorram;
-static tilemap_t *bg_tilemap;
-
-static tilemap_t *txt_tilemap;
-UINT8 * tankbust_txtram;
 
 /***************************************************************************
 
@@ -38,8 +28,9 @@ note:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = tankbust_videoram[tile_index];
-	int attr = tankbust_colorram[tile_index];
+	tankbust_state *state = machine->driver_data<tankbust_state>();
+	int code = state->videoram[tile_index];
+	int attr = state->colorram[tile_index];
 
 	int color = ((attr>>4) & 0x07);
 
@@ -68,7 +59,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_txt_tile_info )
 {
-	int code = tankbust_txtram[tile_index];
+	tankbust_state *state = machine->driver_data<tankbust_state>();
+	int code = state->txtram[tile_index];
 	int color = ((code>>6) & 0x03);
 
 	SET_TILE_INFO(	2,
@@ -86,14 +78,15 @@ static TILE_GET_INFO( get_txt_tile_info )
 
 VIDEO_START( tankbust )
 {
+	tankbust_state *state = machine->driver_data<tankbust_state>();
 	/* not scrollable */
-	txt_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->txt_tilemap = tilemap_create(machine, get_txt_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 	/* scrollable */
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
 
-	tilemap_set_transparent_pen(txt_tilemap, 0);
+	tilemap_set_transparent_pen(state->txt_tilemap, 0);
 }
 
 
@@ -105,66 +98,72 @@ VIDEO_START( tankbust )
 
 WRITE8_HANDLER( tankbust_background_videoram_w )
 {
-	tankbust_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 READ8_HANDLER( tankbust_background_videoram_r )
 {
-	return tankbust_videoram[offset];
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( tankbust_background_colorram_w )
 {
-	tankbust_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 READ8_HANDLER( tankbust_background_colorram_r )
 {
-	return tankbust_colorram[offset];
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	return state->colorram[offset];
 }
 
 WRITE8_HANDLER( tankbust_txtram_w )
 {
-	tankbust_txtram[offset] = data;
-	tilemap_mark_tile_dirty(txt_tilemap, offset);
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	state->txtram[offset] = data;
+	tilemap_mark_tile_dirty(state->txt_tilemap, offset);
 }
 READ8_HANDLER( tankbust_txtram_r )
 {
-	return tankbust_txtram[offset];
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	return state->txtram[offset];
 }
 
 
-static UINT8 xscroll[2];
 
 WRITE8_HANDLER( tankbust_xscroll_w )
 {
-	if( xscroll[offset] != data )
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	if( state->xscroll[offset] != data )
 	{
 		int x;
 
-		xscroll[offset] = data;
+		state->xscroll[offset] = data;
 
-		x = xscroll[0] + 256 * (xscroll[1]&1);
+		x = state->xscroll[0] + 256 * (state->xscroll[1]&1);
 		if (x>=0x100) x-=0x200;
-		tilemap_set_scrollx(bg_tilemap, 0, x );
+		tilemap_set_scrollx(state->bg_tilemap, 0, x );
 	}
-//popmessage("x=%02x %02x", xscroll[0], xscroll[1]);
+//popmessage("x=%02x %02x", state->xscroll[0], state->xscroll[1]);
 }
 
-static UINT8 yscroll[2];
 
 WRITE8_HANDLER( tankbust_yscroll_w )
 {
-	if( yscroll[offset] != data )
+	tankbust_state *state = space->machine->driver_data<tankbust_state>();
+	if( state->yscroll[offset] != data )
 	{
 		int y;
 
-		yscroll[offset] = data;
-		y = yscroll[0];
+		state->yscroll[offset] = data;
+		y = state->yscroll[0];
 		if (y>=0x80) y-=0x100;
-		tilemap_set_scrolly(bg_tilemap, 0, y );
+		tilemap_set_scrolly(state->bg_tilemap, 0, y );
 	}
-//popmessage("y=%02x %02x", yscroll[0], yscroll[1]);
+//popmessage("y=%02x %02x", state->yscroll[0], state->yscroll[1]);
 }
 
 /***************************************************************************
@@ -234,24 +233,25 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( tankbust )
 {
+	tankbust_state *state = screen->machine->driver_data<tankbust_state>();
 #if 0
 	int i;
 
 	for (i=0; i<0x800; i++)
 	{
-		int tile_attrib = tankbust_colorram[i];
+		int tile_attrib = state->colorram[i];
 
 		if ( (tile_attrib&8) || (tile_attrib&0x80) )
 		{
-			tilemap_mark_tile_dirty(bg_tilemap, i);
+			tilemap_mark_tile_dirty(state->bg_tilemap, i);
 		}
 	}
 #endif
 
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1, 0);
 
-	tilemap_draw(bitmap, cliprect, txt_tilemap, 0,0);
+	tilemap_draw(bitmap, cliprect, state->txt_tilemap, 0,0);
 	return 0;
 }

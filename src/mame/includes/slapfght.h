@@ -11,23 +11,62 @@ enum {
 };
 
 
+class slapfght_state : public driver_device
+{
+public:
+	slapfght_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int getstar_id;
+	UINT8 *slapfight_videoram;
+	UINT8 *slapfight_colorram;
+	UINT8 *slapfight_fixvideoram;
+	UINT8 *slapfight_fixcolorram;
+	UINT8 *slapfight_scrollx_lo;
+	UINT8 *slapfight_scrollx_hi;
+	UINT8 *slapfight_scrolly;
+	int slapfight_status;
+	int getstar_sequence_index;
+	int getstar_sh_intenabled;
+	int slapfight_status_state;
+	UINT8 mcu_val;
+	UINT8 getstar_cmd;
+	UINT8 gs_a;
+	UINT8 gs_d;
+	UINT8 gs_e;
+	UINT8 tigerhb_cmd;
+	UINT8 from_main;
+	UINT8 from_mcu;
+	int mcu_sent;
+	int main_sent;
+	UINT8 portA_in;
+	UINT8 portA_out;
+	UINT8 ddrA;
+	UINT8 portB_in;
+	UINT8 portB_out;
+	UINT8 ddrB;
+	UINT8 portC_in;
+	UINT8 portC_out;
+	UINT8 ddrC;
+	int flipscreen;
+	int slapfight_palette_bank;
+	tilemap_t *pf1_tilemap;
+	tilemap_t *fix_tilemap;
+};
+
+
 /*----------- defines -----------*/
 
 /* due to code at 0x108d (GUARDIAN) or 0x1152 (GETSTARJ),
    register C is a unaltered copy of register A */
 
-# define GS_SAVE_REGS  gs_a = cpu_get_reg(space->cpu, Z80_BC) >> 0; \
-                       gs_d = cpu_get_reg(space->cpu, Z80_DE) >> 8; \
-                       gs_e = cpu_get_reg(space->cpu, Z80_DE) >> 0;
+#define GS_SAVE_REGS  state->gs_a = cpu_get_reg(space->cpu, Z80_BC) >> 0; \
+                       state->gs_d = cpu_get_reg(space->cpu, Z80_DE) >> 8; \
+                       state->gs_e = cpu_get_reg(space->cpu, Z80_DE) >> 0;
 
-# define GS_RESET_REGS gs_a = 0; \
-                       gs_d = 0; \
-                       gs_e = 0;
-
-
-/*----------- defined in drivers/slapfght.c -----------*/
-
-extern int getstar_id;
+#define GS_RESET_REGS state->gs_a = 0; \
+                       state->gs_d = 0; \
+                       state->gs_e = 0;
 
 
 /*----------- defined in machine/slapfght.c -----------*/
@@ -82,12 +121,6 @@ INTERRUPT_GEN( getstar_interrupt );
 
 
 /*----------- defined in video/slapfght.c -----------*/
-
-extern UINT8 *slapfight_videoram;
-extern UINT8 *slapfight_colorram;
-extern UINT8 *slapfight_fixvideoram;
-extern UINT8 *slapfight_fixcolorram;
-extern UINT8 *slapfight_scrollx_lo,*slapfight_scrollx_hi,*slapfight_scrolly;
 
 SCREEN_UPDATE( slapfight );
 SCREEN_UPDATE( perfrman );

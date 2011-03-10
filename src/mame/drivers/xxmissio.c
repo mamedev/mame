@@ -14,7 +14,6 @@ XX Mission (c) 1986 UPL
 #include "sound/2203intf.h"
 #include "includes/xxmissio.h"
 
-static UINT8 xxmissio_status;
 
 static WRITE8_HANDLER( xxmissio_bank_sel_w )
 {
@@ -23,43 +22,46 @@ static WRITE8_HANDLER( xxmissio_bank_sel_w )
 
 static CUSTOM_INPUT( xxmissio_status_r )
 {
+	xxmissio_state *state = field->port->machine->driver_data<xxmissio_state>();
 	int bit_mask = (FPTR)param;
-	return (xxmissio_status & bit_mask) ? 1 : 0;
+	return (state->status & bit_mask) ? 1 : 0;
 }
 
 static WRITE8_HANDLER ( xxmissio_status_m_w )
 {
+	xxmissio_state *state = space->machine->driver_data<xxmissio_state>();
 	switch (data)
 	{
 		case 0x00:
-			xxmissio_status |= 0x20;
+			state->status |= 0x20;
 			break;
 
 		case 0x40:
-			xxmissio_status &= ~0x08;
+			state->status &= ~0x08;
 			cputag_set_input_line_and_vector(space->machine, "sub", 0, HOLD_LINE, 0x10);
 			break;
 
 		case 0x80:
-			xxmissio_status |= 0x04;
+			state->status |= 0x04;
 			break;
 	}
 }
 
 static WRITE8_HANDLER ( xxmissio_status_s_w )
 {
+	xxmissio_state *state = space->machine->driver_data<xxmissio_state>();
 	switch (data)
 	{
 		case 0x00:
-			xxmissio_status |= 0x10;
+			state->status |= 0x10;
 			break;
 
 		case 0x40:
-			xxmissio_status |= 0x08;
+			state->status |= 0x08;
 			break;
 
 		case 0x80:
-			xxmissio_status &= ~0x04;
+			state->status &= ~0x04;
 			cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, 0x10);
 			break;
 	}
@@ -67,13 +69,15 @@ static WRITE8_HANDLER ( xxmissio_status_s_w )
 
 static INTERRUPT_GEN( xxmissio_interrupt_m )
 {
-	xxmissio_status &= ~0x20;
+	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
+	state->status &= ~0x20;
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( xxmissio_interrupt_s )
 {
-	xxmissio_status &= ~0x10;
+	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
+	state->status &= ~0x10;
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
@@ -97,9 +101,9 @@ static ADDRESS_MAP_START( map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_m_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE(&xxmissio_fgram)
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE(&xxmissio_bgram)
-	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_BASE(&xxmissio_spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE_MEMBER(xxmissio_state, fgram)
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE_MEMBER(xxmissio_state, bgram)
+	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_BASE_MEMBER(xxmissio_state, spriteram)
 
 	AM_RANGE(0xd800, 0xdaff) AM_SHARE("share4") AM_RAM_WRITE(xxmissio_paletteram_w) AM_BASE_GENERIC(paletteram)
 
@@ -287,7 +291,7 @@ static const ym2203_interface ym2203_interface_2 =
 	NULL
 };
 
-static MACHINE_CONFIG_START( xxmissio, driver_device )
+static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4)	/* 3.0MHz */

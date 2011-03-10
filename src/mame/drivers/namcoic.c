@@ -703,7 +703,7 @@ nth_byte32( const UINT32 *pSource, int which )
 
 /**************************************************************************************************************/
 
-static int (*mpCodeToTile)( int code ); /* sprite banking callback */
+static int (*mpCodeToTile)( running_machine *machine, int code ); /* sprite banking callback */
 static int mGfxC355;	/* gfx bank for sprites */
 
 /**
@@ -877,7 +877,7 @@ draw_spriteC355(running_machine *machine, bitmap_t *bitmap, const rectangle *cli
 					bitmap,
 					&clip,
 					machine->gfx[mGfxC355],
-					mpCodeToTile(tile) + offset,
+					mpCodeToTile(machine, tile) + offset,
 					color,
 					flipx,flipy,
 					sx,sy,
@@ -900,13 +900,13 @@ draw_spriteC355(running_machine *machine, bitmap_t *bitmap, const rectangle *cli
 } /* draw_spriteC355 */
 
 
-static int DefaultCodeToTile( int code )
+static int DefaultCodeToTile( running_machine *machine, int code )
 {
 	return code;
 }
 
 void
-namco_obj_init( running_machine *machine, int gfxbank, int palXOR, int (*codeToTile)( int code ) )
+namco_obj_init( running_machine *machine, int gfxbank, int palXOR, int (*codeToTile)( running_machine *machine, int code ) )
 {
 	mGfxC355 = gfxbank;
 	mPalXOR = palXOR;

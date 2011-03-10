@@ -79,10 +79,9 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/gridlee.h"
-#include "includes/balsente.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
+#include "includes/gridlee.h"
 
 
 /* constants */
@@ -109,15 +108,15 @@ static TIMER_CALLBACK( irq_timer_tick )
 	gridlee_state *state = machine->driver_data<gridlee_state>();
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-        state->irq_timer->adjust(machine->primary_screen->time_until_pos(64), 64);
+		state->irq_timer->adjust(machine->primary_screen->time_until_pos(64), 64);
 	else
-        state->irq_timer->adjust(machine->primary_screen->time_until_pos(param + 64), param + 64);
+		state->irq_timer->adjust(machine->primary_screen->time_until_pos(param + 64), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-    state->irq_off->adjust(machine->primary_screen->time_until_pos(param, BALSENTE_HBSTART));
+	state->irq_off->adjust(machine->primary_screen->time_until_pos(param, GRIDLEE_HBSTART));
 }
 
 
@@ -131,13 +130,13 @@ static TIMER_CALLBACK( firq_timer_tick )
 {
 	gridlee_state *state = machine->driver_data<gridlee_state>();
 	/* same time next frame */
-    state->firq_timer->adjust(machine->primary_screen->time_until_pos(FIRQ_SCANLINE));
+	state->firq_timer->adjust(machine->primary_screen->time_until_pos(FIRQ_SCANLINE));
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
 	cputag_set_input_line(machine, "maincpu", M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-    state->firq_off->adjust(machine->primary_screen->time_until_pos(FIRQ_SCANLINE, BALSENTE_HBSTART));
+	state->firq_off->adjust(machine->primary_screen->time_until_pos(FIRQ_SCANLINE, GRIDLEE_HBSTART));
 }
 
 static MACHINE_START( gridlee )
@@ -145,16 +144,16 @@ static MACHINE_START( gridlee )
 	gridlee_state *state = machine->driver_data<gridlee_state>();
 	state->maincpu = machine->device<cpu_device>("maincpu");
 
-    /* create the polynomial tables */
-    poly17_init(machine);
+	/* create the polynomial tables */
+	poly17_init(machine);
 
-    state_save_register_global_array(machine, state->last_analog_input);
-    state_save_register_global_array(machine, state->last_analog_output);
+	state_save_register_global_array(machine, state->last_analog_input);
+	state_save_register_global_array(machine, state->last_analog_output);
 
-    state->irq_off = machine->scheduler().timer_alloc(FUNC(irq_off_tick));
-    state->irq_timer = machine->scheduler().timer_alloc(FUNC(irq_timer_tick));
-    state->firq_off = machine->scheduler().timer_alloc(FUNC(firq_off_tick));
-    state->firq_timer = machine->scheduler().timer_alloc(FUNC(firq_timer_tick));
+	state->irq_off = machine->scheduler().timer_alloc(FUNC(irq_off_tick));
+	state->irq_timer = machine->scheduler().timer_alloc(FUNC(irq_timer_tick));
+	state->firq_off = machine->scheduler().timer_alloc(FUNC(firq_off_tick));
+	state->firq_timer = machine->scheduler().timer_alloc(FUNC(firq_timer_tick));
 }
 
 
@@ -162,8 +161,8 @@ static MACHINE_RESET( gridlee )
 {
 	gridlee_state *state = machine->driver_data<gridlee_state>();
 	/* start timers to generate interrupts */
-    state->irq_timer->adjust(machine->primary_screen->time_until_pos(0));
-    state->firq_timer->adjust(machine->primary_screen->time_until_pos(FIRQ_SCANLINE));
+	state->irq_timer->adjust(machine->primary_screen->time_until_pos(0));
+	state->firq_timer->adjust(machine->primary_screen->time_until_pos(FIRQ_SCANLINE));
 }
 
 
@@ -240,11 +239,11 @@ static void poly17_init(running_machine *machine)
 	/* generate the polynomial */
 	for (i = 0; i < POLY17_SIZE; i++)
 	{
-        /* store new values */
+		/* store new values */
 		*p++ = x & 1;
 		*r++ = x >> 3;
 
-        /* calculate next bit */
+		/* calculate next bit */
 		x = ((x << POLY17_SHL) + (x >> POLY17_SHR) + POLY17_ADD) & POLY17_SIZE;
 	}
 }
@@ -338,16 +337,16 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gridlee )
 	PORT_START("TRACK0_Y")	/* 9500 (fake) */
-    PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8)
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8)
 
 	PORT_START("TRACK0_X")	/* 9501 (fake) */
-    PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_REVERSE
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_REVERSE
 
 	PORT_START("TRACK1_Y")	/* 9500 (fake) */
-    PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_COCKTAIL
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_COCKTAIL
 
 	PORT_START("TRACK1_X")	/* 9501 (fake) */
-    PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_REVERSE PORT_COCKTAIL
+	PORT_BIT( 0xff, 0, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("IN0")		/* 9502 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -429,17 +428,17 @@ static const samples_interface gridlee_samples_interface =
 static MACHINE_CONFIG_START( gridlee, gridlee_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, BALSENTE_CPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 
-    MCFG_MACHINE_START(gridlee)
+	MCFG_MACHINE_START(gridlee)
 	MCFG_MACHINE_RESET(gridlee)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_RAW_PARAMS(BALSENTE_PIXEL_CLOCK, BALSENTE_HTOTAL, BALSENTE_HBEND, BALSENTE_HBSTART, BALSENTE_VTOTAL, BALSENTE_VBEND, BALSENTE_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(GRIDLEE_PIXEL_CLOCK, GRIDLEE_HTOTAL, GRIDLEE_HBEND, GRIDLEE_HBSTART, GRIDLEE_VTOTAL, GRIDLEE_VBEND, GRIDLEE_VBSTART)
 	MCFG_SCREEN_UPDATE(gridlee)
 
 	MCFG_PALETTE_LENGTH(2048)

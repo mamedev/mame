@@ -5,12 +5,15 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *s2636_0_ram;
+	bitmap_t *spritebitmap;
+	int CollisionBackground;
+	int CollisionSprite;
+	tilemap_t *bg_tilemap;
 };
 
 
 /*----------- defined in video/zac2650.c -----------*/
-
-extern UINT8 *zac2650_s2636_0_ram;
 
 WRITE8_HANDLER( tinvader_videoram_w );
 READ8_HANDLER( zac_s2636_r );

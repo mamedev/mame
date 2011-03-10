@@ -132,11 +132,20 @@ out:
 #include "sound/3812intf.h"
 
 
+class wardner_state : public driver_device
+{
+public:
+	wardner_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-static UINT8 *rambase_ae00, *rambase_c000;
+	UINT8 *rambase_ae00;
+	UINT8 *rambase_c000;
+};
+
 
 static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 {
+	wardner_state *state = space->machine->driver_data<wardner_state>();
 	if (wardner_membank != data) {
 		int bankaddress = 0;
 
@@ -169,8 +178,8 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 			memory_install_read_bank(mainspace, 0xae00, 0xafff, 0, 0, "bank2");
 			memory_install_read_bank(mainspace, 0xc000, 0xc7ff, 0, 0, "bank3");
 			memory_set_bankptr(space->machine, "bank1", &RAM[0x0000]);
-			memory_set_bankptr(space->machine, "bank2", rambase_ae00);
-			memory_set_bankptr(space->machine, "bank3", rambase_c000);
+			memory_set_bankptr(space->machine, "bank2", state->rambase_ae00);
+			memory_set_bankptr(space->machine, "bank3", state->rambase_c000);
 			memory_set_bankptr(space->machine, "bank4", space->machine->generic.paletteram.v);
 		}
 	}
@@ -196,9 +205,9 @@ static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x9000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xadff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xae00, 0xafff) AM_RAM AM_BASE(&rambase_ae00)
+	AM_RANGE(0xae00, 0xafff) AM_RAM AM_BASE_MEMBER(wardner_state, rambase_ae00)
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&rambase_c000) AM_SHARE("share1")	/* Shared RAM with Sound Z80 */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(wardner_state, rambase_c000) AM_SHARE("share1")	/* Shared RAM with Sound Z80 */
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -392,7 +401,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( wardner, driver_device )
+static MACHINE_CONFIG_START( wardner, wardner_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)		/* 6MHz */

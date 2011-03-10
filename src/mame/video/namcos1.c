@@ -21,7 +21,6 @@ Namco System 1 Video Hardware
   7810-7fef : fixed playfield (5)  : 36*28*2
   7ff0-7fff : ?
 */
-static UINT8 *namcos1_videoram;
 
 /*
   paletteram map (s1ram  0x0000-0x7fff)
@@ -34,7 +33,6 @@ static UINT8 *namcos1_videoram;
 
   so there is just 3x0x2000 RAM, plus the CUS116 internal registers.
 */
-static UINT8 namcos1_cus116[0x10];
 
 /*
   spriteram map (s1ram 0x10000-0x10fff)
@@ -44,17 +42,6 @@ static UINT8 namcos1_cus116[0x10];
 
   1000-1fff : playfield control registers
 */
-static UINT8 *namcos1_spriteram;
-
-static UINT8 namcos1_playfield_control[0x20];
-
-static tilemap_t *bg_tilemap[6];
-static UINT8 *tilemap_maskdata;
-static int copy_sprites;
-
-static UINT8 drawmode_table[16];
-
-
 
 
 /***************************************************************************
@@ -65,30 +52,61 @@ static UINT8 drawmode_table[16];
 
 INLINE void bg_get_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT8 *info_vram)
 {
+	namcos1_state *state = machine->driver_data<namcos1_state>();
 	int code;
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
 	SET_TILE_INFO(0,code,0,0);
-	tileinfo->mask_data = &tilemap_maskdata[code << 3];
+	tileinfo->mask_data = &state->tilemap_maskdata[code << 3];
 }
 
 INLINE void fg_get_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT8 *info_vram)
 {
+	namcos1_state *state = machine->driver_data<namcos1_state>();
 	int code;
 
 	tile_index <<= 1;
 	code = info_vram[tile_index + 1] + ((info_vram[tile_index] & 0x3f) << 8);
 	SET_TILE_INFO(0,code,0,0);
-	tileinfo->mask_data = &tilemap_maskdata[code << 3];
+	tileinfo->mask_data = &state->tilemap_maskdata[code << 3];
 }
 
-static TILE_GET_INFO( bg_get_info0 ) { bg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x0000]); }
-static TILE_GET_INFO( bg_get_info1 ) { bg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x2000]); }
-static TILE_GET_INFO( bg_get_info2 ) { bg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x4000]); }
-static TILE_GET_INFO( bg_get_info3 ) { bg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x6000]); }
-static TILE_GET_INFO( fg_get_info4 ) { fg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x7010]); }
-static TILE_GET_INFO( fg_get_info5 ) { fg_get_info(machine,tileinfo,tile_index,&namcos1_videoram[0x7810]); }
+static TILE_GET_INFO( bg_get_info0 )
+{
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	bg_get_info(machine,tileinfo,tile_index,&state->videoram[0x0000]);
+}
+
+static TILE_GET_INFO( bg_get_info1 )
+{
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	bg_get_info(machine,tileinfo,tile_index,&state->videoram[0x2000]);
+}
+
+static TILE_GET_INFO( bg_get_info2 )
+{
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	bg_get_info(machine,tileinfo,tile_index,&state->videoram[0x4000]);
+}
+
+static TILE_GET_INFO( bg_get_info3 )
+{
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	bg_get_info(machine,tileinfo,tile_index,&state->videoram[0x6000]);
+}
+
+static TILE_GET_INFO( fg_get_info4 )
+{
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	fg_get_info(machine,tileinfo,tile_index,&state->videoram[0x7010]);
+}
+
+static TILE_GET_INFO( fg_get_info5 )
+{
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	fg_get_info(machine,tileinfo,tile_index,&state->videoram[0x7810]);
+}
 
 
 
@@ -100,41 +118,42 @@ static TILE_GET_INFO( fg_get_info5 ) { fg_get_info(machine,tileinfo,tile_index,&
 
 VIDEO_START( namcos1 )
 {
+	namcos1_state *state = machine->driver_data<namcos1_state>();
 	int i;
 
-	tilemap_maskdata = (UINT8 *)machine->region("gfx1")->base();
+	state->tilemap_maskdata = (UINT8 *)machine->region("gfx1")->base();
 
 	/* allocate videoram */
-	namcos1_videoram = auto_alloc_array(machine, UINT8, 0x8000);
-	namcos1_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
+	state->videoram = auto_alloc_array(machine, UINT8, 0x8000);
+	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000);
 
 	/* initialize playfields */
-	bg_tilemap[0] = tilemap_create(machine, bg_get_info0,tilemap_scan_rows,8,8,64,64);
-	bg_tilemap[1] = tilemap_create(machine, bg_get_info1,tilemap_scan_rows,8,8,64,64);
-	bg_tilemap[2] = tilemap_create(machine, bg_get_info2,tilemap_scan_rows,8,8,64,64);
-	bg_tilemap[3] = tilemap_create(machine, bg_get_info3,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap[4] = tilemap_create(machine, fg_get_info4,tilemap_scan_rows,8,8,36,28);
-	bg_tilemap[5] = tilemap_create(machine, fg_get_info5,tilemap_scan_rows,8,8,36,28);
+	state->bg_tilemap[0] = tilemap_create(machine, bg_get_info0,tilemap_scan_rows,8,8,64,64);
+	state->bg_tilemap[1] = tilemap_create(machine, bg_get_info1,tilemap_scan_rows,8,8,64,64);
+	state->bg_tilemap[2] = tilemap_create(machine, bg_get_info2,tilemap_scan_rows,8,8,64,64);
+	state->bg_tilemap[3] = tilemap_create(machine, bg_get_info3,tilemap_scan_rows,8,8,64,32);
+	state->bg_tilemap[4] = tilemap_create(machine, fg_get_info4,tilemap_scan_rows,8,8,36,28);
+	state->bg_tilemap[5] = tilemap_create(machine, fg_get_info5,tilemap_scan_rows,8,8,36,28);
 
-	tilemap_set_scrolldx(bg_tilemap[4],73,512-73);
-	tilemap_set_scrolldx(bg_tilemap[5],73,512-73);
-	tilemap_set_scrolldy(bg_tilemap[4],0x10,0x110);
-	tilemap_set_scrolldy(bg_tilemap[5],0x10,0x110);
+	tilemap_set_scrolldx(state->bg_tilemap[4],73,512-73);
+	tilemap_set_scrolldx(state->bg_tilemap[5],73,512-73);
+	tilemap_set_scrolldy(state->bg_tilemap[4],0x10,0x110);
+	tilemap_set_scrolldy(state->bg_tilemap[5],0x10,0x110);
 
 	/* register videoram to the save state system (post-allocation) */
-	state_save_register_global_pointer(machine, namcos1_videoram, 0x8000);
-	state_save_register_global_array(machine, namcos1_cus116);
-	state_save_register_global_pointer(machine, namcos1_spriteram, 0x1000);
-	state_save_register_global_array(machine, namcos1_playfield_control);
+	state_save_register_global_pointer(machine, state->videoram, 0x8000);
+	state_save_register_global_array(machine, state->cus116);
+	state_save_register_global_pointer(machine, state->spriteram, 0x1000);
+	state_save_register_global_array(machine, state->playfield_control);
 
 	/* set table for sprite color == 0x7f */
 	for (i = 0;i < 15;i++)
-		drawmode_table[i] = DRAWMODE_SHADOW;
-	drawmode_table[15] = DRAWMODE_NONE;
+		state->drawmode_table[i] = DRAWMODE_SHADOW;
+	state->drawmode_table[15] = DRAWMODE_NONE;
 
 	/* clear paletteram */
-	memset(namcos1_paletteram, 0, 0x8000);
-	memset(namcos1_cus116, 0, 0x10);
+	memset(state->paletteram, 0, 0x8000);
+	memset(state->cus116, 0, 0x10);
 	for (i = 0; i < 0x2000; i++)
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
 
@@ -145,10 +164,10 @@ VIDEO_START( namcos1 )
 	for (i = 0x0800;i < 0x1000;i++)
 		machine->shadow_table[i] = i + 0x0800;
 
-	machine->generic.spriteram.u8 = &namcos1_spriteram[0x800];
+	machine->generic.spriteram.u8 = &state->spriteram[0x800];
 
-	memset(namcos1_playfield_control, 0, sizeof(namcos1_playfield_control));
-	copy_sprites = 0;
+	memset(state->playfield_control, 0, sizeof(state->playfield_control));
+	state->copy_sprites = 0;
 }
 
 
@@ -161,31 +180,34 @@ VIDEO_START( namcos1 )
 
 READ8_HANDLER( namcos1_videoram_r )
 {
-	return namcos1_videoram[offset];
+	namcos1_state *state = space->machine->driver_data<namcos1_state>();
+	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( namcos1_videoram_w )
 {
-	namcos1_videoram[offset] = data;
+	namcos1_state *state = space->machine->driver_data<namcos1_state>();
+	state->videoram[offset] = data;
 	if (offset < 0x7000)
 	{   /* background 0-3 */
 		int layer = offset >> 13;
 		int num = (offset & 0x1fff) >> 1;
-		tilemap_mark_tile_dirty(bg_tilemap[layer],num);
+		tilemap_mark_tile_dirty(state->bg_tilemap[layer],num);
 	}
 	else
 	{   /* foreground 4-5 */
 		int layer = (offset >> 11 & 1) + 4;
 		int num = ((offset & 0x7ff) - 0x10) >> 1;
 		if (num >= 0 && num < 0x3f0)
-			tilemap_mark_tile_dirty(bg_tilemap[layer],num);
+			tilemap_mark_tile_dirty(state->bg_tilemap[layer],num);
 	}
 }
 
 
 WRITE8_HANDLER( namcos1_paletteram_w )
 {
-	if (namcos1_paletteram[offset] == data)
+	namcos1_state *state = space->machine->driver_data<namcos1_state>();
+	if (state->paletteram[offset] == data)
 		return;
 
 	if ((offset & 0x1800) != 0x1800)
@@ -193,26 +215,26 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 		int r,g,b;
 		int color = ((offset & 0x6000) >> 2) | (offset & 0x7ff);
 
-		namcos1_paletteram[offset] = data;
+		state->paletteram[offset] = data;
 
 		offset &= ~0x1800;
-		r = namcos1_paletteram[offset];
-		g = namcos1_paletteram[offset + 0x0800];
-		b = namcos1_paletteram[offset + 0x1000];
+		r = state->paletteram[offset];
+		g = state->paletteram[offset + 0x0800];
+		b = state->paletteram[offset + 0x1000];
 		palette_set_color(space->machine,color,MAKE_RGB(r,g,b));
 	}
 	else
 	{
 		int i, j;
 
-		namcos1_cus116[offset & 0x0f] = data;
+		state->cus116[offset & 0x0f] = data;
 
 		for (i = 0x1800; i < 0x8000; i += 0x2000)
 		{
 			offset = (offset & 0x0f) | i;
 
 			for (j = 0; j < 0x80; j++, offset += 0x10)
-				namcos1_paletteram[offset] = data;
+				state->paletteram[offset] = data;
 		}
 	}
 }
@@ -222,30 +244,32 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 
 READ8_HANDLER( namcos1_spriteram_r )
 {
+	namcos1_state *state = space->machine->driver_data<namcos1_state>();
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
 	if (offset < 0x1000)
-		return namcos1_spriteram[offset];
+		return state->spriteram[offset];
 	/* 1xxx playfield control ram */
 	else
-		return namcos1_playfield_control[offset & 0x1f];
+		return state->playfield_control[offset & 0x1f];
 }
 
 WRITE8_HANDLER( namcos1_spriteram_w )
 {
+	namcos1_state *state = space->machine->driver_data<namcos1_state>();
 	/* 0000-07ff work ram */
 	/* 0800-0fff sprite ram */
 	if (offset < 0x1000)
 	{
-		namcos1_spriteram[offset] = data;
+		state->spriteram[offset] = data;
 
 		/* a write to this offset tells the sprite chip to buffer the sprite list */
 		if (offset == 0x0ff2)
-			copy_sprites = 1;
+			state->copy_sprites = 1;
 	}
 	/* 1xxx playfield control ram */
 	else
-		namcos1_playfield_control[offset & 0x1f] = data;
+		state->playfield_control[offset & 0x1f] = data;
 }
 
 
@@ -278,6 +302,7 @@ sprite format:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	namcos1_state *state = machine->driver_data<namcos1_state>();
 	const UINT8 *source = &machine->generic.spriteram.u8[0x0800-0x20];	/* the last is NOT a sprite */
 	const UINT8 *finish = &machine->generic.spriteram.u8[0];
 	gfx_element *gfx = machine->gfx[1];
@@ -338,7 +363,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					sx & 0x1ff,
 					((sy + 16) & 0xff) - 16,
 					machine->priority_bitmap, pri_mask,
-					drawmode_table, machine->shadow_table);
+					state->drawmode_table, machine->shadow_table);
 
 		source -= 0x10;
 	}
@@ -348,6 +373,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( namcos1 )
 {
+	namcos1_state *state = screen->machine->driver_data<namcos1_state>();
 	int i, j, scrollx, scrolly, priority;
 	rectangle new_clip = *cliprect;
 
@@ -361,13 +387,13 @@ SCREEN_UPDATE( namcos1 )
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	/* berabohm uses asymmetrical visibility windows to iris on the character */
-	i = ((namcos1_cus116[0] << 8) | namcos1_cus116[1]) - 1;			// min x
+	i = ((state->cus116[0] << 8) | state->cus116[1]) - 1;			// min x
 	if (new_clip.min_x < i) new_clip.min_x = i;
-	i = ((namcos1_cus116[2] << 8) | namcos1_cus116[3]) - 1 - 1;		// max x
+	i = ((state->cus116[2] << 8) | state->cus116[3]) - 1 - 1;		// max x
 	if (new_clip.max_x > i) new_clip.max_x = i;
-	i = ((namcos1_cus116[4] << 8) | namcos1_cus116[5]) - 0x11;		// min y
+	i = ((state->cus116[4] << 8) | state->cus116[5]) - 0x11;		// min y
 	if (new_clip.min_y < i) new_clip.min_y = i;
-	i = ((namcos1_cus116[6] << 8) | namcos1_cus116[7]) - 0x11 - 1;	// max y
+	i = ((state->cus116[6] << 8) | state->cus116[7]) - 0x11 - 1;	// max y
 	if (new_clip.max_y > i) new_clip.max_y = i;
 
 	if (new_clip.max_x < new_clip.min_x || new_clip.max_y < new_clip.min_y)
@@ -376,15 +402,15 @@ SCREEN_UPDATE( namcos1 )
 
 	/* set palette base */
 	for (i = 0;i < 6;i++)
-		tilemap_set_palette_offset(bg_tilemap[i],(namcos1_playfield_control[i + 24] & 7) * 256);
+		tilemap_set_palette_offset(state->bg_tilemap[i],(state->playfield_control[i + 24] & 7) * 256);
 
 	for (i = 0;i < 4;i++)
 	{
 		static const int disp_x[] = { 25, 27, 28, 29 };
 
 		j = i << 2;
-		scrollx = ( namcos1_playfield_control[j+1] + (namcos1_playfield_control[j+0]<<8) ) - disp_x[i];
-		scrolly = ( namcos1_playfield_control[j+3] + (namcos1_playfield_control[j+2]<<8) ) + 8;
+		scrollx = ( state->playfield_control[j+1] + (state->playfield_control[j+0]<<8) ) - disp_x[i];
+		scrolly = ( state->playfield_control[j+3] + (state->playfield_control[j+2]<<8) ) + 8;
 
 		if (flip_screen_get(screen->machine))
 		{
@@ -392,8 +418,8 @@ SCREEN_UPDATE( namcos1 )
 			scrolly = -scrolly;
 		}
 
-		tilemap_set_scrollx(bg_tilemap[i],0,scrollx);
-		tilemap_set_scrolly(bg_tilemap[i],0,scrolly);
+		tilemap_set_scrollx(state->bg_tilemap[i],0,scrollx);
+		tilemap_set_scrolly(state->bg_tilemap[i],0,scrolly);
 	}
 
 
@@ -405,8 +431,8 @@ SCREEN_UPDATE( namcos1 )
 	{
 		for (i = 0;i < 6;i++)
 		{
-			if (namcos1_playfield_control[16 + i] == priority)
-				tilemap_draw_primask(bitmap,&new_clip,bg_tilemap[i],0,priority,0);
+			if (state->playfield_control[16 + i] == priority)
+				tilemap_draw_primask(bitmap,&new_clip,state->bg_tilemap[i],0,priority,0);
 		}
 	}
 
@@ -417,7 +443,8 @@ SCREEN_UPDATE( namcos1 )
 
 SCREEN_EOF( namcos1 )
 {
-	if (copy_sprites)
+	namcos1_state *state = machine->driver_data<namcos1_state>();
+	if (state->copy_sprites)
 	{
 		UINT8 *spriteram = machine->generic.spriteram.u8;
 		int i,j;
@@ -428,6 +455,6 @@ SCREEN_EOF( namcos1 )
 				spriteram[i+j] = spriteram[i+j - 6];
 		}
 
-		copy_sprites = 0;
+		state->copy_sprites = 0;
 	}
 }

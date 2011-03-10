@@ -64,6 +64,7 @@ public:
 	UINT8		buckrog_fchg, buckrog_mov, buckrog_obch;
 	UINT8		buckrog_command;
 	UINT8		buckrog_myship;
+	int last_sound_a;
 };
 
 

@@ -1,14 +1,6 @@
 #include "emu.h"
 #include "includes/timelimt.h"
 
-/* globals */
-UINT8 *timelimt_bg_videoram;
-size_t timelimt_bg_videoram_size;
-
-/* locals */
-static int scrollx, scrolly;
-
-static tilemap_t *bg_tilemap, *fg_tilemap;
 
 /***************************************************************************
 
@@ -63,7 +55,8 @@ PALETTE_INIT( timelimt ) {
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	SET_TILE_INFO(1, timelimt_bg_videoram[tile_index], 0, 0);
+	timelimt_state *state = machine->driver_data<timelimt_state>();
+	SET_TILE_INFO(1, state->bg_videoram[tile_index], 0, 0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -75,13 +68,14 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( timelimt )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	timelimt_state *state = machine->driver_data<timelimt_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 64, 32);
 
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
 /***************************************************************************/
@@ -91,30 +85,34 @@ WRITE8_HANDLER( timelimt_videoram_w )
 	timelimt_state *state = space->machine->driver_data<timelimt_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( timelimt_bg_videoram_w )
 {
-	timelimt_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	timelimt_state *state = space->machine->driver_data<timelimt_state>();
+	state->bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( timelimt_scroll_x_lsb_w )
 {
-	scrollx &= 0x100;
-	scrollx |= data & 0xff;
+	timelimt_state *state = space->machine->driver_data<timelimt_state>();
+	state->scrollx &= 0x100;
+	state->scrollx |= data & 0xff;
 }
 
 WRITE8_HANDLER( timelimt_scroll_x_msb_w )
 {
-	scrollx &= 0xff;
-	scrollx |= ( data & 1 ) << 8;
+	timelimt_state *state = space->machine->driver_data<timelimt_state>();
+	state->scrollx &= 0xff;
+	state->scrollx |= ( data & 1 ) << 8;
 }
 
 WRITE8_HANDLER( timelimt_scroll_y_w )
 {
-	scrolly = data;
+	timelimt_state *state = space->machine->driver_data<timelimt_state>();
+	state->scrolly = data;
 }
 
 
@@ -146,12 +144,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( timelimt )
 {
-	tilemap_set_scrollx(bg_tilemap, 0, scrollx);
-	tilemap_set_scrolly(bg_tilemap, 0, scrolly);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	timelimt_state *state = screen->machine->driver_data<timelimt_state>();
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->scrollx);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->scrolly);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine, bitmap, cliprect);
 
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	return 0;
 }

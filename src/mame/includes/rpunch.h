@@ -5,14 +5,23 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT16 *videoram;
+	UINT8 sound_data;
+	UINT8 sound_busy;
+	UINT8 ym2151_irq;
+	UINT8 upd_rom_bank;
+	UINT16 *bitmapram;
+	size_t bitmapram_size;
+	int sprite_palette;
+	tilemap_t *background[2];
+	UINT16 videoflags;
+	UINT8 crtc_register;
+	emu_timer *crtc_timer;
+	UINT8 bins;
+	UINT8 gins;
 };
 
 
 /*----------- defined in video/rpunch.c -----------*/
-
-extern UINT16 *rpunch_bitmapram;
-extern size_t rpunch_bitmapram_size;
-extern int rpunch_sprite_palette;
 
 VIDEO_START( rpunch );
 SCREEN_UPDATE( rpunch );

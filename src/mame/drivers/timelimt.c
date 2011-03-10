@@ -17,7 +17,6 @@ Notes:
 
 /***************************************************************************/
 
-static int nmi_enabled = 0;
 
 static MACHINE_START( timelimt )
 {
@@ -26,12 +25,14 @@ static MACHINE_START( timelimt )
 
 static MACHINE_RESET( timelimt )
 {
-	nmi_enabled = 0;
+	timelimt_state *state = machine->driver_data<timelimt_state>();
+	state->nmi_enabled = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	nmi_enabled = data & 1;	/* bit 0 = nmi enable */
+	timelimt_state *state = space->machine->driver_data<timelimt_state>();
+	state->nmi_enabled = data & 1;	/* bit 0 = nmi enable */
 }
 
 static WRITE8_HANDLER( sound_reset_w )
@@ -46,7 +47,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		/* rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM		/* ram */
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(timelimt_videoram_w) AM_BASE_MEMBER(timelimt_state, videoram)	/* video ram */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(timelimt_bg_videoram_w) AM_BASE(&timelimt_bg_videoram) AM_SIZE(&timelimt_bg_videoram_size)/* background ram */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(timelimt_bg_videoram_w) AM_BASE_MEMBER(timelimt_state, bg_videoram) AM_SIZE_MEMBER(timelimt_state, bg_videoram_size)/* background ram */
 	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* sprite ram */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
@@ -221,8 +222,10 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static INTERRUPT_GEN( timelimt_irq ) {
-	if ( nmi_enabled )
+static INTERRUPT_GEN( timelimt_irq )
+{
+	timelimt_state *state = device->machine->driver_data<timelimt_state>();
+	if ( state->nmi_enabled )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 

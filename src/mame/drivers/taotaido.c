@@ -71,31 +71,32 @@ zooming might be wrong
 
 #define TAOTAIDO_SHOW_ALL_INPUTS	0
 
-static int pending_command;
 
 static READ16_HANDLER( pending_command_r )
 {
+	taotaido_state *state = space->machine->driver_data<taotaido_state>();
 	/* Only bit 0 is tested */
-	return pending_command;
+	return state->pending_command;
 }
 
 static WRITE16_HANDLER( sound_command_w )
 {
+	taotaido_state *state = space->machine->driver_data<taotaido_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		pending_command = 1;
+		state->pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(taotaido_bgvideoram_w) AM_BASE(&taotaido_bgram)	// bg ram?
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE(&taotaido_spriteram)		// sprite ram
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE(&taotaido_spriteram2)		// sprite tile lookup ram
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(taotaido_bgvideoram_w) AM_BASE_MEMBER(taotaido_state, bgram)	// bg ram?
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE_MEMBER(taotaido_state, spriteram)		// sprite ram
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_MEMBER(taotaido_state, spriteram2)		// sprite tile lookup ram
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM										// main ram
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// palette ram
-	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE(&taotaido_scrollram)		// rowscroll / rowselect / scroll ram
+	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE_MEMBER(taotaido_state, scrollram)		// rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff81) AM_READ_PORT("P1")
 	AM_RANGE(0xffff82, 0xffff83) AM_READ_PORT("P2")
 	AM_RANGE(0xffff84, 0xffff85) AM_READ_PORT("SYSTEM")
@@ -119,7 +120,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( pending_command_clear_w )
 {
-	pending_command = 0;
+	taotaido_state *state = space->machine->driver_data<taotaido_state>();
+	state->pending_command = 0;
 }
 
 static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
@@ -330,7 +332,7 @@ static const ym2610_interface ym2610_config =
 	irqhandler
 };
 
-static MACHINE_CONFIG_START( taotaido, driver_device )
+static MACHINE_CONFIG_START( taotaido, taotaido_state )
 	MCFG_CPU_ADD("maincpu", M68000, 32000000/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)

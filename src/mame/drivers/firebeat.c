@@ -628,8 +628,8 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 
 	if (reg != 0x70 && chip == 0)
 	{
-		//printf("%s:state->gcu%d_w: %08X, %08X, %08X at %08X\n", machine->describe_context(), chip, data, offset, mem_mask);
-		//logerror("%s:state->gcu%d_w: %08X, %08X, %08X at %08X\n", cmachine->describe_context(), hip, data, offset, mem_mask);
+		//printf("%s:gcu%d_w: %08X, %08X, %08X at %08X\n", machine->describe_context(), chip, data, offset, mem_mask);
+		//logerror("%s:gcu%d_w: %08X, %08X, %08X at %08X\n", cmachine->describe_context(), hip, data, offset, mem_mask);
 	}
 
 	switch(reg)

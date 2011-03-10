@@ -269,16 +269,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/ay8910.h"
 #include "includes/slapfght.h"
 
-int getstar_id;
-
 
 static ADDRESS_MAP_START( perfrman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with sound CPU */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE(&slapfight_videoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE(&slapfight_colorram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, slapfight_videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, slapfight_colorram)
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
@@ -287,14 +285,14 @@ static ADDRESS_MAP_START( tigerh_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE(&slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE(&slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, slapfight_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, slapfight_colorram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE(&slapfight_scrollx_lo)
-	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE(&slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE(&slapfight_scrolly)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE(&slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE(&slapfight_fixcolorram)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrollx_lo)
+	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrollx_hi)
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrolly)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, slapfight_fixvideoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, slapfight_fixcolorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfght_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -303,15 +301,15 @@ static ADDRESS_MAP_START( slapfght_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE(&slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE(&slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, slapfight_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, slapfight_colorram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE(&slapfight_scrollx_lo)
-	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE(&slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE(&slapfight_scrolly)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrollx_lo)
+	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrollx_hi)
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrolly)
 //  AM_RANGE(0xe803, 0xe803) AM_READWRITE(slapfight_mcu_r, slapfight_mcu_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE(&slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE(&slapfight_fixcolorram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, slapfight_fixvideoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, slapfight_fixcolorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfighb2_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -320,15 +318,15 @@ static ADDRESS_MAP_START( slapfighb2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE(&slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE(&slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, slapfight_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, slapfight_colorram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE(&slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE(&slapfight_scrolly)
-	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_BASE(&slapfight_scrollx_lo)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrollx_hi)
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrolly)
+	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, slapfight_scrollx_lo)
 	AM_RANGE(0xec00, 0xefff) AM_ROM // it reads a copy of the logo from here!
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE(&slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE(&slapfight_fixcolorram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, slapfight_fixvideoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, slapfight_fixcolorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfght_io_map, ADDRESS_SPACE_IO, 8 )
@@ -743,7 +741,7 @@ static SCREEN_EOF( perfrman )
 	buffer_spriteram_w(space, 0, 0);
 }
 
-static MACHINE_CONFIG_START( perfrman, driver_device )
+static MACHINE_CONFIG_START( perfrman, slapfght_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
@@ -790,7 +788,7 @@ static MACHINE_CONFIG_START( perfrman, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tigerhb, driver_device )
+static MACHINE_CONFIG_START( tigerhb, slapfght_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)
@@ -836,7 +834,7 @@ static MACHINE_CONFIG_START( tigerhb, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tigerh, driver_device )
+static MACHINE_CONFIG_START( tigerh, slapfght_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
@@ -886,7 +884,7 @@ static MACHINE_CONFIG_START( tigerh, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( slapfigh, driver_device )
+static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) /* verified on pcb */
@@ -1815,21 +1813,24 @@ static void getstar_init( running_machine *machine )
 
 static DRIVER_INIT( getstar )
 {
-	getstar_id = GETSTAR;
+	slapfght_state *state = machine->driver_data<slapfght_state>();
+	state->getstar_id = GETSTAR;
 	getstar_init(machine);
 }
 
 static DRIVER_INIT( getstarj )
 {
-	getstar_id = GETSTARJ;
+	slapfght_state *state = machine->driver_data<slapfght_state>();
+	state->getstar_id = GETSTARJ;
 	getstar_init(machine);
 }
 
 static DRIVER_INIT( gtstarb1 )
 {
+	slapfght_state *state = machine->driver_data<slapfght_state>();
 	UINT8 *ROM = machine->region("maincpu")->base();
 
-	getstar_id = GTSTARB1;
+	state->getstar_id = GTSTARB1;
 	getstar_init(machine);
 
 	/* specific handlers for this bootleg */
@@ -1843,7 +1844,8 @@ static DRIVER_INIT( gtstarb1 )
 
 static DRIVER_INIT( gtstarb2 )
 {
-	getstar_id = GTSTARB2;
+	slapfght_state *state = machine->driver_data<slapfght_state>();
+	state->getstar_id = GTSTARB2;
 	getstar_init(machine);
 }
 

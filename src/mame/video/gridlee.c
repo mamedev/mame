@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "includes/gridlee.h"
-#include "includes/balsente.h"
 
 
 /*************************************
@@ -118,7 +117,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
 {
 	gridlee_state *state = space->machine->driver_data<gridlee_state>();
 	/* update the scanline palette */
-	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() - 1 + BALSENTE_VBEND);
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos() - 1 + GRIDLEE_VBEND);
 	state->palettebank_vis = data & 0x3f;
 }
 
@@ -130,7 +129,7 @@ WRITE8_HANDLER( gridlee_palette_select_w )
  *
  *************************************/
 
-/* all the BALSENTE_VBEND adjustments are needed because the hardware has a seperate counting chain
+/* all the GRIDLEE_VBEND adjustments are needed because the hardware has a seperate counting chain
    to address the video memory instead of using the video chain directly */
 
 SCREEN_UPDATE( gridlee )
@@ -145,12 +144,12 @@ SCREEN_UPDATE( gridlee )
 	{
 		/* non-flipped: draw directly from the bitmap */
 		if (!state->cocktail_flip)
-			draw_scanline8(bitmap, 0, y, 256, &state->local_videoram[(y - BALSENTE_VBEND) * 256], pens + 16);
+			draw_scanline8(bitmap, 0, y, 256, &state->local_videoram[(y - GRIDLEE_VBEND) * 256], pens + 16);
 
 		/* flipped: x-flip the scanline into a temp buffer and draw that */
 		else
 		{
-			int srcy = BALSENTE_VBSTART - 1 - y;
+			int srcy = GRIDLEE_VBSTART - 1 - y;
 			UINT8 temp[256];
 			int xx;
 
@@ -167,7 +166,7 @@ SCREEN_UPDATE( gridlee )
 		UINT8 *sprite = screen->machine->generic.spriteram.u8 + i * 4;
 		UINT8 *src;
 		int image = sprite[0];
-		int ypos = sprite[2] + 17 + BALSENTE_VBEND;
+		int ypos = sprite[2] + 17 + GRIDLEE_VBEND;
 		int xpos = sprite[3];
 
 		/* get a pointer to the source image */
@@ -185,7 +184,7 @@ SCREEN_UPDATE( gridlee )
 				currxor = 0xff;
 			}
 
-			if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
+			if (ypos >= (16 + GRIDLEE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 			{
 				int currx = xpos;
 

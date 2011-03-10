@@ -48,24 +48,21 @@ Notes:
 #include "includes/zaccaria.h"
 
 
-static int dsw;
-static int active_8910, port0a, acs;
-static int last_port0b;
-
 static WRITE8_DEVICE_HANDLER( zaccaria_dsw_sel_w )
 {
+	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
 	switch (data & 0xf0)
 	{
 		case 0xe0:
-			dsw = 0;
+			state->dsw = 0;
 			break;
 
 		case 0xd0:
-			dsw = 1;
+			state->dsw = 1;
 			break;
 
 		case 0xb0:
-			dsw = 2;
+			state->dsw = 2;
 			break;
 
 		default:
@@ -76,9 +73,10 @@ static WRITE8_DEVICE_HANDLER( zaccaria_dsw_sel_w )
 
 static READ8_HANDLER( zaccaria_dsw_r )
 {
+	zaccaria_state *state = space->machine->driver_data<zaccaria_state>();
 	static const char *const dswnames[] = { "IN0", "DSW0", "DSW1" };
 
-	return input_port_read(space->machine, dswnames[dsw]);
+	return input_port_read(space->machine, dswnames[state->dsw]);
 }
 
 
@@ -116,56 +114,60 @@ static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
-	return ay8910_r(device->machine->device((active_8910 == 0) ? "ay1" : "ay2"), 0);
+	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
+	return ay8910_r(device->machine->device((state->active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
 {
-	port0a = data;
+	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
+	state->port0a = data;
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 {
+	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
 
 	/* bit 1 goes to 8910 #0 BDIR pin  */
-	if ((last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
+	if ((state->last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(device->machine->device("ay1"), last_port0b, port0a);
+		ay8910_data_address_w(device->machine->device("ay1"), state->last_port0b, state->port0a);
 	}
-	else if ((last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
+	else if ((state->last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		if (last_port0b & 0x01)
-			active_8910 = 0;
+		if (state->last_port0b & 0x01)
+			state->active_8910 = 0;
 	}
 	/* bit 3 goes to 8910 #1 BDIR pin  */
-	if ((last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
+	if ((state->last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(device->machine->device("ay2"), last_port0b >> 2, port0a);
+		ay8910_data_address_w(device->machine->device("ay2"), state->last_port0b >> 2, state->port0a);
 	}
-	else if ((last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
+	else if ((state->last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		if (last_port0b & 0x04)
-			active_8910 = 1;
+		if (state->last_port0b & 0x04)
+			state->active_8910 = 1;
 	}
 
-	last_port0b = data;
+	state->last_port0b = data;
 }
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
+	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
 	device_t *pia0 = device->machine->device("pia0");
-	static int toggle = 0;
 
-	pia6821_cb1_w(pia0, toggle & 1);
-	toggle ^= 1;
+	pia6821_cb1_w(pia0, state->toggle & 1);
+	state->toggle ^= 1;
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
+	zaccaria_state *state = device->machine->driver_data<zaccaria_state>();
 	device_t *tms = device->machine->device("tms");
 
 	// bit 0 = /RS
@@ -174,7 +176,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 	tms5220_wsq_w(tms, (data >> 1) & 0x01);
 
 	// bit 3 = "ACS" (goes, inverted, to input port 6 bit 3)
-	acs = ~data & 0x08;
+	state->acs = ~data & 0x08;
 
 	// bit 4 = led (for testing?)
 	set_led_status(device->machine, 0,~data & 0x10);
@@ -260,8 +262,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_READONLY
 	AM_RANGE(0x6400, 0x6407) AM_READ(zaccaria_prot1_r)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(zaccaria_videoram_w) AM_BASE(&zaccaria_videoram)	/* 6400-67ff is 4 bits wide */
-	AM_RANGE(0x6800, 0x683f) AM_WRITE(zaccaria_attributes_w) AM_BASE(&zaccaria_attributesram)
+	AM_RANGE(0x6000, 0x67ff) AM_WRITE(zaccaria_videoram_w) AM_BASE_MEMBER(zaccaria_state, videoram)	/* 6400-67ff is 4 bits wide */
+	AM_RANGE(0x6800, 0x683f) AM_WRITE(zaccaria_attributes_w) AM_BASE_MEMBER(zaccaria_state, attributesram)
 	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x6c00, 0x6c00) AM_WRITE(zaccaria_flip_screen_x_w)
@@ -340,7 +342,8 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( acs_r )
 {
-	return (acs & 0x08) ? 1 : 0;
+	zaccaria_state *state = field->port->machine->driver_data<zaccaria_state>();
+	return (state->acs & 0x08) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( monymony )
@@ -576,7 +579,7 @@ static const tms5220_interface tms5220_config =
 
 
 
-static MACHINE_CONFIG_START( zaccaria, driver_device )
+static MACHINE_CONFIG_START( zaccaria, zaccaria_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */

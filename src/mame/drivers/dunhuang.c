@@ -435,7 +435,7 @@ static READ8_DEVICE_HANDLER( dunhuang_dsw_r )
 	if (!(state->input & 0x04))	return input_port_read(device->machine, "DSW3");
 	if (!(state->input & 0x08))	return input_port_read(device->machine, "DSW4");
 	if (!(state->input & 0x10))	return input_port_read(device->machine, "DSW5");
-	logerror("%s: warning, unknown dsw bits read, state->input = %02x\n", device->machine->describe_context(), state->input);
+	logerror("%s: warning, unknown dsw bits read, input = %02x\n", device->machine->describe_context(), state->input);
 	return 0xff;
 }
 static READ8_HANDLER( dunhuang_input_r )
@@ -446,7 +446,7 @@ static READ8_HANDLER( dunhuang_input_r )
 	if (!(state->input & 0x04))	return input_port_read(space->machine, "IN2");
 	if (!(state->input & 0x08))	return input_port_read(space->machine, "IN3");
 	if (!(state->input & 0x10))	return input_port_read(space->machine, "IN4");
-	logerror("%s: warning, unknown input bits read, state->input = %02x\n", space->machine->describe_context(), state->input);
+	logerror("%s: warning, unknown input bits read, input = %02x\n", space->machine->describe_context(), state->input);
 	return 0xff;
 }
 
