@@ -67,12 +67,124 @@
 
 
 //**************************************************************************
-//  TYPE DEFINITIONS
+//  FUNCTION PROTOTYPES
+//**************************************************************************
+
+// allocate memory with file and line number information
+void *malloc_file_line(size_t size, const char *file, int line);
+
+// free memory with file and line number information
+void free_file_line(void *memory, const char *file, int line);
+
+// called from the exit path of any code that wants to check for unfreed memory
+void dump_unfreed_mem();
+
+
+
+//**************************************************************************
+//  INLINE FUNCTIONS
 //**************************************************************************
 
 // zeromem_t is a dummy class used to tell new to zero memory after allocation
 class zeromem_t { };
 
+
+// standard new/delete operators (try to avoid using)
+ATTR_FORCE_INLINE inline void *operator new(std::size_t size) throw (std::bad_alloc)
+{
+	void *result = malloc_file_line(size, NULL, 0);
+	if (result == NULL)
+		throw std::bad_alloc();
+	return result;
+}
+
+ATTR_FORCE_INLINE inline void *operator new[](std::size_t size) throw (std::bad_alloc)
+{
+	void *result = malloc_file_line(size, NULL, 0);
+	if (result == NULL)
+		throw std::bad_alloc();
+	return result;
+}
+
+ATTR_FORCE_INLINE inline void operator delete(void *ptr) throw()
+{
+	if (ptr != NULL)
+		free_file_line(ptr, NULL, 0);
+}
+
+ATTR_FORCE_INLINE inline void operator delete[](void *ptr) throw()
+{
+	if (ptr != NULL)
+		free_file_line(ptr, NULL, 0);
+}
+
+
+// file/line new/delete operators
+ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc)
+{
+	void *result = malloc_file_line(size, file, line);
+	if (result == NULL)
+		throw std::bad_alloc();
+	return result;
+}
+
+ATTR_FORCE_INLINE inline void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc)
+{
+	void *result = malloc_file_line(size, file, line);
+	if (result == NULL)
+		throw std::bad_alloc();
+	return result;
+}
+
+ATTR_FORCE_INLINE inline void operator delete(void *ptr, const char *file, int line)
+{
+	if (ptr != NULL)
+		free_file_line(ptr, file, line);
+}
+
+ATTR_FORCE_INLINE inline void operator delete[](void *ptr, const char *file, int line)
+{
+	if (ptr != NULL)
+		free_file_line(ptr, file, line);
+}
+
+
+// file/line new/delete operators with zeroing
+ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
+{
+	void *result = malloc_file_line(size, file, line);
+	if (result == NULL)
+		throw std::bad_alloc();
+	memset(result, 0, size);
+	return result;
+}
+
+ATTR_FORCE_INLINE inline void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
+{
+	void *result = malloc_file_line(size, file, line);
+	if (result == NULL)
+		throw std::bad_alloc();
+	memset(result, 0, size);
+	return result;
+}
+
+ATTR_FORCE_INLINE inline void operator delete(void *ptr, const char *file, int line, const zeromem_t &)
+{
+	if (ptr != NULL)
+		free_file_line(ptr, file, line);
+}
+
+ATTR_FORCE_INLINE inline void operator delete[](void *ptr, const char *file, int line, const zeromem_t &)
+{
+	if (ptr != NULL)
+		free_file_line(ptr, file, line);
+}
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
 // resource_pool_item is a base class for items that are tracked by a resource pool
 class resource_pool_item
@@ -181,118 +293,6 @@ extern resource_pool global_resource_pool;
 
 // dummy objects to pass to the specialized new variants
 extern const zeromem_t zeromem;
-
-
-
-//**************************************************************************
-//  FUNCTION PROTOTYPES
-//**************************************************************************
-
-// allocate memory with file and line number information
-void *malloc_file_line(size_t size, const char *file, int line);
-
-// free memory with file and line number information
-void free_file_line(void *memory, const char *file, int line);
-
-// called from the exit path of any code that wants to check for unfreed memory
-void dump_unfreed_mem();
-
-
-
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-// standard new/delete operators (try to avoid using)
-ATTR_FORCE_INLINE inline void *operator new(std::size_t size) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, NULL, 0);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void *operator new[](std::size_t size) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, NULL, 0);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void operator delete(void *ptr) throw()
-{
-	if (ptr != NULL)
-		free_file_line(ptr, NULL, 0);
-}
-
-ATTR_FORCE_INLINE inline void operator delete[](void *ptr) throw()
-{
-	if (ptr != NULL)
-		free_file_line(ptr, NULL, 0);
-}
-
-
-// file/line new/delete operators
-ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, int line) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void *operator new[](std::size_t size, const char *file, int line) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void operator delete(void *ptr, const char *file, int line)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-ATTR_FORCE_INLINE inline void operator delete[](void *ptr, const char *file, int line)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-
-// file/line new/delete operators with zeroing
-ATTR_FORCE_INLINE inline void *operator new(std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	memset(result, 0, size);
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void *operator new[](std::size_t size, const char *file, int line, const zeromem_t &) throw (std::bad_alloc)
-{
-	void *result = malloc_file_line(size, file, line);
-	if (result == NULL)
-		throw std::bad_alloc();
-	memset(result, 0, size);
-	return result;
-}
-
-ATTR_FORCE_INLINE inline void operator delete(void *ptr, const char *file, int line, const zeromem_t &)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
-
-ATTR_FORCE_INLINE inline void operator delete[](void *ptr, const char *file, int line, const zeromem_t &)
-{
-	if (ptr != NULL)
-		free_file_line(ptr, file, line);
-}
 
 
 

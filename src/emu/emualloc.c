@@ -42,6 +42,14 @@
 
 
 //**************************************************************************
+//  DEBUGGING
+//**************************************************************************
+
+#define LOG_ALLOCS		(0)
+
+
+
+//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -122,10 +130,10 @@ memory_entry *memory_entry::s_freehead = NULL;
 //  GLOBAL HELPERS
 //**************************************************************************
 
-/*-------------------------------------------------
-    malloc_file_line - allocate memory with file
-    and line number information
--------------------------------------------------*/
+//-------------------------------------------------
+//  malloc_file_line - allocate memory with file
+//  and line number information
+//-------------------------------------------------
 
 void *malloc_file_line(size_t size, const char *file, int line)
 {
@@ -146,10 +154,10 @@ void *malloc_file_line(size_t size, const char *file, int line)
 }
 
 
-/*-------------------------------------------------
-    free_file_line - free memory with file
-    and line number information
--------------------------------------------------*/
+//-------------------------------------------------
+//  free_file_line - free memory with file
+//  and line number information
+//-------------------------------------------------
 
 void free_file_line(void *memory, const char *file, int line)
 {
@@ -167,21 +175,19 @@ void free_file_line(void *memory, const char *file, int line)
 #ifdef MAME_DEBUG
 	// clear memory to a bogus value
 	memset(memory, 0xfc, entry->m_size);
-
-	// free the entry and the memory
-	if (entry != NULL)
-		memory_entry::release(entry);
 #endif
 
+	// free the entry and the memory
+	memory_entry::release(entry);
 	osd_free(memory);
 }
 
 
-/*-------------------------------------------------
-    dump_unfreed_mem - called from the exit path
-    of any code that wants to check for unfreed
-    memory
--------------------------------------------------*/
+//-------------------------------------------------
+//  dump_unfreed_mem - called from the exit path
+//  of any code that wants to check for unfreed
+//  memory
+//-------------------------------------------------
 
 void dump_unfreed_mem(void)
 {
@@ -196,10 +202,10 @@ void dump_unfreed_mem(void)
 //  RESOURCE POOL
 //**************************************************************************
 
-/*-------------------------------------------------
-    resource_pool - constructor for a new resource
-    pool
--------------------------------------------------*/
+//-------------------------------------------------
+//  resource_pool - constructor for a new resource
+//  pool
+//-------------------------------------------------
 
 resource_pool::resource_pool()
 	: m_listlock(osd_lock_alloc()),
@@ -210,11 +216,11 @@ resource_pool::resource_pool()
 }
 
 
-/*-------------------------------------------------
-    ~resource_pool - destructor for a resource
-    pool; make sure all tracked objects are
-    deleted
--------------------------------------------------*/
+//-------------------------------------------------
+//  ~resource_pool - destructor for a resource
+//  pool; make sure all tracked objects are
+//  deleted
+//-------------------------------------------------
 
 resource_pool::~resource_pool()
 {
@@ -224,9 +230,9 @@ resource_pool::~resource_pool()
 }
 
 
-/*-------------------------------------------------
-    add - add a new item to the resource pool
--------------------------------------------------*/
+//-------------------------------------------------
+//  add - add a new item to the resource pool
+//-------------------------------------------------
 
 void resource_pool::add(resource_pool_item &item)
 {
@@ -244,6 +250,8 @@ void resource_pool::add(resource_pool_item &item)
 		entry = memory_entry::find(reinterpret_cast<UINT8 *>(item.m_ptr) - sizeof(size_t));
 	assert(entry != NULL);
 	item.m_id = entry->m_id;
+	if (LOG_ALLOCS)
+		fprintf(stderr, "#%06d, add %d bytes (%s:%d)\n", (UINT32)entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
 
 	// find the entry to insert after
 	resource_pool_item *insert_after;
@@ -277,10 +285,10 @@ void resource_pool::add(resource_pool_item &item)
 }
 
 
-/*-------------------------------------------------
-    remove - remove a specific item from the
-    resource pool
--------------------------------------------------*/
+//-------------------------------------------------
+//  remove - remove a specific item from the
+//  resource pool
+//-------------------------------------------------
 
 void resource_pool::remove(void *ptr)
 {
@@ -312,6 +320,8 @@ void resource_pool::remove(void *ptr)
 				m_ordered_tail = deleteme->m_ordered_prev;
 
 			// delete the object and break
+			if (LOG_ALLOCS)
+				fprintf(stderr, "#%06d, delete %d bytes\n", (UINT32)deleteme->m_id, static_cast<UINT32>(deleteme->m_size));
 			delete deleteme;
 			break;
 		}
@@ -320,10 +330,10 @@ void resource_pool::remove(void *ptr)
 }
 
 
-/*-------------------------------------------------
-    find - find a specific item in the resource
-    pool
--------------------------------------------------*/
+//-------------------------------------------------
+//  find - find a specific item in the resource
+//  pool
+//-------------------------------------------------
 
 resource_pool_item *resource_pool::find(void *ptr)
 {
@@ -342,10 +352,10 @@ resource_pool_item *resource_pool::find(void *ptr)
 }
 
 
-/*-------------------------------------------------
-    contains - return true if given ptr is
-    contained by one of the objects in the pool
--------------------------------------------------*/
+//-------------------------------------------------
+//  contains - return true if given ptr is
+//  contained by one of the objects in the pool
+//-------------------------------------------------
 
 bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 {
@@ -371,9 +381,9 @@ found:
 }
 
 
-/*-------------------------------------------------
-    clear - remove all items from a resource pool
--------------------------------------------------*/
+//-------------------------------------------------
+//  clear - remove all items from a resource pool
+//-------------------------------------------------
 
 void resource_pool::clear()
 {
@@ -393,10 +403,10 @@ void resource_pool::clear()
 //  MEMORY ENTRY
 //**************************************************************************
 
-/*-------------------------------------------------
-    acquire_lock - acquire the memory entry lock,
-    creating a new one if needed
--------------------------------------------------*/
+//-------------------------------------------------
+//  acquire_lock - acquire the memory entry lock,
+//  creating a new one if needed
+//-------------------------------------------------
 
 void memory_entry::acquire_lock()
 {
@@ -414,9 +424,9 @@ void memory_entry::acquire_lock()
 }
 
 
-/*-------------------------------------------------
-    release_lock - release the memory entry lock
--------------------------------------------------*/
+//-------------------------------------------------
+//  release_lock - release the memory entry lock
+//-------------------------------------------------
 
 void memory_entry::release_lock()
 {
@@ -424,9 +434,9 @@ void memory_entry::release_lock()
 }
 
 
-/*-------------------------------------------------
-    allocate - allocate a new memory entry
--------------------------------------------------*/
+//-------------------------------------------------
+//  allocate - allocate a new memory entry
+//-------------------------------------------------
 
 memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, int line)
 {
@@ -461,6 +471,8 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 	entry->m_file = file;
 	entry->m_line = line;
 	entry->m_id = s_curid++;
+	if (LOG_ALLOCS)
+		fprintf(stderr, "#%06d, alloc %d bytes (%s:%d)\n", (UINT32)entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
 
 	// add it to the alloc list
 	int hashval = reinterpret_cast<FPTR>(base) % k_hash_prime;
@@ -475,9 +487,9 @@ memory_entry *memory_entry::allocate(size_t size, void *base, const char *file, 
 }
 
 
-/*-------------------------------------------------
-    find - find a memory entry
--------------------------------------------------*/
+//-------------------------------------------------
+//  find - find a memory entry
+//-------------------------------------------------
 
 memory_entry *memory_entry::find(void *ptr)
 {
@@ -499,9 +511,9 @@ memory_entry *memory_entry::find(void *ptr)
 }
 
 
-/*-------------------------------------------------
-    release - release a memory entry
--------------------------------------------------*/
+//-------------------------------------------------
+//  release - release a memory entry
+//-------------------------------------------------
 
 void memory_entry::release(memory_entry *entry)
 {
@@ -524,10 +536,10 @@ void memory_entry::release(memory_entry *entry)
 }
 
 
-/*-------------------------------------------------
-    report_unfreed - print a list of unfreed
-    memory to the target file
--------------------------------------------------*/
+//-------------------------------------------------
+//  report_unfreed - print a list of unfreed
+//  memory to the target file
+//-------------------------------------------------
 
 void memory_entry::report_unfreed()
 {
@@ -543,7 +555,7 @@ void memory_entry::report_unfreed()
 				if (total == 0)
 					fprintf(stderr, "--- memory leak warning ---\n");
 				total += entry->m_size;
-				fprintf(stderr, "allocation #%06d, %d bytes (%s:%d)\n", (UINT32)entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
+				fprintf(stderr, "#%06d, nofree %d bytes (%s:%d)\n", (UINT32)entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
 			}
 
 	release_lock();
