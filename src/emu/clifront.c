@@ -373,7 +373,7 @@ static void display_help(void)
 
 void cli_info_listxml(emu_options &options, const char *gamename)
 {
-	print_mame_xml(stdout, drivers, gamename);
+	print_mame_xml(stdout, drivers, gamename, options);
 }
 
 
@@ -524,7 +524,7 @@ void cli_info_listcrc(emu_options &options, const char *gamename)
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 			const rom_entry *region, *rom;
 			const rom_source *source;
 
@@ -562,7 +562,7 @@ void cli_info_listroms(emu_options &options, const char *gamename)
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			/* print the header */
 			if (count > 0)
@@ -626,7 +626,7 @@ void cli_info_listsamples(emu_options &options, const char *gamename)
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 			const device_config_sound_interface *sound = NULL;
 
 			/* find samples interfaces */
@@ -664,7 +664,7 @@ void cli_info_listdevices(emu_options &options, const char *gamename)
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			if (count != 0)
 				printf("\n");
@@ -800,7 +800,7 @@ static void info_listsoftware(emu_options &options, const char *gamename)
 		if ( mame_strwildcmp( gamename, drivers[drvindex]->name ) == 0 )
 		{
 			/* allocate the machine config */
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 			{
@@ -882,7 +882,7 @@ static void info_listsoftware(emu_options &options, const char *gamename)
 		if ( mame_strwildcmp( gamename, drivers[drvindex]->name ) == 0 )
 		{
 			/* allocate the machine config */
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 			{
@@ -1134,7 +1134,7 @@ static void info_listmedia(emu_options &options, const char *gamename)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
 			/* allocate the machine config */
-			machine_config config(*drivers[drvindex]);
+			machine_config config(*drivers[drvindex], options);
 
 			driver_name = drivers[drvindex]->name;
 
@@ -1514,7 +1514,7 @@ static void match_roms(emu_options &options, const hash_collection &hashes, int 
 	/* iterate over drivers */
 	for (int drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 	{
-		machine_config config(*drivers[drvindex]);
+		machine_config config(*drivers[drvindex], options);
 
 		/* iterate over sources, regions and files within the region */
 		for (const rom_source *source = rom_first_source(config); source != NULL; source = rom_next_source(*source))

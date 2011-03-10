@@ -323,7 +323,7 @@ class running_machine : public bindable_object
 
 public:
 	// construction/destruction
-	running_machine(const machine_config &config, osd_interface &osd, emu_options &options, bool exit_to_game_select = false);
+	running_machine(const machine_config &config, osd_interface &osd, bool exit_to_game_select = false);
 	~running_machine();
 
 	// fetch items by name
@@ -337,7 +337,7 @@ public:
 
 	// getters
 	const char *basename() const { return m_basename; }
-	emu_options &options() const { return m_options; }
+	emu_options &options() const { return m_config.options(); }
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
@@ -477,7 +477,6 @@ private:
 
 	state_manager			m_state;			// state manager
 	device_scheduler		m_scheduler;		// scheduler object
-	emu_options &			m_options;
 	osd_interface &			m_osd;
 
 	astring					m_context;			// context string

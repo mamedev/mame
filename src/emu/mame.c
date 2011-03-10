@@ -177,30 +177,28 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		}
 
 		// create the machine configuration
-		const machine_config *config = global_alloc(machine_config(*system));
+		machine_config config(*system, options);
 
 		// create the machine structure and driver
-		running_machine *machine = global_alloc(running_machine(*config, osd, options, started_empty));
+		running_machine machine(config, osd, started_empty);
 
 		// looooong term: remove this
-		global_machine = machine;
+		global_machine = &machine;
 
 		// run the machine
-		error = machine->run(firstrun);
+		error = machine.run(firstrun);
 		firstrun = false;
 
 		// check the state of the machine
-		if (machine->new_driver_pending())
+		if (machine.new_driver_pending())
 		{
-			options.set_system_name(machine->new_driver_name());
+			options.set_system_name(machine.new_driver_name());
 			firstrun = true;
 		}
-		if (machine->exit_pending())
+		if (machine.exit_pending())
 			exit_pending = true;
 
-		// destroy the machine and the config
-		global_free(machine);
-		global_free(config);
+		// machine will go away when we exit scope
 		global_machine = NULL;
 	}
 

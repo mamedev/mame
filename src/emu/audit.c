@@ -24,7 +24,7 @@
 
 static void audit_one_rom(emu_options &options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, const char *validation, audit_record *record);
 static void audit_one_disk(emu_options &options, const rom_entry *rom, const game_driver *gamedrv, const char *validation, audit_record *record);
-static int rom_used_by_parent(const game_driver *gamedrv, const hash_collection &romhashes, const game_driver **parent);
+static int rom_used_by_parent(emu_options &options, const game_driver *gamedrv, const hash_collection &romhashes, const game_driver **parent);
 
 
 
@@ -56,7 +56,7 @@ INLINE void set_status(audit_record *record, UINT8 status, UINT8 substatus)
 
 int audit_images(emu_options &options, const game_driver *gamedrv, const char *validation, audit_record **audit)
 {
-	machine_config config(*gamedrv);
+	machine_config config(*gamedrv, options);
 	const rom_entry *region, *rom;
 	const rom_source *source;
 	audit_record *record;
@@ -80,7 +80,7 @@ int audit_images(emu_options &options, const game_driver *gamedrv, const char *v
 						if (!hashes.flag(hash_collection::FLAG_NO_DUMP))
 						{
 							anyrequired = TRUE;
-							if (allshared && !rom_used_by_parent(gamedrv, hashes, NULL))
+							if (allshared && !rom_used_by_parent(options, gamedrv, hashes, NULL))
 								allshared = FALSE;
 						}
 					}
@@ -122,7 +122,7 @@ int audit_images(emu_options &options, const game_driver *gamedrv, const char *v
 						continue;
 					}
 
-					if (source_is_gamedrv && record->status != AUDIT_STATUS_NOT_FOUND && (allshared || !rom_used_by_parent(gamedrv, record->exphashes, NULL)))
+					if (source_is_gamedrv && record->status != AUDIT_STATUS_NOT_FOUND && (allshared || !rom_used_by_parent(options, gamedrv, record->exphashes, NULL)))
 						anyfound = TRUE;
 
 					record++;
@@ -151,7 +151,7 @@ int audit_images(emu_options &options, const game_driver *gamedrv, const char *v
 
 int audit_samples(emu_options &options, const game_driver *gamedrv, audit_record **audit)
 {
-	machine_config config(*gamedrv);
+	machine_config config(*gamedrv, options);
 	audit_record *record;
 	int records = 0;
 	int sampnum;
@@ -385,7 +385,7 @@ static void audit_one_rom(emu_options &options, const rom_entry *rom, const char
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_OPTIONAL);
 
 		/* not found and used by parent */
-		else if (rom_used_by_parent(gamedrv, record->exphashes, &parent))
+		else if (rom_used_by_parent(options, gamedrv, record->exphashes, &parent))
 			set_status(record, AUDIT_STATUS_NOT_FOUND, (parent->flags & GAME_IS_BIOS_ROOT) ? SUBSTATUS_NOT_FOUND_BIOS : SUBSTATUS_NOT_FOUND_PARENT);
 
 		/* just plain old not found */
@@ -496,14 +496,14 @@ static void audit_one_disk(emu_options &options, const rom_entry *rom, const gam
     ROM is also used by the parent
 -------------------------------------------------*/
 
-static int rom_used_by_parent(const game_driver *gamedrv, const hash_collection &romhashes, const game_driver **parent)
+static int rom_used_by_parent(emu_options &options, const game_driver *gamedrv, const hash_collection &romhashes, const game_driver **parent)
 {
 	const game_driver *drv;
 
 	/* iterate up the parent chain */
 	for (drv = driver_get_clone(gamedrv); drv != NULL; drv = driver_get_clone(drv))
 	{
-		machine_config config(*drv);
+		machine_config config(*drv, options);
 		const rom_entry *region;
 		const rom_entry *rom;
 

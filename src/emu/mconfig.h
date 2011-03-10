@@ -126,13 +126,14 @@ class machine_config
 
 public:
 	// construction/destruction
-	machine_config(const game_driver &gamedrv);
+	machine_config(const game_driver &gamedrv, emu_options &options);
 	~machine_config();
 
 	// getters
 	const game_driver &gamedrv() const { return m_gamedrv; }
 	const device_config *first_device() const { return m_devicelist.first(); }
 	screen_device_config *first_screen() const;
+	emu_options &options() const { return m_options; }
 
 	// public state
 	attotime				m_minimum_quantum;			// minimum scheduling quantum
@@ -158,6 +159,7 @@ public:
 
 private:
 	const game_driver &		m_gamedrv;
+	emu_options &			m_options;
 	int						m_parse_level;				// nested parsing level
 };
 

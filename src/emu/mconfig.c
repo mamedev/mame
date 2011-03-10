@@ -49,7 +49,7 @@
 //  machine_config - constructor
 //-------------------------------------------------
 
-machine_config::machine_config(const game_driver &gamedrv)
+machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 	: m_minimum_quantum(attotime::zero),
 	  m_perfect_cpu_quantum(NULL),
 	  m_watchdog_vblank_count(0),
@@ -61,6 +61,7 @@ machine_config::machine_config(const game_driver &gamedrv)
 	  m_total_colors(0),
 	  m_default_layout(NULL),
 	  m_gamedrv(gamedrv),
+	  m_options(options),
 	  m_parse_level(0)
 {
 	// construct the config

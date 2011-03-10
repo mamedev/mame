@@ -1199,7 +1199,7 @@ void validate_drivers(emu_options &options, const game_driver *curdriver)
 		{
 			/* expand the machine driver */
 			expansion -= get_profile_ticks();
-			machine_config config(driver);
+			machine_config config(driver, options);
 			expansion += get_profile_ticks();
 
 			/* validate the driver entry */

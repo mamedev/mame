@@ -221,7 +221,7 @@ void emu_options::add_device_options()
 		return;
 
 	// create the configuration
-	machine_config config(*cursystem);
+	machine_config config(*cursystem, *this);
 
 	// iterate through all image devices
 	const device_config_image_interface *image = NULL;
@@ -330,7 +330,7 @@ void emu_options::parse_standard_inis(astring &error_string)
 
 	// parse "vector.ini" for vector games
 	{
-		machine_config config(*cursystem);
+		machine_config config(*cursystem, *this);
 		for (const screen_device_config *devconfig = config.first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
 			if (devconfig->screen_type() == SCREEN_TYPE_VECTOR)
 			{

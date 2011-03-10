@@ -1114,7 +1114,7 @@ chd_error open_disk_image(emu_options &options, const game_driver *gamedrv, cons
 	hash_collection romphashes(ROM_GETHASHDATA(romp));
 	for (drv = gamedrv; drv != NULL; drv = driver_get_clone(drv))
 	{
-		machine_config config(*drv);
+		machine_config config(*drv, options);
 		for (source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 			for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 				if (ROMREGION_ISDISKDATA(region))

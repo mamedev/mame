@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 /* print the MAME database in XML format */
-void print_mame_xml(FILE* out, const game_driver* const games[], const char *gamename);
+void print_mame_xml(FILE* out, const game_driver* const games[], const char *gamename, emu_options &options);
 
 
 #endif	/* __INFO_H__ */
