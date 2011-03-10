@@ -352,6 +352,7 @@ static const int win_key_trans_table[][4] =
 	{ ITEM_ID_TILDE,		DIK_GRAVE,			VK_OEM_3,		'`' },
 	{ ITEM_ID_LSHIFT,		DIK_LSHIFT, 		VK_LSHIFT,		0 },
 	{ ITEM_ID_BACKSLASH,	DIK_BACKSLASH,		VK_OEM_5,		'\\' },
+	{ ITEM_ID_BACKSLASH2,	DIK_OEM_102,		VK_OEM_102,		'<' },
 	{ ITEM_ID_Z,			DIK_Z,				'Z',			'Z' },
 	{ ITEM_ID_X,			DIK_X,				'X',			'X' },
 	{ ITEM_ID_C,			DIK_C,				'C',			'C' },
