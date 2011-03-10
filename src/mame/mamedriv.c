@@ -6052,6 +6052,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( canyonp )	/* 009493-009504    1977/10 [6502] */
 	DRIVER( destroyr )	/* 030131-030136    1977/10 [6800] */
 	DRIVER( destroyr1 )	/* 030131-030136    1977/10 [6800] */
+	DRIVER( catchp )	/* 008837 prototype 1977/?? [6502] */
 	DRIVER( sprint1 )	/* 006443           1978/01 [6502] */
 	DRIVER( ultratnk )	/* 009801           1978/02 [6502] */
 	DRIVER( skyraid )	/* 009709           1978/03 [6502] */
