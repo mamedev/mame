@@ -8015,6 +8015,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( neobattl )	/* (c) 1992 Banpresto / Sotsu Agency. Sunrise */
 	DRIVER( umanclub )	/* (c) 1992 Tsuburaya Prod. / Banpresto */
 	DRIVER( zingzip )	/* UY   (c) 1992 Allumer + Tecmo */
+	DRIVER( zingzipbl )	/* bootleg */
 	DRIVER( atehate )	/* (C) 1993 Athena */
 	DRIVER( jjsquawk )	/* (c) 1993 Athena / Able */
 	DRIVER( jjsquawkb )	/* bootleg */
@@ -10723,7 +10724,7 @@ Other Sun games
 	DRIVER( re800v1 )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v3 )	/* (c) 1992 Entretenimientos GEMINIS */
 	DRIVER( luckyrlt )	/* (c) 198? unknown */
-	
+
 	DRIVER( dfruit )
 
 	// allied.c
@@ -11796,7 +11797,7 @@ Other Sun games
 	DRIVER( gprixg )
 	DRIVER( gprixg_400 )
 	DRIVER( gprixg_340 )
-	DRIVER( gprixg_301 )	
+	DRIVER( gprixg_301 )
 	DRIVER( gprixl )
 	DRIVER( gprixl_400 )
 	DRIVER( gprixl_340 )
