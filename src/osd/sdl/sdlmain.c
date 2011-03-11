@@ -197,9 +197,9 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_KEYMAP_FILE,                 "keymap.dat", OPTION_STRING, "keymap filename" },
 #ifdef MESS
 #ifdef SDLMAME_MACOSX
-	{ SDLOPTION_UIMODEKEY,					 "DELETE", 0,               "Key to toggle MESS keyboard mode" },
+	{ SDLOPTION_UIMODEKEY,					 "DELETE", OPTION_STRING,   "Key to toggle MESS keyboard mode" },
 #else
-	{ SDLOPTION_UIMODEKEY,			         "SCRLOCK", 0,            "Key to toggle MESS keyboard mode" },
+	{ SDLOPTION_UIMODEKEY,			         "SCRLOCK", OPTION_STRING,  "Key to toggle MESS keyboard mode" },
 #endif	// SDLMAME_MACOSX
 #endif	// MESS
 
