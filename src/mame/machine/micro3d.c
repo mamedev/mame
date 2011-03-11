@@ -47,7 +47,9 @@ void micro3d_duart_tx(device_t *device, int channel, UINT8 data)
 	else
 	{
 		state->m68681_tx0 = data;
-		cputag_set_input_line(device->machine, "audiocpu", MCS51_RX_LINE, HOLD_LINE);
+		cputag_set_input_line(device->machine, "audiocpu", MCS51_RX_LINE, ASSERT_LINE);
+		// TODO: next line should be behind a timer callback which lasts one audiocpu clock cycle
+		cputag_set_input_line(device->machine, "audiocpu", MCS51_RX_LINE, CLEAR_LINE);
 	}
 };
 
