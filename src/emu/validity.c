@@ -1087,7 +1087,7 @@ static bool validate_inputs(const machine_config &config, int_map &defstr_map, i
     checks
 -------------------------------------------------*/
 
-static bool validate_devices(const machine_config &config, const ioport_list &portlist, region_array *rgninfo, emu_options &options)
+static bool validate_devices(const machine_config &config, const ioport_list &portlist, region_array *rgninfo)
 {
 	bool error = false;
 	const game_driver &driver = config.gamedrv();
@@ -1110,7 +1110,7 @@ static bool validate_devices(const machine_config &config, const ioport_list &po
 			mame_printf_warning("Device %s does not have short name defined\n", devconfig->name());
 		}
 		/* check for device-specific validity check */
-		if (devconfig->validity_check(options, driver))
+		if (devconfig->validity_check(config.options(), driver))
 			error = true;
 
 	}
@@ -1229,7 +1229,7 @@ void validate_drivers(emu_options &options, const game_driver *curdriver)
 
 			/* validate devices */
 			device_checks -= get_profile_ticks();
-			error = validate_devices(config, portlist, &rgninfo, options) || error;
+			error = validate_devices(config, portlist, &rgninfo) || error;
 			device_checks += get_profile_ticks();
 		}
 		catch (emu_fatalerror &err)

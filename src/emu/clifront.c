@@ -1068,7 +1068,7 @@ static void info_listsoftware(emu_options &options, const char *gamename)
     softlist_match_roms - scan for a matching
     software ROM by hash
 -------------------------------------------------*/
-void softlist_match_roms(machine_config &config, emu_options &options, const hash_collection &hashes, int length, int *found)
+void softlist_match_roms(machine_config &config, const hash_collection &hashes, int length, int *found)
 {
 	for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
@@ -1078,7 +1078,7 @@ void softlist_match_roms(machine_config &config, emu_options &options, const has
 		{
 			if ( swlist->list_name[i] )
 			{
-				software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
+				software_list *list = software_list_open( config.options(), swlist->list_name[i], FALSE, NULL );
 
 				for ( software_info *swinfo = software_list_find( list, "*", NULL ); swinfo != NULL; swinfo = software_list_find( list, "*", swinfo ) )
 				{
@@ -1535,6 +1535,6 @@ static void match_roms(emu_options &options, const hash_collection &hashes, int 
 				}
 
 		// also check any softlists
-		softlist_match_roms( config, options, hashes, length, found );
+		softlist_match_roms( config, hashes, length, found );
 	}
 }
