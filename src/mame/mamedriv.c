@@ -7438,6 +7438,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( empcity )	/* (c) 1986 Seibu Kaihatsu (bootleg?) */
 	DRIVER( empcityu )	/* (c) 1986 Taito (Romstar License) */
 	DRIVER( empcityj )	/* (c) 1986 Taito Corporation (Japan) */
+	DRIVER( empcityi )	/* (c) 1986 Seibu Kaihatsu (Eurobed license) */
 	DRIVER( stfight )	/* (c) 1986 Seibu Kaihatsu (Germany) (bootleg?) */
 	DRIVER( stfighta )	/* (c) 1986 Seibu Kaihatsu (bootleg?) */
 	DRIVER( darkmist )	/* (c) 1986 Taito */
@@ -8001,6 +8002,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( drgnunit )	/* (c) 1989 Athena / Seta + Romstar or Taito license (DSW) */
 	DRIVER( wits )		/* (c) 1989 Athena (Visco license) */
 	DRIVER( thunderl )	/* (c) 1990 Seta + Romstar or Visco license (DSW) */
+	DRIVER( thunderlbl )	/* (c) 1990 Seta + Romstar or Visco license (DSW) - bootleg with Tetris sound */
 	DRIVER( wiggie )	/* (c) 1994 Promat (not genuine seta hardware, but based on thunderl code) */
 	DRIVER( superbar )	/* (c) 1994 Promat (not genuine seta hardware, but based on thunderl code) */
 	DRIVER( jockeyc )	/* (c) 1990 [Seta] (Visco license) */
