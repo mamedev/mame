@@ -1692,6 +1692,17 @@ static const UINT16 eca_prot_data[] =
     0x7470, 0x202e, 0x3123, 0x660a, 0x726f, 0x7420, 0x7365, 0x0a74,
 };
 
+static const UINT16 oceanhun_prot_data[] =
+{
+    0x0000,    // dummy read
+    0x3d3d, 0x203d, 0x434f, 0x4145, 0x204e, 0x5548, 0x544e, 0x5245,
+    0x3d20, 0x3d3d, 0x430a, 0x706f, 0x5279, 0x6769, 0x7468, 0x5320,
+    0x4745, 0x2041, 0x6e45, 0x6574, 0x7072, 0x6972, 0x6573, 0x2c73,
+    0x4c20, 0x6474, 0x0a2e, 0x6d41, 0x7375, 0x6d65, 0x6e65, 0x2074,
+    0x2652, 0x2044, 0x6544, 0x7470, 0x202e, 0x3123, 0x4b0a, 0x7a61,
+    0x6e75, 0x7261, 0x2069, 0x7354, 0x6b75, 0x6d61, 0x746f, 0x206f,
+    0x6553, 0x7463, 0x6f69, 0x206e, 0x614d, 0x616e, 0x6567, 0x0a72
+};
 /*
    dirtdvls: first 2 words read are discarded, then every other word
    is written to char RAM starting at f1013400 (in between words are
@@ -1745,6 +1756,15 @@ static READ64_HANDLER(model3_security_r)
 			{
 				UINT64 data = (UINT64)eca_prot_data[state->prot_data_ptr++] << 16;
 				if (state->prot_data_ptr >= 0x31)
+				{
+					state->prot_data_ptr = 0;
+				}
+				return data;
+			}
+			else if (mame_stricmp(space->machine->gamedrv->name, "oceanhun") == 0)
+			{
+				UINT64 data = (UINT64)oceanhun_prot_data[state->prot_data_ptr++] << 16;
+				if (state->prot_data_ptr >= 58)
 				{
 					state->prot_data_ptr = 0;
 				}
@@ -5531,11 +5551,16 @@ static DRIVER_INIT( skichamp )
 	rom[(0x5263c8^4)/4] = 0x60000000;
 	rom[(0x5263e8^4)/4] = 0x60000000;
 	rom[(0x516bbc^4)/4] = 0x60000000;
-	//rom[(0x516b9c^4)/4] = 0x60000000; // dec
+	rom[(0x516b9c^4)/4] = 0x60000000; // decrementer
 }
 
+static DRIVER_INIT( oceanhun )
+{
+	UINT32 *rom = (UINT32*)machine->region("user1")->base();
+	DRIVER_INIT_CALL(model3_20);
 
-
+	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
+}
 
 
 /* Model 3 Step 1.0 */
@@ -5559,7 +5584,7 @@ GAME( 1998, vs29815,    vs298, model3_15, model3,    vs29815, ROT0, "Sega", "Vir
 GAME( 1997, vs2,            0, model3_20, model3,        vs2, ROT0, "Sega", "Virtua Striker 2 (Step 2.0)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1997, harley,         0, model3_20, harley,     harley, ROT0, "Sega", "Harley-Davidson and L.A. Riders (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1998, lamachin,       0, model3_20, model3,  model3_20, ROT0, "Sega", "L.A. Machineguns", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
-GAME( 1998, oceanhun,       0, model3_20, model3,  model3_20, ROT0, "Sega", "The Ocean Hunter", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 1998, oceanhun,       0, model3_20, model3,   oceanhun, ROT0, "Sega", "The Ocean Hunter", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1998, skichamp,       0, model3_20, skichamp, skichamp, ROT0, "Sega", "Ski Champ", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1998, srally2,        0, model3_20, scud,      srally2, ROT0, "Sega", "Sega Rally 2", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
 GAME( 1998, srally2x,       0, model3_20, scud,      srally2, ROT0, "Sega", "Sega Rally 2 DX", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
