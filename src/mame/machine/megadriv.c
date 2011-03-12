@@ -341,7 +341,7 @@ static UINT16* _32x_palette_lookup;
 /* SegaCD! */
 static cpu_device *_segacd_68k_cpu;
 static emu_timer *segacd_gfx_conversion_timer;
-static emu_timer *segacd_dmna_ret_timer;
+//static emu_timer *segacd_dmna_ret_timer;
 static emu_timer *segacd_irq3_timer;
 static emu_timer *segacd_hock_timer;
 static UINT8 hock_cmd;
@@ -397,6 +397,8 @@ static UINT8 segacd_font_color;
 static UINT16* segacd_font_bits;
 
 
+static UINT16 scd_rammode;
+static UINT32 scd_mode_dmna_ret_flags ;
 
 static void segacd_mark_tiles_dirty(running_machine* machine, int offset);
 
@@ -3795,15 +3797,15 @@ ADDRESS_MAP_END
 *************************************************************************************************/
 
 static UINT8 segacd_ram_writeprotect_bits;
-int segacd_ram_mode;
-static int segacd_ram_mode_old;
+//int segacd_ram_mode;
+//static int segacd_ram_mode_old;
 
 //static int segacd_maincpu_has_ram_access = 0;
 static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
 static int segacd_memory_priority_mode = 0;
 static int segacd_stampsize;
-int segacd_dmna = 0;
-int segacd_ret = 0;
+//int segacd_dmna = 0;
+//int segacd_ret = 0;
 
 #define READ_MAIN (0x0200)
 #define READ_SUB  (0x0300)
@@ -3939,7 +3941,7 @@ UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
 UINT16* segacd_dataram;
 
 #define RAM_MODE_2MEG (0)
-#define RAM_MODE_1MEG (1)
+#define RAM_MODE_1MEG (2)
 
 // 1meg / 2meg swap should actually be an interleaved swap, not half/half of the ram?
 UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
@@ -4498,10 +4500,10 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 		{
 			dest = (UINT8*)segacd_dataram;
 
-			if (segacd_ram_mode)
+			if ((scd_rammode&2))
 			{
 				dstoffset &= 0x1ffff;
-				if (!(segacd_ret & 1)) dest += 0x20000;
+				if (!(scd_rammode & 1)) dest += 0x20000;
 			}
 			else
 			{
@@ -4532,7 +4534,7 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 
 				if (destination==DMA_WRAM)
 				{
-					if (segacd_ram_mode==RAM_MODE_2MEG)
+					if ((scd_rammode&2)==RAM_MODE_2MEG)
 						segacd_mark_tiles_dirty(space->machine, dstoffset/2);
 
 				}
@@ -4831,47 +4833,20 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 // so probably don't change instantly...
 //
 
-static TIMER_CALLBACK( segacd_dmna_ret_timer_callback )
-{
-
-	// this is the initial state, and the state after changing modes?
-	if ((segacd_dmna==0) && (segacd_ret ==0))
-	{
-		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
-		segacd_dmna = 0;
-		segacd_ret = 1;
-		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
-	}
-	else if ((segacd_dmna==1) && (segacd_ret == 1))
-	{
-		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
-		segacd_dmna = 1;
-		segacd_ret = 0;
-		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
-	}
-	else if ((segacd_dmna==1) && (segacd_ret == 0))
-	{
-		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
-		segacd_dmna = 0;
-		segacd_ret = 1;
-		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
-	}
-	else
-	{
-		printf("huh? %d %d\n", segacd_dmna, segacd_ret);
-	}
-}
-
 
 static READ16_HANDLER( scd_a12002_memory_mode_r )
 {
 	space->machine->scheduler().synchronize();
 
+	int temp = scd_rammode;
+	int temp2 = 0;
+
+	temp2 |= (scd_mode_dmna_ret_flags>>(temp*4))&0x7;
+
 	return (segacd_ram_writeprotect_bits << 8) |
 		   (segacd_4meg_prgbank << 6) |
-		   (segacd_ram_mode << 2) |
-		   ((segacd_dmna) << 1) |
-		   ((segacd_ret) << 0);
+			temp2;
+
 }
 
 
@@ -4899,39 +4874,26 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_8_15 )
 
 static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 {
+	space->machine->scheduler().synchronize();
+
+	//printf("scd_a12002_memory_mode_w_0_7 %04x\n",data);
+
 	segacd_4meg_prgbank = (data&0x00c0)>>6;
 
-
-#if 1
-	//if (data&0x0001) printf("ret bit set (invalid? can't set from main68k?)\n");
-	if (data&0x0002)
-	{
-		//printf("dmna set (swap requested)\n"); // give ram to sub?
-
-		// this should take some time?
-
-		//segacd_ret = 1;
-
-		//printf("main cpu dmna set dmna: %d ret: %d\n", segacd_dmna, segacd_ret);
-		if (segacd_ram_mode==RAM_MODE_2MEG)
+	if (scd_rammode&0x2)
+	{ // ==0x2 (1 meg mode)
+		if (!(data&2)) // check DMNA bit
 		{
-			if (!segacd_dmna_ret_timer->enabled())
-			{
-				if (!segacd_dmna)
-				{
-					//printf("main dmna\n");
-					segacd_dmna = 1;
-					segacd_dmna_ret_timer->adjust(attotime::from_usec(1));
-				}
-			}
-		}
-		else
-		{
-			printf("dmna bit in mode 1\n");
+			scd_mode_dmna_ret_flags |= 0x2200;
 		}
 	}
-#endif
-
+	else // == 0x0 (2 meg mode)
+	{
+		if (data&2) // check DMNA bit
+		{
+			scd_rammode = 1;
+		}
+	}
 }
 
 
@@ -4948,18 +4910,19 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 
 
 
-// can't read the bank?
 
 static READ16_HANDLER( segacd_sub_memory_mode_r )
 {
 	space->machine->scheduler().synchronize();
 
+	int temp = scd_rammode;
+	int temp2 = 0;
+
+	temp2 |= (scd_mode_dmna_ret_flags>>(temp*4))&0x7;
+
 	return (segacd_ram_writeprotect_bits << 8) |
-		 /*(segacd_4meg_prgbank << 6) | */
 		   (segacd_memory_priority_mode << 3) |
-		   (segacd_ram_mode << 2) |
-		   ((segacd_dmna) << 1) |
-		   ((segacd_ret) << 0);
+			temp2;
 }
 
 
@@ -4968,85 +4931,65 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_8_15 )
 	/* setting write protect bits from sub-cpu has no effect? */
 }
 
+
+
 WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 {
+	space->machine->scheduler().synchronize();
+
+
 	segacd_memory_priority_mode = (data&0x0018)>>3;
 
+	// If the mode bit is 0 then we're requesting a change to
+	// 2Meg mode?
 
-#if 1
-	if (data&0x0001)
-	{
-		//printf("ret bit set\n");
-		//segacd_dmna = 0;
+	//printf("segacd_sub_memory_mode_w_0_7 %04x\n",data);
 
+	if (!(data&4)) // check ram mode bit
+	{	// == 0x0 - 2 meg mode
+		scd_mode_dmna_ret_flags &= 0xddff;
 
-		//printf("sub cpu ret set dmna: %d ret: %d\n", segacd_dmna, segacd_ret);
-
-		if (segacd_ram_mode==RAM_MODE_2MEG)
+		if (data&1) // check RET
 		{
-			if (!segacd_dmna_ret_timer->enabled())
-			{
-				if (segacd_dmna)
-				{
-				//  printf("sub ret\n");
-				//  segacd_ret = 1;
-				//  segacd_dmna = 0;
-					segacd_dmna_ret_timer->adjust(attotime::from_usec(1));
-				}
-			}
+			// If RET is set and the Mode bit in the write is set to 2M then we want to change to 2M mode
+			// If we're already in 2M mode it has no effect
+			scd_rammode = 0;
+
 		}
 		else
 		{
-			// in mode 1 this changes the word ram 1 to main cpu and word ram 0 to sub cpu?
-			// but should be proceeded by a dmna request? is this only valid if dmna has been
-			// set to 1 by the main CPU first?
-			//printf("ret bit in mode 1\n");
-			segacd_ret = 1;
+			// == 0x4 - 1 meg mode
+
+			int temp = scd_rammode;
+			if (temp&2) // check ram mode
+			{ // == 0x2 - 1 meg mode
+				scd_mode_dmna_ret_flags &= 0xffde;
+				scd_rammode = temp &1;
+			}
 		}
 	}
 	else
-	{
-		// in mode 1 this changes the word ram 0 to main cpu and word ram 1 to sub cpu?
-		// but should be proceeded by a dmna request? is this only valid if dmna has been
-		// set to 1 by the main CPU first?
-		if (segacd_ram_mode==RAM_MODE_1MEG)
-		{
-			segacd_ret = 0;
-		}
-	}
+	{	// == 0x4 - 1 meg mode
+		data &=1;
+		int temp = data;
+		int scd_rammode_old = scd_rammode;
+		data |=2;
 
+		temp ^= scd_rammode_old;
+		scd_rammode = data;
 
-	//if (data&0x0002) printf("dmna set (swap requested) (invalid, can't be set from sub68k?\n");
-
-	//if (data&0x0004)
-	{
-		segacd_ram_mode = (data&0x0004)>>2;
-		if (segacd_ram_mode!=segacd_ram_mode_old)
-		{
-			printf("mode set %d", segacd_ram_mode);
-			if (segacd_ram_mode == RAM_MODE_1MEG) printf("(1 meg mode)\n");
-			else printf("(2 meg mode)\n");
-
-			segacd_ram_mode_old = segacd_ram_mode;
-
-			if (segacd_ram_mode==RAM_MODE_2MEG)
+		if (scd_rammode_old & 2)
+		{ // == 0x2 - already in 1 meg mode
+			if (temp & 1) // ret bit
 			{
-				// reset it flags etc.?
-				segacd_ret = 0;
-				segacd_dmna = 0;
-				segacd_dmna_ret_timer->adjust(attotime::from_usec(100));
-			}
-			else
-			{
-				segacd_ret = 0;
-				segacd_dmna = 0;
-
-
+				scd_mode_dmna_ret_flags &= 0xddff;
 			}
 		}
+		else
+		{ // == 0x0 - currently in 2 meg mode		
+			scd_mode_dmna_ret_flags &= 0xddff;
+		}
 	}
-#endif
-
 }
 
 static WRITE16_HANDLER( segacd_sub_memory_mode_w )
@@ -5233,10 +5176,10 @@ static READ16_HANDLER( segacd_cdc_data_r )
 
 static READ16_HANDLER( segacd_main_dataram_part1_r )
 {
-	if (segacd_ram_mode==RAM_MODE_2MEG)
+	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
 		// is this correct?
-		if (!segacd_dmna)
+		if (!(scd_rammode&1))
 		{
 			//printf("segacd_main_dataram_part1_r in mode 0 %08x %04x\n", offset*2, segacd_dataram[offset]);
 
@@ -5250,7 +5193,7 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 		}
 
 	}
-	else if (segacd_ram_mode==RAM_MODE_1MEG)
+	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 
 		if (offset<0x20000/2)
@@ -5259,7 +5202,7 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 			//printf("Unspported: segacd_main_dataram_part1_r (word RAM) in mode 1\n");
 
 			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
-			if (segacd_ret)
+			if (scd_rammode&1)
 			{
 				return segacd_1meg_mode_word_read(offset+0x20000/2, mem_mask);
 			}
@@ -5283,14 +5226,15 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 			else  /* 0x3c000 - 0x3dfff and 0x3e000 - 0x3ffff */  // 512x32 bitmap (x2) -> tiles
 				offset = BITSWAP24(offset,23,22,21,20,19,18,17,16,15,14,13,12,5,4,3,2,1,11,10,9,8,7,6,0);
 
-			// do we care about the ret bit?? HOTA is missing some startup screens...
-			//if (!segacd_ret)
-			//{
-			//  return segacd_dataram[offset+0x20000/2];
-			//}
-			//else
+			offset &=0xffff;
+			// HOTA cares about this
+			if (!(scd_rammode&1))
 			{
 				return segacd_1meg_mode_word_read(offset+0x00000/2, mem_mask);
+			}
+			else
+			{
+				return segacd_1meg_mode_word_read(offset+0x20000/2, mem_mask);
 			}
 		}
 	}
@@ -5300,10 +5244,10 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 
 static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 {
-	if (segacd_ram_mode==RAM_MODE_2MEG)
+	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
 		// is this correct?
-		if (!segacd_dmna)
+		if (!(scd_rammode&1))
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
 			segacd_mark_tiles_dirty(space->machine, offset);
@@ -5314,7 +5258,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 		}
 
 	}
-	else if (segacd_ram_mode==RAM_MODE_1MEG)
+	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 		if (offset<0x20000/2)
 		{
@@ -5322,7 +5266,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 			// wordram accees
 
 			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
-			if (segacd_ret)
+			if (scd_rammode&1)
 			{
 				segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask);
 			}
@@ -5333,7 +5277,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 		}
 		else
 		{
-			printf("Unspported: segacd_main_dataram_part1_w (Cell rearranged RAM) in mode 1 (illega?)\n"); // is this legal??
+		//	printf("Unspported: segacd_main_dataram_part1_w (Cell rearranged RAM) in mode 1 (illega?)\n"); // is this legal??
 		}
 	}
 }
@@ -5913,7 +5857,7 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_gfx_conversion_timer = machine->scheduler().timer_alloc(FUNC(segacd_gfx_conversion_timer_callback));
 	segacd_gfx_conversion_timer->adjust(attotime::never);
 
-	segacd_dmna_ret_timer = machine->scheduler().timer_alloc(FUNC(segacd_dmna_ret_timer_callback));
+	//segacd_dmna_ret_timer = machine->scheduler().timer_alloc(FUNC(segacd_dmna_ret_timer_callback));
 	segacd_gfx_conversion_timer->adjust(attotime::never);
 
 	segacd_hock_timer = machine->scheduler().timer_alloc(FUNC(segacd_access_timer_callback));
@@ -5961,6 +5905,9 @@ static TIMER_DEVICE_CALLBACK( scd_dma_timer_callback )
 	if (sega_cd_connected)
 		CDC_Do_DMA(timer.machine, RATE);
 
+	// timed reset of flags
+	scd_mode_dmna_ret_flags |= 0x0021;
+
 	scd_dma_timer->adjust(attotime::from_hz(megadriv_framerate) / megadrive_total_scanlines);
 }
 
@@ -5996,13 +5943,9 @@ static MACHINE_RESET( segacd )
 	if (segacd.cd)
 		printf("cd found\n");
 
-	segacd_dmna = 0;
-	segacd_ret = 0;
+	scd_rammode = 0;
+	scd_mode_dmna_ret_flags = 0x5421;
 
-	segacd_ram_mode = 0;
-	segacd_ram_mode_old = 0;
-
-	segacd_dmna_ret_timer->adjust(attotime::zero);
 
 	hock_cmd = 0;
 	stopwatch_timer = machine->device<timer_device>("sw_timer");
@@ -6057,10 +6000,10 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 
 static READ16_HANDLER( segacd_sub_dataram_part1_r )
 {
-	if (segacd_ram_mode==RAM_MODE_2MEG)
+	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
 		// is this correct?
-		if (segacd_dmna)
+		if (scd_rammode&1)
 			return segacd_dataram[offset];
 		else
 		{
@@ -6068,7 +6011,7 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 			return 0x0000;
 		}
 	}
-	else if (segacd_ram_mode==RAM_MODE_1MEG)
+	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 		printf("Unspported: segacd_sub_dataram_part1_r in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
 		return 0x0000;
@@ -6079,10 +6022,10 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 
 static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 {
-	if (segacd_ram_mode==RAM_MODE_2MEG)
+	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
 		// is this correct?
-		if (segacd_dmna)
+		if (scd_rammode&1)
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
 			segacd_mark_tiles_dirty(space->machine, offset);
@@ -6092,7 +6035,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 			printf("Illegal: segacd_sub_dataram_part1_w in mode 0 without permission\n");
 		}
 	}
-	else if (segacd_ram_mode==RAM_MODE_1MEG)
+	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 		printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
 	}
@@ -6100,22 +6043,22 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 
 static READ16_HANDLER( segacd_sub_dataram_part2_r )
 {
-	if (segacd_ram_mode==RAM_MODE_2MEG)
+	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
 		printf("ILLEGAL segacd_sub_dataram_part2_r in mode 0\n"); // not mapped to anything in mode 0
 		return 0x0000;
 	}
-	else if (segacd_ram_mode==RAM_MODE_1MEG)
+	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 		//printf("Unsupported: segacd_sub_dataram_part2_r in mode 1 (Word RAM)\n");
 		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
-		if (!segacd_ret)
+		if (scd_rammode&1)
 		{
-			return segacd_1meg_mode_word_read(offset+0x20000/2, mem_mask);
+			return segacd_1meg_mode_word_read(offset+0x00000/2, mem_mask);
 		}
 		else
 		{
-			return segacd_1meg_mode_word_read(offset+0x00000/2, mem_mask);
+			return segacd_1meg_mode_word_read(offset+0x20000/2, mem_mask);
 		}
 
 	}
@@ -6125,21 +6068,21 @@ static READ16_HANDLER( segacd_sub_dataram_part2_r )
 
 static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 {
-	if (segacd_ram_mode==RAM_MODE_2MEG)
+	if ((scd_rammode&2)==RAM_MODE_2MEG)
 	{
-		printf("ILLEGAL segacd_sub_dataram_part2_w in mode 0\n"); // not mapepd to anything in mode 0
+		printf("ILLEGAL segacd_sub_dataram_part2_w in mode 0\n"); // not mapped to anything in mode 0
 	}
-	else if (segacd_ram_mode==RAM_MODE_1MEG)
+	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 		//printf("Unsupported: segacd_sub_dataram_part2_w in mode 1 (Word RAM)\n");
 		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
-		if (!segacd_ret)
+		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask);
+			segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask);
+			segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask);
 		}
 
 	}
@@ -6354,7 +6297,7 @@ INLINE void write_pixel_to_imagebuffer( running_machine* machine, UINT32 pix, in
 // this triggers the conversion operation, which will cause an IRQ1 when finished
 WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 {
-	if (segacd_ram_mode==RAM_MODE_1MEG)
+	if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 		printf("ILLEGAL: segacd_trace_vector_base_address_w %04x %04x in mode 1!\n",data,mem_mask);
 	}
@@ -9649,7 +9592,7 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
 
 
-	//MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
 /* Different Softlists for different regions (for now at least) */
