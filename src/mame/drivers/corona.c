@@ -9,13 +9,14 @@
 
   Games running in this hardware:
 
-  * Winners Circle (81, 28*28 PCB),      1981, Corona Co, LTD.
-  * Winners Circle (81, 18*22 PCB),      1981, Corona Co, LTD.
-  * Winners Circle (82),                 1982, Corona Co, LTD.
-  * Ruleta RE-800 (earlier),             1991, Entretenimientos GEMINIS & GENATRON.
-  * Ruleta RE-800 (v1.0),                1991, Entretenimientos GEMINIS & GENATRON.
-  * Ruleta RE-800 (v3.0),                1992, Entretenimientos GEMINIS & GENATRON.
-  * Lucky Roulette (6-players, Spanish), 198?, unknown manufacturer.
+  * Winners Circle (81, 28*28 PCB),           1981, Corona Co, LTD.
+  * Winners Circle (81, 18*22 PCB),           1981, Corona Co, LTD.
+  * Winners Circle (82),                      1982, Corona Co, LTD.
+  * Ruleta RE-800 (earlier),                  1991, Entretenimientos GEMINIS & GENATRON.
+  * Ruleta RE-800 (v1.0),                     1991, Entretenimientos GEMINIS & GENATRON.
+  * Ruleta RE-800 (v3.0),                     1992, Entretenimientos GEMINIS & GENATRON.
+  * Ruleta RCI (6-players, Spanish),          199?, Entretenimientos GEMINIS & GENATRON.
+  * Lucky Roulette Plus (6-players, Spanish), 1990, unknown manufacturer.
 
 
   Special thanks to Rob Ragon for his invaluable cooperation.
@@ -1210,7 +1211,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_UP)       PORT_NAME("Player 1 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z)        PORT_NAME("Player 1 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1)        PORT_NAME("Player 1 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 1 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPNAME( 0x80, 0x00, "Player 1 Credits Lock" )	/* lock the credits in/out */	PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1222,7 +1223,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Player 2 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X)     PORT_NAME("Player 2 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2)     PORT_NAME("Player 2 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 2 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPNAME( 0x80, 0x00, "Player 2 Credits Lock" )	/* lock the credits in/out */	PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1234,7 +1235,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("Player 3 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("Player 3 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Player 3 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 3 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPNAME( 0x80, 0x00, "Player 3 Credits Lock" )	/* lock the credits in/out */	PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1246,7 +1247,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("Player 4 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("Player 4 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Player 4 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 4 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPNAME( 0x80, 0x00, "Player 4 Credits Lock" )	/* lock the credits in/out */	PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1258,7 +1259,7 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("Player 5 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("Player 5 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("Player 5 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 5 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPNAME( 0x80, 0x00, "Player 5 Credits Lock" )	/* lock the credits in/out */	PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1270,61 +1271,40 @@ static INPUT_PORTS_START( luckyrlt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_HOME)  PORT_NAME("Player 6 - Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N)     PORT_NAME("Player 6 - Credits Out")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6)     PORT_NAME("Player 6 - Credits In")
-	PORT_DIPNAME( 0x80, 0x00, "Player 6 Credits Lock" )	/* lock the credits in/out */
+	PORT_DIPNAME( 0x80, 0x00, "Player 6 Credits Lock" )	/* lock the credits in/out */	PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Bookkeeping" )
+	PORT_DIPNAME( 0x01, 0x01, "Test / Bookkeeping" )	PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x81, 0x81, "Max Bet" )	PORT_DIPLOCATION("DSW2:1,8")
+	PORT_DIPSETTING(    0x00, "Plain = 10; Line = 30; Chance = 30" )
+	PORT_DIPSETTING(    0x80, "Plain = 20; Line = 40; Chance = 50" )
+	PORT_DIPSETTING(    0x01, "Plain = 30; Line = 50; Chance = 70" )
+	PORT_DIPSETTING(    0x81, "Plain = 40; Line = 70; Chance = 90" )
+	PORT_DIPNAME( 0x0e, 0x0e, "Rate (%)" )	PORT_DIPLOCATION("DSW2:2,3,4")
+	PORT_DIPSETTING(    0x00, "3.12" )
+	PORT_DIPSETTING(    0x02, "6.25" )
+	PORT_DIPSETTING(    0x04, "9.40" )
+	PORT_DIPSETTING(    0x06, "12.5" )
+	PORT_DIPSETTING(    0x08, "15.6" )
+	PORT_DIPSETTING(    0x0a, "18.7" )
+	PORT_DIPSETTING(    0x0c, "21.9" )
+	PORT_DIPSETTING(    0x0e, "25.1" )
+	PORT_DIPNAME( 0x10, 0x10, "Reset" )		PORT_DIPLOCATION("DSW2:5")	/* don't know how it works */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Pago Doble (Double Pay)" )	PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Pago x5 (Pay x5)" )	PORT_DIPLOCATION("DSW2:7")	/* only in PLUS 1990 model */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1389,7 +1369,7 @@ static MACHINE_CONFIG_START( winner82, driver_device )
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MCFG_CPU_ADD("soundcpu", Z80, WC82_MAIN_XTAL/8)	/* measured */
-	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)
+	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)		/* IM1 instead of NMI */
 	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1425,6 +1405,39 @@ static MACHINE_CONFIG_START( re800, driver_device )
 	MCFG_CPU_PROGRAM_MAP(re800_sound_map)
 	MCFG_CPU_IO_MAP(re800_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 244)	/* 244 Hz (1MHz/16/16/16) */
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_PALETTE_INIT(winner)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) //not accurate
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 32*8-1)
+	MCFG_SCREEN_UPDATE(winner)
+
+	MCFG_PALETTE_LENGTH(0x100)
+
+	MCFG_VIDEO_START(winner)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8912, AY_CLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( rcirulet, driver_device )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
+	MCFG_CPU_PROGRAM_MAP(re800_map)
+	MCFG_CPU_IO_MAP(re800_cpu_io_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+
+	MCFG_CPU_ADD("soundcpu", Z80, RE_MAIN_XTAL/8)	/* measured 2MHz */
+	MCFG_CPU_PROGRAM_MAP(winner82_sound_map)		/* IM1 instead of NMI */
+	MCFG_CPU_IO_MAP(winner82_sound_cpu_io_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -1528,7 +1541,7 @@ ROM_START(winner81b)
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* from the 18*22 pins PCB, more close to winner82 */
 	ROM_LOAD("winner_27128_a145.bin",	0x0000, 0x4000, CRC(a9737c8f) SHA1(d1e3b3979d3ef1aa2d8c32d5d56c30165c949e50) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* identical halves */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* IM1 instead of NMI. Identical halves */
 	ROM_LOAD("son_2732_8ccc.bin",	0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -1542,7 +1555,7 @@ ROM_START(winner82)
 	ROM_LOAD("p3.32.bin",	0x2000, 0x1000, CRC(1ae24244) SHA1(a10fba097b18607b1bc10d8720a020c1e01e75c3) )
 	ROM_LOAD("p4.32.bin",	0x3000, 0x1000, CRC(15631824) SHA1(24d5607b186dc880609dd076012d0bc29d7581ba) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )	/* identical halves */
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* IM1 instead of NMI. Identical halves */
 	ROM_LOAD("son_2732_8ccc.bin",	0x0000, 0x1000, CRC(c944a4ae) SHA1(989ec9f39a7761aa73d08ca39b081cb2c4c75a7c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
@@ -1602,6 +1615,36 @@ ROM_START(re800v3)
 ROM_END
 
 /******************************
+  Ruleta RCI.
+  6-players spanish roulette.
+
+  Entretenimientos GEMINIS.
+
+  2x Z80 @ 2MHz.
+  1x AY-3-8910 @ 2MHz.
+  
+  18x22 pins Corona hardware.
+  Multiplexed inputs.
+  
+******************************/
+
+ROM_START(rcirulet)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("rc1.256",	0x4000, 0x4000, CRC(be25f548) SHA1(f59ef5d6d047299ff77f28b24517ba6d0a3afc90) )
+	ROM_CONTINUE(       0x0000, 0x4000)
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )	/* IM1 instead of NMI */
+	ROM_LOAD("rcson.16",	0x0000, 0x0800, CRC(9ba72a6d) SHA1(0d06ee4952255a93a7f097dd84c5937b01367836) )
+	ROM_RELOAD(             0x0800, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )	/* color PROM */
+	ROM_LOAD( "rci_82s123_ic19_1b92.bin",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
+	
+	ROM_REGION( 0x0020, "proms2", 0 )	/* unknown from video */
+	ROM_LOAD( "rci_82s123_ic04_1f95.bin",	0x0000, 0x0020, CRC(3a6684b3) SHA1(c9461565a78f1024c6bd4088e4555f1a8020013b) )
+ROM_END
+
+/******************************
   Lucky Roulette
   6-players spanish roulette.
 
@@ -1626,11 +1669,12 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                              FLAGS                   LAYOUT      */
-GAME(  1981, winner81,  winner82, winner81, winner81, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",      GAME_IMPERFECT_SOUND )
-GAME(  1981, winner81b, winner82, winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",      0 )
-GAME(  1982, winner82,  0,        winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                 0 )
-GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)", 0,                      layout_re800 )
-GAMEL( 1991, re800v1,   0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                0,                      layout_re800 )
-GAMEL( 1991, re800v3,   0,        re800,    re800v3,  0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                GAME_IMPERFECT_COLORS,  layout_re800 )
-GAMEL( 198?, luckyrlt,  0,        luckyrlt, luckyrlt, 0,        ROT90,  "<unknown>",                "Lucky Roulette (6-players, Spanish)", 0,                      layout_luckyrlt )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                   FLAGS                   LAYOUT      */
+GAME(  1981, winner81,  winner82, winner81, winner81, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 28*28 PCB)",           GAME_IMPERFECT_SOUND )
+GAME(  1981, winner81b, winner82, winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (81, 18*22 PCB)",           0 )
+GAME(  1982, winner82,  0,        winner82, winner82, 0,        ROT0,   "Corona Co, LTD.",          "Winners Circle (82)",                      0 )
+GAMEL( 1991, re800ea,   re800v1,  re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (earlier, no attract)",      0,                      layout_re800 )
+GAMEL( 1991, re800v1,   0,        re800,    re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v1.0)",                     0,                      layout_re800 )
+GAMEL( 1991, re800v3,   0,        re800,    re800v3,  0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RE-800 (v3.0)",                     GAME_IMPERFECT_COLORS,  layout_re800 )
+GAMEL( 199?, rcirulet,  0,        rcirulet, re800,    0,        ROT90,  "Entretenimientos GEMINIS", "Ruleta RCI (6-players, Spanish)",          0,                      layout_re800 )
+GAMEL( 1990, luckyrlt,  0,        luckyrlt, luckyrlt, 0,        ROT90,  "<unknown>",                "Lucky Roulette Plus (6-players, Spanish)", 0,                      layout_luckyrlt )

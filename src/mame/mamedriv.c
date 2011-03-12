@@ -10725,7 +10725,8 @@ Other Sun games
 	DRIVER( re800ea )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v1 )	/* (c) 1991 Entretenimientos GEMINIS */
 	DRIVER( re800v3 )	/* (c) 1992 Entretenimientos GEMINIS */
-	DRIVER( luckyrlt )	/* (c) 198? unknown */
+	DRIVER( rcirulet )	/* (c) 199? Entretenimientos GEMINIS */
+	DRIVER( luckyrlt )	/* (c) 1990 unknown */
 
 	DRIVER( dfruit )
 
