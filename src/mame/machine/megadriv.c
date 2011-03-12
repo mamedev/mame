@@ -3943,14 +3943,29 @@ UINT16* segacd_dataram;
 #define RAM_MODE_2MEG (0)
 #define RAM_MODE_1MEG (2)
 
-// 1meg / 2meg swap should actually be an interleaved swap, not half/half of the ram?
+// 1meg / 2meg swap is interleaved swap, not half/half of the ram?
+// Wily Beamish appears to rely on this
 UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
 {
+	offset *= 2;
+
+	if ((offset&0x20000))
+		offset +=1;
+
+	offset &=0x1ffff;
+
 	return segacd_dataram[offset];
 }
 
 void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask)
 {
+	offset *= 2;
+
+	if ((offset&0x20000))
+		offset +=1;
+
+	offset &=0x1ffff;
+
 	COMBINE_DATA(&segacd_dataram[offset]);
 }
 
@@ -4499,16 +4514,6 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 		else if (destination==DMA_WRAM)
 		{
 			dest = (UINT8*)segacd_dataram;
-
-			if ((scd_rammode&2))
-			{
-				dstoffset &= 0x1ffff;
-				if (!(scd_rammode & 1)) dest += 0x20000;
-			}
-			else
-			{
-				dstoffset &= 0x3ffff;
-			}
 		}
 		else if (destination==DMA_PCM)
 		{
@@ -4529,15 +4534,40 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 		{
 			if (dest)
 			{
-				dest[dstoffset+1] = data >>8;
-				dest[dstoffset+0] = data&0xff;
-
 				if (destination==DMA_WRAM)
 				{
+
 					if ((scd_rammode&2)==RAM_MODE_2MEG)
+					{
+						dstoffset &= 0x3ffff;
+
+						dest[dstoffset+1] = data >>8;
+						dest[dstoffset+0] = data&0xff;
+					
 						segacd_mark_tiles_dirty(space->machine, dstoffset/2);
+					}
+					else
+					{
+						dstoffset &= 0x1ffff;
+
+						if (!(scd_rammode & 1))
+						{
+							segacd_1meg_mode_word_write((dstoffset+0x20000)/2, data, 0xffff);
+						}
+						else
+						{
+							segacd_1meg_mode_word_write((dstoffset+0x00000)/2, data, 0xffff);
+						}
+					}
 
 				}
+				else
+				{
+					// main ram
+					dest[dstoffset+1] = data >>8;
+					dest[dstoffset+0] = data&0xff;
+				}
+				
 			}
 		}
 
