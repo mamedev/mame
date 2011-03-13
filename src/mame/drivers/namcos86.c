@@ -432,8 +432,6 @@ ADDRESS_MAP_END
 
 /*******************************************************************/
 
-// #define PRIORITY_EASINESS_TO_PLAY
-
 static INPUT_PORTS_START( hopmappy )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* button 3 player 2 */
@@ -794,9 +792,7 @@ static INPUT_PORTS_START( rthunder )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:7,6")
 	PORT_DIPSETTING(    0x06, "Upright 1 Player" )
-	#ifndef PRIORITY_EASINESS_TO_PLAY
-	  PORT_DIPSETTING(    0x02, "Upright 1 Player" )  // duplicated setting
-	#endif
+	PORT_DIPSETTING(    0x02, "Upright 1 Player" )  // duplicated setting
 	PORT_DIPSETTING(    0x04, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Continues ) ) PORT_DIPLOCATION("SWB:8")
@@ -863,15 +859,16 @@ static INPUT_PORTS_START( rthundro )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0xc0, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SWB:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWB:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SWB:3" )	// bonus life score?
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SWB:4" )	// "
 	PORT_DIPNAME( 0x08, 0x08, "Level Select (Cheat)" ) PORT_DIPLOCATION("SWB:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SWB:6" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:7,6")
+	PORT_DIPSETTING(    0x00, "Upright 1 Player" )
+	PORT_DIPSETTING(    0x04, "Upright 2 Players" )
+	PORT_DIPSETTING(    0x06, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )	// duplicated setting
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -940,9 +937,7 @@ static INPUT_PORTS_START( wndrmomo )
 	PORT_DIPSETTING(    0x02, "Upright 1 Player" )
 	PORT_DIPSETTING(    0x04, "Upright 2 Players" )
 	PORT_DIPSETTING(    0x06, DEF_STR( Cocktail ) )
-	#ifndef PRIORITY_EASINESS_TO_PLAY
-	  PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )  // duplicated setting
-	#endif
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )  // duplicated setting
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SWB:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
