@@ -7132,8 +7132,8 @@ GAME( 1990, bioship,  0,        bioship,  bioship,  0,        ROT0,   "UPL (Amer
 GAME( 1990, sbsgomo,  bioship,  bioship,  bioship,  0,        ROT0,   "UPL",                          "Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND )
 
 GAME( 1990, vandyke,    0,       vandyke,  vandyke, 0,        ROT270, "UPL",                          "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)",  GAME_IMPERFECT_SOUND )
+GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, vandykeb, ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  GAME_NO_SOUND )
 
 GAME( 1991, blkheart, 0,        blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart", GAME_IMPERFECT_SOUND  )

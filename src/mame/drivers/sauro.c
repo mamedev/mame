@@ -530,5 +530,5 @@ static DRIVER_INIT( tecfri )
 }
 
 GAME( 1987, sauro,    0,        sauro,    tecfri,    tecfri, ROT0, "Tecfri", "Sauro", 0 )
-GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    tecfri, ROT0, "Tecfri", "Tricky Doc (Set 1)", 0 )
-GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 2)", 0 )
+GAME( 1987, trckydoc, 0,        trckydoc, tecfri,    tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", 0 )
+GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", 0 )

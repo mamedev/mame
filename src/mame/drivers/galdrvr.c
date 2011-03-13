@@ -6268,7 +6268,7 @@ GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatr
 //GAME( 1984, mrkougar, 0,        theend  /*mrkougar*/, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar", GAME_SUPPORTS_SAVE )
 //GAME( 1983, mrkougr2, mrkougar, theend  /*mrkougar*/, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar (earlier)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, mrkougb,  mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, mrkougb2, mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg Set 2)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, mrkougb2, mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 2)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, hotshock, 0,        theend  /*hotshock*/, hotshock, hotshock,     ROT90, "E.G. Felaco", "Hot Shocker", GAME_SUPPORTS_SAVE )
 //GAME( 1982, conquer,  0,        theend  /*hotshock*/, hotshock, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
 //GAME( 1983, hunchbks, hunchbak, theend  /*hunchbks*/, hunchbks, scramble_ppi, ROT90, "Century Electronics", "Hunchback (Scramble hardware)", GAME_SUPPORTS_SAVE )

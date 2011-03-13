@@ -1514,8 +1514,8 @@ static DRIVER_INIT( schmeisr )
 }
 
 GAME( 1991, rohga,     0,        rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 Set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1991, rohgah,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", GAME_SUPPORTS_SAVE )
 GAME( 1991, rohgau,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", GAME_SUPPORTS_SAVE )
 GAME( 1991, wolffang,  rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", GAME_SUPPORTS_SAVE )

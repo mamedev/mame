@@ -2077,10 +2077,10 @@ static DRIVER_INIT( dtrvwz5 )
 	state->decryption_key = 6;
 }
 
-GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 1)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossa, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 2)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossb, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 3)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, pitbossc, pitboss, casino5,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 4)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (set 1)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossa, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (set 2)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossb, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (set 3)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, pitbossc, pitboss, casino5,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (set 4)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1984, casino5,  0,       casino5,  casino5,  0,      ROT0,  "Merit", "Casino Five",                                 GAME_SUPPORTS_SAVE )
 
@@ -2115,6 +2115,6 @@ GAME( 1986, dodge,    0,       dodge,    couple,   0,      ROT0,  "Merit", "Dodg
 
 GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5,  dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (Edition 5)",  GAME_SUPPORTS_SAVE )
 
-GAME( 1988, couple,   0,       couple,   couple,   couple, ROT0,  "Merit", "The Couples (Set 1)",                         GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1988, couplep,  couple,  couple,   couplep,  couple, ROT0,  "Merit", "The Couples (Set 2)",                         GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1988, couplei,  couple,  couple,   couple,   couple, ROT0,  "Merit", "The Couples (Set 3)",                         GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1988, couple,   0,       couple,   couple,   couple, ROT0,  "Merit", "The Couples (set 1)",                         GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1988, couplep,  couple,  couple,   couplep,  couple, ROT0,  "Merit", "The Couples (set 2)",                         GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1988, couplei,  couple,  couple,   couple,   couple, ROT0,  "Merit", "The Couples (set 3)",                         GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )

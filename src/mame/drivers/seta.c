@@ -10287,9 +10287,9 @@ static DRIVER_INIT( inttootea )
 GAME( 1987, tndrcade, 0,        tndrcade, tndrcade, 0,        ROT270, "Seta (Taito license)",   "Thundercade / Twin Formation" , 0) // Title/License: DSW
 GAME( 1987, tndrcadej,tndrcade, tndrcade, tndrcadj, 0,        ROT270, "Seta (Taito license)",   "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 GAME( 1988, twineagl, 0,        twineagl, twineagl, twineagl, ROT270, "Seta (Taito license)",   "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
-GAME( 1989, downtown, 0,        downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Set 1)" , 0) // Country/License: DSW
-GAME( 1989, downtown2,downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Set 2)" , 0) // Country/License: DSW
-GAME( 1989, downtownj,downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Joystick Hack)" , 0) // Country/License: DSW
+GAME( 1989, downtown, 0,        downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (set 1)" , 0) // Country/License: DSW
+GAME( 1989, downtown2,downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (set 2)" , 0) // Country/License: DSW
+GAME( 1989, downtownj,downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (joystick hack)" , 0) // Country/License: DSW
 GAME( 1989, downtownp,downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (prototype)" , 0) // Country/License: DSW
 GAME( 1989, usclssic, 0,        usclssic, usclssic, 0,        ROT270, "Seta",                   "U.S. Classic" , 0) // Country/License: DSW
 GAME( 1989, calibr50, 0,        calibr50, calibr50, 0,        ROT270, "Athena / Seta",          "Caliber 50" , 0) // Country/License: DSW

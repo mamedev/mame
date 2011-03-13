@@ -663,4 +663,4 @@ ROM_END
 
 /* custom (+video) */
 GAME(1981,	caveman,	0,			caveman,	caveman,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo)",		GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
-GAME(1981,	cavemana,	caveman,	caveman,	caveman,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, Set 2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)
+GAME(1981,	cavemana,	caveman,	caveman,	caveman,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, set 2)",	GAME_NOT_WORKING | GAME_NO_SOUND | GAME_MECHANICAL)

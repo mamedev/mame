@@ -585,7 +585,7 @@ static DRIVER_INIT( yamyam )
 
 
 GAME( 1990, gundealr,  0,        gundealr, gundealr, gundealr, ROT270, "Dooyong", "Gun Dealer",                GAME_SUPPORTS_SAVE )
-GAME( 19??, gundealra, gundealr, gundealr, gundealr, gundealr, ROT270, "Dooyong", "Gun Dealer (Alt Card Set)", GAME_SUPPORTS_SAVE )
+GAME( 19??, gundealra, gundealr, gundealr, gundealr, gundealr, ROT270, "Dooyong", "Gun Dealer (alt card set)", GAME_SUPPORTS_SAVE )
 GAME( 1990, gundealrt, gundealr, gundealr, gundealt, gundealr, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Korea)", GAME_SUPPORTS_SAVE )
 GAME( 1990, yamyam,    0,        gundealr, yamyam,   yamyam,   ROT0,   "Dooyong", "Yam! Yam!?",                GAME_SUPPORTS_SAVE )
 GAME( 1990, wiseguy,   yamyam,   gundealr, yamyam,   yamyam,   ROT0,   "Dooyong", "Wise Guy",                  GAME_SUPPORTS_SAVE )

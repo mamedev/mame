@@ -4466,12 +4466,12 @@ GAMEL( 1994, m_bdrw15, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "
 GAMEL( 1994, m_bdrw16, m_bdrwho,  scorpion2,	 drwho,		drwho,		0,		 "BFM",      "Dr.Who The Timelord (set 17)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 GAMEL( 1994, m_bdrw17, m_bdrwho,  scorpion2,	 drwho,		drwhon,		0,		 "BFM",      "Dr.Who The Timelord (set 18, not encrypted)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL,layout_drwho)
 
-GAME( 1994, m_brkfst, 0,          scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 1 UK, Game Card 95-750-524)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 1994, m_brkfs1, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 1994, m_brkfs2, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 1994, m_brkfs3, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 1994, m_brkfs4, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 5)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
-GAME( 1994, m_brkfs5, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (Set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfst, 0,          scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (set 1 UK, Game Card 95-750-524)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs1, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (set 2)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs2, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (set 3)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs3, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (set 4)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs4, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (set 5)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
+GAME( 1994, m_brkfs5, m_brkfst,	  scorpion2,	 bbrkfst,	bbrkfst,	0,		 "BFM",      "The Big Breakfast (set 6)", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING|GAME_MECHANICAL)
 
 GAME( 1995, m_bfocus, 0,          scorpion3,	 scorpion3,	focus,		0,		 "BFM/ELAM", "Focus (Dutch, Game Card 95-750-347)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)
 GAME( 1996, m_bcgslm, 0,          scorpion2,	 bfmcgslm,	bfmcgslm,	0,		 "BFM",      "Club Grandslam (UK, Game Card 95-750-843)", GAME_NOT_WORKING|GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_MECHANICAL)

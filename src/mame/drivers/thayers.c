@@ -812,6 +812,6 @@ ROM_END
 
 /* Game Drivers */
 
-/*     YEAR  NAME      PARENT   MACHINE  INPUT    INIT  MONITOR  COMPANY               FULLNAME                           FLAGS                             LAYOUT */
-GAMEL( 1984, thayers,  0,       thayers, thayers, 0,	ROT0,    "RDI Video Systems",  "Thayer's Quest",                  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)
-GAMEL( 1984, thayersa, thayers, thayers, thayers, 0,	ROT0,    "RDI Video Systems",  "Thayer's Quest (Alternate Set)",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)
+/*     YEAR  NAME      PARENT   MACHINE  INPUT    INIT  MONITOR  COMPANY               FULLNAME                   FLAGS                             LAYOUT */
+GAMEL( 1984, thayers,  0,       thayers, thayers, 0,	ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)
+GAMEL( 1984, thayersa, thayers, thayers, thayers, 0,	ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  GAME_NOT_WORKING | GAME_NO_SOUND, layout_dlair)
