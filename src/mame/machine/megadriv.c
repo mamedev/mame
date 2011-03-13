@@ -3944,7 +3944,9 @@ UINT16* segacd_dataram;
 #define RAM_MODE_1MEG (2)
 
 // 1meg / 2meg swap is interleaved swap, not half/half of the ram?
-// Wily Beamish appears to rely on this
+// Wily Beamish and Citizen X appear to rely on this
+// however, it breaks the megacdj bios (megacd2j still works!)
+//  (maybe that's a timing issue instead?)
 UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
 {
 	offset *= 2;
@@ -3957,7 +3959,7 @@ UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
 	return segacd_dataram[offset];
 }
 
-void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask)
+void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask, int use_pm)
 {
 	offset *= 2;
 
@@ -3966,7 +3968,53 @@ void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask)
 
 	offset &=0x1ffff;
 
-	COMBINE_DATA(&segacd_dataram[offset]);
+	if (use_pm)
+	{
+		// priority mode can apply when writing with the double up buffer mode
+		// Jaguar XJ220 relies on this
+		switch (segacd_memory_priority_mode)
+		{
+			case 0x00: // normal write, just write the data
+				COMBINE_DATA(&segacd_dataram[offset]);
+				break;
+
+			case 0x01: // underwrite, only write if the existing data is 0
+				if (ACCESSING_BITS_8_15)
+				{
+					if ((segacd_dataram[offset]&0xf000) == 0x0000) segacd_dataram[offset] |= (data)&0xf000;
+					if ((segacd_dataram[offset]&0x0f00) == 0x0000) segacd_dataram[offset] |= (data)&0x0f00;
+				}
+				if (ACCESSING_BITS_0_7)
+				{
+					if ((segacd_dataram[offset]&0x00f0) == 0x0000) segacd_dataram[offset] |= (data)&0x00f0;
+					if ((segacd_dataram[offset]&0x000f) == 0x0000) segacd_dataram[offset] |= (data)&0x000f;
+				}
+				break;
+
+			case 0x02: // overwrite, only write non-zero data
+				if (ACCESSING_BITS_8_15)
+				{
+					if ((data)&0xf000) segacd_dataram[offset] = (segacd_dataram[offset] & 0x0fff) | ((data)&0xf000);
+					if ((data)&0x0f00) segacd_dataram[offset] = (segacd_dataram[offset] & 0xf0ff) | ((data)&0x0f00);
+				}
+				if (ACCESSING_BITS_0_7)
+				{
+					if ((data)&0x00f0) segacd_dataram[offset] = (segacd_dataram[offset] & 0xff0f) | ((data)&0x00f0);
+					if ((data)&0x000f) segacd_dataram[offset] = (segacd_dataram[offset] & 0xfff0) | ((data)&0x000f);
+				}
+				break;
+
+			default:
+			case 0x03: // invalid?
+				COMBINE_DATA(&segacd_dataram[offset]);
+				break;
+
+		}
+	}
+	else
+	{
+		COMBINE_DATA(&segacd_dataram[offset]);
+	}
 }
 
 
@@ -4552,11 +4600,11 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 
 						if (!(scd_rammode & 1))
 						{
-							segacd_1meg_mode_word_write((dstoffset+0x20000)/2, data, 0xffff);
+							segacd_1meg_mode_word_write((dstoffset+0x20000)/2, data, 0xffff, 0);
 						}
 						else
 						{
-							segacd_1meg_mode_word_write((dstoffset+0x00000)/2, data, 0xffff);
+							segacd_1meg_mode_word_write((dstoffset+0x00000)/2, data, 0xffff, 0);
 						}
 					}
 
@@ -4905,6 +4953,7 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_8_15 )
 static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 {
 	space->machine->scheduler().synchronize();
+
 
 	//printf("scd_a12002_memory_mode_w_0_7 %04x\n",data);
 
@@ -5298,11 +5347,11 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 			if (scd_rammode&1)
 			{
-				segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask);
+				segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask, 0);
 			}
 			else
 			{
-				segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask);
+				segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask, 0);
 			}
 		}
 		else
@@ -6043,8 +6092,28 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 	}
 	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
-		printf("Unspported: segacd_sub_dataram_part1_r in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
-		return 0x0000;
+//		printf("Unspported: segacd_sub_dataram_part1_r in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
+		UINT16 data;
+
+		if (scd_rammode&1)
+		{
+			data = segacd_1meg_mode_word_read(offset/2+0x00000/2, 0xffff);
+		}
+		else
+		{
+			data = segacd_1meg_mode_word_read(offset/2+0x20000/2, 0xffff);
+		}
+
+		if (offset&1)
+		{
+			return ((data & 0x00f0) << 4) | ((data & 0x000f) << 0);
+		}
+		else
+		{
+			return ((data & 0xf000) >> 4) | ((data & 0x0f00) >> 8);
+		}
+
+		
 	}
 
 	return 0x0000;
@@ -6067,7 +6136,32 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 	}
 	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
-		printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
+		//if (mem_mask==0xffff)
+		//	printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x %04x\n", data, mem_mask);
+
+		data = (data & 0x000f) | (data & 0x0f00)>>4;
+		mem_mask = (mem_mask & 0x000f) | (mem_mask & 0x0f00)>>4;
+
+//		data = ((data & 0x00f0) >>4) | (data & 0xf000)>>8;
+//		mem_mask = ((mem_mask & 0x00f0)>>4) | ((mem_mask & 0xf000)>>8);
+
+
+		if (!(offset&1))
+		{
+			data <<=8;
+			mem_mask <<=8;
+		}
+
+		if (scd_rammode&1)
+		{
+			segacd_1meg_mode_word_write(offset/2+0x00000/2, data , mem_mask, 1);
+		}
+		else
+		{
+			segacd_1meg_mode_word_write(offset/2+0x20000/2, data, mem_mask, 1);
+		}
+
+	//	printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x\n", data);
 	}
 }
 
@@ -6108,11 +6202,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask);
+			segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask, 0);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask);
+			segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask, 0);
 		}
 
 	}
