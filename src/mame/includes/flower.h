@@ -1,5 +1,15 @@
 #include "devlegcy.h"
 
+class flower_state : public driver_device
+{
+public:
+	flower_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *spriteram;
+};
+
+
 /*----------- defined in audio/flower.c -----------*/
 
 WRITE8_DEVICE_HANDLER( flower_sound1_w );

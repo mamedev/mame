@@ -1,3 +1,13 @@
+class namcos86_state : public driver_device
+{
+public:
+	namcos86_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *spriteram;
+};
+
+
 /*----------- defined in video/namcos86.c -----------*/
 
 extern UINT8 *rthunder_videoram1, *rthunder_videoram2, *rthunder_spriteram;

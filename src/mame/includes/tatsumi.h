@@ -47,6 +47,7 @@ public:
 	UINT8 roundupt_crt_selected_reg;
 	UINT8 roundupt_crt_reg[64];
 	UINT8* shadow_pen_array;
+	UINT16 *spriteram;
 };
 
 

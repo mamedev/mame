@@ -20,6 +20,8 @@ public:
 	int steer;
 	struct tempsprite *spritelist;
 	UINT32 mem[2];
+	UINT32 *spriteram;
+	size_t spriteram_size;
 };
 
 

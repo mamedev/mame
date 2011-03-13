@@ -20,6 +20,16 @@
 
 ***************************************************************************/
 
+class megasys1_state : public driver_device
+{
+public:
+	megasys1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *spriteram;
+};
+
+
 /*----------- defined in video/megasys1.c -----------*/
 
 /* Variables */

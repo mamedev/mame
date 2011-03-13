@@ -889,6 +889,7 @@ NewSceneNode( running_machine *machine, UINT32 zsortvalue24, SceneNodeType type 
 
 static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct SceneNode *node )
 {
+	namcos22_state *state = machine->driver_data<namcos22_state>();
    int tile = node->data.sprite.tile;
    int col,row;
 	int i = 0;
@@ -903,7 +904,7 @@ static void RenderSprite(running_machine *machine, bitmap_t *bitmap, struct Scen
          }
          else
          {
-            code += nthword( &machine->generic.spriteram.u32[0x800/4], i+node->data.sprite.linkType*4 );
+            code += nthword( &state->spriteram[0x800/4], i+node->data.sprite.linkType*4 );
          }
          poly3d_Draw3dSprite(
                bitmap,
@@ -1337,6 +1338,7 @@ DrawSpritesHelper(
 static void
 DrawSprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	namcos22_state *state = machine->driver_data<namcos22_state>();
 /*
 // time crisis:
 00980000: 00060000 000b0053 03000200 03000000
@@ -1405,7 +1407,7 @@ DrawSprites( running_machine *machine, bitmap_t *bitmap, const rectangle *clipre
         0x9a0004:   palette, C381 ZC (depth cueing)
         ...
     */
-	UINT32 *spriteram32 = machine->generic.spriteram.u32;
+	UINT32 *spriteram32 = state->spriteram;
 	int num_sprites = ((spriteram32[0x04/4]>>16)&0x3ff)+1;
 	const UINT32 *pSource = &spriteram32[0x4000/4];
 	const UINT32 *pPal = &spriteram32[0x20000/4];

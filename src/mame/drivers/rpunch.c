@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_BASE_MEMBER(rpunch_state, bitmapram) AM_SIZE_MEMBER(rpunch_state, bitmapram_size)
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_MEMBER(rpunch_state, spriteram)
 	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_BASE_MEMBER(rpunch_state, videoram)
 	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)

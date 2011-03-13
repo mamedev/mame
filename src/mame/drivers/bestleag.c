@@ -36,6 +36,8 @@ public:
 	tilemap_t *tx_tilemap;
 	tilemap_t *bg_tilemap;
 	tilemap_t *fg_tilemap;
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 
@@ -108,7 +110,7 @@ Note: sprite chip is different than the other Big Striker sets and they
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	bestleag_state *state = machine->driver_data<bestleag_state>();
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 
 	/*
 
@@ -118,7 +120,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 	int offs;
 
-	for (offs = 0x16/2;offs < machine->generic.spriteram_size/2;offs += 4)
+	for (offs = 0x16/2;offs < state->spriteram_size/2;offs += 4)
 	{
 		int code = spriteram16[offs+3] & 0xfff;
 		int color = (spriteram16[offs+2] & 0xf000) >> 12;
@@ -233,7 +235,7 @@ static ADDRESS_MAP_START( bestleag_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(bestleag_txram_w) AM_BASE_MEMBER(bestleag_state, txram)
 	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_BASE_MEMBER(bestleag_state, vregs)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE_MEMBER(bestleag_state, spriteram, spriteram_size)
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")

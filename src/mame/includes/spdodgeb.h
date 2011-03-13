@@ -27,6 +27,8 @@ public:
 	int sprite_palbank;
 	tilemap_t *bg_tilemap;
 	int lastscroll;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

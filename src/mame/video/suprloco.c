@@ -190,7 +190,7 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 	short skip;	/* bytes to skip before drawing each row (can be negative) */
 
 
-	spr_reg	= machine->generic.spriteram.u8 + 0x10 * spr_number;
+	spr_reg	= state->spriteram + 0x10 * spr_number;
 
 	src = spr_reg[SPR_GFXOFS_LO] + (spr_reg[SPR_GFXOFS_HI] << 8);
 	skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
@@ -256,13 +256,14 @@ static void draw_sprite(running_machine *machine, bitmap_t *bitmap,const rectang
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	suprloco_state *state = machine->driver_data<suprloco_state>();
 	int spr_number;
 	UINT8 *spr_reg;
 
 
-	for (spr_number = 0;spr_number < (machine->generic.spriteram_size >> 4);spr_number++)
+	for (spr_number = 0;spr_number < (state->spriteram_size >> 4);spr_number++)
 	{
-		spr_reg = machine->generic.spriteram.u8 + 0x10 * spr_number;
+		spr_reg = state->spriteram + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)
 			draw_sprite(machine, bitmap, cliprect, spr_number);
 	}

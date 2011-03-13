@@ -77,6 +77,7 @@ public:
 	tilemap_t *txttilemap;
 	UINT8 *scrollram;
 	UINT8 *mainram;
+	UINT8 *spriteram;
 };
 
 
@@ -188,7 +189,7 @@ static WRITE8_HANDLER(t5182shared_w)
 
 static ADDRESS_MAP_START( panicr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE_MEMBER(panicr_state, mainram)
-	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE_MEMBER(panicr_state, spriteram)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION("user3", 0) //attribue map ?
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_MEMBER(panicr_state, videoram)
@@ -218,7 +219,7 @@ static VIDEO_START( panicr )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
 	panicr_state *state = machine->driver_data<panicr_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs,flipx,flipy,x,y,color,sprite;
 
 	for (offs = 0; offs<0x1000; offs+=16)

@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( burglarx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP												// IRQ Ack
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram_w) AM_BASE_MEMBER(unico_state, vram)		// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM														// ? 0
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_MEMBER(unico_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
 ADDRESS_MAP_END
 
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( zeropnt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITEONLY	// ? IRQ Ack
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram_w) AM_BASE_MEMBER(unico_state, vram)	// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM	// ? 0
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_MEMBER(unico_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
 ADDRESS_MAP_END
 
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( zeropnt2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8001f0, 0x8001f3) AM_DEVWRITE("eeprom", zeropnt2_eeprom_w)					// EEPROM
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE(unico_vram32_w) AM_BASE_MEMBER(unico_state, vram32)	// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM											// ? 0
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_MEMBER(unico_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE(unico_palette32_w) AM_BASE_GENERIC(paletteram )	// Palette
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM											// RAM
 ADDRESS_MAP_END

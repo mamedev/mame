@@ -222,7 +222,8 @@ static WRITE32_HANDLER( mlc_irq_w )
 
 static READ32_HANDLER(mlc_spriteram_r)
 {
-	return space->machine->generic.spriteram.u32[offset]&0xffff;
+	deco_mlc_state *state = space->machine->driver_data<deco_mlc_state>();
+	return state->spriteram[offset]&0xffff;
 }
 
 static READ32_HANDLER(mlc_vram_r)
@@ -267,7 +268,7 @@ static ADDRESS_MAP_START( decomlc_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)	AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE_MEMBER(deco_mlc_state, irq_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_BASE_MEMBER(deco_mlc_state, mlc_clip_ram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0204000, 0x0206fff) AM_RAM_READ(mlc_spriteram_r) AM_BASE_SIZE_GENERIC(spriteram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0204000, 0x0206fff) AM_RAM_READ(mlc_spriteram_r) AM_BASE_SIZE_MEMBER(deco_mlc_state, spriteram, spriteram_size) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0280000, 0x029ffff) AM_RAM_READ(mlc_vram_r) AM_BASE_MEMBER(deco_mlc_state, mlc_vram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_BASE_GENERIC(paletteram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)

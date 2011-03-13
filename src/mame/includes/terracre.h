@@ -13,6 +13,7 @@ public:
 	UINT16 yscroll;
 	tilemap_t *background;
 	tilemap_t *foreground;
+	UINT16 *spriteram;
 };
 
 

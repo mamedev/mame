@@ -18,7 +18,7 @@
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri_mask,int pri_val)
 {
 	stadhero_state *state = machine->driver_data<stadhero_state>();
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
 	for (offs = 0;offs < 0x400;offs += 4)

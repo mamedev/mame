@@ -216,7 +216,7 @@ VIDEO_START( screwloo )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	gottlieb_state *state = machine->driver_data<gottlieb_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	rectangle clip = *cliprect;
     int offs;
 

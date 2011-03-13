@@ -11,6 +11,8 @@ public:
 	int palette_bank;
 	tilemap_t *fg_tilemap;
 	tilemap_t *bg_tilemap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

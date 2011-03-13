@@ -15,6 +15,8 @@ public:
 	tilemap_t *txt_tilemap;
 	UINT8 xscroll[2];
 	UINT8 yscroll[2];
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

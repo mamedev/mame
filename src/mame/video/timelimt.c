@@ -118,10 +118,11 @@ WRITE8_HANDLER( timelimt_scroll_y_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	timelimt_state *state = machine->driver_data<timelimt_state>();
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for( offs = machine->generic.spriteram_size; offs >= 0; offs -= 4 )
+	for( offs = state->spriteram_size; offs >= 0; offs -= 4 )
 	{
 		int sy = 240 - spriteram[offs];
 		int sx = spriteram[offs+3];

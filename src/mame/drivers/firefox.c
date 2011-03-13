@@ -55,6 +55,7 @@ public:
 	UINT8 sound_to_main_flag;
 	UINT8 main_to_sound_flag;
 	int sprite_bank;
+	UINT8 *spriteram;
 };
 
 
@@ -191,7 +192,7 @@ static SCREEN_UPDATE( firefox )
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
-		UINT8 *sprite_data = screen->machine->generic.spriteram.u8 + ( 0x200 * state->sprite_bank ) + ( sprite * 16 );
+		UINT8 *sprite_data = state->spriteram + ( 0x200 * state->sprite_bank ) + ( sprite * 16 );
 		int flags = sprite_data[ 0 ];
 		int y = sprite_data[ 1 ] + ( 256 * ( ( flags >> 0 ) & 1 ) );
 		int x = sprite_data[ 2 ] + ( 256 * ( ( flags >> 1 ) & 1 ) );
@@ -489,7 +490,7 @@ static MACHINE_START( firefox )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_BASE_MEMBER(firefox_state, tileram)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_MEMBER(firefox_state, spriteram)
 	AM_RANGE(0x2800, 0x2aff) AM_RAM_WRITE(sprite_palette_w) AM_BASE_MEMBER(firefox_state, sprite_palette)
 	AM_RANGE(0x2b00, 0x2b00) AM_MIRROR(0x04ff) AM_WRITE(firefox_objram_bank_w)
 	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE(tile_palette_w) AM_BASE_MEMBER(firefox_state, tile_palette)

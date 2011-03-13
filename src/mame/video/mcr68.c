@@ -197,10 +197,11 @@ WRITE16_HANDLER( zwackery_videoram_w )
 
 WRITE16_HANDLER( zwackery_spriteram_w )
 {
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
 	/* yech -- Zwackery relies on the upper 8 bits of a spriteram read being $ff! */
 	/* to make this happen we always write $ff in the upper 8 bits */
-	COMBINE_DATA(&space->machine->generic.spriteram.u16[offset]);
-	space->machine->generic.spriteram.u16[offset] |= 0xff00;
+	COMBINE_DATA(&state->spriteram[offset]);
+	state->spriteram[offset] |= 0xff00;
 }
 
 
@@ -215,7 +216,7 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 {
 	mcr68_state *state = machine->driver_data<mcr68_state>();
 	rectangle sprite_clip = machine->primary_screen->visible_area();
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
 	/* adjust for clipping */
@@ -226,7 +227,7 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 	bitmap_fill(machine->priority_bitmap,&sprite_clip,1);
 
 	/* loop over sprite RAM */
-	for (offs = machine->generic.spriteram_size / 2 - 4;offs >= 0;offs -= 4)
+	for (offs = state->spriteram_size / 2 - 4;offs >= 0;offs -= 4)
 	{
 		int code, color, flipx, flipy, x, y, flags;
 
@@ -267,13 +268,14 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	mcr68_state *state = machine->driver_data<mcr68_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
 	bitmap_fill(machine->priority_bitmap,cliprect,1);
 
 	/* loop over sprite RAM */
-	for (offs = machine->generic.spriteram_size / 2 - 4;offs >= 0;offs -= 4)
+	for (offs = state->spriteram_size / 2 - 4;offs >= 0;offs -= 4)
 	{
 		int code, color, flipx, flipy, x, y, flags;
 

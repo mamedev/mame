@@ -184,8 +184,9 @@ VIDEO_START( tryout )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
-	UINT8 *spriteram_2 = machine->generic.spriteram2.u8;
+	tryout_state *state = machine->driver_data<tryout_state>();
+	UINT8 *spriteram = state->spriteram;
+	UINT8 *spriteram_2 = state->spriteram2;
 	int offs,fx,fy,x,y,color,sprite,inc;
 
 	for (offs = 0;offs < 0x7f;offs += 4)

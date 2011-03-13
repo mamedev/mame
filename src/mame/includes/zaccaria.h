@@ -13,6 +13,8 @@ public:
 	UINT8 *videoram;
 	UINT8 *attributesram;
 	tilemap_t *bg_tilemap;
+	UINT8 *spriteram;
+	UINT8 *spriteram2;
 };
 
 

@@ -29,7 +29,7 @@ static ADDRESS_MAP_START( dcon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x8d000, 0x8d7ff) AM_RAM_WRITE(dcon_midground_w) AM_BASE_MEMBER(dcon_state, mid_data)
 	AM_RANGE(0x8d800, 0x8e7ff) AM_RAM_WRITE(dcon_text_w) AM_BASE_MEMBER(dcon_state, textram)
 	AM_RANGE(0x8e800, 0x8f7ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8f800, 0x8ffff) AM_RAM AM_BASE_SIZE_MEMBER(dcon_state, spriteram, spriteram_size)
 	AM_RANGE(0x9d000, 0x9d7ff) AM_WRITE(dcon_gfxbank_w)
 
 	AM_RANGE(0xa0000, 0xa000d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)

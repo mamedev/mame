@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( chinhero_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE(&shangkid_videoreg)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(shangkid_state, spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE(&shangkid_videoreg)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(shangkid_state, spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 /***************************************************************************************/

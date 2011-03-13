@@ -29,6 +29,19 @@
 #include "sound/okim6295.h"
 #include "cpu/mcs51/mcs51.h"
 
+
+class limenko_state : public driver_device
+{
+public:
+	limenko_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *spriteram;
+	UINT32 *spriteram2;
+	size_t spriteram_size;
+};
+
+
 static tilemap_t *bg_tilemap, *md_tilemap, *fg_tilemap;
 static UINT32 *bg_videoram, *md_videoram, *fg_videoram, *limenko_videoreg;
 
@@ -99,6 +112,7 @@ static CUSTOM_INPUT( spriteram_bit_r )
 
 static WRITE32_HANDLER( spriteram_buffer_w )
 {
+	limenko_state *state = space->machine->driver_data<limenko_state>();
 	rectangle clip;
 	clip.min_x = 0;
 	clip.max_x = 383;
@@ -114,12 +128,12 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 	if(spriteram_bit)
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(space->machine,space->machine->generic.spriteram2.u32,&clip,prev_sprites_count);
+		draw_sprites(space->machine,state->spriteram2,&clip,prev_sprites_count);
 	}
 	else
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(space->machine,space->machine->generic.spriteram.u32,&clip,prev_sprites_count);
+		draw_sprites(space->machine,state->spriteram,&clip,prev_sprites_count);
 	}
 
 	// buffer the next number of sprites to draw
@@ -136,8 +150,8 @@ static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_MEMBER(limenko_state, spriteram, spriteram_size)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_MEMBER(limenko_state, spriteram2)
 	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
@@ -163,8 +177,8 @@ static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_MEMBER(limenko_state, spriteram, spriteram_size)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_MEMBER(limenko_state, spriteram2)
 	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
@@ -640,7 +654,7 @@ GFXDECODE_END
 *****************************************************************************************************/
 
 
-static MACHINE_CONFIG_START( limenko, driver_device )
+static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(limenko_map)
 	MCFG_CPU_IO_MAP(limenko_io_map)
@@ -665,7 +679,7 @@ static MACHINE_CONFIG_START( limenko, driver_device )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spotty, driver_device )
+static MACHINE_CONFIG_START( spotty, limenko_state )
 	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(spotty_map)
 	MCFG_CPU_IO_MAP(spotty_io_map)

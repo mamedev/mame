@@ -12,6 +12,7 @@ public:
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
 //  UINT8 *     nvram;    // currently cuebrick uses generic nvram handling
 //  UINT8 *     cuebrick_nvram;
+	UINT16 *spriteram;
 
 	/* video-related */
 	int        layer_colorbase[3], sprite_colorbase;

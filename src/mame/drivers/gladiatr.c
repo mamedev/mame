@@ -376,7 +376,7 @@ static MACHINE_RESET( ppking )
 
 static ADDRESS_MAP_START( ppking_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_MEMBER(gladiatr_state, spriteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE_MEMBER(gladiatr_state, videoram)
@@ -414,7 +414,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gladiatr_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_MEMBER(gladiatr_state, spriteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(gladiatr_video_registers_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE_MEMBER(gladiatr_state, videoram)

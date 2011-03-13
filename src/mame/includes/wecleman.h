@@ -36,6 +36,7 @@ public:
 	pen_t black_pen;
 	struct sprite *sprite_list;
 	struct sprite **spr_ptr_list;
+	UINT16 *spriteram;
 };
 
 

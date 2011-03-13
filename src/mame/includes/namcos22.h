@@ -29,6 +29,16 @@ extern enum namcos22_gametype
 
 #define NAMCOS22_PALETTE_SIZE 0x8000
 
+class namcos22_state : public driver_device
+{
+public:
+	namcos22_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *spriteram;
+};
+
+
 /*----------- defined in video/namcos22.c -----------*/
 
 extern UINT32 *namcos22_cgram;

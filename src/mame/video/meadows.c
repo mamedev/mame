@@ -65,8 +65,9 @@ WRITE8_HANDLER( meadows_videoram_w )
 
 WRITE8_HANDLER( meadows_spriteram_w )
 {
+	meadows_state *state = space->machine->driver_data<meadows_state>();
 	space->machine->primary_screen->update_now();
-	space->machine->generic.spriteram.u8[offset] = data;
+	state->spriteram[offset] = data;
 }
 
 
@@ -79,7 +80,8 @@ WRITE8_HANDLER( meadows_spriteram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *clip)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	meadows_state *state = machine->driver_data<meadows_state>();
+	UINT8 *spriteram = state->spriteram;
 	int i;
 
 	for (i = 0; i < 4; i++)

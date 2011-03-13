@@ -221,12 +221,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd3ff) AM_BASE_MEMBER(wiz_state, videoram2)					/* Fallthrough */
 	AM_RANGE(0xd400, 0xd7ff) AM_BASE_MEMBER(wiz_state, colorram2)
 	AM_RANGE(0xd800, 0xd83f) AM_BASE_MEMBER(wiz_state, attributesram2)
-	AM_RANGE(0xd840, 0xd85f) AM_BASE_GENERIC(spriteram2) AM_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd840, 0xd85f) AM_BASE_MEMBER(wiz_state, spriteram2) AM_SIZE_MEMBER(wiz_state, spriteram)
 	AM_RANGE(0xd000, 0xd85f) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_BASE_MEMBER(wiz_state, videoram)	/* Fallthrough */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe83f) AM_BASE_MEMBER(wiz_state, attributesram)
-	AM_RANGE(0xe840, 0xe85f) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xe840, 0xe85f) AM_BASE_MEMBER(wiz_state, spriteram)
 	AM_RANGE(0xe000, 0xe85f) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE_MEMBER(wiz_state, sprite_bank)

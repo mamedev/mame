@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd683, 0xd683) AM_WRITE(t5182_sharedram_semaphore_main_release_w)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(darkmist_state, videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(darkmist_state, workram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(darkmist_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 

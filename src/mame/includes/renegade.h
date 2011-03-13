@@ -34,6 +34,7 @@ public:
 	INT32 scrollx;
 	tilemap_t *bg_tilemap;
 	tilemap_t *fg_tilemap;
+	UINT8 *spriteram;
 };
 
 

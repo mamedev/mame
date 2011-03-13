@@ -470,8 +470,9 @@ static void pdraw_tile(running_machine *machine,
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	namcona1_state *state = machine->driver_data<namcona1_state>();
 	int which;
-	const UINT16 *source = machine->generic.spriteram.u16;
+	const UINT16 *source = state->spriteram;
 	UINT16 sprite_control;
 	UINT16 ypos,tile,color,xpos;
 	int priority;

@@ -38,7 +38,8 @@ x = xpos
  its the same sprite chip Data East used on many, many 16-bit era titles */
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect )
 {
-	UINT32 *spriteram = machine->generic.spriteram.u32;
+	simpl156_state *state = machine->driver_data<simpl156_state>();
+	UINT32 *spriteram = state->spriteram;
 	int offs;
 
 	//FIXME: flip_screen_x should not be written!

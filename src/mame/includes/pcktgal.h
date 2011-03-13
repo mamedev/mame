@@ -8,6 +8,8 @@ public:
 	int msm5205next;
 	int toggle;
 	tilemap_t *bg_tilemap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

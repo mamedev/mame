@@ -122,6 +122,7 @@ public:
 	UINT8 *sprite_bank[2];
 
 	UINT8 palettebank_vis;
+	UINT8 *spriteram;
 };
 
 

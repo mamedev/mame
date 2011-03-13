@@ -528,7 +528,7 @@ static void mycopyrozbitmap_core(bitmap_t *bitmap,bitmap_t *srcbitmap,
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int write_priority_only, int rambank)
 {
 	tatsumi_state *state = machine->driver_data<tatsumi_state>();
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 	int offs,fx,x,y,color;
 	int w,h,index,lines,scale,rotate;
 	UINT8 *src1, *src2;

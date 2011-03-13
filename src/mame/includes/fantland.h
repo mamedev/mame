@@ -25,6 +25,8 @@ public:
 	device_t *msm2;
 	device_t *msm3;
 	device_t *msm4;
+	UINT8 *spriteram;
+	UINT8 *spriteram2;
 };
 
 

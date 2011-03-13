@@ -46,6 +46,8 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT32 *videoram;
+	UINT32 *spriteram;
+	size_t spriteram_size;
 };
 
 

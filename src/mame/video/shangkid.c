@@ -177,10 +177,11 @@ static void draw_sprite(running_machine *machine, const UINT8 *source, bitmap_t 
 
 static void shangkid_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	shangkid_state *state = machine->driver_data<shangkid_state>();
 	const UINT8 *source, *finish;
 
-	finish = machine->generic.spriteram.u8;
-	source = machine->generic.spriteram.u8+0x200;
+	finish = state->spriteram;
+	source = state->spriteram+0x200;
 	while( source>finish ){
 		source -= 8;
 		draw_sprite(machine, source, bitmap,cliprect );

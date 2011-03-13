@@ -30,6 +30,7 @@ public:
 	UINT8 drawmode_table[16];
 	int debugsprites;
 	int show_unknown;
+	UINT16 *spriteram;
 };
 
 

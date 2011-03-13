@@ -994,7 +994,7 @@ static const namco_interface namco_config =
 };
 
 
-static MACHINE_CONFIG_START( hopmappy, driver_device )
+static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", M6809, 49152000/32)

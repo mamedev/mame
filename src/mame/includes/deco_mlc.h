@@ -15,6 +15,8 @@ public:
 	UINT32 *mlc_clip_ram;
 	UINT32 colour_mask;
 	UINT32 *mlc_buffered_spriteram;
+	UINT32 *spriteram;
+	size_t spriteram_size;
 };
 
 

@@ -6,6 +6,7 @@ public:
 
 	UINT16 *videoram;
 	tilemap_t *bg_tilemap;
+	UINT16 *spriteram;
 };
 
 

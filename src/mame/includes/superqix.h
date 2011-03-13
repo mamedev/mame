@@ -30,6 +30,8 @@ public:
 	int show_bitmap;
 	tilemap_t *bg_tilemap;
 	int last_power[2];
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

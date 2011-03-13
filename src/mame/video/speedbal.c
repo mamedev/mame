@@ -86,12 +86,13 @@ WRITE8_HANDLER( speedbal_background_videoram_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	speedbal_state *state = machine->driver_data<speedbal_state>();
+	UINT8 *spriteram = state->spriteram;
 	int x,y,code,color,offset,flipx,flipy;
 
 	/* Drawing sprites: 64 in total */
 
-	for (offset = 0;offset < machine->generic.spriteram_size;offset += 4)
+	for (offset = 0;offset < state->spriteram_size;offset += 4)
 	{
 		if(!(spriteram[offset + 2] & 0x80))
 			continue;

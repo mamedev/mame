@@ -24,6 +24,8 @@ public:
 	int sx1;
 	int sy1;
 	int sy2;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

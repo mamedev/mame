@@ -153,7 +153,8 @@ VIDEO_START( dcon )
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	dcon_state *state = machine->driver_data<dcon_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay,inc,pri_mask = 0;
 

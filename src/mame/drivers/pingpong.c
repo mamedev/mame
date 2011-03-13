@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( pingpong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_MEMBER(pingpong_state, colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_MEMBER(pingpong_state, videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
-	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_MEMBER(pingpong_state, spriteram, spriteram_size)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa880, 0xa880) AM_READ_PORT("INPUTS")
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_MEMBER(pingpong_state, colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_MEMBER(pingpong_state, videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
-	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_MEMBER(pingpong_state, spriteram, spriteram_size)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* irq enables */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")

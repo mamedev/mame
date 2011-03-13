@@ -67,7 +67,7 @@ Heavy use is made of sprite zooming.
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	undrfire_state *state = machine->driver_data<undrfire_state>();
-	UINT32 *spriteram32 = machine->generic.spriteram.u32;
+	UINT32 *spriteram32 = state->spriteram;
 	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
@@ -80,7 +80,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
        while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = state->spritelist;
 
-	for (offs = (machine->generic.spriteram_size/4-4);offs >= 0;offs -= 4)
+	for (offs = (state->spriteram_size/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;
@@ -211,7 +211,7 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,const int *primasks,int x_offs,int y_offs)
 {
 	undrfire_state *state = machine->driver_data<undrfire_state>();
-	UINT32 *spriteram32 = machine->generic.spriteram.u32;
+	UINT32 *spriteram32 = state->spriteram;
 	UINT16 *spritemap = (UINT16 *)machine->region("user1")->base();
 	UINT8 *spritemapHibit = (UINT8 *)machine->region("user2")->base();
 
@@ -226,7 +226,7 @@ static void draw_sprites_cbombers(running_machine *machine, bitmap_t *bitmap,con
        while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = state->spritelist;
 
-	for (offs = (machine->generic.spriteram_size/4-4);offs >= 0;offs -= 4)
+	for (offs = (state->spriteram_size/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;

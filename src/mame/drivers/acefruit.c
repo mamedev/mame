@@ -14,6 +14,17 @@ Inputs and Dip Switches by Stephh
 
 #include "sidewndr.lh"
 
+
+class acefruit_state : public driver_device
+{
+public:
+	acefruit_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *spriteram;
+};
+
+
 static UINT8 *colorram;
 static UINT8 *videoram;
 
@@ -63,6 +74,7 @@ static INTERRUPT_GEN( acefruit_vblank )
 
 static SCREEN_UPDATE( acefruit )
 {
+	acefruit_state *state = screen->machine->driver_data<acefruit_state>();
 	int startrow = cliprect->min_y / 8;
 	int endrow = cliprect->max_y / 8;
 	int row;
@@ -94,7 +106,7 @@ static SCREEN_UPDATE( acefruit )
 
 				for( x = 0; x < 16; x++ )
 				{
-					int sprite = ( screen->machine->generic.spriteram.u8[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
+					int sprite = ( state->spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
 					const UINT8 *gfxdata = gfx_element_get_data(gfx, sprite);
 
 					for( y = 0; y < 8; y++ )
@@ -270,7 +282,7 @@ static ADDRESS_MAP_START( acefruit_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("IN5")
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("IN6")
 	AM_RANGE(0x8007, 0x8007) AM_READ_PORT("IN7")
-	AM_RANGE(0x6000, 0x6005) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x6000, 0x6005) AM_RAM AM_BASE_MEMBER(acefruit_state, spriteram)
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(acefruit_lamp_w)
 	AM_RANGE(0xa002, 0xa003) AM_WRITE(acefruit_coin_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(acefruit_solenoid_w)
@@ -548,7 +560,7 @@ static GFXDECODE_START( acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( acefruit, driver_device )
+static MACHINE_CONFIG_START( acefruit, acefruit_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */

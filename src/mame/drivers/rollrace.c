@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( rollrace_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE_MEMBER(rollrace_state, colorram)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_MEMBER(rollrace_state, spriteram, spriteram_size)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(rollrace_backgroundcolor_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(rollrace_bkgpen_w)

@@ -12,6 +12,8 @@ public:
 	tilemap_t *bgtilemap;
 	tilemap_t *fgtilemap;
 	tilemap_t *txtilemap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

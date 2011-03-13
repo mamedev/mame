@@ -11,6 +11,7 @@ public:
 	tilemap_t *pf1_tilemap;
 	tilemap_t *pf2_tilemap;
 	int flipscreen;
+	UINT16 *spriteram;
 };
 
 

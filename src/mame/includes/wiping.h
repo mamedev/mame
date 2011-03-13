@@ -10,6 +10,8 @@ public:
 	UINT8 *colorram;
 	int flipscreen;
 	UINT8 *soundregs;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

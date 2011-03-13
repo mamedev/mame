@@ -22,6 +22,7 @@ public:
 	UINT8			playfield_flip;
 
 	UINT8			whichport;
+	UINT16 *spriteram;
 };
 
 

@@ -27,6 +27,7 @@ public:
 	UINT8* robokid_bg0_videoram;
 	UINT8* robokid_bg1_videoram;
 	UINT8* robokid_bg2_videoram;
+	UINT8 *spriteram;
 };
 
 

@@ -23,6 +23,8 @@ public:
 	UINT16 scroll2_y_w;
 	UINT16 scroll_char_x_w;
 	UINT16 scroll_char_y_w;
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 

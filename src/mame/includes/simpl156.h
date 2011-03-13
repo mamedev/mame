@@ -23,6 +23,8 @@ public:
 	UINT16 *  pf2_rowscroll;
 	UINT32 *  mainram;
 	UINT32 *  systemram;
+	UINT32 *spriteram;
+	size_t spriteram_size;
 
 	/* devices */
 	required_device<cpu_device> maincpu;

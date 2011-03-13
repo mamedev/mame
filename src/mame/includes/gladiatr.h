@@ -24,6 +24,7 @@ public:
 	tilemap_t *bg_tilemap;
 	int fg_tile_bank;
 	int bg_tile_bank;
+	UINT8 *spriteram;
 };
 
 /*----------- defined in video/gladiatr.c -----------*/

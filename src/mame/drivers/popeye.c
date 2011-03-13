@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( skyskipr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE_MEMBER(popeye_state, background_pos)
 	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE_MEMBER(popeye_state, palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_MEMBER(popeye_state, spriteram, spriteram_size)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_MEMBER(popeye_state, videoram)
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_MEMBER(popeye_state, colorram)
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( popeye_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE_MEMBER(popeye_state, background_pos)
 	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE_MEMBER(popeye_state, palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_MEMBER(popeye_state, spriteram, spriteram_size)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_MEMBER(popeye_state, videoram)
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_MEMBER(popeye_state, colorram)
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( popeyebl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE_MEMBER(popeye_state, background_pos)
 	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE_MEMBER(popeye_state, palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_MEMBER(popeye_state, spriteram, spriteram_size)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_MEMBER(popeye_state, videoram)
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_MEMBER(popeye_state, colorram)

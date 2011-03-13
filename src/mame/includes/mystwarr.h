@@ -18,6 +18,7 @@ public:
 	int roz_rombank;
 	tilemap_t *ult_936_tilemap;
 	UINT16 clip;
+	UINT16 *spriteram;
 };
 
 

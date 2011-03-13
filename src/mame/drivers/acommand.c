@@ -76,6 +76,8 @@ public:
 	UINT16 *ac_devram;
 	UINT16 ufo_sw1;
 	UINT16 ufo_sw2;
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 
@@ -110,10 +112,11 @@ static TILE_GET_INFO( ac_get_tx_tile_info )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int pri_mask)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	acommand_state *state = machine->driver_data<acommand_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
-	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 8)
+	for (offs = 0;offs < state->spriteram_size/2;offs += 8)
 	{
 		if (!(spriteram16[offs+0] & 0x1000))
 		{
@@ -456,7 +459,7 @@ static ADDRESS_MAP_START( acommand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(ac_txvram_w) AM_BASE_MEMBER(acommand_state, ac_txvram)
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_BASE_SIZE_MEMBER(acommand_state, spriteram, spriteram_size)
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x1000ff) AM_READ(ac_devices_r) AM_WRITE(ac_devices_w) AM_BASE_MEMBER(acommand_state, ac_devram)
 ADDRESS_MAP_END

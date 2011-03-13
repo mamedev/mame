@@ -13,6 +13,8 @@ public:
 	int rear_disable;
 	int rear_refresh;
 	bitmap_t *bg_bitmap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

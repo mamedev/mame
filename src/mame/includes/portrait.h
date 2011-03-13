@@ -9,6 +9,8 @@ public:
 	int scroll;
 	tilemap_t *foreground;
 	tilemap_t *background;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

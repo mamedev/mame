@@ -24,6 +24,17 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
 
+
+class r2dx_v33_state : public driver_device
+{
+public:
+	r2dx_v33_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *spriteram;
+};
+
+
 static UINT16 *seibu_crtc_regs;
 static UINT16 *bg_vram,*md_vram,*fg_vram,*tx_vram;
 static tilemap_t *bg_tilemap,*md_tilemap,*fg_tilemap,*tx_tilemap;
@@ -71,7 +82,8 @@ static TILE_GET_INFO( get_tx_tile_info )
 /* copied from Legionnaire */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	r2dx_v33_state *state = machine->driver_data<r2dx_v33_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 //  int cur_pri;
 	int dx,dy,ax,ay;
@@ -373,7 +385,7 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
@@ -446,7 +458,7 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
@@ -639,7 +651,7 @@ static INPUT_PORTS_START( nzerotea )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( rdx_v33, driver_device )
+static MACHINE_CONFIG_START( rdx_v33, r2dx_v33_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
@@ -671,7 +683,7 @@ static MACHINE_CONFIG_START( rdx_v33, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nzerotea, driver_device )
+static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V33,XTAL_32MHz/2) /* verified on pcb */

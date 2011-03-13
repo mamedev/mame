@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( flower_cpu1_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa103, 0xa103) AM_READ_PORT("IN1CPU0")
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc000, 0xddff) AM_SHARE("share1") AM_RAM
-	AM_RANGE(0xde00, 0xdfff) AM_SHARE("share2") AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0xde00, 0xdfff) AM_SHARE("share2") AM_RAM AM_BASE_MEMBER(flower_state, spriteram)
 	AM_RANGE(0xe000, 0xe7ff) AM_SHARE("share3") AM_RAM_WRITE(flower_textram_w)  AM_BASE(&flower_textram)
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share4") AM_RAM //only cleared?
 	AM_RANGE(0xf000, 0xf1ff) AM_SHARE("share5") AM_RAM_WRITE(flower_bg0ram_w)   AM_BASE(&flower_bg0ram)
@@ -238,7 +238,7 @@ static INTERRUPT_GEN( flower_cpu0_interrupt )
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( flower, driver_device )
+static MACHINE_CONFIG_START( flower, flower_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)

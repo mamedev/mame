@@ -127,6 +127,7 @@ static TILE_GET_INFO( get_tile_info3 ) { get_tile_info(machine,tileinfo,tile_ind
 
 VIDEO_START( namcos86 )
 {
+	namcos86_state *state = machine->driver_data<namcos86_state>();
 	bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
 	bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,32);
 	bg_tilemap[2] = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,8,8,64,32);
@@ -137,7 +138,7 @@ VIDEO_START( namcos86 )
 	tilemap_set_transparent_pen(bg_tilemap[2],7);
 	tilemap_set_transparent_pen(bg_tilemap[3],7);
 
-	machine->generic.spriteram.u8 = rthunder_spriteram + 0x1800;
+	state->spriteram = rthunder_spriteram + 0x1800;
 }
 
 
@@ -265,12 +266,13 @@ sprite format:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	const UINT8 *source = &machine->generic.spriteram.u8[0x0800-0x20];	/* the last is NOT a sprite */
-	const UINT8 *finish = &machine->generic.spriteram.u8[0];
+	namcos86_state *state = machine->driver_data<namcos86_state>();
+	const UINT8 *source = &state->spriteram[0x0800-0x20];	/* the last is NOT a sprite */
+	const UINT8 *finish = &state->spriteram[0];
 	gfx_element *gfx = machine->gfx[2];
 
-	int sprite_xoffs = machine->generic.spriteram.u8[0x07f5] + ((machine->generic.spriteram.u8[0x07f4] & 1) << 8);
-	int sprite_yoffs = machine->generic.spriteram.u8[0x07f7];
+	int sprite_xoffs = state->spriteram[0x07f5] + ((state->spriteram[0x07f4] & 1) << 8);
+	int sprite_yoffs = state->spriteram[0x07f7];
 
 	int bank_sprites = machine->gfx[2]->total_elements / 8;
 
@@ -343,11 +345,12 @@ static void set_scroll(running_machine *machine, int layer)
 
 SCREEN_UPDATE( namcos86 )
 {
+	namcos86_state *state = screen->machine->driver_data<namcos86_state>();
 	int layer;
 
 	/* flip screen is embedded in the sprite control registers */
 	/* can't use flip_screen_set(screen->machine, ) because the visible area is asymmetrical */
-	flip_screen_set_no_update(screen->machine, screen->machine->generic.spriteram.u8[0x07f6] & 1);
+	flip_screen_set_no_update(screen->machine, state->spriteram[0x07f6] & 1);
 	tilemap_set_flip_all(screen->machine,flip_screen_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	set_scroll(screen->machine, 0);
 	set_scroll(screen->machine, 1);
@@ -376,9 +379,10 @@ SCREEN_UPDATE( namcos86 )
 
 SCREEN_EOF( namcos86 )
 {
+	namcos86_state *state = machine->driver_data<namcos86_state>();
 	if (copy_sprites)
 	{
-		UINT8 *spriteram = machine->generic.spriteram.u8;
+		UINT8 *spriteram = state->spriteram;
 		int i,j;
 
 		for (i = 0;i < 0x800;i += 16)

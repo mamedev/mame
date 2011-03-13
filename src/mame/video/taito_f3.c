@@ -579,25 +579,27 @@ static TILE_GET_INFO( get_tile_info_pixel )
 
 SCREEN_EOF( f3 )
 {
+	taito_f3_state *state = machine->driver_data<taito_f3_state>();
 	if (sprite_lag==2)
 	{
 		if (machine->video().skip_this_frame() == 0)
 		{
 			get_sprite_info(machine, spriteram32_buffered);
 		}
-		memcpy(spriteram32_buffered,machine->generic.spriteram.u32,machine->generic.spriteram_size);
+		memcpy(spriteram32_buffered,state->spriteram,state->spriteram_size);
 	}
 	else if (sprite_lag==1)
 	{
 		if (machine->video().skip_this_frame() == 0)
 		{
-			get_sprite_info(machine, machine->generic.spriteram.u32);
+			get_sprite_info(machine, state->spriteram);
 		}
 	}
 }
 
 VIDEO_START( f3 )
 {
+	taito_f3_state *state = machine->driver_data<taito_f3_state>();
 	const struct F3config *pCFG=&f3_config_table[0];
 	int width, height, i;
 
@@ -695,8 +697,8 @@ VIDEO_START( f3 )
 	machine->gfx[2]->color_granularity=16;
 
 	flipscreen = 0;
-	memset(spriteram32_buffered,0,machine->generic.spriteram_size);
-	memset(machine->generic.spriteram.u32,0,machine->generic.spriteram_size);
+	memset(spriteram32_buffered,0,state->spriteram_size);
+	memset(state->spriteram,0,state->spriteram_size);
 
 	state_save_register_global_array(machine, f3_control_0);
 	state_save_register_global_array(machine, f3_control_1);
@@ -3233,6 +3235,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( f3 )
 {
+	taito_f3_state *state = screen->machine->driver_data<taito_f3_state>();
 	UINT32 sy_fix[5],sx_fix[5];
 
 	f3_skip_this_frame=0;
@@ -3273,7 +3276,7 @@ SCREEN_UPDATE( f3 )
 
 	/* sprites */
 	if (sprite_lag==0)
-		get_sprite_info(screen->machine, screen->machine->generic.spriteram.u32);
+		get_sprite_info(screen->machine, state->spriteram);
 
 	/* Update sprite buffer */
 	draw_sprites(screen->machine, bitmap,cliprect);

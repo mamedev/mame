@@ -118,7 +118,7 @@ DIP locations verified for:
 static ADDRESS_MAP_START( bloodbro_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE_MEMBER(bloodbro_state, spriteram, spriteram_size)
 	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bloodbro_bgvideoram_w) AM_BASE_MEMBER(bloodbro_state, bgvideoram)
 	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
 	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(bloodbro_fgvideoram_w) AM_BASE_MEMBER(bloodbro_state, fgvideoram)
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( weststry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE_MEMBER(bloodbro_state, spriteram, spriteram_size)
 	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE(bloodbro_bgvideoram_w) AM_BASE_MEMBER(bloodbro_state, bgvideoram)
 	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
 	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE(bloodbro_fgvideoram_w) AM_BASE_MEMBER(bloodbro_state, fgvideoram)

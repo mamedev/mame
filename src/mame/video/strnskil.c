@@ -83,7 +83,8 @@ VIDEO_START( strnskil )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	strnskil_state *state = machine->driver_data<strnskil_state>();
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	for (offs = 0x60; offs < 0x100; offs += 4)

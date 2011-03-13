@@ -316,11 +316,12 @@ VIDEO_RESET( bombsa )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	psychic5_state *state = machine->driver_data<psychic5_state>();
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
+	for (offs = 0; offs < state->spriteram_size; offs += 16)
 	{
 		int attr  = spriteram[offs + 13];
 		int code  = spriteram[offs + 14] | ((attr & 0xc0) << 2);
@@ -370,7 +371,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	psychic5_state *state = machine->driver_data<psychic5_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 
 	rectangle clip = *cliprect;
 

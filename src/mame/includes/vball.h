@@ -15,6 +15,8 @@ public:
 	int vb_bgprombank;
 	int vb_spprombank;
 	tilemap_t *bg_tilemap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

@@ -172,7 +172,7 @@ WRITE8_HANDLER( tecmo_flipscreen_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	tecmo_state *state = machine->driver_data<tecmo_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 	static const UINT8 layout[8][8] =
 	{
@@ -186,7 +186,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 		{42,43,46,47,58,59,62,63}
 	};
 
-	for (offs = machine->generic.spriteram_size-8;offs >= 0;offs -= 8)
+	for (offs = state->spriteram_size-8;offs >= 0;offs -= 8)
 	{
 		int flags = spriteram[offs+3];
 		int priority = flags>>6;

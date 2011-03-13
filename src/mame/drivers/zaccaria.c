@@ -264,8 +264,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x6407) AM_READ(zaccaria_prot1_r)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(zaccaria_videoram_w) AM_BASE_MEMBER(zaccaria_state, videoram)	/* 6400-67ff is 4 bits wide */
 	AM_RANGE(0x6800, 0x683f) AM_WRITE(zaccaria_attributes_w) AM_BASE_MEMBER(zaccaria_state, attributesram)
-	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE_MEMBER(zaccaria_state, spriteram)
+	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_BASE_MEMBER(zaccaria_state, spriteram2)
 	AM_RANGE(0x6c00, 0x6c00) AM_WRITE(zaccaria_flip_screen_x_w)
 	AM_RANGE(0x6c01, 0x6c01) AM_WRITE(zaccaria_flip_screen_y_w)
 	AM_RANGE(0x6c02, 0x6c02) AM_WRITENOP    /* sound reset */

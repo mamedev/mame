@@ -18,6 +18,8 @@ public:
 	UINT8 bitmap_type;
 	tilemap_t *fg_tilemap;
 	UINT8 lastflip;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

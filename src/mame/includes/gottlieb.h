@@ -57,6 +57,7 @@ public:
 	UINT8 transparent0;
 	tilemap_t *bg_tilemap;
 	double weights[4];
+	UINT8 *spriteram;
 };
 
 

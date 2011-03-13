@@ -19,6 +19,7 @@ public:
 	tilemap_t *bg_tilemap_noscroll;
 	UINT8 flipx;
 	UINT8 flipy;
+	UINT8 *spriteram;
 };
 
 

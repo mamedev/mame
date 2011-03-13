@@ -163,7 +163,7 @@ SCREEN_UPDATE( gridlee )
 	gfx = screen->machine->region("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
-		UINT8 *sprite = screen->machine->generic.spriteram.u8 + i * 4;
+		UINT8 *sprite = state->spriteram + i * 4;
 		UINT8 *src;
 		int image = sprite[0];
 		int ypos = sprite[2] + 17 + GRIDLEE_VBEND;

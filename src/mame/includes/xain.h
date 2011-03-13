@@ -29,6 +29,8 @@ public:
 	UINT8 scrollyP0[2];
 	UINT8 scrollxP1[2];
 	UINT8 scrollyP1[2];
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

@@ -18,6 +18,7 @@ public:
 	emu_timer *crtc_timer;
 	UINT8 bins;
 	UINT8 gins;
+	UINT16 *spriteram;
 };
 
 

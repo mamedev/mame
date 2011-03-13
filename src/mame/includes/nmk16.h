@@ -35,6 +35,8 @@ public:
 	UINT8 scroll[4];
 	UINT8 scroll_2[4];
 	UINT16 vscroll[4];
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

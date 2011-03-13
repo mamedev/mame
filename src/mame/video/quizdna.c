@@ -141,10 +141,10 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	quizdna_state *state = machine->driver_data<quizdna_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = 0; offs<machine->generic.spriteram_size; offs+=8)
+	for (offs = 0; offs<state->spriteram_size; offs+=8)
 	{
 		int i;
 

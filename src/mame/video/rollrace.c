@@ -104,7 +104,7 @@ WRITE8_HANDLER( rollrace_flipx_w )
 SCREEN_UPDATE( rollrace )
 {
 	rollrace_state *state = screen->machine->driver_data<rollrace_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 	int sx, sy;
 	int scroll;

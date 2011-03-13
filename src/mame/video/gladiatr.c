@@ -212,7 +212,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{0x0,0x1},
 			{0x2,0x3},
 		};
-		UINT8 *src = &machine->generic.spriteram.u8[offs + (state->sprite_buffer << 7)];
+		UINT8 *src = &state->spriteram[offs + (state->sprite_buffer << 7)];
 		int attributes = src[0x800];
 		int size = (attributes & 0x10) >> 4;
 		int bank = (attributes & 0x01) + ((attributes & 0x02) ? state->sprite_bank : 0);

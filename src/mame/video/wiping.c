@@ -89,7 +89,7 @@ WRITE8_HANDLER( wiping_flipscreen_w )
 SCREEN_UPDATE( wiping )
 {
 	wiping_state *state = screen->machine->driver_data<wiping_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	for (offs = 0x3ff; offs > 0; offs--)

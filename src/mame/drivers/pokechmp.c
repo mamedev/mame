@@ -108,7 +108,7 @@ static WRITE8_HANDLER( pokechmp_paletteram_w )
 static ADDRESS_MAP_START( pokechmp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pokechmp_videoram_w) AM_BASE_MEMBER(pokechmp_state, videoram)
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_MEMBER(pokechmp_state, spriteram, spriteram_size)
 
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(pokechmp_flipscreen_w)

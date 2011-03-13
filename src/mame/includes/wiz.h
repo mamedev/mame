@@ -18,6 +18,9 @@ public:
 	UINT8 char_bank[2];
 	UINT8 palbank[2];
 	int palette_bank;
+	UINT8 *spriteram;
+	UINT8 *spriteram2;
+	size_t spriteram_size;
 };
 
 

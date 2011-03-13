@@ -23,6 +23,8 @@ public:
 	bitmap_t *tmp_bitmap[4];
 	tilemap_t *bg;
 	tilemap_t *fg;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

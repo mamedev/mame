@@ -21,6 +21,7 @@ public:
 	tilemap_t *bg_tilemap;
 	UINT8 bullsdrt_sprites_bank;
 	UINT8 penmask[64];
+	UINT8 *spriteram;
 };
 
 

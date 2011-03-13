@@ -13,6 +13,7 @@ public:
 	tilemap_t *text_layer;
 	int deadangle_tilebank;
 	int deadangle_oldtilebank;
+	UINT16 *spriteram;
 };
 
 

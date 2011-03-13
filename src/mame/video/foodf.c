@@ -120,7 +120,7 @@ SCREEN_UPDATE( foodf )
 	int offs;
 	const gfx_element *gfx = screen->machine->gfx[1];
 	bitmap_t *priority_bitmap = screen->machine->priority_bitmap;
-	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 
 	/* first draw the playfield opaquely */
 	tilemap_draw(bitmap, cliprect, state->playfield_tilemap, TILEMAP_DRAW_OPAQUE, 0);

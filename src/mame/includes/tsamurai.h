@@ -20,6 +20,7 @@ public:
 	int flicker;
 	int vsgongf_color;
 	int key_count;
+	UINT8 *spriteram;
 };
 
 

@@ -96,6 +96,18 @@ Notes:
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 
+
+class sigmab98_state : public driver_device
+{
+public:
+	sigmab98_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *spriteram;
+	size_t spriteram_size;
+};
+
+
 /***************************************************************************
 
     Video
@@ -140,8 +152,9 @@ Notes:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri_mask)
 {
-	UINT8 *end		=	machine->generic.spriteram.u8 - 0x10;
-	UINT8 *s		=	end + machine->generic.spriteram_size;
+	sigmab98_state *state = machine->driver_data<sigmab98_state>();
+	UINT8 *end		=	state->spriteram - 0x10;
+	UINT8 *s		=	end + state->spriteram_size;
 
 	for ( ; s != end; s -= 0x10 )
 	{
@@ -418,7 +431,7 @@ static ADDRESS_MAP_START( gegege_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("rombank")
 
-	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE_MEMBER(sigmab98_state, spriteram, spriteram_size)
 
 	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_be_w) AM_BASE_GENERIC(paletteram)
 
@@ -805,6 +818,7 @@ static READ8_HANDLER( haekaka_vblank_r )
 
 static READ8_HANDLER( haekaka_b000_r )
 {
+	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
 	switch (rombank)
 	{
 		case 0x10:	// ROM
@@ -827,7 +841,7 @@ static READ8_HANDLER( haekaka_b000_r )
 
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
-				return space->machine->generic.spriteram.u8[offset];
+				return state->spriteram[offset];
 
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
@@ -843,12 +857,13 @@ static READ8_HANDLER( haekaka_b000_r )
 
 static WRITE8_HANDLER( haekaka_b000_w )
 {
+	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
 	switch (rombank)
 	{
 		case 0x65:	// SPRITERAM
 			if (offset < 0x1000)
 			{
-				space->machine->generic.spriteram.u8[offset] = data;
+				state->spriteram[offset] = data;
 				return;
 			}
 			break;
@@ -929,6 +944,7 @@ ADDRESS_MAP_END
 // rombank
 static WRITE8_HANDLER( itazuram_rombank_w )
 {
+	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
 	if (offset == 0)
 	{
 		reg = data;
@@ -945,8 +961,8 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x11:	// 3800 IS ROM
 					memory_set_bankptr(space->machine, "rombank0", rom + 0x4c00);
 					memory_set_bankptr(space->machine, "rombank1", rom + 0x5c00);
-					memory_set_bankptr(space->machine, "sprbank0", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -961,8 +977,8 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x14:	// 3800 IS ROM
 					memory_set_bankptr(space->machine, "rombank0", rom + 0x8000);
 					memory_set_bankptr(space->machine, "rombank1", rom + 0x9000);
-					memory_set_bankptr(space->machine, "sprbank0", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -977,31 +993,31 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x0f:	// 3800 IS ROM
 					memory_set_bankptr(space->machine, "rombank0", rom + 0x3400);
 					memory_set_bankptr(space->machine, "rombank1", rom + 0x4400);
-					memory_set_bankptr(space->machine, "sprbank0", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				case 0x12:	// 3800 IS ROM
 					memory_set_bankptr(space->machine, "rombank0", rom + 0x6400);
 					memory_set_bankptr(space->machine, "rombank1", rom + 0x7400);
-					memory_set_bankptr(space->machine, "sprbank0", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				// used in test mode:
 //              case 0x5c:  memory_set_bankptr(space->machine, "rombank", rom + 0x400 + 0x0000);    break;  // 3800 IS RAM! (8000 bytes)
 
 				case 0x5e:	// 3800 IS RAM! (1404 bytes)
-					memory_set_bankptr(space->machine, "rombank0", space->machine->generic.spriteram.u8 + 0x1000*1);
-					memory_set_bankptr(space->machine, "sprbank0", space->machine->generic.spriteram.u8 + 0x1000*1);
-					memory_set_bankptr(space->machine, "rombank1", space->machine->generic.spriteram.u8 + 0x1000*2);
-					memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*2);
+					memory_set_bankptr(space->machine, "rombank0", state->spriteram + 0x1000*1);
+					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*1);
+					memory_set_bankptr(space->machine, "rombank1", state->spriteram + 0x1000*2);
+					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*2);
 					break;
 
 				case 0x6c:	// 3800 IS RAM! (1000 bytes) - SPRITERAM
-					memory_set_bankptr(space->machine, "rombank0", space->machine->generic.spriteram.u8);
-					memory_set_bankptr(space->machine, "sprbank0", space->machine->generic.spriteram.u8);
-//                  memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*4);    // scratch
+					memory_set_bankptr(space->machine, "rombank0", state->spriteram);
+					memory_set_bankptr(space->machine, "sprbank0", state->spriteram);
+//                  memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);    // scratch
 					break;
 
 				default:
@@ -1016,8 +1032,8 @@ static WRITE8_HANDLER( itazuram_rombank_w )
 				case 0x14:	// 3800 IS ROM
 					memory_set_bankptr(space->machine, "rombank0", rom + 0x8800);
 					memory_set_bankptr(space->machine, "rombank1", rom + 0x9800);
-					memory_set_bankptr(space->machine, "sprbank0", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
-					memory_set_bankptr(space->machine, "sprbank1", space->machine->generic.spriteram.u8 + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank0", state->spriteram + 0x1000*4);	// scratch
+					memory_set_bankptr(space->machine, "sprbank1", state->spriteram + 0x1000*4);	// scratch
 					break;
 
 				default:
@@ -1280,6 +1296,7 @@ static READ8_HANDLER( tdoboon_rambank_r )
 
 static READ8_HANDLER( tdoboon_c000_r )
 {
+	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
 	switch (rombank)
 	{
 		case 0x10:	// ROM
@@ -1302,7 +1319,7 @@ static READ8_HANDLER( tdoboon_c000_r )
 
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
-				return space->machine->generic.spriteram.u8[offset];
+				return state->spriteram[offset];
 			break;
 
 		case 0x66:	// PALETTERAM + TABLE?
@@ -1322,12 +1339,13 @@ static READ8_HANDLER( tdoboon_c000_r )
 
 static WRITE8_HANDLER( tdoboon_c000_w )
 {
+	sigmab98_state *state = space->machine->driver_data<sigmab98_state>();
 	switch (rombank)
 	{
 		case 0x64:	// SPRITERAM
 			if (offset < 0x1000)
 			{
-				space->machine->generic.spriteram.u8[offset] = data;
+				state->spriteram[offset] = data;
 				return;
 			}
 			break;
@@ -1530,7 +1548,7 @@ static INTERRUPT_GEN( gegege_vblank_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x5a);
 }
 
-static MACHINE_CONFIG_START( gegege, driver_device )
+static MACHINE_CONFIG_START( gegege, sigmab98_state )
 	MCFG_CPU_ADD("maincpu", Z80, 10000000)	// !! TAXAN KY-80, clock @X1? !!
 	MCFG_CPU_PROGRAM_MAP(gegege_mem_map)
 	MCFG_CPU_IO_MAP(gegege_io_map)
@@ -1584,7 +1602,7 @@ static MACHINE_RESET( sammymdl )
 	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0x400);	// code starts at 400 ??? (000 = cart header)
 }
 
-static MACHINE_CONFIG_START( sammymdl, driver_device )
+static MACHINE_CONFIG_START( sammymdl, sigmab98_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)	// !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
@@ -1898,16 +1916,17 @@ ROM_END
 
 static DRIVER_INIT( animalc )
 {
+	sigmab98_state *state = machine->driver_data<sigmab98_state>();
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
 	memory_configure_bank(machine, "rambank", 0, 1, nvram,     0x1000);
 	memory_configure_bank(machine, "rambank", 1, 4, bankedram, 0x1000);
 	memory_set_bank(machine, "rambank", 0);
 
-	machine->generic.spriteram.u8 = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	memset(machine->generic.spriteram.u8, 0, 0x1000 * 5);
-	machine->generic.spriteram_size = 0x1000;
-	memory_configure_bank(machine, "sprbank", 0, 5, machine->generic.spriteram.u8, 0x1000);
+	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
+	memset(state->spriteram, 0, 0x1000 * 5);
+	state->spriteram_size = 0x1000;
+	memory_configure_bank(machine, "sprbank", 0, 5, state->spriteram, 0x1000);
 	memory_set_bank(machine, "sprbank", 0);
 }
 
@@ -1935,6 +1954,7 @@ ROM_END
 
 static DRIVER_INIT( itazuram )
 {
+	sigmab98_state *state = machine->driver_data<sigmab98_state>();
 	// ROM banks
 	UINT8 *rom = machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "rombank0", rom + 0x3400);
@@ -1947,11 +1967,11 @@ static DRIVER_INIT( itazuram )
 	memory_set_bankptr(machine, "palbank", machine->generic.paletteram.u8);
 	rambank = 0x64;
 
-	machine->generic.spriteram.u8 = auto_alloc_array(machine, UINT8, 0x1000 * 5);
-	memset(machine->generic.spriteram.u8, 0, 0x1000 * 5);
-	machine->generic.spriteram_size = 0x1000;
-	memory_set_bankptr(machine, "sprbank0",  machine->generic.spriteram.u8 + 0x1000*4);	// scratch
-	memory_set_bankptr(machine, "sprbank1",  machine->generic.spriteram.u8 + 0x1000*4);	// scratch
+	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
+	memset(state->spriteram, 0, 0x1000 * 5);
+	state->spriteram_size = 0x1000;
+	memory_set_bankptr(machine, "sprbank0",  state->spriteram + 0x1000*4);	// scratch
+	memory_set_bankptr(machine, "sprbank1",  state->spriteram + 0x1000*4);	// scratch
 }
 
 /***************************************************************************
@@ -2050,13 +2070,14 @@ ROM_END
 
 static DRIVER_INIT( haekaka )
 {
+	sigmab98_state *state = machine->driver_data<sigmab98_state>();
 	// RAM banks
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
 	memset(machine->generic.paletteram.u8, 0, 0x200);
 
-	machine->generic.spriteram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
-	memset(machine->generic.spriteram.u8, 0, 0x1000);
-	machine->generic.spriteram_size = 0x1000;
+	state->spriteram = auto_alloc_array(machine, UINT8, 0x1000);
+	memset(state->spriteram, 0, 0x1000);
+	state->spriteram_size = 0x1000;
 
 	rombank = 0x65;
 	rambank = 0x53;

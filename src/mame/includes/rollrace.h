@@ -15,6 +15,8 @@ public:
 	int ra_flipy;
 	int ra_flipx;
 	int ra_spritebank;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

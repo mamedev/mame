@@ -189,10 +189,11 @@ spriteram format (4 bytes per sprite):
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	tankbust_state *state = machine->driver_data<tankbust_state>();
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		int code,color,sx,sy,flipx,flipy;
 

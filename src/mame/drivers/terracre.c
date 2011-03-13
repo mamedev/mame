@@ -199,7 +199,7 @@ static MACHINE_START( amazon )
 
 static ADDRESS_MAP_START( terracre_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_BASE_MEMBER(terracre_state, spriteram)
 	AM_RANGE(0x020200, 0x021fff) AM_RAM
 	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_BASE_MEMBER(terracre_state, amazon_videoram)
 	AM_RANGE(0x023000, 0x023fff) AM_RAM
@@ -216,7 +216,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_BASE_MEMBER(terracre_state, spriteram)
 	AM_RANGE(0x040200, 0x040fff) AM_RAM
 	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_BASE_MEMBER(terracre_state, amazon_videoram)
 	AM_RANGE(0x044000, 0x044001) AM_READ_PORT("IN0")

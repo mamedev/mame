@@ -154,7 +154,7 @@ WRITE8_HANDLER( spdodgeb_videoram_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	spdodgeb_state *state = machine->driver_data<spdodgeb_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	const gfx_element *gfx = machine->gfx[1];
 	UINT8 *src;
 	int i;
@@ -164,7 +164,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 /*  240-SY   Z|F|CLR|WCH WHICH    SX
     xxxxxxxx x|x|xxx|xxx xxxxxxxx xxxxxxxx
 */
-	for (i = 0;i < machine->generic.spriteram_size;i += 4)
+	for (i = 0;i < state->spriteram_size;i += 4)
 	{
 		int attr = src[i+1];
 		int which = src[i+2]+((attr & 0x07)<<8);

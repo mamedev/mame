@@ -24,6 +24,8 @@ public:
 	UINT8 outvalue[8];
 
 	tilemap_t *bg_tilemap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

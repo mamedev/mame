@@ -81,7 +81,8 @@ VIDEO_START( renegade )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *source = machine->generic.spriteram.u8;
+	renegade_state *state = machine->driver_data<renegade_state>();
+	UINT8 *source = state->spriteram;
 	UINT8 *finish = source + 96 * 4;
 
 	while (source < finish)

@@ -5,6 +5,8 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

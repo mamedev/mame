@@ -367,7 +367,7 @@ static void draw_sprites(running_machine* machine, bitmap_t* bitmap)
 	int const big_xshift = state->robokid_sprites ? 1 : 0;
 	int const big_yshift = state->robokid_sprites ? 0 : 1;
 
-	UINT8* sprptr = &machine->generic.spriteram.u8[11];
+	UINT8* sprptr = &state->spriteram[11];
 	int sprites_drawn = 0;
 
 	// the sprite generator draws exactly 96 16x16 sprites per frame. When big

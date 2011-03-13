@@ -22,6 +22,8 @@ public:
 	struct tempsprite *spritelist;
 	UINT16 rotate_ctrl[8];
 	UINT8 dislayer[6];
+	UINT32 *spriteram;
+	size_t spriteram_size;
 };
 
 

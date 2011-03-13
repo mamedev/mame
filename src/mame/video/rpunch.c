@@ -204,7 +204,7 @@ WRITE16_HANDLER( rpunch_ins_w )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int stop)
 {
 	rpunch_state *state = machine->driver_data<rpunch_state>();
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
 	start *= 4;

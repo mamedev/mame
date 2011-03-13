@@ -169,7 +169,7 @@ WRITE8_HANDLER( suprridr_fgram_w )
 SCREEN_UPDATE( suprridr )
 {
 	suprridr_state *state = screen->machine->driver_data<suprridr_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	rectangle subclip;
 	int i;
 	const rectangle &visarea = screen->visible_area();

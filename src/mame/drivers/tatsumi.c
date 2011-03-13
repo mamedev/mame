@@ -168,8 +168,10 @@ static WRITE16_HANDLER(cyclwarr_cpu_bb_w)
 }
 
 static READ16_HANDLER(cyclwarr_palette_r) { return space->machine->generic.paletteram.u16[offset]; }
-static READ16_HANDLER(cyclwarr_sprite_r) { return space->machine->generic.spriteram.u16[offset]; }
-static WRITE16_HANDLER(cyclwarr_sprite_w) { COMBINE_DATA(&space->machine->generic.spriteram.u16[offset]); }
+static READ16_HANDLER(cyclwarr_sprite_r) {
+	tatsumi_state *state = space->machine->driver_data<tatsumi_state>(); return state->spriteram[offset]; }
+static WRITE16_HANDLER(cyclwarr_sprite_w) {
+	tatsumi_state *state = space->machine->driver_data<tatsumi_state>(); COMBINE_DATA(&state->spriteram[offset]); }
 
 static WRITE16_HANDLER(bigfight_a20000_w)
 {
@@ -226,7 +228,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( apache3_68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x83fff) AM_RAM AM_BASE_MEMBER(tatsumi_state, _68k_ram)
-	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_BASE_MEMBER(tatsumi_state, spriteram)
 	AM_RANGE(0x9a000, 0x9a1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE_MEMBER(tatsumi_state, sprite_control_ram)
 	AM_RANGE(0xa0000, 0xa0001) AM_WRITE(apache3_rotate_w) // /BNKCS
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(apache3_z80_ctrl_w)
@@ -271,7 +273,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( roundup5_68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x83fff) AM_RAM AM_BASE_MEMBER(tatsumi_state, _68k_ram)
-	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x90000, 0x93fff) AM_RAM AM_BASE_MEMBER(tatsumi_state, spriteram)
 	AM_RANGE(0x9a000, 0x9a1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE_MEMBER(tatsumi_state, sprite_control_ram)
 	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_BASE_MEMBER(tatsumi_state, roundup_r_ram) // Road control data
 	AM_RANGE(0xb0000, 0xb0fff) AM_RAM AM_BASE_MEMBER(tatsumi_state, roundup_p_ram) // Road pixel data
@@ -309,7 +311,7 @@ static ADDRESS_MAP_START( cyclwarr_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
 	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE_MEMBER(tatsumi_state, spriteram)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE_MEMBER(tatsumi_state, sprite_control_ram)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
@@ -365,7 +367,7 @@ static ADDRESS_MAP_START( bigfight_68000a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
 	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE(cyclwarr_control_r, cyclwarr_control_w)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE_MEMBER(tatsumi_state, spriteram)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE(tatsumi_sprite_control_w) AM_BASE_MEMBER(tatsumi_state, sprite_control_ram)
 	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */

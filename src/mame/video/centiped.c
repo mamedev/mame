@@ -432,7 +432,7 @@ WRITE8_HANDLER( mazeinv_paletteram_w )
 SCREEN_UPDATE( centiped )
 {
 	centiped_state *state = screen->machine->driver_data<centiped_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	rectangle spriteclip = *cliprect;
 	int offs;
 
@@ -464,7 +464,7 @@ SCREEN_UPDATE( centiped )
 SCREEN_UPDATE( warlords )
 {
 	centiped_state *state = screen->machine->driver_data<centiped_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int upright_mode = input_port_read(screen->machine, "IN0") & 0x80;
 	int offs;
 
@@ -510,7 +510,7 @@ SCREEN_UPDATE( warlords )
 SCREEN_UPDATE( bullsdrt )
 {
 	centiped_state *state = screen->machine->driver_data<centiped_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	rectangle spriteclip = *cliprect;
 
 	int offs;
@@ -545,7 +545,7 @@ SCREEN_UPDATE( bullsdrt )
 SCREEN_UPDATE( milliped )
 {
 	centiped_state *state = screen->machine->driver_data<centiped_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	rectangle spriteclip = *cliprect;
 	int offs;
 

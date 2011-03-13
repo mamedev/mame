@@ -64,7 +64,7 @@ static WRITE8_HANDLER( kikcubic_coin_w )
 static ADDRESS_MAP_START( vigilant_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")		/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_BASE_SIZE_MEMBER(vigilant_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(vigilant_state, videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kikcubic_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")		/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_MEMBER(vigilant_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(vigilant_state, videoram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM

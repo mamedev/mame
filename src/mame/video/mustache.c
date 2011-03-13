@@ -106,10 +106,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	rectangle clip = *cliprect;
 	const gfx_element *gfx = machine->gfx[1];
 	const rectangle &visarea = machine->primary_screen->visible_area();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = 0;offs < machine->generic.spriteram_size;offs += 4)
+	for (offs = 0;offs < state->spriteram_size;offs += 4)
 	{
 		int sy = 240-spriteram[offs];
 		int sx = 240-spriteram[offs+3];

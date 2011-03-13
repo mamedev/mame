@@ -228,13 +228,14 @@ WRITE8_HANDLER( spyhunt_scroll_value_w )
 
 static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int color_mask, int code_xor, int dx, int dy)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	mcr3_state *state = machine->driver_data<mcr3_state>();
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	bitmap_fill(machine->priority_bitmap, cliprect, 1);
 
 	/* loop over sprite RAM */
-	for (offs = machine->generic.spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
 	{
 		int code, color, flipx, flipy, sx, sy, flags;
 

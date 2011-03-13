@@ -11,6 +11,8 @@ public:
 	UINT8 bg_xscroll[2];
 	int flipscreen;
 	int video_enable;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

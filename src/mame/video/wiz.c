@@ -197,7 +197,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,
 	wiz_state *state = machine->driver_data<wiz_state>();
 	int offs;
 
-	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy;
 
@@ -225,8 +225,8 @@ SCREEN_UPDATE( kungfut )
 	bitmap_fill(bitmap,cliprect,state->bgpen);
 	draw_background(screen->machine, bitmap, cliprect, 2 + state->char_bank[0] , 0);
 	draw_foreground(screen->machine, bitmap, cliprect, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram2.u8, 4);
-	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram.u8  , 5);
+	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram2, 4);
+	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram  , 5);
 	return 0;
 }
 
@@ -244,8 +244,8 @@ SCREEN_UPDATE( wiz )
 
 	bank = 7 + *state->sprite_bank;
 
-	draw_sprites(screen->machine, bitmap, visible_area, screen->machine->generic.spriteram2.u8, 6);
-	draw_sprites(screen->machine, bitmap, visible_area, screen->machine->generic.spriteram.u8  , bank);
+	draw_sprites(screen->machine, bitmap, visible_area, state->spriteram2, 6);
+	draw_sprites(screen->machine, bitmap, visible_area, state->spriteram  , bank);
 	return 0;
 }
 
@@ -256,7 +256,7 @@ SCREEN_UPDATE( stinger )
 	bitmap_fill(bitmap,cliprect,state->bgpen);
 	draw_background(screen->machine, bitmap, cliprect, 2 + state->char_bank[0], 1);
 	draw_foreground(screen->machine, bitmap, cliprect, 1);
-	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram2.u8, 4);
-	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram.u8  , 5);
+	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram2, 4);
+	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram  , 5);
 	return 0;
 }

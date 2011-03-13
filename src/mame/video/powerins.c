@@ -265,8 +265,9 @@ Offset:     Format:                 Value:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT16 *source = machine->generic.spriteram.u16 + 0x8000/2;
-	UINT16 *finish = machine->generic.spriteram.u16 + 0x9000/2;
+	powerins_state *state = machine->driver_data<powerins_state>();
+	UINT16 *source = state->spriteram + 0x8000/2;
+	UINT16 *finish = state->spriteram + 0x9000/2;
 
 	int screen_w = machine->primary_screen->width();
 	int screen_h = machine->primary_screen->height();

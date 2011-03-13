@@ -244,9 +244,10 @@ static UINT16 *megasys1_buffer_objectram,*megasys1_buffer2_objectram,*megasys1_b
 
 VIDEO_START( megasys1 )
 {
+	megasys1_state *state = machine->driver_data<megasys1_state>();
 	int i;
 
-	machine->generic.spriteram.u16 = &megasys1_ram[0x8000/2];
+	state->spriteram = &megasys1_ram[0x8000/2];
 
 	megasys1_buffer_objectram = auto_alloc_array(machine, UINT16, 0x2000);
 	megasys1_buffer_spriteram16 = auto_alloc_array(machine, UINT16, 0x2000);
@@ -582,6 +583,7 @@ WRITE16_HANDLER( megasys1_vregs_D_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	megasys1_state *state = machine->driver_data<megasys1_state>();
 	int color,code,sx,sy,flipx,flipy,attr,sprite,offs,color_mask;
 
 /* objram: 0x100*4 entries      spritedata: 0x80 entries */
@@ -635,7 +637,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 	}	/* non Z hw */
 	else
 	{
-		UINT16 *spriteram16 = machine->generic.spriteram.u16;
+		UINT16 *spriteram16 = state->spriteram;
 
 		/* MS1-Z just draws Sprite Data, and in reverse order */
 
@@ -1033,13 +1035,14 @@ SCREEN_UPDATE( megasys1 )
 
 SCREEN_EOF( megasys1 )
 {
+	megasys1_state *state = machine->driver_data<megasys1_state>();
 	/* Sprite are TWO frames ahead, like NMK16 HW. */
 //megasys1_objectram
 	memcpy(megasys1_buffer2_objectram,megasys1_buffer_objectram, 0x2000);
 	memcpy(megasys1_buffer_objectram, megasys1_objectram, 0x2000);
 //spriteram16
 	memcpy(megasys1_buffer2_spriteram16, megasys1_buffer_spriteram16, 0x2000);
-	memcpy(megasys1_buffer_spriteram16, machine->generic.spriteram.u16, 0x2000);
+	memcpy(megasys1_buffer_spriteram16, state->spriteram, 0x2000);
 
 }
 

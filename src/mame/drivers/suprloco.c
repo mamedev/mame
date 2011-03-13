@@ -29,7 +29,7 @@ static WRITE8_HANDLER( suprloco_soundport_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE_SIZE_MEMBER(suprloco_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1")
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P2")

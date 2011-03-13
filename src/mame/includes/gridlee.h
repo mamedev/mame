@@ -39,6 +39,7 @@ public:
 	UINT8 cocktail_flip;
 	UINT8 *local_videoram;
 	UINT8 palettebank_vis;
+	UINT8 *spriteram;
 };
 
 

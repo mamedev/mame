@@ -33,6 +33,8 @@ public:
 	UINT8 valtric_unknown;
 	UINT8 butasan_unknown;
 	int mosaic;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

@@ -41,6 +41,8 @@ public:
 	tilemap_t *tilemap_2;
 	tilemap_t *tilemap_3;
 	bitmap_t *bitmaps[5];
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 

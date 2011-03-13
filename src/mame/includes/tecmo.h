@@ -16,6 +16,8 @@ public:
 	tilemap_t *bg_tilemap;
 	UINT8 fgscroll[3];
 	UINT8 bgscroll[3];
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

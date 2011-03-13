@@ -10,6 +10,8 @@ public:
 	tilemap_t *tilemap_0a;
 	tilemap_t *tilemap_0b;
 	tilemap_t *tilemap_1;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

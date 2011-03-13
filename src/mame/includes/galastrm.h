@@ -33,6 +33,8 @@ public:
 	int rsyb;
 	int rsxoffs;
 	int rsyoffs;
+	UINT32 *spriteram;
+	size_t spriteram_size;
 };
 
 

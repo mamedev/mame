@@ -8,6 +8,8 @@ public:
 	UINT16 *fgvideoram;
 	size_t fgvideoram_size;
 	bitmap_t *sprites_bitmap;
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 

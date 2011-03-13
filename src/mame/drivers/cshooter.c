@@ -100,6 +100,8 @@ public:
 	UINT8 *mainram;
 	int coin_stat;
 	int counter;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 
@@ -170,9 +172,9 @@ static SCREEN_UPDATE(cshooter)
 
 	//sprites
 	{
-		UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+		UINT8 *spriteram = state->spriteram;
 		int i;
-		for(i=0;i<screen->machine->generic.spriteram_size;i+=4)
+		for(i=0;i<state->spriteram_size;i+=4)
 		{
 			if(spriteram[i+3]!=0)
 			{
@@ -330,7 +332,7 @@ static ADDRESS_MAP_START( airraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE_MEMBER(cshooter_state, mainram)
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(cshooter_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
 

@@ -79,6 +79,7 @@ public:
 	UINT32 input_sel;
 	UINT32* jclub2_tileram;
 	int jclub2_gfx_index;
+	UINT32 *spriteram;
 };
 
 
@@ -127,8 +128,9 @@ static WRITE32_HANDLER( darkhors_tmapram2_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT32 *s		=	machine->generic.spriteram.u32;
-	UINT32 *end		=	machine->generic.spriteram.u32 + 0x02000/4;
+	darkhors_state *state = machine->driver_data<darkhors_state>();
+	UINT32 *s		=	state->spriteram;
+	UINT32 *end		=	state->spriteram + 0x02000/4;
 
 	for ( ; s < end; s += 8/4 )
 	{
@@ -324,7 +326,7 @@ static ADDRESS_MAP_START( darkhors_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x86c000, 0x86ffff) AM_RAM_WRITE(darkhors_tmapram_w) AM_BASE_MEMBER(darkhors_state, tmapram)
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_BASE_MEMBER(darkhors_state, tmapram2)
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
-	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE_MEMBER(darkhors_state, spriteram)
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_BASE_MEMBER(darkhors_state, tmapscroll)
@@ -355,7 +357,7 @@ static ADDRESS_MAP_START( jclub2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_MEMBER(darkhors_state, spriteram)
 
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!

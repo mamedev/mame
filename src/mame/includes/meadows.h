@@ -28,6 +28,7 @@ public:
 	UINT8 _0c02;
 	UINT8 _0c03;
 	tilemap_t *bg_tilemap;
+	UINT8 *spriteram;
 };
 
 

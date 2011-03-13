@@ -24,6 +24,7 @@ public:
 	UINT8 videoram_bank;
 	tilemap_t *tilemap_page[8];
 	UINT8 tilemap_pages;
+	UINT8 *spriteram;
 };
 
 

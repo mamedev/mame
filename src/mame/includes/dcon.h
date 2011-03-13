@@ -16,6 +16,8 @@ public:
 	UINT16 enable;
 	int gfx_bank_select;
 	int last_gfx_bank;
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 

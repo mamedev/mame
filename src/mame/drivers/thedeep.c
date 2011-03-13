@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w		)	// To Sound CPU
 	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w		)	// ?
 	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE(&thedeep_scroll				)	// Scroll
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(thedeep_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE(&thedeep_vram_1		)	// Text Layer
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE(&thedeep_vram_0		)	// Background Layer
 	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_BASE(&thedeep_scroll2				)	// Column Scroll
@@ -349,7 +349,7 @@ static INTERRUPT_GEN( thedeep_interrupt )
 	}
 }
 
-static MACHINE_CONFIG_START( thedeep, driver_device )
+static MACHINE_CONFIG_START( thedeep, thedeep_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* verified on pcb */

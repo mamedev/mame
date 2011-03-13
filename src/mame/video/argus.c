@@ -855,11 +855,11 @@ static void argus_bg0_scroll_handle(running_machine *machine)
 static void argus_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority)
 {
 	argus_state *state = machine->driver_data<argus_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
+	for (offs = 0; offs < state->spriteram_size; offs += 16)
 	{
 		if (!(spriteram[offs+15] == 0 && spriteram[offs+11] == 0xf0))
 		{
@@ -988,11 +988,11 @@ static void valtric_draw_mosaic(screen_device &screen, bitmap_t *bitmap, const r
 static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	argus_state *state = machine->driver_data<argus_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
+	for (offs = 0; offs < state->spriteram_size; offs += 16)
 	{
 		if (!(spriteram[offs+15] == 0 && spriteram[offs+11] == 0xf0))
 		{
@@ -1028,11 +1028,11 @@ static void valtric_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 static void butasan_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	argus_state *state = machine->driver_data<argus_state>();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
+	for (offs = 0; offs < state->spriteram_size; offs += 16)
 	{
 		int sx, sy, tile, flipx, flipy, color;
 		int fx, fy;
@@ -1144,12 +1144,12 @@ static void butasan_log_vram(running_machine *machine)
 
 	if (input_code_pressed(machine, KEYCODE_M))
 	{
-		UINT8 *spriteram = machine->generic.spriteram.u8;
+		UINT8 *spriteram = state->spriteram;
 		int i;
 		logerror("\nSprite RAM\n");
 		logerror("---------------------------------------\n");
 		logerror("       +0 +1 +2 +3 +4 +5 +6 +7  +8 +9 +a +b +c +d +e +f\n");
-		for (offs = 0; offs < machine->generic.spriteram_size; offs += 16)
+		for (offs = 0; offs < state->spriteram_size; offs += 16)
 		{
 			for (i = 0; i < 16; i++)
 			{

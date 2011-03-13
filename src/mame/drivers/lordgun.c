@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( lordgun_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x315000, 0x317fff) AM_RAM														//
 	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, vram_3)	// DISPLAY
 	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE_MEMBER(lordgun_state, scrollram)							// LINE
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)						// ANIMATOR
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_MEMBER(lordgun_state, spriteram, spriteram_size)						// ANIMATOR
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_0)
 	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_1)
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( aliencha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x315000, 0x317fff) AM_RAM														//
 	AM_RANGE(0x318000, 0x319fff) AM_RAM_WRITE(lordgun_vram_3_w) AM_BASE_MEMBER(lordgun_state, vram_3)	// TEXT
 	AM_RANGE(0x31c000, 0x31c7ff) AM_RAM AM_BASE_MEMBER(lordgun_state, scrollram)							// LINE OFFSET
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)						// ANIMATE
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE_SIZE_MEMBER(lordgun_state, spriteram, spriteram_size)						// ANIMATE
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(lordgun_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x502000, 0x502001) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_0)
 	AM_RANGE(0x502200, 0x502201) AM_WRITEONLY AM_BASE_MEMBER(lordgun_state, scroll_x_1)

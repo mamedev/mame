@@ -68,6 +68,19 @@
 #include "sound/namco.h"
 
 
+class pengo_state : public driver_device
+{
+public:
+	pengo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *spriteram;
+	UINT8 *spriteram2;
+	size_t spriteram_size;
+};
+
+
+
 
 /*************************************
  *
@@ -101,9 +114,9 @@ static ADDRESS_MAP_START( pengo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE(&pacman_videoram) /* video and color RAM, scratchpad RAM, sprite codes */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE(&pacman_colorram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE_MEMBER(pengo_state, spriteram, spriteram_size)
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", pacman_sound_w)
-	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_BASE_MEMBER(pengo_state, spriteram2)
 	AM_RANGE(0x9000, 0x903f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9040, 0x9040) AM_WRITE(interrupt_enable_w)
@@ -123,9 +136,9 @@ static ADDRESS_MAP_START( jrpacmbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE(&pacman_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE_MEMBER(pengo_state, spriteram, spriteram_size)
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", pacman_sound_w)
-	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_BASE_GENERIC(spriteram2)
+	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_BASE_MEMBER(pengo_state, spriteram2)
 	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
 	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
 	AM_RANGE(0x9040, 0x9040) AM_WRITE(interrupt_enable_w)
@@ -344,7 +357,7 @@ static const namco_interface namco_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( pengo, driver_device )
+static MACHINE_CONFIG_START( pengo, pengo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)

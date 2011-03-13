@@ -29,6 +29,7 @@ public:
 	UINT8 firq_select;
 	UINT8 palettebank_io;
 	UINT8 palettebank_vis;
+	UINT8 *spriteram;
 };
 
 

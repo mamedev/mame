@@ -366,7 +366,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	system1_state *state = machine->driver_data<system1_state>();
 	UINT32 gfxbanks = machine->region("sprites")->bytes() / 0x8000;
 	const UINT8 *gfxbase = machine->region("sprites")->base();
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int flipscreen = flip_screen_get(machine);
 	int spritenum;
 

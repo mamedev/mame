@@ -130,7 +130,7 @@ VIDEO_START(darkmist)
 SCREEN_UPDATE( darkmist)
 {
 	darkmist_state *state = screen->machine->driver_data<darkmist_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 
 #define DM_GETSCROLL(n) (((state->scroll[(n)]<<1)&0xff) + ((state->scroll[(n)]&0x80)?1:0) +( ((state->scroll[(n)-1]<<4) | (state->scroll[(n)-1]<<12) )&0xff00))
 
@@ -163,7 +163,7 @@ SCREEN_UPDATE( darkmist)
 
 */
 		int i,fx,fy,tile,palette;
-		for(i=0;i<screen->machine->generic.spriteram_size;i+=32)
+		for(i=0;i<state->spriteram_size;i+=32)
 		{
 			fy=spriteram[i+1]&0x40;
 			fx=spriteram[i+1]&0x80;

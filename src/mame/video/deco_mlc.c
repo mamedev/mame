@@ -517,7 +517,7 @@ SCREEN_EOF( mlc )
     lookup table.  Without buffering incorrect one frame glitches are seen
     in several places, especially in Hoops.
     */
-	memcpy(state->mlc_buffered_spriteram, machine->generic.spriteram.u32, 0x3000);
+	memcpy(state->mlc_buffered_spriteram, state->spriteram, 0x3000);
 }
 
 SCREEN_UPDATE( mlc )

@@ -224,11 +224,11 @@ VIDEO_START( zeropnt2 )
 static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	unico_state *state = machine->driver_data<unico_state>();
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (machine->generic.spriteram_size-8)/2; offs >= 0 ; offs -= 8/2 )
+	for ( offs = (state->spriteram_size-8)/2; offs >= 0 ; offs -= 8/2 )
 	{
 		int x, startx, endx, incx;
 
@@ -279,11 +279,11 @@ static void unico_draw_sprites(running_machine *machine, bitmap_t *bitmap,const 
 static void zeropnt2_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	unico_state *state = machine->driver_data<unico_state>();
-	UINT32 *spriteram32 = machine->generic.spriteram.u32;
+	UINT32 *spriteram32 = (UINT32 *)state->spriteram;
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (machine->generic.spriteram_size-8)/4; offs >= 0 ; offs -= 8/4 )
+	for ( offs = (state->spriteram_size-8)/4; offs >= 0 ; offs -= 8/4 )
 	{
 		int x, startx, endx, incx;
 

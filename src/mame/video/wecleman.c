@@ -80,7 +80,7 @@ static void get_sprite_info(running_machine *machine)
 	UINT8 *base_gfx = machine->region("gfx1")->base();
 	int gfx_max     = machine->region("gfx1")->bytes();
 
-	UINT16 *source = machine->generic.spriteram.u16;
+	UINT16 *source = state->spriteram;
 
 	struct sprite *sprite = state->sprite_list;
 	struct sprite *finish = state->sprite_list + NUM_SPRITES;

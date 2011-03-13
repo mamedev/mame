@@ -288,10 +288,11 @@ Offset:     Format:     Value:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	clshroad_state *state = machine->driver_data<clshroad_state>();
+	UINT8 *spriteram = state->spriteram;
 	int i;
 
-	for (i = 0; i < machine->generic.spriteram_size ; i += 8)
+	for (i = 0; i < state->spriteram_size ; i += 8)
 	{
 		int y		=	 240 - spriteram[i+1];
 		int code	=	(spriteram[i+3] & 0x3f) + (spriteram[i+2] << 6);

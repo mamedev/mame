@@ -231,8 +231,9 @@ static WRITE16_HANDLER( irq_ack_w )
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
 static READ16_HANDLER( K053247_scattered_word_r )
 {
+	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
 	if (offset & 0x0078)
-		return space->machine->generic.spriteram.u16[offset];
+		return state->spriteram[offset];
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
@@ -242,10 +243,11 @@ static READ16_HANDLER( K053247_scattered_word_r )
 
 static WRITE16_HANDLER( K053247_scattered_word_w )
 {
+	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
 	if (offset & 0x0078)
 	{
 //      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
-		COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
+		COMBINE_DATA(state->spriteram+offset);
 	}
 	else
 	{
@@ -260,7 +262,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 static ADDRESS_MAP_START( mystwarr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// main program
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(mystwarr_state, gx_workram)
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_MEMBER(mystwarr_state, spriteram)
 	AM_RANGE(0x480000, 0x4800ff) AM_WRITE(K055555_word_w)
 	AM_RANGE(0x482000, 0x48200f) AM_READ(K055673_rom_word_r)
 	AM_RANGE(0x482010, 0x48201f) AM_WRITE(K053247_reg_word_w)
@@ -384,8 +386,9 @@ ADDRESS_MAP_END
 // Martial Champion specific interfaces
 static READ16_HANDLER( K053247_martchmp_word_r )
 {
+	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
 	if (offset & 0x0018)
-		return space->machine->generic.spriteram.u16[offset];
+		return state->spriteram[offset];
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
@@ -395,9 +398,10 @@ static READ16_HANDLER( K053247_martchmp_word_r )
 
 static WRITE16_HANDLER( K053247_martchmp_word_w )
 {
+	mystwarr_state *state = space->machine->driver_data<mystwarr_state>();
 	if (offset & 0x0018)
 	{
-		COMBINE_DATA(space->machine->generic.spriteram.u16+offset);
+		COMBINE_DATA(state->spriteram+offset);
 	}
 	else
 	{
@@ -458,7 +462,7 @@ static ADDRESS_MAP_START( martchmp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x41a000, 0x41a001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x41c000, 0x41c01f) AM_WRITE(K053252_word_w)				// CCU
 	AM_RANGE(0x41e000, 0x41e007) AM_WRITE(K056832_b_word_w)				// VSCCS
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(K053247_martchmp_word_r,K053247_martchmp_word_w) AM_BASE_GENERIC(spriteram)	// sprite RAM
+	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(K053247_martchmp_word_r,K053247_martchmp_word_w) AM_BASE_MEMBER(mystwarr_state, spriteram)	// sprite RAM
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)						// palette RAM
 	AM_RANGE(0x680000, 0x681fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
 	AM_RANGE(0x682000, 0x683fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
@@ -477,7 +481,7 @@ ADDRESS_MAP_END
 /* Ultimate Battler Dadandarn */
 static ADDRESS_MAP_START( dadandrn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM							// main program and data ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_MEMBER(mystwarr_state, spriteram)
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
@@ -525,7 +529,7 @@ ADDRESS_MAP_END
 // c00000 = 936 tiles (7fffff window)
 static ADDRESS_MAP_START( gaiapols_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM								// main program
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE_MEMBER(mystwarr_state, spriteram)
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_READWRITE(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM mirror read / write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)

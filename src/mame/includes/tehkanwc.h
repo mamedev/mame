@@ -16,6 +16,8 @@ public:
 	UINT8 led1;
 	tilemap_t *bg_tilemap;
 	tilemap_t *fg_tilemap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

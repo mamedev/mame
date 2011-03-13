@@ -47,11 +47,12 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 
 static void comad_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	galpanic_state *state = machine->driver_data<galpanic_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 	int sx=0, sy=0;
 
-	for (offs = 0;offs < machine->generic.spriteram_size/2;offs += 4)
+	for (offs = 0;offs < state->spriteram_size/2;offs += 4)
 	{
 		int code,color,flipx,flipy;
 

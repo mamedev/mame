@@ -11,6 +11,8 @@ public:
 	UINT8 vram_bank;
 	UINT8 *vram;
 	UINT8 *vram_gfx;
+	UINT8 *spriteram;
+	UINT8 *spriteram2;
 };
 
 

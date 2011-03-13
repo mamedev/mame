@@ -11,6 +11,8 @@ public:
 	tilemap_t *tilemap[3];
 	int sprites_scrolldx;
 	int sprites_scrolldy;
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 

@@ -96,6 +96,8 @@ public:
 	int bgcolor;
 	int nmi_main;
 	int nmi_sub;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 
@@ -148,7 +150,7 @@ static VIDEO_START(pturn)
 static SCREEN_UPDATE(pturn)
 {
 	pturn_state *state = screen->machine->driver_data<pturn_state>();
-	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 	int sx, sy;
 	int flipx, flipy;
@@ -312,7 +314,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_w)
 
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_MEMBER(pturn_state, spriteram, spriteram_size)
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(bg_scrollx_w)
 

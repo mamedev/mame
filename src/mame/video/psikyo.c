@@ -390,7 +390,7 @@ static void draw_sprites_bootleg( running_machine *machine, bitmap_t *bitmap, co
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 
-//  UINT16 *spritelist  =   (UINT16 *)(machine->generic.spriteram.u32 + 0x1800/4);
+//  UINT16 *spritelist  =   (UINT16 *)(state->spriteram + 0x1800/4);
 	UINT16 *spritelist = (UINT16 *)(state->spritebuf2 + 0x1800 / 4);
 
 	UINT8 *TILES = machine->region("spritelut")->base();	// Sprites LUT
@@ -869,5 +869,5 @@ SCREEN_EOF( psikyo )
 {
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 	memcpy(state->spritebuf2, state->spritebuf1, 0x2000);
-	memcpy(state->spritebuf1, machine->generic.spriteram.u32, 0x2000);
+	memcpy(state->spritebuf1, state->spriteram, 0x2000);
 }

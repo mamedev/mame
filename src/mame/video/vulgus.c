@@ -173,11 +173,12 @@ WRITE8_HANDLER( vulgus_palette_bank_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	vulgus_state *state = machine->driver_data<vulgus_state>();
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
 
-	for (offs = machine->generic.spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->spriteram_size - 4;offs >= 0;offs -= 4)
 	{
 		int code,i,col,sx,sy,dir;
 

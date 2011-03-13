@@ -153,7 +153,8 @@ Offset:     Bits:       Value:
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *s = machine->generic.spriteram.u8, *end = s + machine->generic.spriteram_size;
+	thedeep_state *state = machine->driver_data<thedeep_state>();
+	UINT8 *s = state->spriteram, *end = s + state->spriteram_size;
 
 	while (s < end)
 	{

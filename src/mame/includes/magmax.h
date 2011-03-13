@@ -15,6 +15,8 @@ public:
 	UINT16 *scroll_y;
 	int flipscreen;
 	UINT32 *prom_tab;
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 

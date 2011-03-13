@@ -12,6 +12,7 @@ public:
 	tilemap_t *tilemap_0;
 	tilemap_t *tilemap_1;
 	int tile_bank;
+	UINT16 *spriteram;
 };
 
 

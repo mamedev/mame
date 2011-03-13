@@ -37,6 +37,8 @@ public:
 	attotime m6840_internal_counter_period;
 	tilemap_t *bg_tilemap;
 	tilemap_t *fg_tilemap;
+	UINT16 *spriteram;
+	size_t spriteram_size;
 };
 
 

@@ -160,7 +160,7 @@ static WRITE16_HANDLER( backup_ram_w )
 /*Basic memory map for this HW*/
 static ADDRESS_MAP_START( base_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							    			// ROM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_BASE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_BASE_MEMBER(realbrk_state, spriteram)	// Sprites
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram	)	// Palette
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(realbrk_vram_0_w) AM_BASE_MEMBER(realbrk_state, vram_0	)	// Background   (0)
 	AM_RANGE(0x602000, 0x603fff) AM_RAM_WRITE(realbrk_vram_1_w) AM_BASE_MEMBER(realbrk_state, vram_1	)	// Background   (1)

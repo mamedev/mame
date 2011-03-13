@@ -9,6 +9,8 @@ public:
 	UINT8 *videoram;
 	UINT8 *colorram;
 	tilemap_t *bg_tilemap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

@@ -88,7 +88,7 @@ SCREEN_UPDATE( magmax )
 {
 	magmax_state *state = screen->machine->driver_data<magmax_state>();
 	UINT16 *videoram = state->videoram;
-	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
 	/* bit 2 flip screen */
@@ -173,7 +173,7 @@ SCREEN_UPDATE( magmax )
 	}
 
 	/* draw the sprites */
-	for (offs = 0; offs < screen->machine->generic.spriteram_size/2; offs += 4)
+	for (offs = 0; offs < state->spriteram_size/2; offs += 4)
 	{
 		int sx, sy;
 

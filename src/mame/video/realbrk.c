@@ -216,7 +216,7 @@ VIDEO_START(realbrk)
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	realbrk_state *state = machine->driver_data<realbrk_state>();
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
 	int max_x = machine->primary_screen->width();
@@ -382,7 +382,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 /* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
 static void dai2kaku_draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int layer)
 {
-	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	realbrk_state *state = machine->driver_data<realbrk_state>();
+	UINT16 *spriteram16 = state->spriteram;
 	int offs;
 
 	int max_x = machine->primary_screen->width();

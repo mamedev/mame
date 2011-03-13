@@ -498,6 +498,7 @@ static READ16_HANDLER( namcona1_vreg_r )
 
 static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 {
+	namcona1_state *state = machine->driver_data<namcona1_state>();
 	UINT16 data;
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -532,7 +533,7 @@ static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source 
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )
 	{
-		space->machine->generic.spriteram.u16[(dest-0xfff000)/2] = data;
+		state->spriteram[(dest-0xfff000)/2] = data;
 	}
 	else
 	{
@@ -754,7 +755,7 @@ static ADDRESS_MAP_START( namcona1_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_MEMBER(namcona1_state, videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_GENERIC(spriteram)			/* spriteram */
+	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_MEMBER(namcona1_state, spriteram)			/* spriteram */
 ADDRESS_MAP_END
 
 
@@ -776,7 +777,7 @@ static ADDRESS_MAP_START( namcona2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_MEMBER(namcona1_state, videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_GENERIC(spriteram)			/* spriteram */
+	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_MEMBER(namcona1_state, spriteram)			/* spriteram */
 ADDRESS_MAP_END
 
 

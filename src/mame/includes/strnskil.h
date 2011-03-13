@@ -8,6 +8,8 @@ public:
 	UINT8 *xscroll;
 	UINT8 scrl_ctrl;
 	tilemap_t *bg_tilemap;
+	UINT8 *spriteram;
+	size_t spriteram_size;
 };
 
 

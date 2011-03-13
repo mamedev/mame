@@ -1455,7 +1455,7 @@ static const ym2151_interface ym2151_config =
 	megasys1_sound_irq
 };
 
-static MACHINE_CONFIG_START( system_A, driver_device )
+static MACHINE_CONFIG_START( system_A, megasys1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
@@ -1520,7 +1520,7 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( system_Bbl, driver_device )
+static MACHINE_CONFIG_START( system_Bbl, megasys1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
@@ -1592,7 +1592,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_D, driver_device )
+static MACHINE_CONFIG_START( system_D, megasys1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
@@ -1654,7 +1654,7 @@ static const ym2203_interface ym2203_config =
 	irq_handler
 };
 
-static MACHINE_CONFIG_START( system_Z, driver_device )
+static MACHINE_CONFIG_START( system_Z, megasys1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
@@ -3794,11 +3794,13 @@ static DRIVER_INIT( rodlandj )
 
 static READ16_HANDLER( soldamj_spriteram16_r )
 {
-	return space->machine->generic.spriteram.u16[offset];
+	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	return state->spriteram[offset];
 }
 static WRITE16_HANDLER( soldamj_spriteram16_w )
 {
-	if (offset < 0x800/2)	COMBINE_DATA(&space->machine->generic.spriteram.u16[offset]);
+	megasys1_state *state = space->machine->driver_data<megasys1_state>();
+	if (offset < 0x800/2)	COMBINE_DATA(&state->spriteram[offset]);
 }
 
 static DRIVER_INIT( soldamj )
