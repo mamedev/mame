@@ -3225,7 +3225,7 @@ static DRIVER_INIT( scorpion )
 static DRIVER_INIT( anteater )
 {
 	/* video extensions */
-	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
+	common_init(machine, scramble_draw_bullet, anteater_draw_background, NULL, NULL);
 
 	/* decode graphics */
 	decode_anteater_gfx(machine);

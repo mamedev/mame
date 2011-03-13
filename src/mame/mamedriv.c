@@ -317,8 +317,8 @@ const game_driver * const drivers[] =
 	DRIVER( tazmani2 )	/* (c) 1982 Stern */
 	DRIVER( calipso )	/* (c) 1982 Tago */
 	DRIVER( anteater )	/* (c) 1982 Tago */
-	DRIVER( anteatg )	/* (c) 1983 TV-Tuning (F.E.G. license) */
-	DRIVER( anteatgb )	/* (c) 1983 Free Enterprise Games */
+	DRIVER( anteaterg )	/* (c) 1983 TV-Tuning (F.E.G. license) */
+	DRIVER( anteateruk )/* (c) 1983 Free Enterprise Games */
 	DRIVER( rescue )	/* (c) 1982 Stern */
 	DRIVER( aponow )	/* bootleg */
 	DRIVER( minefld )	/* (c) 1983 Stern */

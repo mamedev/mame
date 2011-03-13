@@ -747,7 +747,8 @@ WRITE8_HANDLER( galaxian_flip_screen_xy_w )
 WRITE8_HANDLER( galaxian_stars_enable_w )
 {
 	if ((stars_enabled ^ data) & 0x01)
-	space->machine->primary_screen->update_now();
+		space->machine->primary_screen->update_now();
+
 	if (!stars_enabled && (data & 0x01))
 	{
 		/* on the rising edge of this, the CLR on the shift registers is released */
@@ -762,28 +763,36 @@ WRITE8_HANDLER( galaxian_stars_enable_w )
 
 WRITE8_HANDLER( scramble_background_enable_w )
 {
-	space->machine->primary_screen->update_now();
+	if ((background_enable ^ data) & 0x01)
+		space->machine->primary_screen->update_now();
+
 	background_enable = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_red_w )
 {
-	space->machine->primary_screen->update_now();
+	if ((background_red ^ data) & 0x01)
+		space->machine->primary_screen->update_now();
+
 	background_red = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_green_w )
 {
-	space->machine->primary_screen->update_now();
+	if ((background_green ^ data) & 0x01)
+		space->machine->primary_screen->update_now();
+
 	background_green = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_blue_w )
 {
-	space->machine->primary_screen->update_now();
+	if ((background_blue ^ data) & 0x01)
+		space->machine->primary_screen->update_now();
+
 	background_blue = data & 0x01;
 }
 
@@ -954,26 +963,6 @@ static void stars_draw_row(bitmap_t *bitmap, int maxx, int y, UINT32 star_offs, 
  *
  *************************************/
 
-#ifdef UNUSED_FUNCTION
-static int flip_and_clip(rectangle *draw, int xstart, int xend, const rectangle *cliprect)
-{
-	*draw = *cliprect;
-	if (!flipscreen_x)
-	{
-		draw->min_x = xstart * GALAXIAN_XSCALE;
-		draw->max_x = xend * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
-	}
-	else
-	{
-		draw->min_x = (xend ^ 255) * GALAXIAN_XSCALE;
-		draw->max_x = (xstart ^ 255) * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
-	}
-	sect_rect(draw, cliprect);
-	return (draw->min_x <= draw->max_x);
-}
-#endif
-
-
 void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* erase the background to black first */
@@ -997,43 +986,129 @@ void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap, const 
 }
 
 
-void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void background_draw_colorsplit(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, rgb_t color, int split, int split_flipped)
 {
-	rectangle draw;
-
+	/* horizontal bgcolor split */
 	if (flipscreen_x)
 	{
-		/* color split point verified on real machine */
-		/* hmmm, according to schematics it is at 128+8; which is right? */
-		draw = *cliprect;
-		draw.max_x = MIN(draw.max_x, (128-8) * GALAXIAN_XSCALE - 1);
+		rectangle draw = *cliprect;
+		draw.max_x = MIN(draw.max_x, split_flipped * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
 			bitmap_fill(bitmap, &draw, RGB_BLACK);
 
 		draw = *cliprect;
-		draw.min_x = MAX(draw.min_x, (128-8) * GALAXIAN_XSCALE);
+		draw.min_x = MAX(draw.min_x, split_flipped * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
-			bitmap_fill(bitmap, &draw, MAKE_RGB(0,0,0x47));
+			bitmap_fill(bitmap, &draw, color);
 	}
 	else
 	{
-		/* color split point verified on real machine */
-		/* hmmm, according to schematics it is at 128+8; which is right? */
-		draw = *cliprect;
-		draw.max_x = MIN(draw.max_x, (128+8) * GALAXIAN_XSCALE - 1);
+		rectangle draw = *cliprect;
+		draw.max_x = MIN(draw.max_x, split * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
-			bitmap_fill(bitmap, &draw, MAKE_RGB(0,0,0x47));
+			bitmap_fill(bitmap, &draw, color);
 
 		draw = *cliprect;
-		draw.min_x = MAX(draw.min_x, (128+8) * GALAXIAN_XSCALE);
+		draw.min_x = MAX(draw.min_x, split * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
 			bitmap_fill(bitmap, &draw, RGB_BLACK);
 	}
+}
 
+
+static void scramble_draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int maxx)
+{
+	/* update the star origin to the current frame */
+	stars_update_origin(machine);
+
+	/* render stars if enabled */
+	if (stars_enabled)
+	{
+		int blink_state = stars_blink_state & 3;
+		int y;
+
+		/* iterate over scanlines */
+		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		{
+			/* blink state 2 suppressed stars when 2V == 0 */
+			if (blink_state != 2 || (y & 2) != 0)
+			{
+				/* blink states 0 and 1 suppress stars when certain bits of the color == 0 */
+				static const UINT8 colormask_table[4] = { 0x20, 0x08, 0xff, 0xff };
+				stars_draw_row(bitmap, maxx, y, y * 512, colormask_table[blink_state]);
+			}
+		}
+	}
+}
+
+
+void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	/* blue background - 390 ohm resistor */
+	bitmap_fill(bitmap, cliprect, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK);
+
+	scramble_draw_stars(machine, bitmap, cliprect, 256);
+}
+
+
+void anteater_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	/* blue background, horizontal split as seen on flyer and real cabinet */
+	background_draw_colorsplit(machine, bitmap, cliprect, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, 56, 256-56);
+
+	scramble_draw_stars(machine, bitmap, cliprect, 256);
+}
+
+
+void jumpbug_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	/* blue background - 390 ohm resistor */
+	bitmap_fill(bitmap, cliprect, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK);
+
+	/* render stars same as scramble but nothing in the status area */
+	scramble_draw_stars(machine, bitmap, cliprect, 240);
+}
+
+
+void turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	/*
+        The background color generator is connected this way:
+
+            RED   - 390 ohm resistor
+            GREEN - 470 ohm resistor
+            BLUE  - 390 ohm resistor
+    */
+	bitmap_fill(bitmap, cliprect, MAKE_RGB(background_red * 0x55, background_green * 0x47, background_blue * 0x55));
+}
+
+
+void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	/* color split point verified on real machine */
+	/* hmmm, according to schematics it is at 128+8; which is right? */
+	background_draw_colorsplit(machine, bitmap, cliprect, MAKE_RGB(0,0,0x47), 128+8, 128-8);
 }
 
 
 #ifdef UNUSED_FUNCTION
+static int flip_and_clip(rectangle *draw, int xstart, int xend, const rectangle *cliprect)
+{
+	*draw = *cliprect;
+	if (!flipscreen_x)
+	{
+		draw->min_x = xstart * GALAXIAN_XSCALE;
+		draw->max_x = xend * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
+	}
+	else
+	{
+		draw->min_x = (xend ^ 255) * GALAXIAN_XSCALE;
+		draw->max_x = (xstart ^ 255) * GALAXIAN_XSCALE + (GALAXIAN_XSCALE - 1);
+	}
+	sect_rect(draw, cliprect);
+	return (draw->min_x <= draw->max_x);
+}
+
 void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	const UINT8 *prom = machine->region("user1")->base();
@@ -1064,77 +1139,6 @@ void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		}
 }
 #endif
-
-
-void turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	/*
-        The background color generator is connected this way:
-
-            RED   - 390 ohm resistor
-            GREEN - 470 ohm resistor
-            BLUE  - 390 ohm resistor
-    */
-	bitmap_fill(bitmap, cliprect, MAKE_RGB(background_red * 0x55, background_green * 0x47, background_blue * 0x55));
-}
-
-
-void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	/* blue background - 390 ohm resistor */
-	bitmap_fill(bitmap, cliprect, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK);
-
-	/* update the star origin to the current frame */
-	stars_update_origin(machine);
-
-	/* render stars if enabled */
-	if (stars_enabled)
-	{
-		int blink_state = stars_blink_state & 3;
-		int y;
-
-		/* iterate over scanlines */
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		{
-			/* blink state 2 suppressed stars when 2V == 0 */
-			if (blink_state != 2 || (y & 2) != 0)
-			{
-				/* blink states 0 and 1 suppress stars when certain bits of the color == 0 */
-				static const UINT8 colormask_table[4] = { 0x20, 0x08, 0xff, 0xff };
-				stars_draw_row(bitmap, 256, y, y * 512, colormask_table[blink_state]);
-			}
-		}
-	}
-}
-
-
-void jumpbug_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	/* blue background - 390 ohm resistor */
-	bitmap_fill(bitmap, cliprect, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK);
-
-	/* update the star origin to the current frame */
-	stars_update_origin(machine);
-
-	/* render stars if enabled -- same as scramble but nothing in the status area */
-	if (stars_enabled)
-	{
-		int blink_state = stars_blink_state & 3;
-		int y;
-
-		/* iterate over scanlines */
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		{
-			/* blink state 2 suppressed stars when 2V == 0 */
-			if (blink_state != 2 || (y & 2) != 0)
-			{
-				/* blink states 0 and 1 suppress stars when certain bits of the color == 0 */
-				static const UINT8 colormask_table[4] = { 0x20, 0x08, 0xff, 0xff };
-				stars_draw_row(bitmap, 240, y, y * 512, colormask_table[blink_state]);
-			}
-		}
-	}
-}
 
 
 

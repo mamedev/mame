@@ -206,62 +206,62 @@ static ADDRESS_MAP_START( mimonkey_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static READ8_DEVICE_HANDLER( anteatg_ppi8255_0_reg0_r )
+static READ8_DEVICE_HANDLER( anteaterg_ppi8255_0_reg0_r )
 {
 	return ppi8255_r(device, 0);
 }
 
-static READ8_DEVICE_HANDLER( anteatg_ppi8255_0_reg1_r )
+static READ8_DEVICE_HANDLER( anteaterg_ppi8255_0_reg1_r )
 {
 	return ppi8255_r(device, 1);
 }
 
-static READ8_DEVICE_HANDLER( anteatg_ppi8255_0_reg2_r )
+static READ8_DEVICE_HANDLER( anteaterg_ppi8255_0_reg2_r )
 {
 	return ppi8255_r(device, 2);
 }
 
-static READ8_DEVICE_HANDLER( anteatg_ppi8255_0_reg3_r )
+static READ8_DEVICE_HANDLER( anteaterg_ppi8255_0_reg3_r )
 {
 	return ppi8255_r(device, 3);
 }
 
-static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_0_reg0_w )
+static WRITE8_DEVICE_HANDLER( anteaterg_ppi8255_0_reg0_w )
 {
 	ppi8255_w(device, 0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_0_reg1_w )
+static WRITE8_DEVICE_HANDLER( anteaterg_ppi8255_0_reg1_w )
 {
 	ppi8255_w(device, 1, data);
 }
 
-static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_0_reg2_w )
+static WRITE8_DEVICE_HANDLER( anteaterg_ppi8255_0_reg2_w )
 {
 	ppi8255_w(device, 2, data);
 }
 
-static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_0_reg3_w )
+static WRITE8_DEVICE_HANDLER( anteaterg_ppi8255_0_reg3_w )
 {
 	ppi8255_w(device, 3, data);
 }
 
-static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_1_reg0_w )
+static WRITE8_DEVICE_HANDLER( anteaterg_ppi8255_1_reg0_w )
 {
 	ppi8255_w(device, 0, data);
 }
 
-static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_1_reg1_w )
+static WRITE8_DEVICE_HANDLER( anteaterg_ppi8255_1_reg1_w )
 {
 	ppi8255_w(device, 1, data);
 }
 
-static WRITE8_DEVICE_HANDLER( anteatg_ppi8255_1_reg3_w )
+static WRITE8_DEVICE_HANDLER( anteaterg_ppi8255_1_reg3_w )
 {
 	ppi8255_w(device, 3, data);
 }
 
-static ADDRESS_MAP_START( anteatg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( anteaterg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
@@ -269,9 +269,9 @@ static ADDRESS_MAP_START( anteatg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2040, 0x205f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
 	AM_RANGE(0x2060, 0x207f) AM_RAM AM_BASE(&galaxold_bulletsram) AM_SIZE(&galaxold_bulletsram_size)
 	AM_RANGE(0x2080, 0x20ff) AM_RAM
-	AM_RANGE(0x2423, 0x2423) AM_DEVWRITE("ppi8255_1", anteatg_ppi8255_1_reg3_w)
-	AM_RANGE(0x2450, 0x2450) AM_DEVWRITE("ppi8255_1", anteatg_ppi8255_1_reg0_w)
-	AM_RANGE(0x2511, 0x2511) AM_DEVWRITE("ppi8255_1", anteatg_ppi8255_1_reg1_w)
+	AM_RANGE(0x2423, 0x2423) AM_DEVWRITE("ppi8255_1", anteaterg_ppi8255_1_reg3_w)
+	AM_RANGE(0x2450, 0x2450) AM_DEVWRITE("ppi8255_1", anteaterg_ppi8255_1_reg0_w)
+	AM_RANGE(0x2511, 0x2511) AM_DEVWRITE("ppi8255_1", anteaterg_ppi8255_1_reg1_w)
 	AM_RANGE(0x2621, 0x2621) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x2624, 0x2624) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x2647, 0x2647) AM_WRITE(galaxold_flip_screen_y_w)
@@ -284,13 +284,13 @@ static ADDRESS_MAP_START( anteatg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8300, 0x98ff) AM_ROM
 	AM_RANGE(0xa300, 0xa7ff) AM_ROM
 	AM_RANGE(0xf521, 0xf521) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xf612, 0xf612) AM_DEVREADWRITE("ppi8255_0", anteatg_ppi8255_0_reg0_r, anteatg_ppi8255_0_reg0_w)
-	AM_RANGE(0xf631, 0xf631) AM_DEVREADWRITE("ppi8255_0", anteatg_ppi8255_0_reg1_r, anteatg_ppi8255_0_reg1_w)
-	AM_RANGE(0xf710, 0xf710) AM_DEVREADWRITE("ppi8255_0", anteatg_ppi8255_0_reg2_r, anteatg_ppi8255_0_reg2_w)
-	AM_RANGE(0xf753, 0xf753) AM_DEVREADWRITE("ppi8255_0", anteatg_ppi8255_0_reg3_r, anteatg_ppi8255_0_reg3_w)
+	AM_RANGE(0xf612, 0xf612) AM_DEVREADWRITE("ppi8255_0", anteaterg_ppi8255_0_reg0_r, anteaterg_ppi8255_0_reg0_w)
+	AM_RANGE(0xf631, 0xf631) AM_DEVREADWRITE("ppi8255_0", anteaterg_ppi8255_0_reg1_r, anteaterg_ppi8255_0_reg1_w)
+	AM_RANGE(0xf710, 0xf710) AM_DEVREADWRITE("ppi8255_0", anteaterg_ppi8255_0_reg2_r, anteaterg_ppi8255_0_reg2_w)
+	AM_RANGE(0xf753, 0xf753) AM_DEVREADWRITE("ppi8255_0", anteaterg_ppi8255_0_reg3_r, anteaterg_ppi8255_0_reg3_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( anteatgb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( anteateruk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
@@ -542,7 +542,7 @@ static INPUT_PORTS_START( tazmania )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( anteatg )
+static INPUT_PORTS_START( anteaterg )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Coinage ) )
@@ -593,7 +593,7 @@ static INPUT_PORTS_START( anteatg )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( anteatgb )
+static INPUT_PORTS_START( anteateruk )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -1046,19 +1046,19 @@ MACHINE_CONFIG_END
 
 
 /* same as type1 but with a strange memory map, maybe a kind of protection */
-static MACHINE_CONFIG_DERIVED( anteatg, type1 )
+static MACHINE_CONFIG_DERIVED( anteaterg, type1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(anteatg_map)
+	MCFG_CPU_PROGRAM_MAP(anteaterg_map)
 MACHINE_CONFIG_END
 
 /* same as type1 but with a strange memory map, maybe a kind of protection */
-static MACHINE_CONFIG_DERIVED( anteatgb, type1 )
+static MACHINE_CONFIG_DERIVED( anteateruk, type1 )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(anteatgb_map)
+	MCFG_CPU_PROGRAM_MAP(anteateruk_map)
 MACHINE_CONFIG_END
 
 
@@ -1182,7 +1182,7 @@ ROM_START( tazmani2 )
 	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
 ROM_END
 
-ROM_START( anteatg )
+ROM_START( anteaterg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "prg_2.bin",    0x0000, 0x0400, CRC(2ba793a8) SHA1(a97c96dcd55804d3b41856ece6477ec1c1e45892) )
 	ROM_CONTINUE(             0x4600, 0x0a00 )
@@ -1203,7 +1203,7 @@ ROM_START( anteatg )
 	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
 ROM_END
 
-ROM_START( anteatgb )
+ROM_START( anteateruk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ant1.bin",     0x0000, 0x0400, CRC(69debc90) SHA1(2ad4c86a1cbaf86d0b76bb07b885f61bc6604009) )
 	ROM_CONTINUE(             0x4600, 0x0a00 )
@@ -1382,7 +1382,7 @@ ROM_START( hustlerb2 )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "b4.r2",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
-	ROM_LOAD( "b5",   0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // broken rom, assumed to be the same
+	ROM_LOAD( "b5",  	 0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // broken rom, assumed to be the same
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "27s19.bin",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
@@ -1437,21 +1437,21 @@ ROM_START( mimonsco )
 ROM_END
 
 
-GAME( 1981, stratgyx, 0,        stratgyx, stratgyx, stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
-GAME( 1981, stratgys, stratgyx, stratgyx, stratgyx, stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1982, strongx,  stratgyx, stratgyx, stratgyx, stratgyx,	  ROT0,	  "bootleg", "Strong X", GAME_SUPPORTS_SAVE )
-GAME( 1982, darkplnt, 0,        darkplnt, darkplnt, darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
-GAME( 1982, tazmani2, tazmania, type2,    tazmania, tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, anteatgb, anteater, anteatgb, anteatgb, scramble_ppi, ROT90,  "Tago Electronics (Free Enterprise Games license)", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
-GAME( 1983, anteatg,  anteater, anteatg,  anteatg,  scramble_ppi, ROT90,  "Tago Electronics (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
-GAME( 1982, rescue,   0,        rescue,   rescue,   rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
-GAME( 1982, aponow,   rescue,   rescue,   rescue,   rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
-GAME( 1983, minefld,  0,        minefld,  minefld,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustler,  0,        hustler,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerd, hustler,  hustler,  hustler,  hustlerd,     ROT90,  "Konami (Dynamo Games license)", "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
-GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?
-GAME( 1981, hustlerb2,hustler,  hustler,  hustler,  scramble_ppi, ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, mimonkey, 0,        mimonkey, mimonkey, mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
-GAME( 1982, mimonsco, mimonkey, mimonkey, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, stratgyx,  0,        stratgyx,  stratgyx,  stratgyx,     ROT0,   "Konami", "Strategy X", GAME_SUPPORTS_SAVE )
+GAME( 1981, stratgys,  stratgyx, stratgyx,  stratgyx,  stratgyx,     ROT0,   "Konami (Stern Electronics license)", "Strategy X (Stern Electronics)", GAME_SUPPORTS_SAVE )
+GAME( 1982, strongx,   stratgyx, stratgyx,  stratgyx,  stratgyx,     ROT0,   "bootleg", "Strong X", GAME_SUPPORTS_SAVE )
+GAME( 1982, darkplnt,  0,        darkplnt,  darkplnt,  darkplnt,     ROT180, "Stern Electronics", "Dark Planet", GAME_SUPPORTS_SAVE )
+GAME( 1982, tazmani2,  tazmania, type2,     tazmania,  tazmani2,     ROT90,  "Stern Electronics", "Tazz-Mania (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1983, anteateruk,anteater, anteateruk,anteateruk,scramble_ppi, ROT90,  "Tago Electronics (Free Enterprise Games license)", "The Anteater (UK)", GAME_SUPPORTS_SAVE )
+GAME( 1983, anteaterg, anteater, anteaterg, anteaterg, scramble_ppi, ROT90,  "Tago Electronics (TV-Tuning license from Free Enterprise Games)", "Ameisenbaer (German)", GAME_SUPPORTS_SAVE )
+GAME( 1982, rescue,    0,        rescue,    rescue,    rescue,       ROT90,  "Stern Electronics", "Rescue", GAME_SUPPORTS_SAVE )
+GAME( 1982, aponow,    rescue,   rescue,    rescue,    rescue,       ROT90,  "bootleg", "Apocaljpse Now", GAME_SUPPORTS_SAVE )
+GAME( 1983, minefld,   0,        minefld,   minefld,   minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustler,   0,        hustler,   hustler,   hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerd,  hustler,  hustler,   hustler,   hustlerd,     ROT90,  "Konami (Dynamo Games license)", "Video Hustler (Dynamo Games)", GAME_SUPPORTS_SAVE )
+GAME( 1981, billiard,  hustler,  hustler,   hustler,   billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   scramble_ppi, ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?
+GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_ppi, ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
+GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
 
