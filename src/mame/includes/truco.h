@@ -5,6 +5,8 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *battery_ram;
+	int trigger;
 };
 
 

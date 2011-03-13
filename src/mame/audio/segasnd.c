@@ -727,7 +727,7 @@ static DEVICE_START( usb_sound )
 }
 
 
-DEVICE_GET_INFO( usb_sound )
+static DEVICE_GET_INFO( usb_sound )
 {
 	switch (state)
 	{
@@ -740,8 +740,8 @@ DEVICE_GET_INFO( usb_sound )
 	}
 }
 
-DECLARE_LEGACY_SOUND_DEVICE(USB, usb_sound);
-DEFINE_LEGACY_SOUND_DEVICE(USB, usb_sound);
+DECLARE_LEGACY_SOUND_DEVICE(SEGAUSB, usb_sound);
+DEFINE_LEGACY_SOUND_DEVICE(SEGAUSB, usb_sound);
 
 
 
@@ -924,7 +924,7 @@ MACHINE_CONFIG_FRAGMENT( sega_universal_sound_board )
 	MCFG_TIMER_ADD_PERIODIC("usb_timer", increment_t1_clock, attotime::from_hz(USB_2MHZ_CLOCK / 256))
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("usbsnd", USB, 0)
+	MCFG_SOUND_ADD("usbsnd", SEGAUSB, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

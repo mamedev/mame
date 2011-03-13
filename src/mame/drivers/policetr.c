@@ -94,24 +94,6 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 #define MASTER_CLOCK	48000000
 
 
-/* global variables */
-UINT32 *	policetr_rambase;
-
-
-/* local variables */
-static UINT32 control_data;
-
-static UINT32 bsmt_data_bank;
-static UINT32 bsmt_data_offset;
-
-static UINT32 *speedup_data;
-static UINT64 last_cycles;
-static UINT32 loop_count;
-
-static offs_t speedup_pc;
-
-
-
 /*************************************
  *
  *  Interrupt handling
@@ -140,7 +122,8 @@ static INTERRUPT_GEN( irq4_gen )
 
 static WRITE32_HANDLER( control_w )
 {
-	UINT32 old = control_data;
+	policetr_state *state = space->machine->driver_data<policetr_state>();
+	UINT32 old = state->control_data;
 
 	// bit $80000000 = BSMT access/ROM read
 	// bit $20000000 = toggled every 64 IRQ4's
@@ -149,7 +132,7 @@ static WRITE32_HANDLER( control_w )
 	// bit $00400000 = EEPROM clock
 	// bit $00200000 = EEPROM enable (on 1)
 
-	COMBINE_DATA(&control_data);
+	COMBINE_DATA(&state->control_data);
 
 	/* handle EEPROM I/O */
 	if (ACCESSING_BITS_16_23)
@@ -161,7 +144,7 @@ static WRITE32_HANDLER( control_w )
 	}
 
 	/* toggling BSMT off then on causes a reset */
-	if (!(old & 0x80000000) && (control_data & 0x80000000))
+	if (!(old & 0x80000000) && (state->control_data & 0x80000000))
 	{
 		bsmt2000_device *bsmt = space->machine->device<bsmt2000_device>("bsmt");
 		bsmt->reset();
@@ -182,17 +165,19 @@ static WRITE32_HANDLER( control_w )
 
 static WRITE32_HANDLER( policetr_bsmt2000_reg_w )
 {
-	if (control_data & 0x80000000)
+	policetr_state *state = space->machine->driver_data<policetr_state>();
+	if (state->control_data & 0x80000000)
 		space->machine->device<bsmt2000_device>("bsmt")->write_data(data);
 	else
-		COMBINE_DATA(&bsmt_data_offset);
+		COMBINE_DATA(&state->bsmt_data_offset);
 }
 
 
 static WRITE32_HANDLER( policetr_bsmt2000_data_w )
 {
+	policetr_state *state = space->machine->driver_data<policetr_state>();
 	space->machine->device<bsmt2000_device>("bsmt")->write_reg(data);
-	COMBINE_DATA(&bsmt_data_bank);
+	COMBINE_DATA(&state->bsmt_data_bank);
 }
 
 
@@ -204,7 +189,8 @@ static CUSTOM_INPUT( bsmt_status_r )
 
 static READ32_HANDLER( bsmt2000_data_r )
 {
-	return space->machine->region("bsmt")->base()[bsmt_data_bank * 0x10000 + bsmt_data_offset] << 8;
+	policetr_state *state = space->machine->driver_data<policetr_state>();
+	return space->machine->region("bsmt")->base()[state->bsmt_data_bank * 0x10000 + state->bsmt_data_offset] << 8;
 }
 
 
@@ -217,26 +203,27 @@ static READ32_HANDLER( bsmt2000_data_r )
 
 static WRITE32_HANDLER( speedup_w )
 {
-	COMBINE_DATA(speedup_data);
+	policetr_state *state = space->machine->driver_data<policetr_state>();
+	COMBINE_DATA(state->speedup_data);
 
 	/* see if the PC matches */
-	if ((cpu_get_previouspc(space->cpu) & 0x1fffffff) == speedup_pc)
+	if ((cpu_get_previouspc(space->cpu) & 0x1fffffff) == state->speedup_pc)
 	{
 		UINT64 curr_cycles = space->machine->firstcpu->total_cycles();
 
 		/* if less than 50 cycles from the last time, count it */
-		if (curr_cycles - last_cycles < 50)
+		if (curr_cycles - state->last_cycles < 50)
 		{
-			loop_count++;
+			state->loop_count++;
 
 			/* more than 2 in a row and we spin */
-			if (loop_count > 2)
+			if (state->loop_count > 2)
 				cpu_spinuntil_int(space->cpu);
 		}
 		else
-			loop_count = 0;
+			state->loop_count = 0;
 
-		last_cycles = curr_cycles;
+		state->last_cycles = curr_cycles;
 	}
 }
 
@@ -268,7 +255,7 @@ static const eeprom_interface eeprom_interface_policetr =
  *************************************/
 
 static ADDRESS_MAP_START( policetr_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(&policetr_rambase)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(policetr_state, rambase)
 	AM_RANGE(0x00200000, 0x0020000f) AM_WRITE(policetr_video_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
 	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
@@ -287,7 +274,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sshooter_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(&policetr_rambase)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(policetr_state, rambase)
 	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(policetr_bsmt2000_data_w)
 	AM_RANGE(0x00300000, 0x00300003) AM_WRITE(policetr_palette_offset_w)
 	AM_RANGE(0x00320000, 0x00320003) AM_WRITE(policetr_palette_data_w)
@@ -427,7 +414,7 @@ static const r3000_cpu_core r3000_config =
 };
 
 
-static MACHINE_CONFIG_START( policetr, driver_device )
+static MACHINE_CONFIG_START( policetr, policetr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3000BE, MASTER_CLOCK/2)
@@ -691,27 +678,31 @@ ROM_END
 
 static DRIVER_INIT( policetr )
 {
-	speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
-	speedup_pc = 0x1fc028ac;
+	policetr_state *state = machine->driver_data<policetr_state>();
+	state->speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	state->speedup_pc = 0x1fc028ac;
 }
 
 static DRIVER_INIT( plctr13b )
 {
-	speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
-	speedup_pc = 0x1fc028bc;
+	policetr_state *state = machine->driver_data<policetr_state>();
+	state->speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	state->speedup_pc = 0x1fc028bc;
 }
 
 
 static DRIVER_INIT( sshooter )
 {
-	speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
-	speedup_pc = 0x1fc03470;
+	policetr_state *state = machine->driver_data<policetr_state>();
+	state->speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	state->speedup_pc = 0x1fc03470;
 }
 
 static DRIVER_INIT( sshoot12 )
 {
-	speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
-	speedup_pc = 0x1fc033e0;
+	policetr_state *state = machine->driver_data<policetr_state>();
+	state->speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	state->speedup_pc = 0x1fc033e0;
 }
 
 

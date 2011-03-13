@@ -31,6 +31,8 @@ public:
 	int page;
 #endif
 
+	INT16 *samplebuf;
+	int sample;
 };
 
 

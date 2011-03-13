@@ -517,14 +517,13 @@ void btoads_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanlin
 
 	if (input_code_pressed(screen.machine, KEYCODE_X))
 	{
-		static int count = 0;
 		char name[10];
 		FILE *f;
 		int i;
 
 		while (input_code_pressed(screen.machine, KEYCODE_X)) ;
 
-		sprintf(name, "disp%d.log", count++);
+		sprintf(name, "disp%d.log", state->xcount++);
 		f = fopen(name, "w");
 		fprintf(f, "screen_control = %04X\n\n", state->screen_control << 8);
 

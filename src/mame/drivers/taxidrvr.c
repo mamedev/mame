@@ -23,30 +23,30 @@ static WRITE8_DEVICE_HANDLER( p4b_w ) { taxidrvr_spritectrl_w(device,7,data); }
 static WRITE8_DEVICE_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(device,8,data); }
 
 
-
-
-static int s1,s2,s3,s4,latchA,latchB;
-
 static READ8_DEVICE_HANDLER( p0a_r )
 {
-	return latchA;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	return state->latchA;
 }
 
 static READ8_DEVICE_HANDLER( p0c_r )
 {
-	return (s1 << 7);
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	return (state->s1 << 7);
 }
 
 static WRITE8_DEVICE_HANDLER( p0b_w )
 {
-	latchB = data;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	state->latchB = data;
 }
 
 static WRITE8_DEVICE_HANDLER( p0c_w )
 {
-	s2 = data & 1;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	state->s2 = data & 1;
 
-	taxidrvr_bghide = data & 2;
+	state->bghide = data & 2;
 
 	/* bit 2 toggles during gameplay */
 
@@ -57,40 +57,47 @@ static WRITE8_DEVICE_HANDLER( p0c_w )
 
 static READ8_DEVICE_HANDLER( p1b_r )
 {
-	return latchB;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	return state->latchB;
 }
 
 static READ8_DEVICE_HANDLER( p1c_r )
 {
-	return (s2 << 7) | (s4 << 6) | ((input_port_read(device->machine, "SERVCOIN") & 1) << 4);
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	return (state->s2 << 7) | (state->s4 << 6) | ((input_port_read(device->machine, "SERVCOIN") & 1) << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( p1a_w )
 {
-	latchA = data;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	state->latchA = data;
 }
 
 static WRITE8_DEVICE_HANDLER( p1c_w )
 {
-	s1 = data & 1;
-	s3 = (data & 2) >> 1;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	state->s1 = data & 1;
+	state->s3 = (data & 2) >> 1;
 }
 
 static READ8_DEVICE_HANDLER( p8910_0a_r )
 {
-	return latchA;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	return state->latchA;
 }
 
 static READ8_DEVICE_HANDLER( p8910_1a_r )
 {
-	return s3;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	return state->s3;
 }
 
 /* note that a lot of writes happen with port B set as input. I think this is a bug in the
    original, since it works anyway even if the communication is flawed. */
 static WRITE8_DEVICE_HANDLER( p8910_0b_w )
 {
-	s4 = data & 1;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	state->s4 = data & 1;
 }
 
 
@@ -145,21 +152,21 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_RAM	/* ??? */
 	AM_RANGE(0xa000, 0xafff) AM_RAM	/* ??? */
 	AM_RANGE(0xb000, 0xbfff) AM_RAM	/* ??? */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(&taxidrvr_vram4)			/* radar bitmap */
-	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_BASE(&taxidrvr_vram5)	/* "sprite1" bitmap */
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_BASE(&taxidrvr_vram6)	/* "sprite2" bitmap */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&taxidrvr_vram7)			/* "sprite3" bitmap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(taxidrvr_state, vram4)			/* radar bitmap */
+	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram5)	/* "sprite1" bitmap */
+	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram6)	/* "sprite2" bitmap */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(taxidrvr_state, vram7)			/* "sprite3" bitmap */
 	AM_RANGE(0xe000, 0xf3ff) AM_READONLY
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_BASE(&taxidrvr_vram1)	/* car tilemap */
-	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_BASE(&taxidrvr_vram2)	/* bg1 tilemap */
-	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_BASE(&taxidrvr_vram0)	/* fg tilemap */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_BASE(&taxidrvr_vram3)	/* bg2 tilemap */
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram1)	/* car tilemap */
+	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram2)	/* bg1 tilemap */
+	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram0)	/* fg tilemap */
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, vram3)	/* bg2 tilemap */
 	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
 	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
 	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE("ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
 	//AM_RANGE(0xf780, 0xf781) AM_WRITEONLY     /* more scroll registers? */
-	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_BASE(&taxidrvr_scroll)	/* bg scroll (three copies always identical) */
+	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_BASE_MEMBER(taxidrvr_state, scroll)	/* bg scroll (three copies always identical) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -358,7 +365,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 
 
-static MACHINE_CONFIG_START( taxidrvr, driver_device )
+static MACHINE_CONFIG_START( taxidrvr, taxidrvr_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz ??? */

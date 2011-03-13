@@ -37,42 +37,6 @@
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-/* I/O */
-static UINT8 g_iodata;
-static UINT8 g_ioaddr;
-static UINT8 coin_latch;
-static UINT8 keypad_status;
-static UINT8 g_status;
-static UINT8 f_status;
-static int io_firq_status;
-static UINT8 cmos_ram_a2_0;
-static UINT8 cmos_ram_a10_3;
-static UINT8 *cmos_ram;
-
-/* Sound */
-static UINT8 u56a;
-static UINT8 u56b;
-static UINT8 g_to_s_latch1;
-static UINT8 g_to_s_latch2;
-static UINT8 s_to_g_latch1;
-static UINT8 s_to_g_latch2;
-static UINT8 dac_msb;
-static UINT8 dac_vol;
-static UINT8 tms_data;
-
-/* Frame/Video CPU shared RAM */
-static UINT8 *fdt_a;
-static UINT8 *fdt_b;
-static int _fasel;
-static int _fbsel;
-
-
-/*************************************
- *
  *  6840 PTM
  *
  *************************************/
@@ -131,18 +95,20 @@ static READ8_HANDLER( uart_r )
 
 static READ8_HANDLER( g_status_r )
 {
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
 	int bank4 = BIT(get_rip_status(space->machine->device("video_cpu")), 2);
 	int vblank = space->machine->primary_screen->vblank();
 
-	return (!vblank << 7) | (bank4 << 6) | (f_status & 0x2f);
+	return (!vblank << 7) | (bank4 << 6) | (state->f_status & 0x2f);
 }
 
 static WRITE8_HANDLER( g_status_w )
 {
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
 	int bankaddress;
 	UINT8 *rom = space->machine->region("game_cpu")->base();
 
-	g_status = data;
+	state->g_status = data;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
 	memory_set_bankptr(space->machine, "bank1", &rom[bankaddress]);
@@ -179,17 +145,19 @@ static WRITE8_HANDLER( g_status_w )
 
 static READ8_HANDLER( f_status_r )
 {
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
 	int vblank = space->machine->primary_screen->vblank();
 	UINT8 rip_status = get_rip_status(space->machine->device("video_cpu"));
 
 	rip_status = (rip_status & 0x18) | (BIT(rip_status, 6) << 1) |  BIT(rip_status, 7);
 
-	return (!vblank << 7) | (_fbsel << 6) | (esripsys_frame_vbl << 5) | rip_status;
+	return (!vblank << 7) | (state->_fbsel << 6) | (state->frame_vbl << 5) | rip_status;
 }
 
 static WRITE8_HANDLER( f_status_w )
 {
-	f_status = data;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	state->f_status = data;
 }
 
 
@@ -201,30 +169,34 @@ static WRITE8_HANDLER( f_status_w )
 
 static TIMER_CALLBACK( delayed_bank_swap )
 {
-	_fasel ^= 1;
-	_fbsel ^= 1;
+	esripsys_state *state = machine->driver_data<esripsys_state>();
+	state->_fasel ^= 1;
+	state->_fbsel ^= 1;
 }
 
 static WRITE8_HANDLER( frame_w )
 {
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
 	space->machine->scheduler().synchronize(FUNC(delayed_bank_swap));
-	esripsys_frame_vbl = 1;
+	state->frame_vbl = 1;
 }
 
 static READ8_HANDLER( fdt_r )
 {
-	if (!_fasel)
-		return fdt_b[offset];
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	if (!state->_fasel)
+		return state->fdt_b[offset];
 	else
-		return fdt_a[offset];
+		return state->fdt_a[offset];
 }
 
 static WRITE8_HANDLER( fdt_w )
 {
-	if (!_fasel)
-		fdt_b[offset] = data;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	if (!state->_fasel)
+		state->fdt_b[offset] = data;
 	else
-		fdt_a[offset] = data;
+		state->fdt_a[offset] = data;
 }
 
 
@@ -236,27 +208,29 @@ static WRITE8_HANDLER( fdt_w )
 
 static READ16_DEVICE_HANDLER( fdt_rip_r )
 {
+	esripsys_state *state = device->machine->driver_data<esripsys_state>();
 	offset = (offset & 0x7ff) << 1;
 
-	if (!_fasel)
-		return (fdt_a[offset] << 8) | fdt_a[offset + 1];
+	if (!state->_fasel)
+		return (state->fdt_a[offset] << 8) | state->fdt_a[offset + 1];
 	else
-		return (fdt_b[offset] << 8) | fdt_b[offset + 1];
+		return (state->fdt_b[offset] << 8) | state->fdt_b[offset + 1];
 }
 
 static WRITE16_DEVICE_HANDLER( fdt_rip_w )
 {
+	esripsys_state *state = device->machine->driver_data<esripsys_state>();
 	offset = (offset & 0x7ff) << 1;
 
-	if (!_fasel)
+	if (!state->_fasel)
 	{
-		fdt_a[offset + 0] = data >> 8;
-		fdt_a[offset + 1] = data & 0xff;
+		state->fdt_a[offset + 0] = data >> 8;
+		state->fdt_a[offset + 1] = data & 0xff;
 	}
 	else
 	{
-		fdt_b[offset + 0] = data >> 8;
-		fdt_b[offset + 1] = data & 0xff;
+		state->fdt_b[offset + 0] = data >> 8;
+		state->fdt_b[offset + 1] = data & 0xff;
 	}
 }
 
@@ -273,16 +247,17 @@ static WRITE16_DEVICE_HANDLER( fdt_rip_w )
 
 static UINT8 rip_status_in(running_machine *machine)
 {
+	esripsys_state *state = machine->driver_data<esripsys_state>();
 	int vpos =  machine->primary_screen->vpos();
 	UINT8 _vblank = !(vpos >= ESRIPSYS_VBLANK_START);
 //  UINT8 _hblank = !machine->primary_screen->hblank();
 
 	return	_vblank
-			| (esripsys_hblank << 1)
-			| (esripsys__12sel << 2)
-			| (_fbsel << 4)
+			| (state->hblank << 1)
+			| (state->_12sel << 2)
+			| (state->_fbsel << 4)
 			| ((vpos & 1) << 5)
-			| (f_status & 0x80);
+			| (state->f_status & 0x80);
 }
 
 /*************************************
@@ -293,24 +268,26 @@ static UINT8 rip_status_in(running_machine *machine)
 
 static WRITE8_HANDLER( g_iobus_w )
 {
-	g_iodata = data;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	state->g_iodata = data;
 }
 
 static READ8_HANDLER( g_iobus_r )
 {
-	switch (g_ioaddr & 0x7f)
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	switch (state->g_ioaddr & 0x7f)
 	{
 		case 0:
-			return s_to_g_latch2 & 0x3f;
+			return state->s_to_g_latch2 & 0x3f;
 		case 3:
-			return s_to_g_latch1;
+			return state->s_to_g_latch1;
 		case 5:
-			return cmos_ram[(cmos_ram_a10_3 << 3) | (cmos_ram_a2_0 & 3)];
+			return state->cmos_ram[(state->cmos_ram_a10_3 << 3) | (state->cmos_ram_a2_0 & 3)];
 		case 8:
 		{
-			int keypad = input_port_read(space->machine, "KEYPAD_B") | keypad_status;
-			keypad_status = 0;
-			io_firq_status = 0;
+			int keypad = input_port_read(space->machine, "KEYPAD_B") | state->keypad_status;
+			state->keypad_status = 0;
+			state->io_firq_status = 0;
 			return keypad;
 		}
 		case 9:
@@ -319,9 +296,9 @@ static READ8_HANDLER( g_iobus_r )
 		}
 		case 0xa:
 		{
-			int coins =  coin_latch | (input_port_read(space->machine, "COINS") & 0x30);
-			coin_latch = 0;
-			io_firq_status = 0;
+			int coins =  state->coin_latch | (input_port_read(space->machine, "COINS") & 0x30);
+			state->coin_latch = 0;
+			state->io_firq_status = 0;
 			return coins;
 		}
 		case 0x10:
@@ -331,7 +308,7 @@ static READ8_HANDLER( g_iobus_r )
 		case 0x12:
 			return input_port_read(space->machine, "JOYSTICK_Y");
 		case 0x16:
-			return io_firq_status;
+			return state->io_firq_status;
 		case 0x18:
 			return input_port_read(space->machine, "IO_2");
 			/* Unused I/O */
@@ -357,7 +334,7 @@ static READ8_HANDLER( g_iobus_r )
 			return 0xff;
 		default:
 		{
-			logerror("Unknown I/O read (%x)\n", g_ioaddr & 0x7f);
+			logerror("Unknown I/O read (%x)\n", state->g_ioaddr & 0x7f);
 			return 0xff;
 		}
 	}
@@ -365,51 +342,52 @@ static READ8_HANDLER( g_iobus_r )
 
 static WRITE8_HANDLER( g_ioadd_w )
 {
-	g_ioaddr = data;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	state->g_ioaddr = data;
 
 	/* Bit 7 is connected to /OE of LS374 containing I/O data */
 	if ((data & 0x80) == 0)
 	{
-		switch (g_ioaddr & 0x7f)
+		switch (state->g_ioaddr & 0x7f)
 		{
 			case 0x00:
 			{
-				g_to_s_latch1 = g_iodata;
+				state->g_to_s_latch1 = state->g_iodata;
 				break;
 			}
 			case 0x02:
 			{
-				cputag_set_input_line(space->machine, "sound_cpu", INPUT_LINE_NMI, g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
+				cputag_set_input_line(space->machine, "sound_cpu", INPUT_LINE_NMI, state->g_iodata & 4 ? CLEAR_LINE : ASSERT_LINE);
 
-				if (!(g_to_s_latch2 & 1) && (g_iodata & 1))
+				if (!(state->g_to_s_latch2 & 1) && (state->g_iodata & 1))
 				{
 					/* Rising D0 will clock in 1 to FF1... */
-					u56a = 1;
+					state->u56a = 1;
 
 					/*...causing a sound CPU /IRQ */
 					cputag_set_input_line(space->machine, "sound_cpu", M6809_IRQ_LINE, ASSERT_LINE);
 				}
 
-				if (g_iodata & 2)
-					u56b = 0;
+				if (state->g_iodata & 2)
+					state->u56b = 0;
 
-				g_to_s_latch2 = g_iodata;
+				state->g_to_s_latch2 = state->g_iodata;
 
 				break;
 			}
 			case 0x04:
 			{
-				cmos_ram[(cmos_ram_a10_3 << 3) | (cmos_ram_a2_0 & 3)] = g_iodata;
+				state->cmos_ram[(state->cmos_ram_a10_3 << 3) | (state->cmos_ram_a2_0 & 3)] = state->g_iodata;
 				break;
 			}
 			case 0x06:
 			{
-				cmos_ram_a10_3 = g_iodata;
+				state->cmos_ram_a10_3 = state->g_iodata;
 				break;
 			}
 			case 0x07:
 			{
-				cmos_ram_a2_0 = g_iodata;
+				state->cmos_ram_a2_0 = state->g_iodata;
 				break;
 			}
 			case 0x0b:
@@ -423,12 +401,12 @@ static WRITE8_HANDLER( g_ioadd_w )
 			}
 			case 0x15:
 			{
-				esripsys_video_firq_en = g_iodata & 1;
+				state->video_firq_en = state->g_iodata & 1;
 				break;
 			}
 			default:
 			{
-				logerror("Unknown I/O write to %x with %x\n", g_ioaddr, g_iodata);
+				logerror("Unknown I/O write to %x with %x\n", state->g_ioaddr, state->g_iodata);
 			}
 		}
 	}
@@ -436,20 +414,22 @@ static WRITE8_HANDLER( g_ioadd_w )
 
 static INPUT_CHANGED( keypad_interrupt )
 {
+	esripsys_state *state = field->port->machine->driver_data<esripsys_state>();
 	if (newval == 0)
 	{
-		io_firq_status |= 2;
-		keypad_status |= 0x20;
+		state->io_firq_status |= 2;
+		state->keypad_status |= 0x20;
 		cputag_set_input_line(field->port->machine, "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
 static INPUT_CHANGED( coin_interrupt )
 {
+	esripsys_state *state = field->port->machine->driver_data<esripsys_state>();
 	if (newval == 1)
 	{
-		io_firq_status |= 2;
-		coin_latch = input_port_read(field->port->machine, "COINS") << 2;
+		state->io_firq_status |= 2;
+		state->coin_latch = input_port_read(field->port->machine, "COINS") << 2;
 		cputag_set_input_line(field->port->machine, "game_cpu", M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
@@ -513,41 +493,45 @@ INPUT_PORTS_END
 /* Game/Sound CPU communications */
 static READ8_HANDLER( s_200e_r )
 {
-	return g_to_s_latch1;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	return state->g_to_s_latch1;
 }
 
 static WRITE8_HANDLER( s_200e_w )
 {
-	s_to_g_latch1 = data;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	state->s_to_g_latch1 = data;
 }
 
 static WRITE8_HANDLER( s_200f_w )
 {
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
 	UINT8 *rom = space->machine->region("sound_data")->base();
 	int rombank = data & 0x20 ? 0x2000 : 0;
 
 	/* Bit 6 -> Reset latch U56A */
 	/* Bit 7 -> Clock latch U56B */
-	if (s_to_g_latch2 & 0x40)
+	if (state->s_to_g_latch2 & 0x40)
 	{
-		u56a = 0;
+		state->u56a = 0;
 		cputag_set_input_line(space->machine, "sound_cpu", M6809_IRQ_LINE, CLEAR_LINE);
 	}
 
-	if (!(s_to_g_latch2 & 0x80) && (data & 0x80))
-		u56b = 1;
+	if (!(state->s_to_g_latch2 & 0x80) && (data & 0x80))
+		state->u56b = 1;
 
 	/* Speech data resides in the upper 8kB of the ROMs */
 	memory_set_bankptr(space->machine, "bank2", &rom[0x0000 + rombank]);
 	memory_set_bankptr(space->machine, "bank3", &rom[0x4000 + rombank]);
 	memory_set_bankptr(space->machine, "bank4", &rom[0x8000 + rombank]);
 
-	s_to_g_latch2 = data;
+	state->s_to_g_latch2 = data;
 }
 
 static READ8_HANDLER( s_200f_r )
 {
-	return (g_to_s_latch2 & 0xfc) | (u56b << 1) | u56a;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	return (state->g_to_s_latch2 & 0xfc) | (state->u56b << 1) | state->u56a;
 }
 
 static READ8_HANDLER( tms5220_r )
@@ -568,16 +552,17 @@ static READ8_HANDLER( tms5220_r )
 /* TODO: Implement correctly using the state PROM */
 static WRITE8_HANDLER( tms5220_w )
 {
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
 	device_t *tms = space->machine->device("tms5220nl");
 	if (offset == 0)
 	{
-		tms_data = data;
-		tms5220_data_w(tms, 0, tms_data);
+		state->tms_data = data;
+		tms5220_data_w(tms, 0, state->tms_data);
 	}
 #if 0
 	if (offset == 1)
 	{
-		tms5220_data_w(tms, 0, tms_data);
+		tms5220_data_w(tms, 0, state->tms_data);
 	}
 #endif
 }
@@ -592,26 +577,28 @@ static WRITE8_HANDLER( control_w )
 /* 10-bit MC3410CL DAC */
 static WRITE8_DEVICE_HANDLER( esripsys_dac_w )
 {
+	esripsys_state *state = device->machine->driver_data<esripsys_state>();
 	if (offset == 0)
 	{
-		dac_msb = data & 3;
+		state->dac_msb = data & 3;
 	}
 	else
 	{
-		UINT16 dac_data = (dac_msb << 8) | data;
+		UINT16 dac_data = (state->dac_msb << 8) | data;
 
 		/*
             The 8-bit DAC modulates the 10-bit DAC.
             Shift down to prevent clipping.
         */
-		dac_signed_data_16_w(device, (dac_vol * dac_data) >> 1);
+		dac_signed_data_16_w(device, (state->dac_vol * dac_data) >> 1);
 	}
 }
 
 /* 8-bit MC3408 DAC */
 static WRITE8_HANDLER( volume_dac_w )
 {
-	dac_vol = data;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	state->dac_vol = data;
 }
 
 
@@ -623,7 +610,7 @@ static WRITE8_HANDLER( volume_dac_w )
 
 static ADDRESS_MAP_START( game_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_BASE(&esripsys_pal_ram)
+	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_BASE_MEMBER(esripsys_state, pal_ram)
 	AM_RANGE(0x4300, 0x4300) AM_WRITE(esripsys_bg_intensity_w)
 	AM_RANGE(0x4400, 0x47ff) AM_NOP /* Collision detection RAM */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(g_status_r, g_status_w)
@@ -675,47 +662,48 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT( esripsys )
 {
+	esripsys_state *state = machine->driver_data<esripsys_state>();
 	UINT8 *rom = machine->region("sound_data")->base();
 
-	fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
-	fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
-	cmos_ram = auto_alloc_array(machine, UINT8, CMOS_RAM_SIZE);
+	state->fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
+	state->fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
+	state->cmos_ram = auto_alloc_array(machine, UINT8, CMOS_RAM_SIZE);
 
-	machine->device<nvram_device>("nvram")->set_base(cmos_ram, CMOS_RAM_SIZE);
+	machine->device<nvram_device>("nvram")->set_base(state->cmos_ram, CMOS_RAM_SIZE);
 
 	memory_set_bankptr(machine, "bank2", &rom[0x0000]);
 	memory_set_bankptr(machine, "bank3", &rom[0x4000]);
 	memory_set_bankptr(machine, "bank4", &rom[0x8000]);
 
 	/* Register stuff for state saving */
-	state_save_register_global_pointer(machine, fdt_a, FDT_RAM_SIZE);
-	state_save_register_global_pointer(machine, fdt_b, FDT_RAM_SIZE);
-	state_save_register_global_pointer(machine, cmos_ram, CMOS_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->fdt_a, FDT_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->fdt_b, FDT_RAM_SIZE);
+	state_save_register_global_pointer(machine, state->cmos_ram, CMOS_RAM_SIZE);
 
-	state_save_register_global(machine, g_iodata);
-	state_save_register_global(machine, g_ioaddr);
-	state_save_register_global(machine, coin_latch);
-	state_save_register_global(machine, keypad_status);
-	state_save_register_global(machine, g_status);
-	state_save_register_global(machine, f_status);
-	state_save_register_global(machine, io_firq_status);
-	state_save_register_global(machine, cmos_ram_a2_0);
-	state_save_register_global(machine, cmos_ram_a10_3);
+	state_save_register_global(machine, state->g_iodata);
+	state_save_register_global(machine, state->g_ioaddr);
+	state_save_register_global(machine, state->coin_latch);
+	state_save_register_global(machine, state->keypad_status);
+	state_save_register_global(machine, state->g_status);
+	state_save_register_global(machine, state->f_status);
+	state_save_register_global(machine, state->io_firq_status);
+	state_save_register_global(machine, state->cmos_ram_a2_0);
+	state_save_register_global(machine, state->cmos_ram_a10_3);
 
-	state_save_register_global(machine, u56a);
-	state_save_register_global(machine, u56b);
-	state_save_register_global(machine, g_to_s_latch1);
-	state_save_register_global(machine, g_to_s_latch2);
-	state_save_register_global(machine, s_to_g_latch1);
-	state_save_register_global(machine, s_to_g_latch2);
-	state_save_register_global(machine, dac_msb);
-	state_save_register_global(machine, dac_vol);
-	state_save_register_global(machine, tms_data);
+	state_save_register_global(machine, state->u56a);
+	state_save_register_global(machine, state->u56b);
+	state_save_register_global(machine, state->g_to_s_latch1);
+	state_save_register_global(machine, state->g_to_s_latch2);
+	state_save_register_global(machine, state->s_to_g_latch1);
+	state_save_register_global(machine, state->s_to_g_latch2);
+	state_save_register_global(machine, state->dac_msb);
+	state_save_register_global(machine, state->dac_vol);
+	state_save_register_global(machine, state->tms_data);
 
-	_fasel = 0;
-	_fbsel = 1;
-	state_save_register_global(machine, _fasel);
-	state_save_register_global(machine, _fbsel);
+	state->_fasel = 0;
+	state->_fbsel = 1;
+	state_save_register_global(machine, state->_fasel);
+	state_save_register_global(machine, state->_fbsel);
 }
 
 static const esrip_config rip_config =
@@ -727,7 +715,7 @@ static const esrip_config rip_config =
 	"proms"
 };
 
-static MACHINE_CONFIG_START( esripsys, driver_device )
+static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
 	MCFG_CPU_VBLANK_INT("screen", esripsys_vblank_irq)

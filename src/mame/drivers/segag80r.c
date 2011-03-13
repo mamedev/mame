@@ -142,16 +142,6 @@
 
 /*************************************
  *
- *  Global variables
- *
- *************************************/
-
-static UINT8 *mainram;
-
-
-
-/*************************************
- *
  *  Machine setup and config
  *
  *************************************/
@@ -196,7 +186,12 @@ static offs_t decrypt_offset(address_space *space, offs_t offset)
 	return (offset & 0xff00) | (*state->decrypt)(pc, space->read_byte(pc + 1));
 }
 
-static WRITE8_HANDLER( mainram_w )         { mainram[decrypt_offset(space, offset)] = data; }
+static WRITE8_HANDLER( mainram_w )
+{
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
+	state->mainram[decrypt_offset(space, offset)] = data;
+}
+
 static WRITE8_HANDLER( vidram_w )          { segag80r_videoram_w(space, decrypt_offset(space, offset), data); }
 static WRITE8_HANDLER( monsterb_vidram_w ) { monsterb_videoram_w(space, decrypt_offset(space, offset), data); }
 static WRITE8_HANDLER( pignewt_vidram_w )  { pignewt_videoram_w(space, decrypt_offset(space, offset), data); }
@@ -349,7 +344,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0x7fff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM		/* PROM board ROM area */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE(&mainram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE_MEMBER(segag80r_state, mainram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_BASE_MEMBER(segag80r_state, videoram)
 ADDRESS_MAP_END
 
@@ -1449,7 +1444,7 @@ static DRIVER_INIT( astrob )
 	state->decrypt = segag80_security(62);
 
 	/* configure video */
-	segag80r_background_pcb = G80_BACKGROUND_NONE;
+	state->background_pcb = G80_BACKGROUND_NONE;
 
 	/* install speech board */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x38, 0x38, 0, 0, sega_speech_data_w);
@@ -1468,7 +1463,7 @@ static DRIVER_INIT( 005 )
 	state->decrypt = segag80_security(70);
 
 	/* configure video */
-	segag80r_background_pcb = G80_BACKGROUND_NONE;
+	state->background_pcb = G80_BACKGROUND_NONE;
 }
 
 
@@ -1480,7 +1475,7 @@ static DRIVER_INIT( spaceod )
 	state->decrypt = segag80_security(63);
 
 	/* configure video */
-	segag80r_background_pcb = G80_BACKGROUND_SPACEOD;
+	state->background_pcb = G80_BACKGROUND_SPACEOD;
 
 	/* configure ports for the background board */
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x08, 0x0f, 0, 0, spaceod_back_port_r, spaceod_back_port_w);
@@ -1502,7 +1497,7 @@ static DRIVER_INIT( monsterb )
 	state->decrypt = segag80_security(82);
 
 	/* configure video */
-	segag80r_background_pcb = G80_BACKGROUND_MONSTERB;
+	state->background_pcb = G80_BACKGROUND_MONSTERB;
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
@@ -1520,7 +1515,7 @@ static DRIVER_INIT( monster2 )
 	state->decrypt = segag80_security(0);
 
 	/* configure video */
-	segag80r_background_pcb = G80_BACKGROUND_PIGNEWT;
+	state->background_pcb = G80_BACKGROUND_PIGNEWT;
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
@@ -1538,7 +1533,7 @@ static DRIVER_INIT( pignewt )
 	state->decrypt = segag80_security(63);
 
 	/* configure video */
-	segag80r_background_pcb = G80_BACKGROUND_PIGNEWT;
+	state->background_pcb = G80_BACKGROUND_PIGNEWT;
 	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
@@ -1561,7 +1556,7 @@ static DRIVER_INIT( sindbadm )
 	state->decrypt = segag80_security(0);
 
 	/* configure video */
-	segag80r_background_pcb = G80_BACKGROUND_SINDBADM;
+	state->background_pcb = G80_BACKGROUND_SINDBADM;
 
 	/* install background board handlers */
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x40, 0x41, 0, 0, sindbadm_back_port_w);

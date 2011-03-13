@@ -24,7 +24,7 @@ static struct
 	UINT16 *videoram;
 	int gfxbank;
 	UINT8 *maskBaseAddr;
-	void (*cb)( UINT16 code, int *gfx, int *mask);
+	void (*cb)( running_machine *machine, UINT16 code, int *gfx, int *mask);
 } mTilemapInfo;
 
 void namco_tilemap_invalidate( void )
@@ -39,7 +39,7 @@ void namco_tilemap_invalidate( void )
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,UINT16 *vram)
 {
 	int tile, mask;
-	mTilemapInfo.cb( vram[tile_index], &tile, &mask );
+	mTilemapInfo.cb( machine, vram[tile_index], &tile, &mask );
 	tileinfo->mask_data = mTilemapInfo.maskBaseAddr+mask*8;
 	SET_TILE_INFO(mTilemapInfo.gfxbank,tile,0,0);
 } /* get_tile_info */
@@ -53,7 +53,7 @@ static TILE_GET_INFO( get_tile_info5 ) { get_tile_info(machine,tileinfo,tile_ind
 
 void
 namco_tilemap_init( running_machine *machine, int gfxbank, void *maskBaseAddr,
-	void (*cb)( UINT16 code, int *gfx, int *mask) )
+	void (*cb)( running_machine *machine, UINT16 code, int *gfx, int *mask) )
 {
 	int i;
 	mTilemapInfo.gfxbank = gfxbank;

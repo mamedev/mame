@@ -13,10 +13,24 @@
 #define NAMCONB1_SPRITEGFX		1
 #define NAMCONB1_ROTGFX			2
 
-/*----------- defined in drivers/namconb1.c -----------*/
+class namconb1_state : public driver_device
+{
+public:
+	namconb1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-extern UINT32 *namconb1_spritebank32;
-extern UINT32 *namconb1_tilebank32;
+	UINT32 *nvmem32;
+	UINT16 *namconb_shareram;
+	UINT8 namconb_cpureg[32];
+	int vblank_irq_active;
+	int pos_irq_active;
+	UINT16 count;
+	UINT8 nbx_port6;
+	UINT32 *spritebank32;
+	UINT32 *tilebank32;
+	UINT32 tilemap_tile_bank[4];
+};
+
 
 /*----------- defined in video/namconb1.c -----------*/
 

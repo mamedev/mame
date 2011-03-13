@@ -12,6 +12,10 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT16>	m_nvram;
+	int sound_status;
+	UINT16 *vectorram;
+	int xcenter;
+	int ycenter;
 };
 
 /*----------- defined in audio/aztarac.c -----------*/
@@ -27,8 +31,6 @@ INTERRUPT_GEN( aztarac_snd_timed_irq );
 
 
 /*----------- defined in video/aztarac.c -----------*/
-
-extern UINT16 *aztarac_vectorram;
 
 WRITE16_HANDLER( aztarac_ubr_w );
 

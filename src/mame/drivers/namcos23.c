@@ -1499,24 +1499,24 @@ static int render_poly_order[POLY_MAX_ENTRIES];
 static int render_count[2], render_cur, render_poly_count;
 static poly_manager *polymgr;
 
-static inline INT32 u32_to_s24(UINT32 v)
+INLINE INT32 u32_to_s24(UINT32 v)
 {
-  return v & 0x800000 ? v | 0xff000000 : v & 0xffffff;
+	return v & 0x800000 ? v | 0xff000000 : v & 0xffffff;
 }
 
-static inline INT32 u32_to_s10(UINT32 v)
+INLINE INT32 u32_to_s10(UINT32 v)
 {
 	return v & 0x200 ? v | 0xfffffe00 : v & 0x1ff;
 }
 
 
-static inline UINT8 light(UINT8 c, float l)
+INLINE UINT8 light(UINT8 c, float l)
 {
-  if(l < 1)
-    l = l*c;
-  else
-    l = 255 - (255-c)/l;
-  return UINT8(l);
+	if(l < 1)
+		l = l*c;
+	else
+		l = 255 - (255-c)/l;
+	return UINT8(l);
 }
 
 static UINT32 texture_lookup_nocache_point(const pen_t *pens, float x, float y)
@@ -3646,7 +3646,7 @@ ROM_END
 
 ROM_START( crszonea )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
-        ROM_LOAD16_WORD_SWAP( "cszo2vera.ic4", 0x400000, 0x400000, CRC(1426d8d0) SHA1(e8049df1b2db1180f9edf6e5fa9fe8692ae81086) )
+	ROM_LOAD16_WORD_SWAP( "cszo2vera.ic4", 0x400000, 0x400000, CRC(1426d8d0) SHA1(e8049df1b2db1180f9edf6e5fa9fe8692ae81086) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */

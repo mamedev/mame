@@ -9,62 +9,28 @@
 #include "includes/esripsys.h"
 
 
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static struct
-{
-	UINT8 *colour_buf;
-	UINT8 *intensity_buf;
-	UINT8 *priority_buf;
-} line_buffer[2];
-
-static emu_timer *hblank_end_timer;
-static emu_timer *hblank_start_timer;
-
-static UINT8 *fig_scale_table;
-static UINT8 *scale_table;
-
-static int video_firq;
-static UINT8 bg_intensity;
-
-
-/*************************************
- *
- *  Globals
- *
- *************************************/
-
-int esripsys_hblank;
-int esripsys_video_firq_en;
-int esripsys_frame_vbl;
-int esripsys__12sel;
-UINT8 *esripsys_pal_ram;
-
-
 INTERRUPT_GEN( esripsys_vblank_irq )
 {
+	esripsys_state *state = device->machine->driver_data<esripsys_state>();
 	cputag_set_input_line(device->machine, "game_cpu", M6809_IRQ_LINE, ASSERT_LINE);
-	esripsys_frame_vbl = 0;
+	state->frame_vbl = 0;
 }
 
 static TIMER_CALLBACK( hblank_start_callback )
 {
+	esripsys_state *state = machine->driver_data<esripsys_state>();
 	int v = machine->primary_screen->vpos();
 
-	if (video_firq)
+	if (state->video_firq)
 	{
-		video_firq = 0;
+		state->video_firq = 0;
 		cputag_set_input_line(machine, "game_cpu", M6809_FIRQ_LINE, CLEAR_LINE);
 	}
 
 	/* Not sure if this is totally accurate - I couldn't find the circuit that generates the FIRQs! */
-	if (!(v % 6) && v && esripsys_video_firq_en && v < ESRIPSYS_VBLANK_START)
+	if (!(v % 6) && v && state->video_firq_en && v < ESRIPSYS_VBLANK_START)
 	{
-		video_firq = 1;
+		state->video_firq = 1;
 		cputag_set_input_line(machine, "game_cpu", M6809_FIRQ_LINE, ASSERT_LINE);
 	}
 
@@ -73,25 +39,28 @@ static TIMER_CALLBACK( hblank_start_callback )
 		v = 0;
 
 	/* Set end of HBLANK timer */
-	hblank_end_timer->adjust(machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
-	esripsys_hblank = 0;
+	state->hblank_end_timer->adjust(machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_END), v);
+	state->hblank = 0;
 }
 
 static TIMER_CALLBACK( hblank_end_callback )
 {
+	esripsys_state *state = machine->driver_data<esripsys_state>();
 	int v = machine->primary_screen->vpos();
 
 	if (v > 0)
 		machine->primary_screen->update_partial(v - 1);
 
-	esripsys__12sel ^= 1;
-	hblank_start_timer->adjust(machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
+	state->_12sel ^= 1;
+	state->hblank_start_timer->adjust(machine->primary_screen->time_until_pos(v, ESRIPSYS_HBLANK_START));
 
-	esripsys_hblank = 1;
+	state->hblank = 1;
 }
 
 VIDEO_START( esripsys )
 {
+	esripsys_state *state = machine->driver_data<esripsys_state>();
+	struct line_buffer_t *line_buffer = state->line_buffer;
 	int i;
 
 	/* Allocate memory for the two 512-pixel line buffers */
@@ -104,12 +73,12 @@ VIDEO_START( esripsys )
 	line_buffer[1].priority_buf = auto_alloc_array(machine, UINT8, 512);
 
 	/* Create and initialise the HBLANK timers */
-	hblank_start_timer = machine->scheduler().timer_alloc(FUNC(hblank_start_callback));
-	hblank_end_timer = machine->scheduler().timer_alloc(FUNC(hblank_end_callback));
-	hblank_start_timer->adjust(machine->primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
+	state->hblank_start_timer = machine->scheduler().timer_alloc(FUNC(hblank_start_callback));
+	state->hblank_end_timer = machine->scheduler().timer_alloc(FUNC(hblank_end_callback));
+	state->hblank_start_timer->adjust(machine->primary_screen->time_until_pos(0, ESRIPSYS_HBLANK_START));
 
 	/* Create the sprite scaling table */
-	scale_table = auto_alloc_array(machine, UINT8, 64 * 64);
+	state->scale_table = auto_alloc_array(machine, UINT8, 64 * 64);
 
 	for (i = 0; i < 64; ++i)
 	{
@@ -137,12 +106,12 @@ VIDEO_START( esripsys )
 			if (i & 0x20)
 				p5 = BIT(j, 0);
 
-			scale_table[i * 64 + j - 1] = p0 | p1 | p2 | p3 | p4 | p5;
+			state->scale_table[i * 64 + j - 1] = p0 | p1 | p2 | p3 | p4 | p5;
 		}
 	}
 
 	/* Now create a lookup table for scaling the sprite 'fig' value */
-	fig_scale_table = auto_alloc_array(machine, UINT8, 1024 * 64);
+	state->fig_scale_table = auto_alloc_array(machine, UINT8, 1024 * 64);
 
 	for (i = 0; i < 1024; ++i)
 	{
@@ -155,13 +124,13 @@ VIDEO_START( esripsys )
 
 			while (input_pixels)
 			{
-				if (scale_table[scale * 64 + (scaled_pixels & 0x3f)] == 0)
+				if (state->scale_table[scale * 64 + (scaled_pixels & 0x3f)] == 0)
 					input_pixels--;
 
 				scaled_pixels++;
 			}
 
-			fig_scale_table[i * 64 + scale] = scaled_pixels - 1;
+			state->fig_scale_table[i * 64 + scale] = scaled_pixels - 1;
 		}
 	}
 
@@ -174,21 +143,23 @@ VIDEO_START( esripsys )
 	state_save_register_global_pointer(machine, line_buffer[1].intensity_buf, 512);
 	state_save_register_global_pointer(machine, line_buffer[1].priority_buf, 512);
 
-	state_save_register_global(machine, video_firq);
-	state_save_register_global(machine, bg_intensity);
-	state_save_register_global(machine, esripsys_hblank);
-	state_save_register_global(machine, esripsys_video_firq_en);
-	state_save_register_global(machine, esripsys_frame_vbl);
-	state_save_register_global(machine, esripsys__12sel);
+	state_save_register_global(machine, state->video_firq);
+	state_save_register_global(machine, state->bg_intensity);
+	state_save_register_global(machine, state->hblank);
+	state_save_register_global(machine, state->video_firq_en);
+	state_save_register_global(machine, state->frame_vbl);
+	state_save_register_global(machine, state->_12sel);
 }
 
 SCREEN_UPDATE( esripsys )
 {
+	esripsys_state *state = screen->machine->driver_data<esripsys_state>();
+	struct line_buffer_t *line_buffer = state->line_buffer;
 	int x, y;
 
-	UINT8 *colour_buf = line_buffer[esripsys__12sel ? 0 : 1].colour_buf;
-	UINT8 *intensity_buf = line_buffer[esripsys__12sel ? 0 : 1].intensity_buf;
-	UINT8 *priority_buf = line_buffer[esripsys__12sel ? 0 : 1].priority_buf;
+	UINT8 *colour_buf = line_buffer[state->_12sel ? 0 : 1].colour_buf;
+	UINT8 *intensity_buf = line_buffer[state->_12sel ? 0 : 1].intensity_buf;
+	UINT8 *priority_buf = line_buffer[state->_12sel ? 0 : 1].priority_buf;
 
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
 	{
@@ -197,16 +168,16 @@ SCREEN_UPDATE( esripsys )
 		for (x = 0; x < 512; ++x)
 		{
 			int idx = colour_buf[x];
-			int r = (esripsys_pal_ram[idx] & 0xf);
-			int g = (esripsys_pal_ram[256 + idx] & 0xf);
-			int b = (esripsys_pal_ram[512 + idx] & 0xf);
+			int r = (state->pal_ram[idx] & 0xf);
+			int g = (state->pal_ram[256 + idx] & 0xf);
+			int b = (state->pal_ram[512 + idx] & 0xf);
 			int i = intensity_buf[x];
 
 			*dest++ = MAKE_RGB(r*i, g*i, b*i);
 
 			/* Clear the line buffer as we scan out */
 			colour_buf[x] = 0xff;
-			intensity_buf[x] = bg_intensity;
+			intensity_buf[x] = state->bg_intensity;
 			priority_buf[x] = 0;
 		}
 	}
@@ -216,15 +187,18 @@ SCREEN_UPDATE( esripsys )
 
 WRITE8_HANDLER( esripsys_bg_intensity_w )
 {
-	bg_intensity = data & 0xf;
+	esripsys_state *state = space->machine->driver_data<esripsys_state>();
+	state->bg_intensity = data & 0xf;
 }
 
 /* Draw graphics to a line buffer */
 int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank)
 {
-	UINT8 *colour_buf = line_buffer[esripsys__12sel ? 1 : 0].colour_buf;
-	UINT8 *intensity_buf = line_buffer[esripsys__12sel ? 1 : 0].intensity_buf;
-	UINT8 *priority_buf = line_buffer[esripsys__12sel ? 1 : 0].priority_buf;
+	esripsys_state *state = machine->driver_data<esripsys_state>();
+	struct line_buffer_t *line_buffer = state->line_buffer;
+	UINT8 *colour_buf = line_buffer[state->_12sel ? 1 : 0].colour_buf;
+	UINT8 *intensity_buf = line_buffer[state->_12sel ? 1 : 0].intensity_buf;
+	UINT8 *priority_buf = line_buffer[state->_12sel ? 1 : 0].priority_buf;
 
 	UINT8 pri = attr & 0xff;
 	UINT8 iny = (attr >> 8) & 0xf;
@@ -238,7 +212,7 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 
 	/* Fig is the number of pixels to draw / 2 - 1 */
 	if (xs_typ)
-		fig = fig_scale_table[fig * 64 + xs_val];
+		fig = state->fig_scale_table[fig * 64 + xs_val];
 
 	/* 8bpp case */
 	if (attr & 0x8000)
@@ -290,7 +264,7 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 			/* Shrink */
 			if (!xs_typ)
 			{
-				if (scale_table[xs_val * 64 + (cnt & 0x3f)])
+				if (state->scale_table[xs_val * 64 + (cnt & 0x3f)])
 				{
 					--lpos;
 					++rpos;
@@ -304,7 +278,7 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 			}
 			else
 			{
-				if (!scale_table[xs_val * 64 + (cnt & 0x3f)])
+				if (!state->scale_table[xs_val * 64 + (cnt & 0x3f)])
 				{
 					if (++ptr == 4)
 					{
@@ -367,7 +341,7 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 			/* Shrink */
 			if (!xs_typ)
 			{
-				if (scale_table[xs_val * 64 + (cnt & 0x3f)])
+				if (state->scale_table[xs_val * 64 + (cnt & 0x3f)])
 				{
 					lpos--;
 					rpos++;
@@ -381,7 +355,7 @@ int esripsys_draw(running_machine *machine, int l, int r, int fig, int attr, int
 			}
 			else
 			{
-				if (!scale_table[xs_val * 64 + (cnt & 0x3f)])
+				if (!state->scale_table[xs_val * 64 + (cnt & 0x3f)])
 				{
 					if (++ptr == 4)
 					{

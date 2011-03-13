@@ -12,11 +12,16 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT16>	m_nvram;
+	UINT8 *decode_memory;
+	UINT8 cmos_write_enable;
+	UINT16 iodata[8];
+	UINT8 ioshuffle[16];
+	UINT8 uart[8];
+	UINT8 security_bits;
+	UINT16 *umk3_palette;
 };
 
 /*----------- defined in machine/midwunit.c -----------*/
-
-extern UINT8 *midwunit_decode_memory;
 
 WRITE16_HANDLER( midwunit_cmos_enable_w );
 WRITE16_HANDLER( midwunit_cmos_w );

@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x01c00060, 0x01c0007f) AM_READWRITE(midyunit_protection_r, midyunit_cmos_enable_w)
 	AM_RANGE(0x01e00000, 0x01e0001f) AM_WRITE(midyunit_sound_w)
 	AM_RANGE(0x01f00000, 0x01f0001f) AM_WRITE(midyunit_control_w)
-	AM_RANGE(0x02000000, 0x05ffffff) AM_READ(midyunit_gfxrom_r) AM_BASE((UINT16 **)&midyunit_gfx_rom) AM_SIZE(&midyunit_gfx_rom_size)
+	AM_RANGE(0x02000000, 0x05ffffff) AM_READ(midyunit_gfxrom_r) AM_BASE_MEMBER(midyunit_state, gfx_rom) AM_SIZE_MEMBER(midyunit_state, gfx_rom_size)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -996,7 +996,7 @@ static const tms34010_config yunit_tms_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( zunit, driver_device )
+static MACHINE_CONFIG_START( zunit, midyunit_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
@@ -1029,7 +1029,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( yunit_core, driver_device )
+static MACHINE_CONFIG_START( yunit_core, midyunit_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)

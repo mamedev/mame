@@ -1,10 +1,6 @@
 #include "emu.h"
 #include "includes/mjkjidai.h"
 
-static int display_enable;
-static tilemap_t *bg_tilemap;
-
-
 
 /***************************************************************************
 
@@ -32,7 +28,8 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( mjkjidai )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,64,32);
+	mjkjidai_state *state = machine->driver_data<mjkjidai_state>();
+	state->bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
 
@@ -48,11 +45,12 @@ WRITE8_HANDLER( mjkjidai_videoram_w )
 	mjkjidai_state *state = space->machine->driver_data<mjkjidai_state>();
 
 	state->videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset & 0x7ff);
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset & 0x7ff);
 }
 
 WRITE8_HANDLER( mjkjidai_ctrl_w )
 {
+	mjkjidai_state *state = space->machine->driver_data<mjkjidai_state>();
 	UINT8 *rom = space->machine->region("maincpu")->base();
 
 //  logerror("%04x: port c0 = %02x\n",cpu_get_pc(space->cpu),data);
@@ -64,7 +62,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 	flip_screen_set(space->machine, data & 0x02);
 
 	/* bit 2 =display enable */
-	display_enable = data & 0x04;
+	state->display_enable = data & 0x04;
 
 	/* bit 5 = coin counter */
 	coin_counter_w(space->machine, 0,data & 0x20);
@@ -133,11 +131,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( mjkjidai )
 {
-	if (!display_enable)
+	mjkjidai_state *state = screen->machine->driver_data<mjkjidai_state>();
+	if (!state->display_enable)
 		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	else
 	{
-		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 		draw_sprites(screen->machine, bitmap,cliprect);
 	}
 	return 0;

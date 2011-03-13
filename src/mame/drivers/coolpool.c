@@ -46,10 +46,6 @@ static const UINT16 nvram_unlock_seq[] =
 {
 	0x3fb, 0x3fb, 0x3f8, 0x3fc, 0x3fa, 0x3fe, 0x3f9, 0x3fd, 0x3fb, 0x3ff
 };
-#define NVRAM_UNLOCK_SEQ_LEN (ARRAY_LENGTH(nvram_unlock_seq))
-static UINT16 nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
-static UINT8 nvram_write_enable;
-
 
 
 /*************************************
@@ -143,13 +139,14 @@ static MACHINE_RESET( amerdart )
 	state->maincpu = machine->device("maincpu");
 	state->dsp = machine->device("dsp");
 
-	nvram_write_enable = 0;
+	state->nvram_write_enable = 0;
 }
 
 
 static MACHINE_RESET( coolpool )
 {
-	nvram_write_enable = 0;
+	coolpool_state *state = machine->driver_data<coolpool_state>();
+	state->nvram_write_enable = 0;
 }
 
 
@@ -162,20 +159,22 @@ static MACHINE_RESET( coolpool )
 
 static TIMER_DEVICE_CALLBACK( nvram_write_timeout )
 {
-	nvram_write_enable = 0;
+	coolpool_state *state = timer.machine->driver_data<coolpool_state>();
+	state->nvram_write_enable = 0;
 }
 
 
 static WRITE16_HANDLER( nvram_thrash_w )
 {
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 	/* keep track of the last few writes */
-	memmove(&nvram_write_seq[0], &nvram_write_seq[1], (NVRAM_UNLOCK_SEQ_LEN - 1) * sizeof(nvram_write_seq[0]));
-	nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN - 1] = offset & 0x3ff;
+	memmove(&state->nvram_write_seq[0], &state->nvram_write_seq[1], (NVRAM_UNLOCK_SEQ_LEN - 1) * sizeof(state->nvram_write_seq[0]));
+	state->nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN - 1] = offset & 0x3ff;
 
 	/* if they match the unlock sequence, enable writes and set a timeout */
-	if (!memcmp(nvram_unlock_seq, nvram_write_seq, sizeof(nvram_unlock_seq)))
+	if (!memcmp(nvram_unlock_seq, state->nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
-		nvram_write_enable = 1;
+		state->nvram_write_enable = 1;
 		timer_device *nvram_timer = space->machine->device<timer_device>("nvram_timer");
 		nvram_timer->adjust(attotime::from_msec(1000));
 	}
@@ -184,12 +183,12 @@ static WRITE16_HANDLER( nvram_thrash_w )
 
 static WRITE16_HANDLER( nvram_data_w )
 {
+	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 	/* only the low 8 bits matter */
 	if (ACCESSING_BITS_0_7)
 	{
-		if (nvram_write_enable)
+		if (state->nvram_write_enable)
 		{
-			coolpool_state *state = space->machine->driver_data<coolpool_state>();
 			state->m_nvram[offset] = data & 0xff;
 		}
 	}
@@ -235,21 +234,18 @@ static READ16_HANDLER( amerdart_dsp_bio_line_r )
 {
 	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
-	static UINT8 old_cmd;
-	static UINT8 same_cmd_count;
-
 	/* Skip idle checking */
-	if (old_cmd == state->cmd_pending)
-		same_cmd_count += 1;
+	if (state->old_cmd == state->cmd_pending)
+		state->same_cmd_count += 1;
 	else
-		same_cmd_count = 0;
+		state->same_cmd_count = 0;
 
-	if (same_cmd_count >= 5)
+	if (state->same_cmd_count >= 5)
 	{
-		same_cmd_count = 5;
+		state->same_cmd_count = 5;
 		cpu_spin(space->cpu);
 	}
-	old_cmd = state->cmd_pending;
+	state->old_cmd = state->cmd_pending;
 
 	return state->cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }

@@ -1446,17 +1446,18 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static UINT8 prot_data;
 
 static READ8_HANDLER( mirderby_prot_r )
 {
-	prot_data&=0x7f;
-	return prot_data++;
+	homedata_state *state = space->machine->driver_data<homedata_state>();
+	state->prot_data&=0x7f;
+	return state->prot_data++;
 }
 
 static WRITE8_HANDLER( mirderby_prot_w )
 {
-	prot_data = data;
+	homedata_state *state = space->machine->driver_data<homedata_state>();
+	state->prot_data = data;
 }
 
 

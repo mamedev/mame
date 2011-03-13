@@ -14,37 +14,20 @@
 #define INSTANT_BLIT		1
 
 
-UINT16 *artmagic_vram0;
-UINT16 *artmagic_vram1;
-
-/* decryption parameters */
-int artmagic_xor[16], artmagic_is_stoneball;
-
-static UINT16 *blitter_base;
-static UINT32 blitter_mask;
-static UINT16 blitter_data[8];
-static UINT8 blitter_page;
-
-#if (!INSTANT_BLIT)
-static attotime blitter_busy_until;
-#endif
-
-
-
 /*************************************
  *
  *  Inlines
  *
  *************************************/
 
-INLINE UINT16 *address_to_vram(offs_t *address)
+INLINE UINT16 *address_to_vram(artmagic_state *state, offs_t *address)
 {
 	offs_t original = *address;
 	*address = TOWORD(original & 0x001fffff);
 	if (original >= 0x00000000 && original < 0x001fffff)
-		return artmagic_vram0;
+		return state->vram0;
 	else if (original >= 0x00400000 && original < 0x005fffff)
-		return artmagic_vram1;
+		return state->vram1;
 	return NULL;
 }
 
@@ -58,13 +41,14 @@ INLINE UINT16 *address_to_vram(offs_t *address)
 
 VIDEO_START( artmagic )
 {
-	blitter_base = (UINT16 *)machine->region("gfx1")->base();
-	blitter_mask = machine->region("gfx1")->bytes()/2 - 1;
+	artmagic_state *state = machine->driver_data<artmagic_state>();
+	state->blitter_base = (UINT16 *)machine->region("gfx1")->base();
+	state->blitter_mask = machine->region("gfx1")->bytes()/2 - 1;
 
-	state_save_register_global_array(machine, artmagic_xor);
-	state_save_register_global(machine, artmagic_is_stoneball);
-	state_save_register_global_array(machine, blitter_data);
-	state_save_register_global(machine, blitter_page);
+	state_save_register_global_array(machine, state->_xor);
+	state_save_register_global(machine, state->is_stoneball);
+	state_save_register_global_array(machine, state->blitter_data);
+	state_save_register_global(machine, state->blitter_page);
 }
 
 
@@ -77,7 +61,8 @@ VIDEO_START( artmagic )
 
 void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data)
 {
-	UINT16 *vram = address_to_vram(&address);
+	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	UINT16 *vram = address_to_vram(state, &address);
 	if (vram)
 		memcpy(data, &vram[address], TOBYTE(0x2000));
 }
@@ -85,7 +70,8 @@ void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data)
 
 void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data)
 {
-	UINT16 *vram = address_to_vram(&address);
+	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	UINT16 *vram = address_to_vram(state, &address);
 	if (vram)
 		memcpy(&vram[address], data, TOBYTE(0x2000));
 }
@@ -100,15 +86,16 @@ void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data)
 
 static void execute_blit(running_machine *machine)
 {
-	UINT16 *dest = blitter_page ? artmagic_vram0 : artmagic_vram1;
-	int offset = ((blitter_data[1] & 0xff) << 16) | blitter_data[0];
-	int color = (blitter_data[1] >> 4) & 0xf0;
-	int x = (INT16)blitter_data[2];
-	int y = (INT16)blitter_data[3];
-	int maskx = blitter_data[6] & 0xff;
-	int masky = blitter_data[6] >> 8;
-	int w = ((blitter_data[7] & 0xff) + 1) * 4;
-	int h = (blitter_data[7] >> 8) + 1;
+	artmagic_state *state = machine->driver_data<artmagic_state>();
+	UINT16 *dest = state->blitter_page ? state->vram0 : state->vram1;
+	int offset = ((state->blitter_data[1] & 0xff) << 16) | state->blitter_data[0];
+	int color = (state->blitter_data[1] >> 4) & 0xf0;
+	int x = (INT16)state->blitter_data[2];
+	int y = (INT16)state->blitter_data[3];
+	int maskx = state->blitter_data[6] & 0xff;
+	int masky = state->blitter_data[6] >> 8;
+	int w = ((state->blitter_data[7] & 0xff) + 1) * 4;
+	int h = (state->blitter_data[7] >> 8) + 1;
 	int i, j, sx, sy, last;
 
 #if 0
@@ -119,10 +106,10 @@ static void execute_blit(running_machine *machine)
 
 	logerror("%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
 				machine->describe_context(), offset, x, y, w, h,
-				blitter_data[0], blitter_data[1],
-				blitter_data[2], blitter_data[3],
-				blitter_data[4], blitter_data[5],
-				blitter_data[6], blitter_data[7]);
+				state->blitter_data[0], state->blitter_data[1],
+				state->blitter_data[2], state->blitter_data[3],
+				state->blitter_data[4], state->blitter_data[5],
+				state->blitter_data[6], state->blitter_data[7]);
 
 	if (!f) f = fopen("artmagic.log", "w");
 
@@ -137,16 +124,16 @@ static void execute_blit(running_machine *machine)
 		fprintf(f, "----------------------\n"
 				   "%s:Blit from %06X to (%d,%d) %dx%d -- %04X %04X %04X %04X %04X %04X %04X %04X\n",
 					machine->describe_context(), offset, x, y, w, h,
-					blitter_data[0], blitter_data[1],
-					blitter_data[2], blitter_data[3],
-					blitter_data[4], blitter_data[5],
-					blitter_data[6], blitter_data[7]);
+					state->blitter_data[0], state->blitter_data[1],
+					state->blitter_data[2], state->blitter_data[3],
+					state->blitter_data[4], state->blitter_data[5],
+					state->blitter_data[6], state->blitter_data[7]);
 
 		fprintf(f, "\t");
 		for (i = 0; i < h; i++)
 		{
 			for (j = 0; j < w; j += 4)
-				fprintf(f, "%04X ", blitter_base[tempoffs++]);
+				fprintf(f, "%04X ", state->blitter_base[tempoffs++]);
 			fprintf(f, "\n\t");
 		}
 		fprintf(f, "\n\t");
@@ -157,19 +144,19 @@ static void execute_blit(running_machine *machine)
 			if (i == 0)	/* first line */
 			{
 				/* ultennis, stonebal */
-				last ^= (blitter_data[7] & 0x0001);
-				if (artmagic_is_stoneball)
-					last ^= ((blitter_data[0] & 0x0020) >> 3);
+				last ^= (state->blitter_data[7] & 0x0001);
+				if (state->is_stoneball)
+					last ^= ((state->blitter_data[0] & 0x0020) >> 3);
 				else	/* ultennis */
-					last ^= ((blitter_data[0] & 0x0040) >> 4);
+					last ^= ((state->blitter_data[0] & 0x0040) >> 4);
 
 				/* cheesech */
-				last ^= ((blitter_data[7] & 0x0400) >> 9);
-				last ^= ((blitter_data[0] & 0x2000) >> 10);
+				last ^= ((state->blitter_data[7] & 0x0400) >> 9);
+				last ^= ((state->blitter_data[0] & 0x2000) >> 10);
 			}
 			else	/* following lines */
 			{
-				int val = blitter_base[tempoffs];
+				int val = state->blitter_base[tempoffs];
 
 				/* ultennis, stonebal */
 				last ^= 4;
@@ -185,12 +172,12 @@ static void execute_blit(running_machine *machine)
 			for (j = 0; j < w; j += 4)
 			{
 				static const char hex[] = ".123456789ABCDEF";
-				int val = blitter_base[tempoffs++];
+				int val = state->blitter_base[tempoffs++];
 				int p1, p2, p3, p4;
-				p1 = last = ((val ^ artmagic_xor[last]) >>  0) & 0xf;
-				p2 = last = ((val ^ artmagic_xor[last]) >>  4) & 0xf;
-				p3 = last = ((val ^ artmagic_xor[last]) >>  8) & 0xf;
-				p4 = last = ((val ^ artmagic_xor[last]) >> 12) & 0xf;
+				p1 = last = ((val ^ state->_xor[last]) >>  0) & 0xf;
+				p2 = last = ((val ^ state->_xor[last]) >>  4) & 0xf;
+				p3 = last = ((val ^ state->_xor[last]) >>  8) & 0xf;
+				p4 = last = ((val ^ state->_xor[last]) >> 12) & 0xf;
 				fprintf(f, "%c%c%c%c ", hex[p1], hex[p2], hex[p3], hex[p4]);
 			}
 			fprintf(f, "\n\t");
@@ -226,19 +213,19 @@ static void execute_blit(running_machine *machine)
 				if (i == 0)	/* first line */
 				{
 					/* ultennis, stonebal */
-					last ^= (blitter_data[7] & 0x0001);
-					if (artmagic_is_stoneball)
-						last ^= ((blitter_data[0] & 0x0020) >> 3);
+					last ^= (state->blitter_data[7] & 0x0001);
+					if (state->is_stoneball)
+						last ^= ((state->blitter_data[0] & 0x0020) >> 3);
 					else	/* ultennis */
-						last ^= (((blitter_data[0] + 1) & 0x0040) >> 4);
+						last ^= (((state->blitter_data[0] + 1) & 0x0040) >> 4);
 
 					/* cheesech */
-					last ^= ((blitter_data[7] & 0x0400) >> 9);
-					last ^= ((blitter_data[0] & 0x2000) >> 10);
+					last ^= ((state->blitter_data[7] & 0x0400) >> 9);
+					last ^= ((state->blitter_data[0] & 0x2000) >> 10);
 				}
 				else	/* following lines */
 				{
-					int val = blitter_base[offset & blitter_mask];
+					int val = state->blitter_base[offset & state->blitter_mask];
 
 					/* ultennis, stonebal */
 					last ^= 4;
@@ -253,13 +240,13 @@ static void execute_blit(running_machine *machine)
 
 				for (j = 0; j < w; j += 4)
 				{
-					UINT16 val = blitter_base[(offset + j/4) & blitter_mask];
+					UINT16 val = state->blitter_base[(offset + j/4) & state->blitter_mask];
 					if (sx < 508)
 					{
-						if (h == 1 && artmagic_is_stoneball)
+						if (h == 1 && state->is_stoneball)
 							last = ((val) >>  0) & 0xf;
 						else
-							last = ((val ^ artmagic_xor[last]) >>  0) & 0xf;
+							last = ((val ^ state->_xor[last]) >>  0) & 0xf;
 						if (!((maskx << ((j/2) & 7)) & 0x80))
 						{
 							if (last && sx >= 0 && sx < 512)
@@ -267,20 +254,20 @@ static void execute_blit(running_machine *machine)
 							sx++;
 						}
 
-						if (h == 1 && artmagic_is_stoneball)
+						if (h == 1 && state->is_stoneball)
 							last = ((val) >>  4) & 0xf;
 						else
-							last = ((val ^ artmagic_xor[last]) >>  4) & 0xf;
+							last = ((val ^ state->_xor[last]) >>  4) & 0xf;
 						{
 							if (last && sx >= 0 && sx < 512)
 								dest[tsy + sx] = color | (last);
 							sx++;
 						}
 
-						if (h == 1 && artmagic_is_stoneball)
+						if (h == 1 && state->is_stoneball)
 							last = ((val) >>  8) & 0xf;
 						else
-							last = ((val ^ artmagic_xor[last]) >>  8) & 0xf;
+							last = ((val ^ state->_xor[last]) >>  8) & 0xf;
 						if (!((maskx << ((j/2) & 7)) & 0x40))
 						{
 							if (last && sx >= 0 && sx < 512)
@@ -288,10 +275,10 @@ static void execute_blit(running_machine *machine)
 							sx++;
 						}
 
-						if (h == 1 && artmagic_is_stoneball)
+						if (h == 1 && state->is_stoneball)
 							last = ((val) >> 12) & 0xf;
 						else
-							last = ((val ^ artmagic_xor[last]) >> 12) & 0xf;
+							last = ((val ^ state->_xor[last]) >> 12) & 0xf;
 						{
 							if (last && sx >= 0 && sx < 512)
 								dest[tsy + sx] = color | (last);
@@ -308,21 +295,22 @@ static void execute_blit(running_machine *machine)
 	g_profiler.stop();
 
 #if (!INSTANT_BLIT)
-	blitter_busy_until = machine->time() + attotime::from_nsec(w*h*20);
+	state->blitter_busy_until = machine->time() + attotime::from_nsec(w*h*20);
 #endif
 }
 
 
 READ16_HANDLER( artmagic_blitter_r )
 {
+	artmagic_state *state = space->machine->driver_data<artmagic_state>();
 	/*
         bit 1 is a busy flag; loops tightly if clear
         bit 2 is tested in a similar fashion
         bit 4 reflects the page
     */
-	UINT16 result = 0xffef | (blitter_page << 4);
+	UINT16 result = 0xffef | (state->blitter_page << 4);
 #if (!INSTANT_BLIT)
-	if (space->machine->time() < blitter_busy_until)
+	if (attotime_compare(space->machine->time(), state->blitter_busy_until) < 0)
 		result ^= 6;
 #endif
 	return result;
@@ -331,7 +319,8 @@ READ16_HANDLER( artmagic_blitter_r )
 
 WRITE16_HANDLER( artmagic_blitter_w )
 {
-	COMBINE_DATA(&blitter_data[offset]);
+	artmagic_state *state = space->machine->driver_data<artmagic_state>();
+	COMBINE_DATA(&state->blitter_data[offset]);
 
 	/* offset 3 triggers the blit */
 	if (offset == 3)
@@ -339,7 +328,7 @@ WRITE16_HANDLER( artmagic_blitter_w )
 
 	/* offset 4 contains the target page */
 	else if (offset == 4)
-		blitter_page = (data >> 1) & 1;
+		state->blitter_page = (data >> 1) & 1;
 }
 
 
@@ -352,8 +341,9 @@ WRITE16_HANDLER( artmagic_blitter_w )
 
 void artmagic_scanline(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
+	artmagic_state *state = screen.machine->driver_data<artmagic_state>();
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
-	UINT16 *vram = address_to_vram(&offset);
+	UINT16 *vram = address_to_vram(state, &offset);
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
 	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
 	int coladdr = params->coladdr << 1;

@@ -13,6 +13,8 @@ public:
 	int nvram_init_count;
 	UINT8 *nvram;
 	size_t nvram_size;
+	int display_enable;
+	tilemap_t *bg_tilemap;
 };
 
 

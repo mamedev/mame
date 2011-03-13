@@ -676,16 +676,6 @@
 #include "lucky74.lh"
 #include "includes/lucky74.h"
 
-static UINT8 ym2149_portb;
-static UINT8 usart_8251;
-static UINT8 copro_sm7831;
-
-static int lucky74_adpcm_pos;
-static int lucky74_adpcm_end;
-static int lucky74_adpcm_data;
-static UINT8 lucky74_adpcm_reg[6];
-static UINT8 lucky74_adpcm_busy_line;
-
 
 /*****************************
 *    Read/Write  Handlers    *
@@ -693,30 +683,33 @@ static UINT8 lucky74_adpcm_busy_line;
 
 static READ8_HANDLER( custom_09R81P_port_r )
 {
+	lucky74_state *state = space->machine->driver_data<lucky74_state>();
 	if (offset != 0x00)
 	{
-		return lucky74_adpcm_reg[offset];
+		return state->adpcm_reg[offset];
 	}
 	else
 	{
-		return lucky74_adpcm_busy_line;
+		return state->adpcm_busy_line;
 	}
 }
 
 static WRITE8_HANDLER( custom_09R81P_port_w )
 {
-	lucky74_adpcm_reg[offset] = data;
+	lucky74_state *state = space->machine->driver_data<lucky74_state>();
+	state->adpcm_reg[offset] = data;
 }
 
 static WRITE8_DEVICE_HANDLER( ym2149_portb_w )
 {
+	lucky74_state *state = device->machine->driver_data<lucky74_state>();
 /*  when is in game mode writes 0x0a.
     when is in test mode writes 0x0e.
     after reset writes 0x16.
 
     bit 0 contains the screen orientation.
 */
-	ym2149_portb = data;
+	state->ym2149_portb = data;
 	flip_screen_set(device->machine, data & 0x01);
 }
 
@@ -729,9 +722,10 @@ static READ8_HANDLER( usart_8251_r )
 
 static WRITE8_HANDLER( usart_8251_w )
 {
+	lucky74_state *state = space->machine->driver_data<lucky74_state>();
 	/* writes to USART 8251 port */
-	usart_8251 = data;
-	logerror("write to USART port: %02x \n", usart_8251);
+	state->usart_8251 = data;
+	logerror("write to USART port: %02x \n", state->usart_8251);
 }
 
 static READ8_HANDLER( copro_sm7831_r )
@@ -743,9 +737,10 @@ static READ8_HANDLER( copro_sm7831_r )
 
 static WRITE8_HANDLER( copro_sm7831_w )
 {
+	lucky74_state *state = space->machine->driver_data<lucky74_state>();
 	/* write to SM7831 co-processor */
-	copro_sm7831 = data;
-	logerror("write to co-processor: %2X\n", copro_sm7831);
+	state->copro_sm7831 = data;
+	logerror("write to co-processor: %2X\n", state->copro_sm7831);
 }
 
 
@@ -799,7 +794,8 @@ static WRITE8_DEVICE_HANDLER(lamps_b_w)
 
 static INTERRUPT_GEN( nmi_interrupt )
 {
-	if ((ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
+	lucky74_state *state = device->machine->driver_data<lucky74_state>();
+	if ((state->ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
 	{
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
@@ -813,10 +809,10 @@ static INTERRUPT_GEN( nmi_interrupt )
 static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_BASE(&lucky74_fg_videoram)				/* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_BASE(&lucky74_fg_colorram)				/* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_BASE(&lucky74_bg_videoram)				/* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_BASE(&lucky74_bg_colorram)				/* VRAM2-2 */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_BASE_MEMBER(lucky74_state, fg_videoram)				/* VRAM1-1 */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_BASE_MEMBER(lucky74_state, fg_colorram)				/* VRAM1-2 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_BASE_MEMBER(lucky74_state, bg_videoram)				/* VRAM2-1 */
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_BASE_MEMBER(lucky74_state, bg_colorram)				/* VRAM2-2 */
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
 	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
 	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
@@ -1102,57 +1098,59 @@ GFXDECODE_END
 
 static SOUND_START( lucky74 )
 {
+	lucky74_state *state = machine->driver_data<lucky74_state>();
     /* cleaning all 09R81P registers */
 
 	UINT8 i;
 
 	for (i = 0; i < 6; i++)
 	{
-		lucky74_adpcm_reg[i] = 0;
+		state->adpcm_reg[i] = 0;
 	}
 
-	lucky74_adpcm_busy_line = 0x01;	/* free and ready */
+	state->adpcm_busy_line = 0x01;	/* free and ready */
 }
 
 static void lucky74_adpcm_int(device_t *device)
 {
-	if (lucky74_adpcm_reg[05] == 0x01)	/* register 0x05 (bit 0 activated), trigger the sample */
+	lucky74_state *state = device->machine->driver_data<lucky74_state>();
+	if (state->adpcm_reg[05] == 0x01)	/* register 0x05 (bit 0 activated), trigger the sample */
 	{
 		/* conditional zone for samples reproduction */
 
-		if (lucky74_adpcm_busy_line)     /* still not started */
+		if (state->adpcm_busy_line)     /* still not started */
 		{
 			/* init all 09R81P registers */
 			logerror("init ADPCM registers\n");
-			lucky74_adpcm_end = (lucky74_adpcm_reg[04] << 8) + lucky74_adpcm_reg[03];
-			lucky74_adpcm_pos = (lucky74_adpcm_reg[01] << 8) + lucky74_adpcm_reg[00];
-			lucky74_adpcm_busy_line = 0;
-			lucky74_adpcm_data = -1;
+			state->adpcm_end = (state->adpcm_reg[04] << 8) + state->adpcm_reg[03];
+			state->adpcm_pos = (state->adpcm_reg[01] << 8) + state->adpcm_reg[00];
+			state->adpcm_busy_line = 0;
+			state->adpcm_data = -1;
 
-			logerror("sample pos:%4X\n", lucky74_adpcm_pos);
-			logerror("sample end:%4X\n", lucky74_adpcm_end);
+			logerror("sample pos:%4X\n", state->adpcm_pos);
+			logerror("sample end:%4X\n", state->adpcm_end);
 		}
 
-		if (lucky74_adpcm_data == -1)
+		if (state->adpcm_data == -1)
 		{
 			/* transferring 1st nibble */
-			lucky74_adpcm_data = device->machine->region("adpcm")->base()[lucky74_adpcm_pos];
-			lucky74_adpcm_pos = (lucky74_adpcm_pos + 1) & 0xffff;
-			msm5205_data_w(device, lucky74_adpcm_data >> 4);
+			state->adpcm_data = device->machine->region("adpcm")->base()[state->adpcm_pos];
+			state->adpcm_pos = (state->adpcm_pos + 1) & 0xffff;
+			msm5205_data_w(device, state->adpcm_data >> 4);
 
-			if (lucky74_adpcm_pos == lucky74_adpcm_end)
+			if (state->adpcm_pos == state->adpcm_end)
 			{
 				msm5205_reset_w(device, 0);			/* reset the M5205 */
-				lucky74_adpcm_reg[05] = 0;		/* clean trigger register */
-				lucky74_adpcm_busy_line = 0x01;	/* deactivate busy flag */
+				state->adpcm_reg[05] = 0;		/* clean trigger register */
+				state->adpcm_busy_line = 0x01;	/* deactivate busy flag */
 				logerror("end of sample.\n");
 			}
 		}
 		else
 		{
 			/* transferring 2nd nibble */
-			msm5205_data_w(device, lucky74_adpcm_data & 0x0f);
-			lucky74_adpcm_data = -1;
+			msm5205_data_w(device, state->adpcm_data & 0x0f);
+			state->adpcm_data = -1;
 		}
 	}
 
@@ -1230,7 +1228,7 @@ static const msm5205_interface msm5205_config =
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( lucky74, driver_device )
+static MACHINE_CONFIG_START( lucky74, lucky74_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)	/* 3 MHz. */

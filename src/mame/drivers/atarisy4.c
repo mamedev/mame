@@ -168,7 +168,7 @@ static SCREEN_UPDATE( atarisy4 )
 	return 0;
 }
 
-static inline UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
+INLINE UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
 {
 //  UINT32 offset = ((gpu.mcr >> 4) & 3) << 9;
 	UINT32 offset = 0;
@@ -792,7 +792,7 @@ ROM_END
  *
  *************************************/
 
-static inline UINT8 hex_to_ascii(UINT8 in)
+INLINE UINT8 hex_to_ascii(UINT8 in)
 {
 	if (in < 0x3a)
 		return in - 0x30;

@@ -6,12 +6,6 @@
 #include "includes/tsamurai.h"
 
 
-/*
-** variables
-*/
-
-
-
 /***************************************************************************
 
   Callbacks for the TileMap code

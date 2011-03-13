@@ -218,7 +218,7 @@ static GFXDECODE_START( tiamc1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tiamc1, driver_device )
+static MACHINE_CONFIG_START( tiamc1, tiamc1_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080,16000000/9)		 /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(tiamc1_map)

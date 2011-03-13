@@ -73,7 +73,7 @@ static void namcofl_install_palette(running_machine *machine)
 		}
 	}
 }
-static void TilemapCB(UINT16 code, int *tile, int *mask )
+static void TilemapCB(running_machine *machine, UINT16 code, int *tile, int *mask )
 {
 	*tile = code;
 	*mask = code;

@@ -9,23 +9,23 @@
 #include "includes/aztarac.h"
 
 #define AVECTOR(m, x, y, color, intensity) \
-vector_add_point (m, xcenter + ((x) << 16), ycenter - ((y) << 16), color, intensity)
+vector_add_point (m, state->xcenter + ((x) << 16), state->ycenter - ((y) << 16), color, intensity)
 
-UINT16 *aztarac_vectorram;
 
-static int xcenter, ycenter;
 
-INLINE void read_vectorram (int addr, int *x, int *y, int *c)
+INLINE void read_vectorram(UINT16 *vectorram, int addr, int *x, int *y, int *c)
 {
-    *c = aztarac_vectorram[addr] & 0xffff;
-    *x = aztarac_vectorram[addr + 0x800] & 0x03ff;
-    *y = aztarac_vectorram[addr + 0x1000] & 0x03ff;
+    *c = vectorram[addr] & 0xffff;
+    *x = vectorram[addr + 0x800] & 0x03ff;
+    *y = vectorram[addr + 0x1000] & 0x03ff;
     if (*x & 0x200) *x |= 0xfffffc00;
     if (*y & 0x200) *y |= 0xfffffc00;
 }
 
 WRITE16_HANDLER( aztarac_ubr_w )
 {
+    aztarac_state *state = space->machine->driver_data<aztarac_state>();
+    UINT16 *vectorram = state->vectorram;
     int x, y, c, intensity, xoffset, yoffset, color;
     int defaddr, objaddr=0, ndefs;
 
@@ -35,7 +35,7 @@ WRITE16_HANDLER( aztarac_ubr_w )
 
         while (1)
         {
-            read_vectorram (objaddr, &xoffset, &yoffset, &c);
+            read_vectorram(vectorram, objaddr, &xoffset, &yoffset, &c);
             objaddr++;
 
             if (c & 0x4000)
@@ -46,18 +46,18 @@ WRITE16_HANDLER( aztarac_ubr_w )
                 defaddr = (c >> 1) & 0x7ff;
                 AVECTOR (space->machine, xoffset, yoffset, 0, 0);
 
-                read_vectorram (defaddr, &x, &ndefs, &c);
-				ndefs++;
+                read_vectorram(vectorram, defaddr, &x, &ndefs, &c);
+                ndefs++;
 
                 if (c & 0xff00)
                 {
                     /* latch color only once */
                     intensity = (c >> 8);
-					color = VECTOR_COLOR222(c & 0x3f);
+                    color = VECTOR_COLOR222(c & 0x3f);
                     while (ndefs--)
                     {
                         defaddr++;
-                        read_vectorram (defaddr, &x, &y, &c);
+                        read_vectorram(vectorram, defaddr, &x, &y, &c);
                         if ((c & 0xff00) == 0)
                             AVECTOR (space->machine, x + xoffset, y + yoffset, 0, 0);
                         else
@@ -70,8 +70,8 @@ WRITE16_HANDLER( aztarac_ubr_w )
                     while (ndefs--)
                     {
                         defaddr++;
-                        read_vectorram (defaddr, &x, &y, &c);
-						color = VECTOR_COLOR222(c & 0x3f);
+                        read_vectorram(vectorram, defaddr, &x, &y, &c);
+                        color = VECTOR_COLOR222(c & 0x3f);
                         AVECTOR (space->machine, x + xoffset, y + yoffset, color, c >> 8);
                     }
                 }
@@ -83,6 +83,7 @@ WRITE16_HANDLER( aztarac_ubr_w )
 
 VIDEO_START( aztarac )
 {
+	aztarac_state *state = machine->driver_data<aztarac_state>();
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
 	int xmin = visarea.min_x;
@@ -90,8 +91,8 @@ VIDEO_START( aztarac )
 	int xmax = visarea.max_x;
 	int ymax = visarea.max_y;
 
-	xcenter=((xmax + xmin) / 2) << 16;
-	ycenter=((ymax + ymin) / 2) << 16;
+	state->xcenter=((xmax + xmin) / 2) << 16;
+	state->ycenter=((ymax + ymin) / 2) << 16;
 
 	VIDEO_START_CALL(vector);
 }

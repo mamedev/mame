@@ -6,7 +6,6 @@
 #include "includes/namcos2.h"
 #include "audio/namcoc7x.h"
 
-static UINT32 tilemap_tile_bank[4];
 
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
@@ -42,22 +41,23 @@ nth_byte32( const UINT32 *pSource, int which )
 } /* nth_byte32 */
 
 static void
-NB1TilemapCB(UINT16 code, int *tile, int *mask )
+NB1TilemapCB(running_machine *machine, UINT16 code, int *tile, int *mask )
 {
 	*tile = code;
 	*mask = code;
 } /* NB1TilemapCB */
 
 static void
-NB2TilemapCB(UINT16 code, int *tile, int *mask )
+NB2TilemapCB(running_machine *machine, UINT16 code, int *tile, int *mask )
 {
+	namconb1_state *state = machine->driver_data<namconb1_state>();
 	int mangle;
 
 	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
 	{
 		/*  00010203 04050607 00010203 04050607 (normal) */
 		/*  00010718 191a1b07 00010708 090a0b07 (alt bank) */
-		int bank = nth_byte32( namconb1_tilebank32, (code>>13)+8 );
+		int bank = nth_byte32( state->tilebank32, (code>>13)+8 );
 		mangle = (code&0x1fff) + bank*0x2000;
 		*tile = mangle;
 		*mask = mangle;
@@ -159,7 +159,8 @@ SCREEN_UPDATE( namconb1 )
 static int
 NB1objcode2tile( running_machine *machine, int code )
 {
-	int bank = nth_word32( namconb1_spritebank32, code>>11 );
+	namconb1_state *state = machine->driver_data<namconb1_state>();
+	int bank = nth_word32( state->spritebank32, code>>11 );
 	return (code&0x7ff) + bank*0x800;
 }
 
@@ -173,6 +174,7 @@ VIDEO_START( namconb1 )
 
 SCREEN_UPDATE( namconb2 )
 {
+	namconb1_state *state = screen->machine->driver_data<namconb1_state>();
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a016a 00210101 01440020
@@ -190,10 +192,10 @@ SCREEN_UPDATE( namconb2 )
 
 	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 
-	if( memcmp(tilemap_tile_bank,namconb1_tilebank32,sizeof(tilemap_tile_bank))!=0 )
+	if( memcmp(state->tilemap_tile_bank,state->tilebank32,sizeof(state->tilemap_tile_bank))!=0 )
 	{
 		namco_tilemap_invalidate();
-		memcpy(tilemap_tile_bank,namconb1_tilebank32,sizeof(tilemap_tile_bank));
+		memcpy(state->tilemap_tile_bank,state->tilebank32,sizeof(state->tilemap_tile_bank));
 	}
 	video_update_common( screen->machine, bitmap, &clip, 1 );
 	return 0;
@@ -202,7 +204,8 @@ SCREEN_UPDATE( namconb2 )
 static int
 NB2objcode2tile( running_machine *machine, int code )
 {
-	int bank = nth_byte32( namconb1_spritebank32, (code>>11)&0xf );
+	namconb1_state *state = machine->driver_data<namconb1_state>();
+	int bank = nth_byte32( state->spritebank32, (code>>11)&0xf );
 	code &= 0x7ff;
 	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
 	{

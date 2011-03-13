@@ -41,21 +41,19 @@
 #include "video/resnet.h"
 #include "includes/snookr10.h"
 
-UINT8 *snookr10_videoram;
-UINT8 *snookr10_colorram;
-static tilemap_t *bg_tilemap;
-
 
 WRITE8_HANDLER( snookr10_videoram_w )
 {
-	snookr10_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	snookr10_state *state = space->machine->driver_data<snookr10_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( snookr10_colorram_w )
 {
-	snookr10_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	snookr10_state *state = space->machine->driver_data<snookr10_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
@@ -99,15 +97,16 @@ PALETTE_INIT( snookr10 )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	snookr10_state *state = machine->driver_data<snookr10_state>();
 /*  - bits -
     7654 3210
     xxxx ----   tiles color.
     ---- xxxx   seems unused.
 */
 	int offs = tile_index;
-	int attr = snookr10_videoram[offs] + (snookr10_colorram[offs] << 8);
+	int attr = state->videoram[offs] + (state->colorram[offs] << 8);
 	int code = attr & 0xfff;
-	int color = snookr10_colorram[offs] >> 4;
+	int color = state->colorram[offs] >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -161,15 +160,16 @@ PALETTE_INIT( apple10 )
 
 static TILE_GET_INFO( apple10_get_bg_tile_info )
 {
+	snookr10_state *state = machine->driver_data<snookr10_state>();
 /*  - bits -
     7654 3210
     xxxx ----   tiles color.
     ---- xxxx   seems unused.
 */
 	int offs = tile_index;
-	int attr = snookr10_videoram[offs] + (snookr10_colorram[offs] << 8);
+	int attr = state->videoram[offs] + (state->colorram[offs] << 8);
 	int code = BITSWAP16((attr & 0xfff),15,14,13,12,8,9,10,11,0,1,2,3,4,5,6,7);	/* encrypted tile matrix */
-	int color = snookr10_colorram[offs] >> 4;
+	int color = state->colorram[offs] >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
@@ -177,16 +177,19 @@ static TILE_GET_INFO( apple10_get_bg_tile_info )
 
 VIDEO_START( snookr10 )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
+	snookr10_state *state = machine->driver_data<snookr10_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
 }
 
 VIDEO_START( apple10 )
 {
-	bg_tilemap = tilemap_create(machine, apple10_get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
+	snookr10_state *state = machine->driver_data<snookr10_state>();
+	state->bg_tilemap = tilemap_create(machine, apple10_get_bg_tile_info, tilemap_scan_rows, 4, 8, 128, 30);
 }
 
 SCREEN_UPDATE( snookr10 )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	snookr10_state *state = screen->machine->driver_data<snookr10_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }

@@ -36,28 +36,6 @@ DEFINE_LEGACY_SOUND_DEVICE(SEGA005, sega005_sound);
 
 /*************************************
  *
- *  Local sound states
- *
- *************************************/
-
-static UINT8 sound_state[2];
-static UINT8 sound_rate;
-static UINT16 sound_addr;
-static UINT8 sound_data;
-
-static UINT8 square_state;
-static UINT8 square_count;
-
-static emu_timer *sega005_sound_timer;
-static sound_stream *sega005_stream;
-
-static UINT8 n7751_command;
-static UINT8 n7751_busy;
-
-
-
-/*************************************
- *
  *  Astro Blaster sound hardware
  *
  *************************************/
@@ -227,8 +205,9 @@ MACHINE_CONFIG_END
 
 static SOUND_START( astrob )
 {
-	state_save_register_global_array(machine, sound_state);
-	state_save_register_global(machine, sound_rate);
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	state_save_register_global_array(machine, state->sound_state);
+	state_save_register_global(machine, state->sound_rate);
 }
 
 
@@ -241,6 +220,7 @@ static SOUND_START( astrob )
 
 WRITE8_HANDLER( astrob_sound_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	static const float attack_resistor[10] =
 	{
 		120.0f, 82.0f, 62.0f, 56.0f, 47.0f, 39.0f, 33.0f, 27.0f, 24.0f, 22.0f
@@ -248,8 +228,8 @@ WRITE8_HANDLER( astrob_sound_w )
 	device_t *samples = space->machine->device("samples");
 	float freq_factor;
 
-	UINT8 diff = data ^ sound_state[offset];
-	sound_state[offset] = data;
+	UINT8 diff = data ^ state->sound_state[offset];
+	state->sound_state[offset] = data;
 
 	switch (offset)
 	{
@@ -305,10 +285,10 @@ WRITE8_HANDLER( astrob_sound_w )
 			if ((diff & 0x08) && !(data & 0x08)) sample_start(samples, 8, 13, FALSE);
 
 			/* ATTACK RATE */
-			if ((diff & 0x10) && !(data & 0x10)) sound_rate = (sound_rate + 1) % 10;
+			if ((diff & 0x10) && !(data & 0x10)) state->sound_rate = (state->sound_rate + 1) % 10;
 
 			/* RATE RESET */
-			if (!(data & 0x20)) sound_rate = 0;
+			if (!(data & 0x20)) state->sound_rate = 0;
 
 			/* BONUS: channel 9 */
 			if ((diff & 0x40) && !(data & 0x40)) sample_start(samples, 9, 14, FALSE);
@@ -324,7 +304,7 @@ WRITE8_HANDLER( astrob_sound_w )
 	/* account for the fact that frequency goes up as CV goes down */
 	/* WARP is already taken into account by the differing samples above */
 	freq_factor  = (11.5f - 8.163f) * (-22.0f / attack_resistor[0]) + 8.163f;
-	freq_factor /= (11.5f - 8.163f) * (-22.0f / attack_resistor[sound_rate]) + 8.163f;
+	freq_factor /= (11.5f - 8.163f) * (-22.0f / attack_resistor[state->sound_rate]) + 8.163f;
 
 	/* adjust the sample rate of invader sounds based the sound_rate */
 	/* this is an approximation */
@@ -460,11 +440,12 @@ MACHINE_CONFIG_END
 
 static SOUND_START( sega005 )
 {
-	state_save_register_global_array(machine, sound_state);
-	state_save_register_global(machine, sound_addr);
-	state_save_register_global(machine, sound_data);
-	state_save_register_global(machine, square_state);
-	state_save_register_global(machine, square_count);
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	state_save_register_global_array(machine, state->sound_state);
+	state_save_register_global(machine, state->sound_addr);
+	state_save_register_global(machine, state->sound_data);
+	state_save_register_global(machine, state->square_state);
+	state_save_register_global(machine, state->square_count);
 }
 
 
@@ -477,9 +458,10 @@ static SOUND_START( sega005 )
 
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	device_t *samples = device->machine->device("samples");
-	UINT8 diff = data ^ sound_state[0];
-	sound_state[0] = data;
+	UINT8 diff = data ^ state->sound_state[0];
+	state->sound_state[0] = data;
 
 	/* LARGE EXPL: channel 0 */
 	if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 0, 0, FALSE);
@@ -508,59 +490,61 @@ static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 
 INLINE void sega005_update_sound_data(running_machine *machine)
 {
-	UINT8 newval = machine->region("005")->base()[sound_addr];
-	UINT8 diff = newval ^ sound_data;
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	UINT8 newval = machine->region("005")->base()[state->sound_addr];
+	UINT8 diff = newval ^ state->sound_data;
 
-	//mame_printf_debug("  [%03X] = %02X\n", sound_addr, newval);
+	//mame_printf_debug("  [%03X] = %02X\n", state->sound_addr, newval);
 
 	/* latch the new value */
-	sound_data = newval;
+	state->sound_data = newval;
 
 	/* if bit 5 goes high, we reset the timer */
 	if ((diff & 0x20) && !(newval & 0x20))
 	{
 		//mame_printf_debug("Stopping timer\n");
-		sega005_sound_timer->adjust(attotime::never);
+		state->sega005_sound_timer->adjust(attotime::never);
 	}
 
 	/* if bit 5 goes low, we start the timer again */
 	if ((diff & 0x20) && (newval & 0x20))
 	{
 		//mame_printf_debug("Starting timer\n");
-		sega005_sound_timer->adjust(attotime::from_hz(SEGA005_555_TIMER_FREQ), 0, attotime::from_hz(SEGA005_555_TIMER_FREQ));
+		state->sega005_sound_timer->adjust(attotime::from_hz(SEGA005_555_TIMER_FREQ), 0, attotime::from_hz(SEGA005_555_TIMER_FREQ));
 	}
 }
 
 
 static WRITE8_DEVICE_HANDLER( sega005_sound_b_w )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	/*
            D6: manual timer clock (0->1)
            D5: 0 = manual timer, 1 = auto timer
            D4: 1 = hold/reset address counter to 0
         D3-D0: upper 4 bits of ROM address
     */
-	UINT8 diff = data ^ sound_state[1];
-	sound_state[1] = data;
+	UINT8 diff = data ^ state->sound_state[1];
+	state->sound_state[1] = data;
 
 	//mame_printf_debug("sound[%d] = %02X\n", 1, data);
 
 	/* force a stream update */
-	sega005_stream->update();
+	state->sega005_stream->update();
 
 	/* ROM address */
-	sound_addr = ((data & 0x0f) << 7) | (sound_addr & 0x7f);
+	state->sound_addr = ((data & 0x0f) << 7) | (state->sound_addr & 0x7f);
 
 	/* reset both sound address and square wave counters */
 	if (data & 0x10)
 	{
-		sound_addr &= 0x780;
-		square_state = 0;
+		state->sound_addr &= 0x780;
+		state->square_state = 0;
 	}
 
 	/* manual clock */
 	if ((diff & 0x40) && (data & 0x40) && !(data & 0x20) && !(data & 0x10))
-		sound_addr = (sound_addr & 0x780) | ((sound_addr + 1) & 0x07f);
+		state->sound_addr = (state->sound_addr & 0x780) | ((state->sound_addr + 1) & 0x07f);
 
 	/* update the sound data */
 	sega005_update_sound_data(device->machine);
@@ -576,16 +560,17 @@ static WRITE8_DEVICE_HANDLER( sega005_sound_b_w )
 
 static DEVICE_START( sega005_sound )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	running_machine *machine = device->machine;
 
 	/* create the stream */
-	sega005_stream = device->machine->sound().stream_alloc(*device, 0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
+	state->sega005_stream = device->machine->sound().stream_alloc(*device, 0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
 
 	/* create a timer for the 555 */
-	sega005_sound_timer = machine->scheduler().timer_alloc(FUNC(sega005_auto_timer));
+	state->sega005_sound_timer = machine->scheduler().timer_alloc(FUNC(sega005_auto_timer));
 
 	/* set the initial sound data */
-	sound_data = 0x00;
+	state->sound_data = 0x00;
 	sega005_update_sound_data(machine);
 }
 
@@ -606,33 +591,35 @@ DEVICE_GET_INFO( sega005_sound )
 
 static STREAM_UPDATE( sega005_stream_update )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	const UINT8 *sound_prom = device->machine->region("proms")->base();
 	int i;
 
 	/* no implementation yet */
 	for (i = 0; i < samples; i++)
 	{
-		if (!(sound_state[1] & 0x10) && (++square_count & 0xff) == 0)
+		if (!(state->sound_state[1] & 0x10) && (++state->square_count & 0xff) == 0)
 		{
-			square_count = sound_prom[sound_data & 0x1f];
+			state->square_count = sound_prom[state->sound_data & 0x1f];
 
 			/* hack - the RC should filter this out */
-			if (square_count != 0xff)
-				square_state += 2;
+			if (state->square_count != 0xff)
+				state->square_state += 2;
 		}
 
-		outputs[0][i] = (square_state & 2) ? 0x7fff : 0x0000;
+		outputs[0][i] = (state->square_state & 2) ? 0x7fff : 0x0000;
 	}
 }
 
 
 static TIMER_CALLBACK( sega005_auto_timer )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
 	/* force an update then clock the sound address if not held in reset */
-	sega005_stream->update();
-	if ((sound_state[1] & 0x20) && !(sound_state[1] & 0x10))
+	state->sega005_stream->update();
+	if ((state->sound_state[1] & 0x20) && !(state->sound_state[1] & 0x10))
 	{
-		sound_addr = (sound_addr & 0x780) | ((sound_addr + 1) & 0x07f);
+		state->sound_addr = (state->sound_addr & 0x780) | ((state->sound_addr + 1) & 0x07f);
 		sega005_update_sound_data(machine);
 	}
 }
@@ -692,7 +679,8 @@ MACHINE_CONFIG_END
 
 static SOUND_START( spaceod )
 {
-	state_save_register_global_array(machine, sound_state);
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	state_save_register_global_array(machine, state->sound_state);
 }
 
 
@@ -705,9 +693,10 @@ static SOUND_START( spaceod )
 
 WRITE8_HANDLER( spaceod_sound_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	device_t *samples = space->machine->device("samples");
-	UINT8 diff = data ^ sound_state[offset];
-	sound_state[offset] = data;
+	UINT8 diff = data ^ state->sound_state[offset];
+	state->sound_state[offset] = data;
 
 	switch (offset)
 	{
@@ -874,10 +863,11 @@ MACHINE_CONFIG_END
 
 static SOUND_START( monsterb )
 {
-	state_save_register_global_array(machine, sound_state);
-	state_save_register_global(machine, sound_addr);
-	state_save_register_global(machine, n7751_command);
-	state_save_register_global(machine, n7751_busy);
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	state_save_register_global_array(machine, state->sound_state);
+	state_save_register_global(machine, state->sound_addr);
+	state_save_register_global(machine, state->n7751_command);
+	state_save_register_global(machine, state->n7751_busy);
 }
 
 
@@ -911,9 +901,10 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 
 static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	device_t *samples = device->machine->device("samples");
-	UINT8 diff = data ^ sound_state[1];
-	sound_state[1] = data;
+	UINT8 diff = data ^ state->sound_state[1];
+	state->sound_state[1] = data;
 
 	/* SHOT: channel 0 */
 	if ((diff & 0x01) && !(data & 0x01)) sample_start(samples, 0, 0, FALSE);
@@ -934,19 +925,21 @@ static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 
 static READ8_DEVICE_HANDLER( n7751_status_r )
 {
-	return n7751_busy << 4;
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
+	return state->n7751_busy << 4;
 }
 
 
 static WRITE8_DEVICE_HANDLER( n7751_command_w )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	/*
         Z80 7751 control port
 
         D0-D2 = connected to 7751 port C
         D3    = /INT line
     */
-	n7751_command = data & 0x07;
+	state->n7751_command = data & 0x07;
 	cputag_set_input_line(device->machine, "audiocpu", 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
@@ -954,6 +947,7 @@ static WRITE8_DEVICE_HANDLER( n7751_command_w )
 
 static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	/* P4 - address lines 0-3 */
 	/* P5 - address lines 4-7 */
 	/* P6 - address lines 8-11 */
@@ -961,25 +955,25 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 	switch (offset)
 	{
 		case 0:
-			sound_addr = (sound_addr & ~0x00f) | ((data & 0x0f) << 0);
+			state->sound_addr = (state->sound_addr & ~0x00f) | ((data & 0x0f) << 0);
 			break;
 
 		case 1:
-			sound_addr = (sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
+			state->sound_addr = (state->sound_addr & ~0x0f0) | ((data & 0x0f) << 4);
 			break;
 
 		case 2:
-			sound_addr = (sound_addr & ~0xf00) | ((data & 0x0f) << 8);
+			state->sound_addr = (state->sound_addr & ~0xf00) | ((data & 0x0f) << 8);
 			break;
 
 		case 3:
-			sound_addr &= 0xfff;
+			state->sound_addr &= 0xfff;
 			{
 				int numroms = device->machine->region("n7751")->bytes() / 0x1000;
-				if (!(data & 0x01) && numroms >= 1) sound_addr |= 0x0000;
-				if (!(data & 0x02) && numroms >= 2) sound_addr |= 0x1000;
-				if (!(data & 0x04) && numroms >= 3) sound_addr |= 0x2000;
-				if (!(data & 0x08) && numroms >= 4) sound_addr |= 0x3000;
+				if (!(data & 0x01) && numroms >= 1) state->sound_addr |= 0x0000;
+				if (!(data & 0x02) && numroms >= 2) state->sound_addr |= 0x1000;
+				if (!(data & 0x04) && numroms >= 3) state->sound_addr |= 0x2000;
+				if (!(data & 0x08) && numroms >= 4) state->sound_addr |= 0x3000;
 			}
 			break;
 	}
@@ -988,27 +982,30 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 
 static READ8_HANDLER( n7751_rom_r )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	/* read from BUS */
-	return space->machine->region("n7751")->base()[sound_addr];
+	return space->machine->region("n7751")->base()[state->sound_addr];
 }
 
 
 static READ8_HANDLER( n7751_command_r )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	/* read from P2 - 8255's PC0-2 connects to 7751's S0-2 (P24-P26 on an 8048) */
 	/* bit 0x80 is an alternate way to control the sample on/off; doesn't appear to be used */
-	return 0x80 | ((n7751_command & 0x07) << 4);
+	return 0x80 | ((state->n7751_command & 0x07) << 4);
 }
 
 
 static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	/* write to P2; low 4 bits go to 8243 */
 	i8243_p2_w(device, offset, data & 0x0f);
 
 	/* output of bit $80 indicates we are ready (1) or busy (0) */
 	/* no other outputs are used */
-	n7751_busy = data >> 7;
+	state->n7751_busy = data >> 7;
 }
 
 

@@ -9,30 +9,8 @@
 #include "machine/rescap.h"
 #include "video/resnet.h"
 
-UINT8 segag80r_background_pcb;
 
-static double rweights[3], gweights[3], bweights[2];
-
-static UINT8 video_control;
-static UINT8 video_flip;
-static UINT8 vblank_latch;
-
-static tilemap_t *spaceod_bg_htilemap;
-static tilemap_t *spaceod_bg_vtilemap;
-static UINT16 spaceod_hcounter;
-static UINT16 spaceod_vcounter;
-static UINT8 spaceod_fixed_color;
-static UINT8 spaceod_bg_control;
-static UINT8 spaceod_bg_detect;
-static const UINT8 spaceod_bg_detect_tile_color = 1;
-
-static tilemap_t *bg_tilemap;
-static UINT8 bg_enable;
-static UINT8 bg_char_bank;
-static UINT16 bg_scrollx, bg_scrolly;
-
-static UINT8 pignewt_bg_color_offset;
-
+enum { spaceod_bg_detect_tile_color = 1 };
 
 
 /*************************************
@@ -43,28 +21,31 @@ static UINT8 pignewt_bg_color_offset;
 
 static TIMER_CALLBACK( vblank_latch_clear )
 {
-	vblank_latch = 0;
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	state->vblank_latch = 0;
 }
 
 
 static void vblank_latch_set(running_machine *machine)
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
 	/* set a timer to mimic the 555 timer that drives the EDGINT signal */
 	/* the 555 is run in monostable mode with R=56000 and C=1000pF */
-	vblank_latch = 1;
+	state->vblank_latch = 1;
 	machine->scheduler().timer_set(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), FUNC(vblank_latch_clear));
 
 	/* latch the current flip state at the same time */
-	video_flip = video_control & 1;
+	state->video_flip = state->video_control & 1;
 }
 
 
 INTERRUPT_GEN( segag80r_vblank_start )
 {
+	segag80r_state *state = device->machine->driver_data<segag80r_state>();
 	vblank_latch_set(device->machine);
 
 	/* if interrupts are enabled, clock one */
-	if (video_control & 0x04)
+	if (state->video_control & 0x04)
 		irq0_line_hold(device);
 }
 
@@ -89,6 +70,7 @@ INTERRUPT_GEN( sindbadm_vblank_start )
 
 static void g80_set_palette_entry(running_machine *machine, int entry, UINT8 data)
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
 	int bit0, bit1, bit2;
 	int r, g, b;
 
@@ -101,18 +83,18 @@ static void g80_set_palette_entry(running_machine *machine, int entry, UINT8 dat
 	bit0 = (r >> 0) & 0x01;
 	bit1 = (r >> 1) & 0x01;
 	bit2 = (r >> 2) & 0x01;
-	r = combine_3_weights(rweights, bit0, bit1, bit2);
+	r = combine_3_weights(state->rweights, bit0, bit1, bit2);
 
 	/* green component */
 	bit0 = (g >> 0) & 0x01;
 	bit1 = (g >> 1) & 0x01;
 	bit2 = (g >> 2) & 0x01;
-	g = combine_3_weights(gweights, bit0, bit1, bit2);
+	g = combine_3_weights(state->gweights, bit0, bit1, bit2);
 
 	/* blue component */
 	bit0 = (b >> 0) & 0x01;
 	bit1 = (b >> 1) & 0x01;
-	b = combine_2_weights(bweights, bit0, bit1);
+	b = combine_2_weights(state->bweights, bit0, bit1);
 
 	palette_set_color(machine, entry, MAKE_RGB(r, g, b));
 }
@@ -170,8 +152,9 @@ static void spaceod_bg_init_palette(running_machine *machine)
 
 static TILE_GET_INFO( spaceod_get_tile_info )
 {
-	int code = machine->region("gfx2")->base()[tile_index + 0x1000 * (spaceod_bg_control >> 6)];
-	SET_TILE_INFO(1, code + 0x100 * ((spaceod_bg_control >> 2) & 1), 0, 0);
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	int code = machine->region("gfx2")->base()[tile_index + 0x1000 * (state->spaceod_bg_control >> 6)];
+	SET_TILE_INFO(1, code + 0x100 * ((state->spaceod_bg_control >> 2) & 1), 0, 0);
 }
 
 
@@ -185,8 +168,9 @@ static TILEMAP_MAPPER( spaceod_scan_rows )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
 	int code = machine->region("gfx2")->base()[tile_index];
-	SET_TILE_INFO(1, code + 0x100 * bg_char_bank, code >> 4, 0);
+	SET_TILE_INFO(1, code + 0x100 * state->bg_char_bank, code >> 4, 0);
 }
 
 
@@ -206,9 +190,9 @@ VIDEO_START( segag80r )
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0,	255, -1.0,
-			3,	rg_resistances, rweights, 220, 0,
-			3,	rg_resistances, gweights, 220, 0,
-			2,	b_resistances,  bweights, 220, 0);
+			3,	rg_resistances, state->rweights, 220, 0,
+			3,	rg_resistances, state->gweights, 220, 0,
+			2,	b_resistances,  state->bweights, 220, 0);
 
 	gfx_element_set_source(machine->gfx[0], &videoram[0x800]);
 
@@ -216,7 +200,7 @@ VIDEO_START( segag80r )
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x80);
 
 	/* initialize the particulars for each type of background PCB */
-	switch (segag80r_background_pcb)
+	switch (state->background_pcb)
 	{
 		/* nothing to do here */
 		case G80_BACKGROUND_NONE:
@@ -226,41 +210,41 @@ VIDEO_START( segag80r )
 		/* and one vertically scrolling */
 		case G80_BACKGROUND_SPACEOD:
 			spaceod_bg_init_palette(machine);
-			spaceod_bg_htilemap = tilemap_create(machine, spaceod_get_tile_info, spaceod_scan_rows,  8,8, 128,32);
-			spaceod_bg_vtilemap = tilemap_create(machine, spaceod_get_tile_info, spaceod_scan_rows,  8,8, 32,128);
+			state->spaceod_bg_htilemap = tilemap_create(machine, spaceod_get_tile_info, spaceod_scan_rows,  8,8, 128,32);
+			state->spaceod_bg_vtilemap = tilemap_create(machine, spaceod_get_tile_info, spaceod_scan_rows,  8,8, 32,128);
 			break;
 
 		/* background tilemap is effectively 1 screen x n screens */
 		case G80_BACKGROUND_MONSTERB:
-			bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows,  8,8, 32,machine->region("gfx2")->bytes() / 32);
+			state->bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows,  8,8, 32,machine->region("gfx2")->bytes() / 32);
 			break;
 
 		/* background tilemap is effectively 4 screens x n screens */
 		case G80_BACKGROUND_PIGNEWT:
 		case G80_BACKGROUND_SINDBADM:
-			bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows,  8,8, 128,machine->region("gfx2")->bytes() / 128);
+			state->bg_tilemap = tilemap_create(machine, bg_get_tile_info, tilemap_scan_rows,  8,8, 128,machine->region("gfx2")->bytes() / 128);
 			break;
 	}
 
 	/* register for save states */
 	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x80);
 
-	state_save_register_global(machine, video_control);
-	state_save_register_global(machine, video_flip);
-	state_save_register_global(machine, vblank_latch);
+	state_save_register_global(machine, state->video_control);
+	state_save_register_global(machine, state->video_flip);
+	state_save_register_global(machine, state->vblank_latch);
 
-	state_save_register_global(machine, spaceod_hcounter);
-	state_save_register_global(machine, spaceod_vcounter);
-	state_save_register_global(machine, spaceod_fixed_color);
-	state_save_register_global(machine, spaceod_bg_control);
-	state_save_register_global(machine, spaceod_bg_detect);
+	state_save_register_global(machine, state->spaceod_hcounter);
+	state_save_register_global(machine, state->spaceod_vcounter);
+	state_save_register_global(machine, state->spaceod_fixed_color);
+	state_save_register_global(machine, state->spaceod_bg_control);
+	state_save_register_global(machine, state->spaceod_bg_detect);
 
-	state_save_register_global(machine, bg_enable);
-	state_save_register_global(machine, bg_char_bank);
-	state_save_register_global(machine, bg_scrollx);
-	state_save_register_global(machine, bg_scrolly);
+	state_save_register_global(machine, state->bg_enable);
+	state_save_register_global(machine, state->bg_char_bank);
+	state_save_register_global(machine, state->bg_scrollx);
+	state_save_register_global(machine, state->bg_scrolly);
 
-	state_save_register_global(machine, pignewt_bg_color_offset);
+	state_save_register_global(machine, state->pignewt_bg_color_offset);
 }
 
 
@@ -276,7 +260,7 @@ WRITE8_HANDLER( segag80r_videoram_w )
 	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	UINT8 *videoram = state->videoram;
 	/* accesses to the upper half of VRAM go to paletteram if selected */
-	if ((offset & 0x1000) && (video_control & 0x02))
+	if ((offset & 0x1000) && (state->video_control & 0x02))
 	{
 		offset &= 0x3f;
 		space->machine->generic.paletteram.u8[offset] = data;
@@ -302,6 +286,7 @@ WRITE8_HANDLER( segag80r_videoram_w )
 
 READ8_HANDLER( segag80r_video_port_r )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	if (offset == 0)
 	{
 		logerror("%04X:segag80r_video_port_r(%d)\n", cpu_get_pc(space->cpu), offset);
@@ -315,13 +300,14 @@ READ8_HANDLER( segag80r_video_port_r )
             D2 = interrupt enable state
             D3 = n/c
         */
-		return (vblank_latch << 0) | (video_flip << 1) | (video_control & 0x04) | 0xf8;
+		return (state->vblank_latch << 0) | (state->video_flip << 1) | (state->video_control & 0x04) | 0xf8;
 	}
 }
 
 
 WRITE8_HANDLER( segag80r_video_port_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	if (offset == 0)
 	{
 		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", cpu_get_pc(space->cpu), offset, data);
@@ -335,7 +321,7 @@ WRITE8_HANDLER( segag80r_video_port_w )
             D2 = interrupt enable
             D3 = n/c (used as flip by many background boards)
         */
-		video_control = data;
+		state->video_control = data;
 	}
 }
 
@@ -350,14 +336,16 @@ WRITE8_HANDLER( segag80r_video_port_w )
 
 READ8_HANDLER( spaceod_back_port_r )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	/* force an update to get the current detection value */
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
-	return 0xfe | spaceod_bg_detect;
+	return 0xfe | state->spaceod_bg_detect;
 }
 
 
 WRITE8_HANDLER( spaceod_back_port_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	switch (offset & 7)
 	{
 		/* port 0: latches D0-D7 into LS377 at U39 (SH4)
@@ -369,54 +357,54 @@ WRITE8_HANDLER( spaceod_back_port_w )
             d7 = background ROM select 1
         */
 		case 0:
-			if ((spaceod_bg_control ^ data) & 0xc4)
+			if ((state->spaceod_bg_control ^ data) & 0xc4)
 			{
-				tilemap_mark_all_tiles_dirty(spaceod_bg_htilemap);
-				tilemap_mark_all_tiles_dirty(spaceod_bg_vtilemap);
+				tilemap_mark_all_tiles_dirty(state->spaceod_bg_htilemap);
+				tilemap_mark_all_tiles_dirty(state->spaceod_bg_vtilemap);
 			}
-			spaceod_bg_control = data;
+			state->spaceod_bg_control = data;
 			break;
 
 		/* port 1: loads both H and V counters with 0 */
 		case 1:
-			spaceod_hcounter = 0;
-			spaceod_vcounter = 0;
+			state->spaceod_hcounter = 0;
+			state->spaceod_vcounter = 0;
 			break;
 
 		/* port 2: clocks either the H or V counters (based on port 0:d1) */
 		/* either up or down (based on port 0:d0) */
 		case 2:
-			if (!(spaceod_bg_control & 0x02))
+			if (!(state->spaceod_bg_control & 0x02))
 			{
-				if (!(spaceod_bg_control & 0x01))
-					spaceod_hcounter++;
+				if (!(state->spaceod_bg_control & 0x01))
+					state->spaceod_hcounter++;
 				else
-					spaceod_hcounter--;
+					state->spaceod_hcounter--;
 			}
 			else
 			{
-				if (!(spaceod_bg_control & 0x01))
-					spaceod_vcounter++;
+				if (!(state->spaceod_bg_control & 0x01))
+					state->spaceod_vcounter++;
 				else
-					spaceod_vcounter--;
+					state->spaceod_vcounter--;
 			}
 			break;
 
 		/* port 3: clears the background detection flag */
 		case 3:
 			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
-			spaceod_bg_detect = 0;
+			state->spaceod_bg_detect = 0;
 			break;
 
 		/* port 4: enables (0)/disables (1) the background */
 		case 4:
-			bg_enable = data & 1;
+			state->bg_enable = data & 1;
 			break;
 
 		/* port 5: specifies fixed background color */
 		/* top two bits are not connected */
 		case 5:
-			spaceod_fixed_color = data & 0x3f;
+			state->spaceod_fixed_color = data & 0x3f;
 			break;
 
 		/* port 6: latches D0-D7 into LS377 at U37 -> CN1-11/12/13/14/15/16/17/18 */
@@ -438,9 +426,10 @@ WRITE8_HANDLER( spaceod_back_port_w )
 
 WRITE8_HANDLER( monsterb_videoram_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	/* accesses to the the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
-	if ((offset & 0x1fc0) == 0x1040 && (video_control & 0x40))
+	if ((offset & 0x1fc0) == 0x1040 && (state->video_control & 0x40))
 	{
 		offs_t paloffs = offset & 0x3f;
 		space->machine->generic.paletteram.u8[paloffs | 0x40] = data;
@@ -456,6 +445,7 @@ WRITE8_HANDLER( monsterb_videoram_w )
 
 WRITE8_HANDLER( monsterb_back_port_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	switch (offset & 7)
 	{
 		/* port 0: not used (looks like latches for C7-C10 = background color) */
@@ -484,11 +474,11 @@ WRITE8_HANDLER( monsterb_back_port_w )
             d7 = BKGEN - background enable
          */
 		case 4:
-			if ((bg_char_bank ^ data) & 0x0f)
-				tilemap_mark_all_tiles_dirty(bg_tilemap);
-			bg_char_bank = data & 0x0f;
-			bg_scrolly = (data << 4) & 0x700;
-			bg_enable = data & 0x80;
+			if ((state->bg_char_bank ^ data) & 0x0f)
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+			state->bg_char_bank = data & 0x0f;
+			state->bg_scrolly = (data << 4) & 0x700;
+			state->bg_enable = data & 0x80;
 			break;
 
 		/* port 5: not connected */
@@ -508,9 +498,10 @@ WRITE8_HANDLER( monsterb_back_port_w )
 
 WRITE8_HANDLER( pignewt_videoram_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	/* accesses to the the area $f040-$f07f go to background palette if */
 	/* the palette access enable bit is set */
-	if ((offset & 0x1fc0) == 0x1040 && (video_control & 0x02))
+	if ((offset & 0x1fc0) == 0x1040 && (state->video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
 		space->machine->generic.paletteram.u8[paloffs | 0x40] = data;
@@ -525,37 +516,39 @@ WRITE8_HANDLER( pignewt_videoram_w )
 
 WRITE8_HANDLER( pignewt_back_color_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	/* it is not really known what this does */
 	if (offset == 0)
-		pignewt_bg_color_offset = data;
+		state->pignewt_bg_color_offset = data;
 	else
-		logerror("pignewt_back_color_w(%d) = %02X\n", pignewt_bg_color_offset, data);
+		logerror("pignewt_back_color_w(%d) = %02X\n", state->pignewt_bg_color_offset, data);
 }
 
 
 WRITE8_HANDLER( pignewt_back_port_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	switch (offset & 7)
 	{
 		/* port 0: scroll offset low */
 		case 0:
-			bg_scrollx = (bg_scrollx & 0x300) | data;
+			state->bg_scrollx = (state->bg_scrollx & 0x300) | data;
 			break;
 
 		/* port 1: scroll offset high */
 		case 1:
-			bg_scrollx = (bg_scrollx & 0x0ff) | ((data << 8) & 0x300);
-			bg_enable = data & 0x80;
+			state->bg_scrollx = (state->bg_scrollx & 0x0ff) | ((data << 8) & 0x300);
+			state->bg_enable = data & 0x80;
 			break;
 
 		/* port 2: scroll offset low */
 		case 2:
-			bg_scrolly = (bg_scrolly & 0x300) | data;
+			state->bg_scrolly = (state->bg_scrolly & 0x300) | data;
 			break;
 
 		/* port 3: scroll offset high */
 		case 3:
-			bg_scrolly = (bg_scrolly & 0x0ff) | ((data << 8) & 0x300);
+			state->bg_scrolly = (state->bg_scrolly & 0x0ff) | ((data << 8) & 0x300);
 			break;
 
 		/* port 4: background character bank control
@@ -570,9 +563,9 @@ WRITE8_HANDLER( pignewt_back_port_w )
          */
 		case 4:
 			data = (data & 0x09) | ((data >> 2) & 0x02) | ((data << 2) & 0x04);
-			if ((bg_char_bank ^ data) & 0x0f)
-				tilemap_mark_all_tiles_dirty(bg_tilemap);
-			bg_char_bank = data & 0x0f;
+			if ((state->bg_char_bank ^ data) & 0x0f)
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+			state->bg_char_bank = data & 0x0f;
 			break;
 
 		/* port 5: not connected? */
@@ -591,9 +584,10 @@ WRITE8_HANDLER( pignewt_back_port_w )
 
 WRITE8_HANDLER( sindbadm_videoram_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	/* accesses to the the area $f000-$f03f go to background palette if */
 	/* the palette access enable bit is set */
-	if ((offset & 0x1fc0) == 0x1000 && (video_control & 0x02))
+	if ((offset & 0x1fc0) == 0x1000 && (state->video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
 		space->machine->generic.paletteram.u8[paloffs | 0x40] = data;
@@ -608,6 +602,7 @@ WRITE8_HANDLER( sindbadm_videoram_w )
 
 WRITE8_HANDLER( sindbadm_back_port_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
 	switch (offset & 3)
 	{
 		/* port 0: irq ack */
@@ -627,12 +622,12 @@ WRITE8_HANDLER( sindbadm_back_port_w )
             d7 = BG enable
         */
 		case 1:
-			bg_enable = data & 0x80;
-			bg_scrollx = (data << 6) & 0x300;
-			bg_scrolly = (data << 4) & 0x700;
-			if ((bg_char_bank ^ data) & 0x03)
-				tilemap_mark_all_tiles_dirty(bg_tilemap);
-			bg_char_bank = data & 0x03;
+			state->bg_enable = data & 0x80;
+			state->bg_scrollx = (data << 6) & 0x300;
+			state->bg_scrolly = (data << 4) & 0x700;
+			if ((state->bg_char_bank ^ data) & 0x03)
+				tilemap_mark_all_tiles_dirty(state->bg_tilemap);
+			state->bg_char_bank = data & 0x03;
 			break;
 	}
 }
@@ -649,20 +644,20 @@ static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rect
 {
 	segag80r_state *state = machine->driver_data<segag80r_state>();
 	UINT8 *videoram = state->videoram;
-	int flipmask = video_flip ? 0x1f : 0x00;
+	int flipmask = state->video_flip ? 0x1f : 0x00;
 	int x, y;
 
 	/* iterate over the screen and draw visible tiles */
 	for (y = cliprect->min_y / 8; y <= cliprect->max_y / 8; y++)
 	{
-		int effy = video_flip ? 27 - y : y;
+		int effy = state->video_flip ? 27 - y : y;
 		for (x = cliprect->min_x / 8; x <= cliprect->max_x / 8; x++)
 		{
 			int offs = effy * 32 + (x ^ flipmask);
 			UINT8 tile = videoram[offs];
 
 			/* draw the tile */
-			drawgfx_transmask(bitmap, cliprect, machine->gfx[0], tile, tile >> 4, video_flip, video_flip, x*8, y*8, transparent_pens[tile >> 4]);
+			drawgfx_transmask(bitmap, cliprect, machine->gfx[0], tile, tile >> 4, state->video_flip, state->video_flip, x*8, y*8, transparent_pens[tile >> 4]);
 		}
 	}
 }
@@ -677,9 +672,10 @@ static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_background_spaceod(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	bitmap_t *pixmap = tilemap_get_pixmap(!(spaceod_bg_control & 0x02) ? spaceod_bg_htilemap : spaceod_bg_vtilemap);
-	int flipmask = (spaceod_bg_control & 0x01) ? 0xff : 0x00;
-	int xoffset = (spaceod_bg_control & 0x02) ? 0x10 : 0x00;
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	bitmap_t *pixmap = tilemap_get_pixmap(!(state->spaceod_bg_control & 0x02) ? state->spaceod_bg_htilemap : state->spaceod_bg_vtilemap);
+	int flipmask = (state->spaceod_bg_control & 0x01) ? 0xff : 0x00;
+	int xoffset = (state->spaceod_bg_control & 0x02) ? 0x10 : 0x00;
 	int xmask = pixmap->width - 1;
 	int ymask = pixmap->height - 1;
 	int x, y;
@@ -693,14 +689,14 @@ static void draw_background_spaceod(running_machine *machine, bitmap_t *bitmap, 
 	/* now fill in the background wherever there are black pixels */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		int effy = (y + spaceod_vcounter + 22) ^ flipmask;
+		int effy = (y + state->spaceod_vcounter + 22) ^ flipmask;
 		UINT16 *src = (UINT16 *)pixmap->base + (effy & ymask) * pixmap->rowpixels;
 		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
 
 		/* loop over horizontal pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			int effx = ((x + spaceod_hcounter) ^ flipmask) + xoffset;
+			int effx = ((x + state->spaceod_hcounter) ^ flipmask) + xoffset;
 			UINT8 fgpix = machine->generic.paletteram.u8[dst[x]];
 			UINT8 bgpix = src[effx & xmask] & 0x3f;
 
@@ -710,15 +706,15 @@ static void draw_background_spaceod(running_machine *machine, bitmap_t *bitmap, 
                 - the original tile color == DIP switches
             */
 			if (bgpix != 0 && fgpix != 0 && (dst[x] >> 2) == spaceod_bg_detect_tile_color)
-				spaceod_bg_detect = 1;
+				state->spaceod_bg_detect = 1;
 
 			/* the background graphics are only displayed if:
                 - fgpix == 0 AND
                 - !EXTBLK (not blanked) AND
-                - bg_enable == 0
+                - state->bg_enable == 0
             */
-			if (fgpix == 0 && bg_enable == 0)
-				dst[x] = bgpix | spaceod_fixed_color | 0x40;
+			if (fgpix == 0 && state->bg_enable == 0)
+				dst[x] = bgpix | state->spaceod_fixed_color | 0x40;
 		}
 	}
 }
@@ -732,16 +728,17 @@ static void draw_background_spaceod(running_machine *machine, bitmap_t *bitmap, 
  *
  *************************************/
 
-static void draw_background_page_scroll(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background_page_scroll(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	bitmap_t *pixmap = tilemap_get_pixmap(bg_tilemap);
-	int flipmask = (video_control & 0x08) ? 0xff : 0x00;
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	bitmap_t *pixmap = tilemap_get_pixmap(state->bg_tilemap);
+	int flipmask = (state->video_control & 0x08) ? 0xff : 0x00;
 	int xmask = pixmap->width - 1;
 	int ymask = pixmap->height - 1;
 	int x, y;
 
 	/* if disabled, draw nothing */
-	if (!bg_enable)
+	if (!state->bg_enable)
 	{
 		bitmap_fill(bitmap, cliprect, 0);
 		return;
@@ -750,14 +747,14 @@ static void draw_background_page_scroll(bitmap_t *bitmap, const rectangle *clipr
 	/* now fill in the background wherever there are black pixels */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		int effy = bg_scrolly + (((y ^ flipmask) + (flipmask & 0xe0)) & 0xff);
+		int effy = state->bg_scrolly + (((y ^ flipmask) + (flipmask & 0xe0)) & 0xff);
 		UINT16 *src = (UINT16 *)pixmap->base + (effy & ymask) * pixmap->rowpixels;
 		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
 
 		/* loop over horizontal pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			int effx = bg_scrollx + (x ^ flipmask);
+			int effx = state->bg_scrollx + (x ^ flipmask);
 			dst[x] = src[effx & xmask];
 		}
 	}
@@ -772,16 +769,17 @@ static void draw_background_page_scroll(bitmap_t *bitmap, const rectangle *clipr
  *
  *************************************/
 
-static void draw_background_full_scroll(bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_background_full_scroll(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	bitmap_t *pixmap = tilemap_get_pixmap(bg_tilemap);
-	int flipmask = (video_control & 0x08) ? 0x3ff : 0x000;
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	bitmap_t *pixmap = tilemap_get_pixmap(state->bg_tilemap);
+	int flipmask = (state->video_control & 0x08) ? 0x3ff : 0x000;
 	int xmask = pixmap->width - 1;
 	int ymask = pixmap->height - 1;
 	int x, y;
 
 	/* if disabled, draw nothing */
-	if (!bg_enable)
+	if (!state->bg_enable)
 	{
 		bitmap_fill(bitmap, cliprect, 0);
 		return;
@@ -790,14 +788,14 @@ static void draw_background_full_scroll(bitmap_t *bitmap, const rectangle *clipr
 	/* now fill in the background wherever there are black pixels */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
-		int effy = (y + bg_scrolly) ^ flipmask;
+		int effy = (y + state->bg_scrolly) ^ flipmask;
 		UINT16 *src = (UINT16 *)pixmap->base + (effy & ymask) * pixmap->rowpixels;
 		UINT16 *dst = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
 
 		/* loop over horizontal pixels */
 		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			int effx = (x + bg_scrollx) ^ flipmask;
+			int effx = (x + state->bg_scrollx) ^ flipmask;
 			dst[x] = src[effx & xmask];
 		}
 	}
@@ -813,9 +811,10 @@ static void draw_background_full_scroll(bitmap_t *bitmap, const rectangle *clipr
 
 SCREEN_UPDATE( segag80r )
 {
+	segag80r_state *state = screen->machine->driver_data<segag80r_state>();
 	UINT8 transparent_pens[16];
 
-	switch (segag80r_background_pcb)
+	switch (state->background_pcb)
 	{
 		/* foreground: opaque */
 		/* background: none */
@@ -837,7 +836,7 @@ SCREEN_UPDATE( segag80r )
 		/* background: page-granular scrolling */
 		case G80_BACKGROUND_MONSTERB:
 			memset(transparent_pens, 1, 16);
-			draw_background_page_scroll(bitmap, cliprect);
+			draw_background_page_scroll(screen->machine, bitmap, cliprect);
 			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 
@@ -845,7 +844,7 @@ SCREEN_UPDATE( segag80r )
 		/* background: full scrolling */
 		case G80_BACKGROUND_PIGNEWT:
 			memset(transparent_pens, 1, 16);
-			draw_background_full_scroll(bitmap, cliprect);
+			draw_background_full_scroll(screen->machine, bitmap, cliprect);
 			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 
@@ -853,7 +852,7 @@ SCREEN_UPDATE( segag80r )
 		/* background: page-granular scrolling */
 		case G80_BACKGROUND_SINDBADM:
 			memset(transparent_pens, 1, 16);
-			draw_background_page_scroll(bitmap, cliprect);
+			draw_background_page_scroll(screen->machine, bitmap, cliprect);
 			draw_videoram(screen->machine, bitmap, cliprect, transparent_pens);
 			break;
 	}

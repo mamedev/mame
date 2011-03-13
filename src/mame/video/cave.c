@@ -1637,7 +1637,6 @@ SCREEN_UPDATE( cave )
 
 #ifdef MAME_DEBUG
 {
-	static int rasflag, old_rasflag;
 	if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X) || input_code_pressed(screen->machine, KEYCODE_C) ||
     	 input_code_pressed(screen->machine, KEYCODE_V) || input_code_pressed(screen->machine, KEYCODE_B) )
 	{
@@ -1670,35 +1669,35 @@ SCREEN_UPDATE( cave )
 	}
 
 	/* Show the row / "column" scroll enable flags, when they change state */
-	rasflag = 0;
+	state->rasflag = 0;
 	if (state->tilemap_0)
 	{
-		rasflag |= (state->vctrl_0[0] & 0x4000) ? 0x0001 : 0;
-		rasflag |= (state->vctrl_0[1] & 0x4000) ? 0x0002 : 0;
+		state->rasflag |= (state->vctrl_0[0] & 0x4000) ? 0x0001 : 0;
+		state->rasflag |= (state->vctrl_0[1] & 0x4000) ? 0x0002 : 0;
 	}
 	if (state->tilemap_1)
 	{
-		rasflag |= (state->vctrl_1[0] & 0x4000) ? 0x0010 : 0;
-		rasflag |= (state->vctrl_1[1] & 0x4000) ? 0x0020 : 0;
+		state->rasflag |= (state->vctrl_1[0] & 0x4000) ? 0x0010 : 0;
+		state->rasflag |= (state->vctrl_1[1] & 0x4000) ? 0x0020 : 0;
 	}
 	if (state->tilemap_2)
 	{
-		rasflag |= (state->vctrl_2[0] & 0x4000) ? 0x0100 : 0;
-		rasflag |= (state->vctrl_2[1] & 0x4000) ? 0x0200 : 0;
+		state->rasflag |= (state->vctrl_2[0] & 0x4000) ? 0x0100 : 0;
+		state->rasflag |= (state->vctrl_2[1] & 0x4000) ? 0x0200 : 0;
 	}
 	if (state->tilemap_3)
 	{
-		rasflag |= (state->vctrl_3[0] & 0x4000) ? 0x1000 : 0;
-		rasflag |= (state->vctrl_3[1] & 0x4000) ? 0x2000 : 0;
+		state->rasflag |= (state->vctrl_3[0] & 0x4000) ? 0x1000 : 0;
+		state->rasflag |= (state->vctrl_3[1] & 0x4000) ? 0x2000 : 0;
 	}
-	if (rasflag != old_rasflag)
+	if (state->rasflag != state->old_rasflag)
 	{
 		popmessage("Line Effect: 0:%c%c 1:%c%c 2:%c%c 3:%c%c",
-			(rasflag & 0x0001) ? 'x' : ' ', (rasflag & 0x0002) ? 'y' : ' ',
-			(rasflag & 0x0010) ? 'x' : ' ', (rasflag & 0x0020) ? 'y' : ' ',
-			(rasflag & 0x0100) ? 'x' : ' ', (rasflag & 0x0200) ? 'y' : ' ',
-			(rasflag & 0x1000) ? 'x' : ' ', (rasflag & 0x2000) ? 'y' : ' ' );
-		old_rasflag = rasflag;
+			(state->rasflag & 0x0001) ? 'x' : ' ', (state->rasflag & 0x0002) ? 'y' : ' ',
+			(state->rasflag & 0x0010) ? 'x' : ' ', (state->rasflag & 0x0020) ? 'y' : ' ',
+			(state->rasflag & 0x0100) ? 'x' : ' ', (state->rasflag & 0x0200) ? 'y' : ' ',
+			(state->rasflag & 0x1000) ? 'x' : ' ', (state->rasflag & 0x2000) ? 'y' : ' ' );
+		state->old_rasflag = state->rasflag;
 	}
 }
 #endif

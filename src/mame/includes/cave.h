@@ -113,6 +113,8 @@ public:
 	device_t *maincpu;
 	device_t *audiocpu;
 	required_device<timer_device> int_timer;
+	int rasflag;
+	int old_rasflag;
 };
 
 /*----------- defined in video/cave.c -----------*/

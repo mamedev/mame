@@ -2,34 +2,29 @@
 #include "includes/taxidrvr.h"
 
 
-UINT8 *taxidrvr_vram0,*taxidrvr_vram1,*taxidrvr_vram2,*taxidrvr_vram3;
-UINT8 *taxidrvr_vram4,*taxidrvr_vram5,*taxidrvr_vram6,*taxidrvr_vram7;
-UINT8 *taxidrvr_scroll;
-int taxidrvr_bghide;
-static int spritectrl[9];
-
-
 WRITE8_DEVICE_HANDLER( taxidrvr_spritectrl_w )
 {
-	spritectrl[offset] = data;
+	taxidrvr_state *state = device->machine->driver_data<taxidrvr_state>();
+	state->spritectrl[offset] = data;
 }
 
 
 
 SCREEN_UPDATE( taxidrvr )
 {
+	taxidrvr_state *state = screen->machine->driver_data<taxidrvr_state>();
 	int offs;
 	int sx,sy;
 
 
-	if (taxidrvr_bghide)
+	if (state->bghide)
 	{
 		bitmap_fill(bitmap,cliprect,0);
 
 
 		/* kludge to fix scroll after death */
-		taxidrvr_scroll[0] = taxidrvr_scroll[1] = taxidrvr_scroll[2] = taxidrvr_scroll[3] = 0;
-		spritectrl[2] = spritectrl[5] = spritectrl[8] = 0;
+		state->scroll[0] = state->scroll[1] = state->scroll[2] = state->scroll[3] = 0;
+		state->spritectrl[2] = state->spritectrl[5] = state->spritectrl[8] = 0;
 	}
 	else
 	{
@@ -39,10 +34,10 @@ SCREEN_UPDATE( taxidrvr )
 			sy = offs / 32;
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[3],
-					taxidrvr_vram3[offs],
+					state->vram3[offs],
 					0,
 					0,0,
-					(sx*8-taxidrvr_scroll[0])&0xff,(sy*8-taxidrvr_scroll[1])&0xff);
+					(sx*8-state->scroll[0])&0xff,(sy*8-state->scroll[1])&0xff);
 		}
 
 		for (offs = 0;offs < 0x400;offs++)
@@ -51,22 +46,22 @@ SCREEN_UPDATE( taxidrvr )
 			sy = offs / 32;
 
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[2],
-					taxidrvr_vram2[offs]+256*taxidrvr_vram2[offs+0x400],
+					state->vram2[offs]+256*state->vram2[offs+0x400],
 					0,
 					0,0,
-					(sx*8-taxidrvr_scroll[2])&0xff,(sy*8-taxidrvr_scroll[3])&0xff,0);
+					(sx*8-state->scroll[2])&0xff,(sy*8-state->scroll[3])&0xff,0);
 		}
 
-		if (spritectrl[2] & 4)
+		if (state->spritectrl[2] & 4)
 		{
 			for (offs = 0;offs < 0x1000;offs++)
 			{
 				int color;
 
-				sx = ((offs/2) % 64-spritectrl[0]-256*(spritectrl[2]&1))&0x1ff;
-				sy = ((offs/2) / 64-spritectrl[1]-128*(spritectrl[2]&2))&0x1ff;
+				sx = ((offs/2) % 64-state->spritectrl[0]-256*(state->spritectrl[2]&1))&0x1ff;
+				sy = ((offs/2) / 64-state->spritectrl[1]-128*(state->spritectrl[2]&2))&0x1ff;
 
-				color = (taxidrvr_vram5[offs/4]>>(2*(offs&3)))&0x03;
+				color = (state->vram5[offs/4]>>(2*(offs&3)))&0x03;
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
@@ -75,16 +70,16 @@ SCREEN_UPDATE( taxidrvr )
 			}
 		}
 
-		if (spritectrl[5] & 4)
+		if (state->spritectrl[5] & 4)
 		{
 			for (offs = 0;offs < 0x1000;offs++)
 			{
 				int color;
 
-				sx = ((offs/2) % 64-spritectrl[3]-256*(spritectrl[5]&1))&0x1ff;
-				sy = ((offs/2) / 64-spritectrl[4]-128*(spritectrl[5]&2))&0x1ff;
+				sx = ((offs/2) % 64-state->spritectrl[3]-256*(state->spritectrl[5]&1))&0x1ff;
+				sy = ((offs/2) / 64-state->spritectrl[4]-128*(state->spritectrl[5]&2))&0x1ff;
 
-				color = (taxidrvr_vram6[offs/4]>>(2*(offs&3)))&0x03;
+				color = (state->vram6[offs/4]>>(2*(offs&3)))&0x03;
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
@@ -93,16 +88,16 @@ SCREEN_UPDATE( taxidrvr )
 			}
 		}
 
-		if (spritectrl[8] & 4)
+		if (state->spritectrl[8] & 4)
 		{
 			for (offs = 0;offs < 0x1000;offs++)
 			{
 				int color;
 
-				sx = ((offs/2) % 64-spritectrl[6]-256*(spritectrl[8]&1))&0x1ff;
-				sy = ((offs/2) / 64-spritectrl[7]-128*(spritectrl[8]&2))&0x1ff;
+				sx = ((offs/2) % 64-state->spritectrl[6]-256*(state->spritectrl[8]&1))&0x1ff;
+				sy = ((offs/2) / 64-state->spritectrl[7]-128*(state->spritectrl[8]&2))&0x1ff;
 
-				color = (taxidrvr_vram7[offs/4]>>(2*(offs&3)))&0x03;
+				color = (state->vram7[offs/4]>>(2*(offs&3)))&0x03;
 				if (color)
 				{
 					if (sx > 0 && sx < 256 && sy > 0 && sy < 256)
@@ -117,7 +112,7 @@ SCREEN_UPDATE( taxidrvr )
 			sy = offs / 32;
 
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],
-					taxidrvr_vram1[offs],
+					state->vram1[offs],
 					0,
 					0,0,
 					sx*8,sy*8,0);
@@ -130,7 +125,7 @@ SCREEN_UPDATE( taxidrvr )
 			sx = (offs/2) % 64;
 			sy = (offs/2) / 64;
 
-			color = (taxidrvr_vram4[offs/4]>>(2*(offs&3)))&0x03;
+			color = (state->vram4[offs/4]>>(2*(offs&3)))&0x03;
 			if (color)
 			{
 				*BITMAP_ADDR16(bitmap, sy, sx) = 2 * color;
@@ -144,7 +139,7 @@ SCREEN_UPDATE( taxidrvr )
 		sy = offs / 32;
 
 		drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
-				taxidrvr_vram0[offs],
+				state->vram0[offs],
 				0,
 				0,0,
 				sx*8,sy*8,0);

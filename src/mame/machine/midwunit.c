@@ -13,20 +13,6 @@
 #include "midwayic.h"
 
 
-/* code-related variables */
-       UINT8 *	midwunit_decode_memory;
-
-/* CMOS-related variables */
-static UINT8	cmos_write_enable;
-
-/* I/O-related variables */
-static UINT16	iodata[8];
-static UINT8	ioshuffle[16];
-
-/* UART-related variables */
-static UINT8	uart[8];
-static UINT8	security_bits;
-
 /* prototype */
 static READ16_HANDLER( midwunit_sound_state_r );
 
@@ -40,11 +26,12 @@ static READ16_HANDLER( midwunit_sound_state_r );
 
 static void register_state_saving(running_machine *machine)
 {
-	state_save_register_global(machine, cmos_write_enable);
-	state_save_register_global_array(machine, iodata);
-	state_save_register_global_array(machine, ioshuffle);
-	state_save_register_global_array(machine, uart);
-	state_save_register_global(machine, security_bits);
+	midwunit_state *state = machine->driver_data<midwunit_state>();
+	state_save_register_global(machine, state->cmos_write_enable);
+	state_save_register_global_array(machine, state->iodata);
+	state_save_register_global_array(machine, state->ioshuffle);
+	state_save_register_global_array(machine, state->uart);
+	state_save_register_global(machine, state->security_bits);
 }
 
 
@@ -57,17 +44,19 @@ static void register_state_saving(running_machine *machine)
 
 WRITE16_HANDLER( midwunit_cmos_enable_w )
 {
-	cmos_write_enable = 1;
+	midwunit_state *state = space->machine->driver_data<midwunit_state>();
+	state->cmos_write_enable = 1;
 }
 
 
 WRITE16_HANDLER( midwunit_cmos_w )
 {
-	if (cmos_write_enable)
+	midwunit_state *state = space->machine->driver_data<midwunit_state>();
+	if (state->cmos_write_enable)
 	{
 		midwunit_state *state = space->machine->driver_data<midwunit_state>();
 		COMBINE_DATA(state->m_nvram+offset);
-		cmos_write_enable = 0;
+		state->cmos_write_enable = 0;
 	}
 	else
 	{
@@ -94,10 +83,11 @@ READ16_HANDLER( midwunit_cmos_r )
 
 WRITE16_HANDLER( midwunit_io_w )
 {
+	midwunit_state *state = space->machine->driver_data<midwunit_state>();
 	int oldword, newword;
 
 	offset %= 8;
-	oldword = iodata[offset];
+	oldword = state->iodata[offset];
 	newword = oldword;
 	COMBINE_DATA(&newword);
 
@@ -123,7 +113,7 @@ WRITE16_HANDLER( midwunit_io_w )
 			logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
-	iodata[offset] = newword;
+	state->iodata[offset] = newword;
 }
 
 
@@ -136,10 +126,11 @@ WRITE16_HANDLER( midwunit_io_w )
 
 READ16_HANDLER( midwunit_io_r )
 {
+	midwunit_state *state = space->machine->driver_data<midwunit_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "DSW", "IN2" };
 
 	/* apply I/O shuffling */
-	offset = ioshuffle[offset % 16];
+	offset = state->ioshuffle[offset % 16];
 
 	switch (offset)
 	{
@@ -169,6 +160,7 @@ READ16_HANDLER( midwunit_io_r )
 
 static void init_wunit_generic(running_machine *machine)
 {
+	midwunit_state *state = machine->driver_data<midwunit_state>();
 	UINT8 *base;
 	int i, j, len;
 
@@ -180,13 +172,13 @@ static void init_wunit_generic(running_machine *machine)
 	len = machine->region("gfx1")->bytes();
 	for (i = 0; i < len / 0x400000; i++)
 	{
-		memcpy(midwunit_decode_memory, base, 0x400000);
+		memcpy(state->decode_memory, base, 0x400000);
 		for (j = 0; j < 0x100000; j++)
 		{
-			*base++ = midwunit_decode_memory[0x000000 + j];
-			*base++ = midwunit_decode_memory[0x100000 + j];
-			*base++ = midwunit_decode_memory[0x200000 + j];
-			*base++ = midwunit_decode_memory[0x300000 + j];
+			*base++ = state->decode_memory[0x000000 + j];
+			*base++ = state->decode_memory[0x100000 + j];
+			*base++ = state->decode_memory[0x200000 + j];
+			*base++ = state->decode_memory[0x300000 + j];
 		}
 	}
 
@@ -207,10 +199,10 @@ static void init_wunit_generic(running_machine *machine)
 
 /********************** Mortal Kombat 3 **********************/
 
-static UINT16 *umk3_palette;
 
 static WRITE16_HANDLER( umk3_palette_hack_w )
 {
+	midwunit_state *state = space->machine->driver_data<midwunit_state>();
 	/*
         UMK3 uses a circular buffer to hold pending palette changes; the buffer holds 17 entries
         total, and the buffer is processed/cleared during the video interrupt. Most of the time,
@@ -229,9 +221,9 @@ static WRITE16_HANDLER( umk3_palette_hack_w )
         Although not realistic, this is sufficient to reduce the frequency of incorrect colors
         without significantly impacting the rest of the system.
     */
-	COMBINE_DATA(&umk3_palette[offset]);
+	COMBINE_DATA(&state->umk3_palette[offset]);
 	cpu_adjust_icount(space->cpu, -100);
-/*  printf("in=%04X%04X  out=%04X%04X\n", umk3_palette[3], umk3_palette[2], umk3_palette[1], umk3_palette[0]); */
+/*  printf("in=%04X%04X  out=%04X%04X\n", state->umk3_palette[3], state->umk3_palette[2], state->umk3_palette[1], state->umk3_palette[0]); */
 }
 
 static void init_mk3_common(running_machine *machine)
@@ -260,14 +252,16 @@ DRIVER_INIT( mk3r10 )
 
 DRIVER_INIT( umk3 )
 {
+	midwunit_state *state = machine->driver_data<midwunit_state>();
 	init_mk3_common(machine);
-	umk3_palette = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
+	state->umk3_palette = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 DRIVER_INIT( umk3r11 )
 {
+	midwunit_state *state = machine->driver_data<midwunit_state>();
 	init_mk3_common(machine);
-	umk3_palette = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
+	state->umk3_palette = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 
@@ -299,11 +293,12 @@ DRIVER_INIT( nbahangt )
 
 static WRITE16_HANDLER( wwfmania_io_0_w )
 {
+	midwunit_state *state = space->machine->driver_data<midwunit_state>();
 	int i;
 
 	/* start with the originals */
 	for (i = 0; i < 16; i++)
-		ioshuffle[i] = i % 8;
+		state->ioshuffle[i] = i % 8;
 
 	/* based on the data written, shuffle */
 	switch (data)
@@ -312,35 +307,35 @@ static WRITE16_HANDLER( wwfmania_io_0_w )
 			break;
 
 		case 1:
-			ioshuffle[4] = 0;
-			ioshuffle[8] = 1;
-			ioshuffle[1] = 2;
-			ioshuffle[9] = 3;
-			ioshuffle[2] = 4;
+			state->ioshuffle[4] = 0;
+			state->ioshuffle[8] = 1;
+			state->ioshuffle[1] = 2;
+			state->ioshuffle[9] = 3;
+			state->ioshuffle[2] = 4;
 			break;
 
 		case 2:
-			ioshuffle[8] = 0;
-			ioshuffle[2] = 1;
-			ioshuffle[4] = 2;
-			ioshuffle[6] = 3;
-			ioshuffle[1] = 4;
+			state->ioshuffle[8] = 0;
+			state->ioshuffle[2] = 1;
+			state->ioshuffle[4] = 2;
+			state->ioshuffle[6] = 3;
+			state->ioshuffle[1] = 4;
 			break;
 
 		case 3:
-			ioshuffle[1] = 0;
-			ioshuffle[8] = 1;
-			ioshuffle[2] = 2;
-			ioshuffle[10] = 3;
-			ioshuffle[5] = 4;
+			state->ioshuffle[1] = 0;
+			state->ioshuffle[8] = 1;
+			state->ioshuffle[2] = 2;
+			state->ioshuffle[10] = 3;
+			state->ioshuffle[5] = 4;
 			break;
 
 		case 4:
-			ioshuffle[2] = 0;
-			ioshuffle[4] = 1;
-			ioshuffle[1] = 2;
-			ioshuffle[7] = 3;
-			ioshuffle[8] = 4;
+			state->ioshuffle[2] = 0;
+			state->ioshuffle[4] = 1;
+			state->ioshuffle[1] = 2;
+			state->ioshuffle[7] = 3;
+			state->ioshuffle[8] = 4;
 			break;
 	}
 	logerror("Changed I/O swiching to %d\n", data);
@@ -379,6 +374,7 @@ DRIVER_INIT( rmpgwt )
 
 MACHINE_RESET( midwunit )
 {
+	midwunit_state *state = machine->driver_data<midwunit_state>();
 	int i;
 
 	/* reset sound */
@@ -387,7 +383,7 @@ MACHINE_RESET( midwunit )
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
-		ioshuffle[i] = i % 8;
+		state->ioshuffle[i] = i % 8;
 }
 
 

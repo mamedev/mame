@@ -35,7 +35,7 @@ public:
 	UINT8 *sprite_dest_base;
 	UINT16 sprite_dest_offs;
 	UINT16 misc_control;
-	int count;
+	int xcount;
 };
 
 

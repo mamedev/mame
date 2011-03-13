@@ -16,23 +16,6 @@
 #define DSTBITMAP_HEIGHT	256
 
 
-/* local variables */
-static UINT32 palette_offset;
-static UINT8 palette_index;
-static UINT8 palette_data[3];
-
-static rectangle render_clip;
-static UINT8 *srcbitmap;
-static UINT8 *dstbitmap;
-
-static UINT16 src_xoffs, src_yoffs;
-static UINT16 dst_xoffs, dst_yoffs;
-static UINT8 video_latch;
-
-static UINT32 srcbitmap_height_mask;
-
-
-
 /*************************************
  *
  *  Video system start
@@ -41,14 +24,15 @@ static UINT32 srcbitmap_height_mask;
 
 VIDEO_START( policetr )
 {
+	policetr_state *state = machine->driver_data<policetr_state>();
 	/* the source bitmap is in ROM */
-	srcbitmap = machine->region("gfx1")->base();
+	state->srcbitmap = machine->region("gfx1")->base();
 
 	/* compute the height */
-	srcbitmap_height_mask = (machine->region("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
+	state->srcbitmap_height_mask = (machine->region("gfx1")->bytes() / SRCBITMAP_WIDTH) - 1;
 
 	/* the destination bitmap is not directly accessible to the CPU */
-	dstbitmap = auto_alloc_array(machine, UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
+	state->dstbitmap = auto_alloc_array(machine, UINT8, DSTBITMAP_WIDTH * DSTBITMAP_HEIGHT);
 }
 
 
@@ -59,17 +43,18 @@ VIDEO_START( policetr )
  *
  *************************************/
 
-static void render_display_list(offs_t offset)
+static void render_display_list(running_machine *machine, offs_t offset)
 {
+	policetr_state *state = machine->driver_data<policetr_state>();
 	/* mask against the R3000 address space */
 	offset &= 0x1fffffff;
 
 	/* loop over all items */
 	while (offset != 0x1fffffff)
 	{
-		UINT32 *entry = &policetr_rambase[offset / 4];
+		UINT32 *entry = &state->rambase[offset / 4];
 		UINT32 srcx = entry[0] & 0xfffffff;
-		UINT32 srcy = entry[1] & ((srcbitmap_height_mask << 16) | 0xffff);
+		UINT32 srcy = entry[1] & ((state->srcbitmap_height_mask << 16) | 0xffff);
 		UINT32 srcxstep = entry[2];
 		UINT32 srcystep = entry[3];
 		int dstw = (entry[4] & 0x1ff) + 1;
@@ -81,43 +66,43 @@ static void render_display_list(offs_t offset)
 		UINT32 curx, cury;
 		int x, y;
 
-		if (dstx > render_clip.max_x)
+		if (dstx > state->render_clip.max_x)
 		{
 			dstw -= (512 - dstx);
 			dstx = 0;
 		}
 		/* apply X clipping */
-		if (dstx < render_clip.min_x)
+		if (dstx < state->render_clip.min_x)
 		{
-			srcx += srcxstep * (render_clip.min_x - dstx);
-			dstw -= render_clip.min_x - dstx;
-			dstx = render_clip.min_x;
+			srcx += srcxstep * (state->render_clip.min_x - dstx);
+			dstw -= state->render_clip.min_x - dstx;
+			dstx = state->render_clip.min_x;
 		}
-		if (dstx + dstw > render_clip.max_x)
-			dstw = render_clip.max_x - dstx + 1;
+		if (dstx + dstw > state->render_clip.max_x)
+			dstw = state->render_clip.max_x - dstx + 1;
 
 		/* apply Y clipping */
-		if (dsty < render_clip.min_y)
+		if (dsty < state->render_clip.min_y)
 		{
-			srcy += srcystep * (render_clip.min_y - dsty);
-			dsth -= render_clip.min_y - dsty;
-			dsty = render_clip.min_y;
+			srcy += srcystep * (state->render_clip.min_y - dsty);
+			dsth -= state->render_clip.min_y - dsty;
+			dsty = state->render_clip.min_y;
 		}
-		if (dsty + dsth > render_clip.max_y)
-			dsth = render_clip.max_y - dsty + 1;
+		if (dsty + dsth > state->render_clip.max_y)
+			dsth = state->render_clip.max_y - dsty + 1;
 
 		/* special case for fills */
 		if (srcxstep == 0 && srcystep == 0)
 		{
 			/* prefetch the pixel */
-			UINT8 pixel = srcbitmap[((srcy >> 16) * srcbitmap_height_mask) * SRCBITMAP_WIDTH + (srcx >> 16) % SRCBITMAP_WIDTH];
+			UINT8 pixel = state->srcbitmap[((srcy >> 16) * state->srcbitmap_height_mask) * SRCBITMAP_WIDTH + (srcx >> 16) % SRCBITMAP_WIDTH];
 			pixel = color | (pixel & mask);
 
 			/* loop over rows and columns */
 			if (dstw > 0)
 				for (y = 0; y < dsth; y++)
 				{
-					UINT8 *dst = &dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
+					UINT8 *dst = &state->dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
 					memset(dst, pixel, dstw);
 				}
 		}
@@ -128,8 +113,8 @@ static void render_display_list(offs_t offset)
 			/* loop over rows */
 			for (y = 0, cury = srcy; y < dsth; y++, cury += srcystep)
 			{
-				UINT8 *src = &srcbitmap[((cury >> 16) & srcbitmap_height_mask) * SRCBITMAP_WIDTH];
-				UINT8 *dst = &dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
+				UINT8 *src = &state->srcbitmap[((cury >> 16) & state->srcbitmap_height_mask) * SRCBITMAP_WIDTH];
+				UINT8 *dst = &state->dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
 
 				/* loop over columns */
 				for (x = 0, curx = srcx; x < dstw; x++, curx += srcxstep)
@@ -156,6 +141,7 @@ static void render_display_list(offs_t offset)
 
 WRITE32_HANDLER( policetr_video_w )
 {
+	policetr_state *state = space->machine->driver_data<policetr_state>();
 	/* we assume 4-byte accesses */
 	if (mem_mask)
 		logerror("%08X: policetr_video_w access with mask %08X\n", cpu_get_previouspc(space->cpu), mem_mask);
@@ -165,50 +151,50 @@ WRITE32_HANDLER( policetr_video_w )
 	{
 		/* offset 0 specifies the start address of a display list */
 		case 0:
-			render_display_list(data);
+			render_display_list(space->machine, data);
 			break;
 
 		/* offset 1 specifies a latch value in the upper 8 bits */
 		case 1:
-			video_latch = data >> 24;
+			state->video_latch = data >> 24;
 			break;
 
 		/* offset 2 has various meanings based on the latch */
 		case 2:
 		{
-			switch (video_latch)
+			switch (state->video_latch)
 			{
 				/* latch 0x04 specifies the source X offset for a source bitmap pixel read */
 				case 0x04:
-					src_xoffs = data >> 16;
+					state->src_xoffs = data >> 16;
 					break;
 
 				/* latch 0x14 specifies the source Y offset for a source bitmap pixel read */
 				case 0x14:
-					src_yoffs = data >> 16;
+					state->src_yoffs = data >> 16;
 					break;
 
 				/* latch 0x20 specifies the top/left corners of the render cliprect */
 				case 0x20:
-					render_clip.min_y = (data >> 12) & 0xfff;
-					render_clip.min_x = data & 0xfff;
+					state->render_clip.min_y = (data >> 12) & 0xfff;
+					state->render_clip.min_x = data & 0xfff;
 					break;
 
 				/* latch 0x30 specifies the bottom/right corners of the render cliprect */
 				case 0x30:
-					render_clip.max_y = (data >> 12) & 0xfff;
-					render_clip.max_x = data & 0xfff;
+					state->render_clip.max_y = (data >> 12) & 0xfff;
+					state->render_clip.max_x = data & 0xfff;
 					break;
 
 				/* latch 0x50 allows a direct write to the destination bitmap */
 				case 0x50:
-					if (ACCESSING_BITS_24_31 && dst_xoffs < DSTBITMAP_WIDTH && dst_yoffs < DSTBITMAP_HEIGHT)
-						dstbitmap[dst_yoffs * DSTBITMAP_WIDTH + dst_xoffs] = data >> 24;
+					if (ACCESSING_BITS_24_31 && state->dst_xoffs < DSTBITMAP_WIDTH && state->dst_yoffs < DSTBITMAP_HEIGHT)
+						state->dstbitmap[state->dst_yoffs * DSTBITMAP_WIDTH + state->dst_xoffs] = data >> 24;
 					break;
 
 				/* log anything else */
 				default:
-					logerror("%08X: policetr_video_w(2) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
+					logerror("%08X: policetr_video_w(2) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
 					break;
 			}
 			break;
@@ -217,30 +203,30 @@ WRITE32_HANDLER( policetr_video_w )
 		/* offset 3 has various meanings based on the latch */
 		case 3:
 		{
-			switch (video_latch)
+			switch (state->video_latch)
 			{
 				/* latch 0x00 is unknown; 0, 1, and 2 get written into the upper 12 bits before rendering */
 				case 0x00:
 					if (data != (0 << 20) && data != (1 << 20) && data != (2 << 20))
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
 					break;
 
 				/* latch 0x10 specifies destination bitmap X and Y offsets */
 				case 0x10:
-					dst_yoffs = (data >> 12) & 0xfff;
-					dst_xoffs = data & 0xfff;
+					state->dst_yoffs = (data >> 12) & 0xfff;
+					state->dst_xoffs = data & 0xfff;
 					break;
 
 				/* latch 0x20 is unknown; either 0xef or 0x100 is written every IRQ4 */
 				case 0x20:
 					if (data != (0x100 << 12) && data != (0xef << 12))
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
 					break;
 
 				/* latch 0x40 is unknown; a 0 is written every IRQ4 */
 				case 0x40:
 					if (data != 0)
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
 					break;
 
 				/* latch 0x50 clears IRQ4 */
@@ -255,7 +241,7 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* log anything else */
 				default:
-					logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
+					logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, state->video_latch);
 					break;
 			}
 			break;
@@ -273,12 +259,13 @@ WRITE32_HANDLER( policetr_video_w )
 
 READ32_HANDLER( policetr_video_r )
 {
+	policetr_state *state = space->machine->driver_data<policetr_state>();
 	int inputval;
 	int width = space->machine->primary_screen->width();
 	int height = space->machine->primary_screen->height();
 
 	/* the value read is based on the latch */
-	switch (video_latch)
+	switch (state->video_latch)
 	{
 		/* latch 0x00 is player 1's gun X coordinate */
 		case 0x00:
@@ -306,7 +293,7 @@ READ32_HANDLER( policetr_video_r )
 
 		/* latch 0x04 is the pixel value in the ROM at the specified address */
 		case 0x04:
-			return srcbitmap[(src_yoffs & srcbitmap_height_mask) * SRCBITMAP_WIDTH + src_xoffs % SRCBITMAP_WIDTH] << 24;
+			return state->srcbitmap[(state->src_yoffs & state->srcbitmap_height_mask) * SRCBITMAP_WIDTH + state->src_xoffs % SRCBITMAP_WIDTH] << 24;
 
 		/* latch 0x50 is read at IRQ 4; the top 2 bits are checked. If they're not 0,
             they skip the rest of the interrupt processing */
@@ -315,7 +302,7 @@ READ32_HANDLER( policetr_video_r )
 	}
 
 	/* log anything else */
-	logerror("%08X: policetr_video_r with latch %02X\n", cpu_get_previouspc(space->cpu), video_latch);
+	logerror("%08X: policetr_video_r with latch %02X\n", cpu_get_previouspc(space->cpu), state->video_latch);
 	return 0;
 }
 
@@ -330,23 +317,25 @@ READ32_HANDLER( policetr_video_r )
 
 WRITE32_HANDLER( policetr_palette_offset_w )
 {
+	policetr_state *state = space->machine->driver_data<policetr_state>();
 	if (ACCESSING_BITS_16_23)
 	{
-		palette_offset = (data >> 16) & 0xff;
-		palette_index = 0;
+		state->palette_offset = (data >> 16) & 0xff;
+		state->palette_index = 0;
 	}
 }
 
 
 WRITE32_HANDLER( policetr_palette_data_w )
 {
+	policetr_state *state = space->machine->driver_data<policetr_state>();
 	if (ACCESSING_BITS_16_23)
 	{
-		palette_data[palette_index] = (data >> 16) & 0xff;
-		if (++palette_index == 3)
+		state->palette_data[state->palette_index] = (data >> 16) & 0xff;
+		if (++state->palette_index == 3)
 		{
-			palette_set_color(space->machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
-			palette_index = 0;
+			palette_set_color(space->machine, state->palette_offset, MAKE_RGB(state->palette_data[0], state->palette_data[1], state->palette_data[2]));
+			state->palette_index = 0;
 		}
 	}
 }
@@ -361,12 +350,13 @@ WRITE32_HANDLER( policetr_palette_data_w )
 
 SCREEN_UPDATE( policetr )
 {
+	policetr_state *state = screen->machine->driver_data<policetr_state>();
 	int width = cliprect->max_x - cliprect->min_x + 1;
 	int y;
 
 	/* render all the scanlines from the dstbitmap to MAME's bitmap */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		draw_scanline8(bitmap, cliprect->min_x, y, width, &dstbitmap[DSTBITMAP_WIDTH * y + cliprect->min_x], NULL);
+		draw_scanline8(bitmap, cliprect->min_x, y, width, &state->dstbitmap[DSTBITMAP_WIDTH * y + cliprect->min_x], NULL);
 
 	return 0;
 }

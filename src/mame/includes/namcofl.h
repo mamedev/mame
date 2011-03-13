@@ -1,17 +1,3 @@
-class namcofl_state : public driver_device
-{
-public:
-	namcofl_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-
-	emu_timer *raster_interrupt_timer;
-	UINT32 *workram;
-	UINT16 *shareram;
-	UINT8 mcu_port6;
-	UINT32 sprbank;
-};
-
-
 #define NAMCOFL_HTOTAL		(288)	/* wrong */
 #define NAMCOFL_HBSTART	(288)
 #define NAMCOFL_VTOTAL		(262)	/* needs to be checked */
@@ -26,6 +12,20 @@ public:
 #define NAMCOFL_TILEGFX		0
 #define NAMCOFL_SPRITEGFX		1
 #define NAMCOFL_ROTGFX			2
+
+class namcofl_state : public driver_device
+{
+public:
+	namcofl_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	emu_timer *raster_interrupt_timer;
+	UINT32 *workram;
+	UINT16 *shareram;
+	UINT8 mcu_port6;
+	UINT32 sprbank;
+};
+
 
 /*----------- defined in video/namcofl.c -----------*/
 

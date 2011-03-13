@@ -13,21 +13,6 @@
 #include "midwayic.h"
 
 
-/* code-related variables */
-       UINT8 *	midxunit_decode_memory;
-
-/* CMOS-related variables */
-static UINT8	cmos_write_enable;
-
-/* I/O-related variables */
-static UINT16	iodata[8];
-static UINT8	ioshuffle[16];
-static UINT8	midxunit_analog_port;
-
-/* UART-related variables */
-static UINT8	uart[8];
-static UINT8	security_bits;
-
 /* prototype */
 static READ16_HANDLER( midxunit_sound_state_r );
 static void midxunit_dcs_output_full(running_machine *machine, int state);
@@ -42,12 +27,13 @@ static void midxunit_dcs_output_full(running_machine *machine, int state);
 
 static void register_state_saving(running_machine *machine)
 {
-	state_save_register_global(machine, cmos_write_enable);
-	state_save_register_global_array(machine, iodata);
-	state_save_register_global_array(machine, ioshuffle);
-	state_save_register_global(machine, midxunit_analog_port);
-	state_save_register_global_array(machine, uart);
-	state_save_register_global(machine, security_bits);
+	midxunit_state *state = machine->driver_data<midxunit_state>();
+	state_save_register_global(machine, state->cmos_write_enable);
+	state_save_register_global_array(machine, state->iodata);
+	state_save_register_global_array(machine, state->ioshuffle);
+	state_save_register_global(machine, state->analog_port);
+	state_save_register_global_array(machine, state->uart);
+	state_save_register_global(machine, state->security_bits);
 }
 
 
@@ -79,10 +65,11 @@ WRITE16_HANDLER( midxunit_cmos_w )
 
 WRITE16_HANDLER( midxunit_io_w )
 {
+	midxunit_state *state = space->machine->driver_data<midxunit_state>();
 	int oldword, newword;
 
 	offset = (offset / 2) % 8;
-	oldword = iodata[offset];
+	oldword = state->iodata[offset];
 	newword = oldword;
 	COMBINE_DATA(&newword);
 
@@ -108,7 +95,7 @@ WRITE16_HANDLER( midxunit_io_w )
 //          logerror("%08X:Unknown I/O write to %d = %04X\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
-	iodata[offset] = newword;
+	state->iodata[offset] = newword;
 }
 
 
@@ -155,16 +142,18 @@ READ16_HANDLER( midxunit_io_r )
 
 READ16_HANDLER( midxunit_analog_r )
 {
+	midxunit_state *state = space->machine->driver_data<midxunit_state>();
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
 
-	return input_port_read(space->machine, portnames[midxunit_analog_port]);
+	return input_port_read(space->machine, portnames[state->analog_port]);
 }
 
 
 WRITE16_HANDLER( midxunit_analog_select_w )
 {
+	midxunit_state *state = space->machine->driver_data<midxunit_state>();
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midxunit_analog_port = data - 8;
+		state->analog_port = data - 8;
 }
 
 
@@ -184,14 +173,16 @@ READ16_HANDLER( midxunit_status_r )
 
 static void midxunit_dcs_output_full(running_machine *machine, int state)
 {
+	midxunit_state *drvstate = machine->driver_data<midxunit_state>();
 	/* only signal if not in loopback state */
-	if (uart[1] != 0x66)
+	if (drvstate->uart[1] != 0x66)
 		cputag_set_input_line(machine, "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 READ16_HANDLER( midxunit_uart_r )
 {
+	midxunit_state *state = space->machine->driver_data<midxunit_state>();
 	int result = 0;
 
 	/* convert to a byte offset */
@@ -209,7 +200,7 @@ READ16_HANDLER( midxunit_uart_r )
 		case 1:	/* register 1 contains the status */
 
 			/* loopback case: data always ready, and always ok to send */
-			if (uart[1] == 0x66)
+			if (state->uart[1] == 0x66)
 				result |= 5;
 
 			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
@@ -225,8 +216,8 @@ READ16_HANDLER( midxunit_uart_r )
 		case 3:	/* register 3 contains the data read */
 
 			/* loopback case: feed back last data wrtten */
-			if (uart[1] == 0x66)
-				result = uart[3];
+			if (state->uart[1] == 0x66)
+				result = state->uart[3];
 
 			/* non-loopback case: read from the DCS system */
 			else
@@ -236,7 +227,7 @@ READ16_HANDLER( midxunit_uart_r )
 		case 5:	/* register 5 seems to be like 3, but with in/out swapped */
 
 			/* loopback case: data always ready, and always ok to send */
-			if (uart[1] == 0x66)
+			if (state->uart[1] == 0x66)
 				result |= 5;
 
 			/* non-loopback case: bit 0 means data ready, bit 2 means ok to send */
@@ -250,7 +241,7 @@ READ16_HANDLER( midxunit_uart_r )
 			break;
 
 		default: /* everyone else reads themselves */
-			result = uart[offset];
+			result = state->uart[offset];
 			break;
 	}
 
@@ -261,6 +252,7 @@ READ16_HANDLER( midxunit_uart_r )
 
 WRITE16_HANDLER( midxunit_uart_w )
 {
+	midxunit_state *state = space->machine->driver_data<midxunit_state>();
 	/* convert to a byte offset, ignoring MSB writes */
 	if ((offset & 1) || !ACCESSING_BITS_0_7)
 		return;
@@ -273,8 +265,8 @@ WRITE16_HANDLER( midxunit_uart_w )
 		case 3:	/* register 3 contains the data to be sent */
 
 			/* loopback case: don't feed through */
-			if (uart[1] == 0x66)
-				uart[3] = data;
+			if (state->uart[1] == 0x66)
+				state->uart[3] = data;
 
 			/* non-loopback case: send to the DCS system */
 			else
@@ -286,7 +278,7 @@ WRITE16_HANDLER( midxunit_uart_w )
 			break;
 
 		default: /* everyone else just stores themselves */
-			uart[offset] = data;
+			state->uart[offset] = data;
 			break;
 	}
 
@@ -307,6 +299,7 @@ WRITE16_HANDLER( midxunit_uart_w )
 
 DRIVER_INIT( revx )
 {
+	midxunit_state *state = machine->driver_data<midxunit_state>();
 	UINT8 *base;
 	int i, j, len;
 
@@ -318,13 +311,13 @@ DRIVER_INIT( revx )
 	len = machine->region("gfx1")->bytes();
 	for (i = 0; i < len / 0x200000; i++)
 	{
-		memcpy(midxunit_decode_memory, base, 0x200000);
+		memcpy(state->decode_memory, base, 0x200000);
 		for (j = 0; j < 0x80000; j++)
 		{
-			*base++ = midxunit_decode_memory[0x000000 + j];
-			*base++ = midxunit_decode_memory[0x080000 + j];
-			*base++ = midxunit_decode_memory[0x100000 + j];
-			*base++ = midxunit_decode_memory[0x180000 + j];
+			*base++ = state->decode_memory[0x000000 + j];
+			*base++ = state->decode_memory[0x080000 + j];
+			*base++ = state->decode_memory[0x100000 + j];
+			*base++ = state->decode_memory[0x180000 + j];
 		}
 	}
 
@@ -345,6 +338,7 @@ DRIVER_INIT( revx )
 
 MACHINE_RESET( midxunit )
 {
+	midxunit_state *state = machine->driver_data<midxunit_state>();
 	int i;
 
 	/* reset sound */
@@ -353,7 +347,7 @@ MACHINE_RESET( midxunit )
 
 	/* reset I/O shuffling */
 	for (i = 0; i < 16; i++)
-		ioshuffle[i] = i % 8;
+		state->ioshuffle[i] = i % 8;
 
 	dcs_set_io_callbacks(midxunit_dcs_output_full, NULL);
 }
@@ -373,15 +367,17 @@ READ16_HANDLER( midxunit_security_r )
 
 WRITE16_HANDLER( midxunit_security_w )
 {
+	midxunit_state *state = space->machine->driver_data<midxunit_state>();
 	if (ACCESSING_BITS_0_7)
-		security_bits = data & 0x0f;
+		state->security_bits = data & 0x0f;
 }
 
 
 WRITE16_HANDLER( midxunit_security_clock_w )
 {
+	midxunit_state *state = space->machine->driver_data<midxunit_state>();
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		midway_serial_pic_w(space, ((~data & 2) << 3) | security_bits);
+		midway_serial_pic_w(space, ((~data & 2) << 3) | state->security_bits);
 }
 
 

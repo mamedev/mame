@@ -133,7 +133,6 @@ static void mcu63705_update_inputs(running_machine *machine)
 	/* update jumping and buttons state */
 	for (p = 0; p <= 1; p++)
 	{
-		static int state->prev[2];
 		int curr[2];
 
 		curr[p] = input_port_read(machine, p ? "P2" : "P1") & 0x30;

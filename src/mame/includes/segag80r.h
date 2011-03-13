@@ -12,8 +12,39 @@ public:
 	segag80r_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	UINT8 sound_state[2];
+	UINT8 sound_rate;
+	UINT16 sound_addr;
+	UINT8 sound_data;
+	UINT8 square_state;
+	UINT8 square_count;
+	emu_timer *sega005_sound_timer;
+	sound_stream *sega005_stream;
+	UINT8 n7751_command;
+	UINT8 n7751_busy;
 	UINT8 *videoram;
 	segag80_decrypt_func decrypt;
+	UINT8 *mainram;
+	UINT8 background_pcb;
+	double rweights[3];
+	double gweights[3];
+	double bweights[2];
+	UINT8 video_control;
+	UINT8 video_flip;
+	UINT8 vblank_latch;
+	tilemap_t *spaceod_bg_htilemap;
+	tilemap_t *spaceod_bg_vtilemap;
+	UINT16 spaceod_hcounter;
+	UINT16 spaceod_vcounter;
+	UINT8 spaceod_fixed_color;
+	UINT8 spaceod_bg_control;
+	UINT8 spaceod_bg_detect;
+	tilemap_t *bg_tilemap;
+	UINT8 bg_enable;
+	UINT8 bg_char_bank;
+	UINT16 bg_scrollx;
+	UINT16 bg_scrolly;
+	UINT8 pignewt_bg_color_offset;
 };
 
 
@@ -37,7 +68,6 @@ WRITE8_HANDLER( spaceod_sound_w );
 #define G80_BACKGROUND_PIGNEWT		3
 #define G80_BACKGROUND_SINDBADM		4
 
-extern UINT8 segag80r_background_pcb;
 
 INTERRUPT_GEN( segag80r_vblank_start );
 

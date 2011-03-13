@@ -14,19 +14,6 @@
 #define BLITTER_DEST_HEIGHT			512
 
 
-static UINT16 blitter_data[8];
-
-static UINT16 *screenram;
-static UINT8 vispage;
-static UINT16 *blitter_base;
-static int blitter_rows;
-
-static UINT16 gunx, guny;
-static UINT8 blank_palette;
-
-
-
-
 /*************************************
  *
  *  Compute X/Y coordinates
@@ -54,6 +41,7 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 
 READ16_HANDLER( lethalj_gun_r )
 {
+	lethalj_state *state = space->machine->driver_data<lethalj_state>();
 	UINT16 result = 0;
 	int beamx, beamy;
 
@@ -63,17 +51,17 @@ READ16_HANDLER( lethalj_gun_r )
 		case 5:
 			/* latch the crosshair position */
 			get_crosshair_xy(space->machine, offset - 4, &beamx, &beamy);
-			gunx = beamx;
-			guny = beamy;
-			blank_palette = 1;
+			state->gunx = beamx;
+			state->guny = beamy;
+			state->blank_palette = 1;
 			break;
 
 		case 6:
-			result = gunx / 2;
+			result = state->gunx / 2;
 			break;
 
 		case 7:
-			result = guny + 4;
+			result = state->guny + 4;
 			break;
 	}
 /*  logerror("%08X:lethalj_gun_r(%d) = %04X\n", cpu_get_pc(space->cpu), offset, result); */
@@ -90,12 +78,13 @@ READ16_HANDLER( lethalj_gun_r )
 
 VIDEO_START( lethalj )
 {
+	lethalj_state *state = machine->driver_data<lethalj_state>();
 	/* allocate video RAM for screen */
-	screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
+	state->screenram = auto_alloc_array(machine, UINT16, BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
-	blitter_base = (UINT16 *)machine->region("gfx1")->base();
-	blitter_rows = machine->region("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
+	state->blitter_base = (UINT16 *)machine->region("gfx1")->base();
+	state->blitter_rows = machine->region("gfx1")->bytes() / (2*BLITTER_SOURCE_WIDTH);
 }
 
 
@@ -113,19 +102,19 @@ static TIMER_CALLBACK( gen_ext1_int )
 
 
 
-static void do_blit(void)
+static void do_blit(lethalj_state *state)
 {
-	int dsty = (INT16)blitter_data[1];
-	int srcx = (UINT16)blitter_data[2];
-	int srcy = (UINT16)(blitter_data[3] + 1);
-	int width = (UINT16)blitter_data[5];
-	int dstx = (INT16)blitter_data[6];
-	int height = (UINT16)blitter_data[7];
+	int dsty = (INT16)state->blitter_data[1];
+	int srcx = (UINT16)state->blitter_data[2];
+	int srcy = (UINT16)(state->blitter_data[3] + 1);
+	int width = (UINT16)state->blitter_data[5];
+	int dstx = (INT16)state->blitter_data[6];
+	int height = (UINT16)state->blitter_data[7];
 	int y;
 /*
     logerror("blitter data = %04X %04X %04X %04X %04X %04X %04X %04X\n",
-            blitter_data[0], blitter_data[1], blitter_data[2], blitter_data[3],
-            blitter_data[4], blitter_data[5], blitter_data[6], blitter_data[7]);
+            state->blitter_data[0], state->blitter_data[1], state->blitter_data[2], state->blitter_data[3],
+            state->blitter_data[4], state->blitter_data[5], state->blitter_data[6], state->blitter_data[7]);
 */
 	/* loop over Y coordinates */
 	for (y = 0; y <= height; y++, srcy++, dsty++)
@@ -133,8 +122,8 @@ static void do_blit(void)
 		/* clip in Y */
 		if (dsty >= 0 && dsty < BLITTER_DEST_HEIGHT/2)
 		{
-			UINT16 *source = blitter_base + (srcy % blitter_rows) * BLITTER_SOURCE_WIDTH;
-			UINT16 *dest = screenram + (dsty + (vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
+			UINT16 *source = state->blitter_base + (srcy % state->blitter_rows) * BLITTER_SOURCE_WIDTH;
+			UINT16 *dest = state->screenram + (dsty + (state->vispage ^ 1) * 256) * BLITTER_DEST_WIDTH;
 			int sx = srcx;
 			int dx = dstx;
 			int x;
@@ -154,18 +143,19 @@ static void do_blit(void)
 
 WRITE16_HANDLER( lethalj_blitter_w )
 {
+	lethalj_state *state = space->machine->driver_data<lethalj_state>();
 	/* combine the data */
-	COMBINE_DATA(&blitter_data[offset]);
+	COMBINE_DATA(&state->blitter_data[offset]);
 
 	/* blit on a write to offset 7, and signal an IRQ */
 	if (offset == 7)
 	{
-		if (blitter_data[6] == 2 && blitter_data[7] == 2)
-			vispage ^= 1;
+		if (state->blitter_data[6] == 2 && state->blitter_data[7] == 2)
+			state->vispage ^= 1;
 		else
-			do_blit();
+			do_blit(state);
 
-		space->machine->scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((blitter_data[5] + 1) * (blitter_data[7] + 1)), FUNC(gen_ext1_int));
+		space->machine->scheduler().timer_set(attotime::from_hz(XTAL_32MHz) * ((state->blitter_data[5] + 1) * (state->blitter_data[7] + 1)), FUNC(gen_ext1_int));
 	}
 
 	/* clear the IRQ on offset 0 */
@@ -183,18 +173,19 @@ WRITE16_HANDLER( lethalj_blitter_w )
 
 void lethalj_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	UINT16 *src = &screenram[(vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
+	lethalj_state *state = screen.machine->driver_data<lethalj_state>();
+	UINT16 *src = &state->screenram[(state->vispage << 17) | ((params->rowaddr << 9) & 0x3fe00)];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
 	int coladdr = params->coladdr << 1;
 	int x;
 
 	/* blank palette: fill with white */
-	if (blank_palette)
+	if (state->blank_palette)
 	{
 		for (x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = 0x7fff;
 		if (scanline == screen.visible_area().max_y)
-			blank_palette = 0;
+			state->blank_palette = 0;
 		return;
 	}
 

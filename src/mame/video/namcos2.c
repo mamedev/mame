@@ -15,7 +15,7 @@ static UINT16 namcos2_68k_roz_ctrl[0x8];
 static tilemap_t *tilemap_roz;
 
 static void
-TilemapCB( UINT16 code, int *tile, int *mask )
+TilemapCB( running_machine *machine, UINT16 code, int *tile, int *mask )
 {
 	*mask = code;
 

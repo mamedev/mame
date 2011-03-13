@@ -92,7 +92,7 @@ C102 - Controls CPU access to ROZ Memory Area.
 
 void namco_tilemap_init(
 		running_machine *machine, int gfxbank, void *pMaskROM,
-		void (*cb)( UINT16 code, int *gfx, int *mask) );
+		void (*cb)( running_machine *machine, UINT16 code, int *gfx, int *mask) );
 void namco_tilemap_draw( bitmap_t *bitmap, const rectangle *cliprect, int pri );
 void namco_tilemap_invalidate( void );
 WRITE16_HANDLER( namco_tilemapvideoram16_w );

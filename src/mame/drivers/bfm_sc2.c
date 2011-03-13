@@ -240,25 +240,6 @@ public:
 static int  read_e2ram(running_machine *machine);
 static void e2ram_reset(running_machine *machine);
 
-// global vars ////////////////////////////////////////////////////////////
-
-
-// local vars /////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-// user interface stuff ///////////////////////////////////////////////////
-
-
-
 /*      INPUTS layout
 
      b7 b6 b5 b4 b3 b2 b1 b0

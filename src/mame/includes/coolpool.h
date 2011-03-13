@@ -1,3 +1,5 @@
+#define NVRAM_UNLOCK_SEQ_LEN 10
+
 class coolpool_state : public driver_device
 {
 public:
@@ -25,4 +27,8 @@ public:
 
 	device_t *maincpu;
 	device_t *dsp;
+	UINT16 nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN];
+	UINT8 nvram_write_enable;
+	UINT8 old_cmd;
+	UINT8 same_cmd_count;
 };

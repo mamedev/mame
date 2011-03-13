@@ -42,8 +42,6 @@ static WRITE8_HANDLER( irq_enable_w )
 	interrupt_enable_w( space, 0, (~data) & 1 );
 }
 
-static int cur_dac_address;
-static int cur_dac_address_index = 0;
 
 static TIMER_CALLBACK( dac_irq )
 {
@@ -52,18 +50,19 @@ static TIMER_CALLBACK( dac_irq )
 
 static WRITE8_DEVICE_HANDLER( audio_dac_w )
 {
+	trucocl_state *state = device->machine->driver_data<trucocl_state>();
 	UINT8 *rom = device->machine->region("maincpu")->base();
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 
-	if ( cur_dac_address != dac_address )
+	if ( state->cur_dac_address != dac_address )
 	{
-		cur_dac_address_index = 0;
-		cur_dac_address = dac_address;
+		state->cur_dac_address_index = 0;
+		state->cur_dac_address = dac_address;
 	}
 	else
 	{
-		cur_dac_address_index++;
+		state->cur_dac_address_index++;
 	}
 
 	if ( sel & 1 )
@@ -74,15 +73,15 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 
 	dac_address += 0x10000;
 
-	dac_data_w( device, rom[dac_address+cur_dac_address_index] );
+	dac_data_w( device, rom[dac_address+state->cur_dac_address_index] );
 
 	device->machine->scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_BASE(&trucocl_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_BASE(&trucocl_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_BASE_MEMBER(trucocl_state, videoram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_BASE_MEMBER(trucocl_state, colorram)
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
@@ -127,7 +126,7 @@ static INTERRUPT_GEN( trucocl_interrupt )
 	irq0_line_hold(device);
 }
 
-static MACHINE_CONFIG_START( trucocl, driver_device )
+static MACHINE_CONFIG_START( trucocl, trucocl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -182,8 +181,9 @@ ROM_END
 
 static DRIVER_INIT( trucocl )
 {
-	cur_dac_address = -1;
-	cur_dac_address_index = 0;
+	trucocl_state *state = machine->driver_data<trucocl_state>();
+	state->cur_dac_address = -1;
+	state->cur_dac_address_index = 0;
 }
 
 

@@ -35,6 +35,7 @@ public:
 	device_t *dac;
 	device_t *ym;
 	device_t *sn;
+	UINT8 prot_data;
 };
 
 
