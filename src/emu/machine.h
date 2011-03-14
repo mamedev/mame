@@ -214,7 +214,7 @@ class memory_region
 	friend resource_pool_object<memory_region>::~resource_pool_object();
 
 	// construction/destruction
-	memory_region(running_machine &machine, const char *name, UINT32 length, UINT32 flags);
+	memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian);
 	~memory_region();
 
 public:
@@ -224,12 +224,10 @@ public:
 	UINT8 *end() const { return (this != NULL) ? m_base.u8 + m_length : NULL; }
 	UINT32 bytes() const { return (this != NULL) ? m_length : 0; }
 	const char *name() const { return m_name; }
-	UINT32 flags() const { return m_flags; }
 
 	// flag expansion
-	endianness_t endianness() const { return ((m_flags & ROMREGION_ENDIANMASK) == ROMREGION_LE) ? ENDIANNESS_LITTLE : ENDIANNESS_BIG; }
-	UINT8 width() const { return 1 << ((m_flags & ROMREGION_WIDTHMASK) >> 8); }
-	bool invert() const { return ((m_flags & ROMREGION_INVERTMASK) != 0); }
+	endianness_t endianness() const { return m_endianness; }
+	UINT8 width() const { return m_width; }
 
 	// data access
 	UINT8 &u8(offs_t offset = 0) const { return m_base.u8[offset]; }
@@ -255,7 +253,8 @@ private:
 	astring					m_name;
 	generic_ptr				m_base;
 	UINT32					m_length;
-	UINT32					m_flags;
+	UINT8					m_width;
+	endianness_t			m_endianness;
 };
 
 
@@ -372,7 +371,7 @@ public:
 	void current_datetime(system_time &systime);
 
 	// regions
-	memory_region *region_alloc(const char *name, UINT32 length, UINT32 flags);
+	memory_region *region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian);
 	void region_free(const char *name);
 
 	// managers

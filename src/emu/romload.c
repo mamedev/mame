@@ -567,7 +567,7 @@ static void display_rom_load_results(rom_load_data *romdata)
     byte swapping and inverting data as necessary
 -------------------------------------------------*/
 
-static void region_post_process(rom_load_data *romdata, const char *rgntag)
+static void region_post_process(rom_load_data *romdata, const char *rgntag, bool invert)
 {
 	const memory_region *region = romdata->machine->region(rgntag);
 	UINT8 *base;
@@ -580,7 +580,7 @@ static void region_post_process(rom_load_data *romdata, const char *rgntag)
 	LOG(("+ datawidth=%d little=%d\n", region->width(), region->endianness() == ENDIANNESS_LITTLE));
 
 	/* if the region is inverted, do that now */
-	if (region->invert())
+	if (invert)
 	{
 		LOG(("+ Inverting region\n"));
 		for (i = 0, base = region->base(); i < region->bytes(); i++)
@@ -1288,7 +1288,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
     flags for the given device
 -------------------------------------------------*/
 
-static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startflags, const char *rgntag)
+static void normalize_flags_for_device(running_machine *machine, const char *rgntag, UINT8 &width, endianness_t &endian)
 {
 	device_t *device = machine->device(rgntag);
 	device_memory_interface *memory;
@@ -1300,26 +1300,23 @@ static UINT32 normalize_flags_for_device(running_machine *machine, UINT32 startf
 			int buswidth;
 
 			/* set the endianness */
-			startflags &= ~ROMREGION_ENDIANMASK;
 			if (spaceconfig->m_endianness == ENDIANNESS_LITTLE)
-				startflags |= ROMREGION_LE;
+				endian = ENDIANNESS_LITTLE;
 			else
-				startflags |= ROMREGION_BE;
+				endian = ENDIANNESS_BIG;
 
 			/* set the width */
-			startflags &= ~ROMREGION_WIDTHMASK;
 			buswidth = spaceconfig->m_databus_width;
 			if (buswidth <= 8)
-				startflags |= ROMREGION_8BIT;
+				width = 1;
 			else if (buswidth <= 16)
-				startflags |= ROMREGION_16BIT;
+				width = 2;
 			else if (buswidth <= 32)
-				startflags |= ROMREGION_32BIT;
+				width = 4;
 			else
-				startflags |= ROMREGION_64BIT;
+				width = 8;
 		}
 	}
-	return startflags;
 }
 
 
@@ -1388,7 +1385,6 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 	for (region = start_region; region != NULL; region = rom_next_region(region))
 	{
 		UINT32 regionlength = ROMREGION_GETLENGTH(region);
-		UINT32 regionflags = ROMREGION_GETFLAGS(region);
 
 		device->subtag(regiontag, ROMREGION_GETTAG(region));
 		LOG(("Processing region \"%s\" (length=%X)\n", regiontag.cstr(), regionlength));
@@ -1397,18 +1393,20 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 		assert(ROMENTRY_ISREGION(region));
 
 		/* if this is a device region, override with the device width and endianness */
+		endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
+		UINT8 width = ROMREGION_GETWIDTH(region) / 8;
 		const memory_region *memregion = romdata->machine->region(regiontag);
 		if (memregion != NULL)
 		{
 			if (romdata->machine->device(regiontag) != NULL)
-				regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
+				normalize_flags_for_device(romdata->machine, regiontag, width, endianness);
 
 			/* clear old region (todo: should be moved to an image unload function) */
 			romdata->machine->region_free(memregion->name());
 		}
 
 		/* remember the base and length */
-		romdata->region = romdata->machine->region_alloc(regiontag, regionlength, regionflags);
+		romdata->region = romdata->machine->region_alloc(regiontag, regionlength, width, endianness);
 		LOG(("Allocated %X bytes @ %p\n", romdata->region->bytes(), romdata->region->base()));
 
 		/* clear the region if it's requested */
@@ -1434,7 +1432,7 @@ void load_software_part_region(device_t *device, char *swlist, char *swname, rom
 
 	/* now go back and post-process all the regions */
 	for (region = start_region; region != NULL; region = rom_next_region(region))
-		region_post_process(romdata, ROMREGION_GETTAG(region));
+		region_post_process(romdata, ROMREGION_GETTAG(region), ROMREGION_ISINVERTED(region));
 
 	/* display the results and exit */
 	display_rom_load_results(romdata);
@@ -1456,7 +1454,6 @@ static void process_region_list(rom_load_data *romdata)
 		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 		{
 			UINT32 regionlength = ROMREGION_GETLENGTH(region);
-			UINT32 regionflags = ROMREGION_GETFLAGS(region);
 
 			rom_region_name(regiontag, romdata->machine->gamedrv, source, region);
 			LOG(("Processing region \"%s\" (length=%X)\n", regiontag.cstr(), regionlength));
@@ -1467,11 +1464,13 @@ static void process_region_list(rom_load_data *romdata)
 			if (ROMREGION_ISROMDATA(region))
 			{
 				/* if this is a device region, override with the device width and endianness */
+				UINT8 width = ROMREGION_GETWIDTH(region) / 8;
+				endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
 				if (romdata->machine->device(regiontag) != NULL)
-					regionflags = normalize_flags_for_device(romdata->machine, regionflags, regiontag);
+					normalize_flags_for_device(romdata->machine, regiontag, width, endianness);
 
 				/* remember the base and length */
-				romdata->region = romdata->machine->region_alloc(regiontag, regionlength, regionflags);
+				romdata->region = romdata->machine->region_alloc(regiontag, regionlength, width, endianness);
 				LOG(("Allocated %X bytes @ %p\n", romdata->region->bytes(), romdata->region->base()));
 
 				/* clear the region if it's requested */
@@ -1498,7 +1497,7 @@ static void process_region_list(rom_load_data *romdata)
 	/* now go back and post-process all the regions */
 	for (source = rom_first_source(*romdata->machine->config); source != NULL; source = rom_next_source(*source))
 		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
-			region_post_process(romdata, ROMREGION_GETTAG(region));
+			region_post_process(romdata, ROMREGION_GETTAG(region), ROMREGION_ISINVERTED(region));
 }
 
 

@@ -281,7 +281,7 @@ void eeprom_device::nvram_default()
 		if (m_config.m_data_bits == 8 && m_region->width() != 1)
 			fatalerror("eeprom region '%s' needs to be an 8-bit region", tag());
 		if (m_config.m_data_bits == 16 && (m_region->width() != 2 || m_region->endianness() != ENDIANNESS_BIG))
-			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region (flags=%08x)", tag(), m_region->flags());
+			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region", tag());
 
 		for (offs_t offs = 0; offs < eeprom_length; offs++)
 			if (m_config.m_data_bits == 8)
