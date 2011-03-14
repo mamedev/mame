@@ -415,6 +415,7 @@ const game_driver * const drivers[] =
 	DRIVER( cop01a )	/* (c) 1985 */
 	DRIVER( mightguy )	/* (c) 1986 */
 	DRIVER( terracre )	/* (c) 1985 */
+	DRIVER( terracreo )	/* (c) 1985 */
 	DRIVER( terracrea )	/* (c) 1985 */
 	DRIVER( terracren )	/* (c) 1985 */
 	DRIVER( amazon )	/* (c) 1986 */
