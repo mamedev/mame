@@ -3943,6 +3943,52 @@ UINT16* segacd_dataram;
 #define RAM_MODE_2MEG (0)
 #define RAM_MODE_1MEG (2)
 
+
+
+INLINE void write_pixel(running_machine* machine, UINT8 pix, int pixeloffset )
+{
+
+	int shift = 12-(4*(pixeloffset&0x3));
+	UINT16 datamask = (0x000f) << shift;
+
+	int offset = pixeloffset>>3;
+	if (pixeloffset&4) offset++;
+
+	offset &=0x1ffff;
+
+	switch (segacd_memory_priority_mode)
+	{
+		case 0x00: // normal write, just write the data
+			segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
+			segacd_dataram[offset] |= pix << shift;
+			break;
+
+		case 0x01: // underwrite, only write if the existing data is 0
+			if ((segacd_dataram[offset]&datamask) == 0x0000)
+			{
+				segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
+				segacd_dataram[offset] |= pix << shift;
+			}
+			break;
+		
+		case 0x02: // overwrite, only write non-zero data
+			if (pix)
+			{
+				segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
+				segacd_dataram[offset] |= pix << shift;
+			}
+			break;
+
+		default:
+		case 0x03:
+			pix = machine->rand() & 0x000f;
+			segacd_dataram[offset] = segacd_dataram[offset] &~ datamask;
+			segacd_dataram[offset] |= pix << shift;
+			break;
+
+	}
+}
+
 // 1meg / 2meg swap is interleaved swap, not half/half of the ram?
 // Wily Beamish and Citizen X appear to rely on this
 // however, it breaks the megacdj bios (megacd2j still works!)
@@ -3959,7 +4005,8 @@ UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
 	return segacd_dataram[offset];
 }
 
-void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask, int use_pm)
+
+void segacd_1meg_mode_word_write(running_machine* machine, int offset, UINT16 data, UINT16 mem_mask, int use_pm)
 {
 	offset *= 2;
 
@@ -4600,11 +4647,11 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 
 						if (!(scd_rammode & 1))
 						{
-							segacd_1meg_mode_word_write((dstoffset+0x20000)/2, data, 0xffff, 0);
+							segacd_1meg_mode_word_write(space->machine,(dstoffset+0x20000)/2, data, 0xffff, 0);
 						}
 						else
 						{
-							segacd_1meg_mode_word_write((dstoffset+0x00000)/2, data, 0xffff, 0);
+							segacd_1meg_mode_word_write(space->machine,(dstoffset+0x00000)/2, data, 0xffff, 0);
 						}
 					}
 
@@ -4855,6 +4902,7 @@ static tilemap_t    *segacd_stampmap[4];
 //static void segacd_mark_stampmaps_dirty(void);
 
 
+
 static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 {
 	space->machine->scheduler().synchronize();
@@ -4865,15 +4913,27 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 	{
 		// reset line
 		if (a12000_halt_reset_reg&0x0001)
+		{
 			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, CLEAR_LINE);
+			printf("clear reset slave\n");
+		}
 		else
+		{
 			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, ASSERT_LINE);
+			printf("assert reset slave\n");
+		}
 
 		// request BUS
 		if (a12000_halt_reset_reg&0x0002)
+		{
 			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, ASSERT_LINE);
+			printf("halt slave\n");
+		}
 		else
+		{
 			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, CLEAR_LINE);
+			printf("resume slave\n");
+		}
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -4886,7 +4946,7 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 
 		if (a12000_halt_reset_reg&0x8000)
 		{
-			printf("a12000_halt_reset_reg & 0x8000 set\n"); // irq2 mask?
+			//printf("a12000_halt_reset_reg & 0x8000 set\n"); // irq2 mask?
 		}
 
 
@@ -5347,11 +5407,11 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 			if (scd_rammode&1)
 			{
-				segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask, 0);
+				segacd_1meg_mode_word_write(space->machine, offset+0x20000/2, data, mem_mask, 0);
 			}
 			else
 			{
-				segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask, 0);
+				segacd_1meg_mode_word_write(space->machine, offset+0x00000/2, data, mem_mask, 0);
 			}
 		}
 		else
@@ -6030,6 +6090,16 @@ static MACHINE_RESET( segacd )
 	stopwatch_timer = machine->device<timer_device>("sw_timer");
 
 	scd_dma_timer->adjust(attotime::zero);
+
+
+	// HACK!!!! timegal, anettfut, roadaven end up with the SubCPU waiting in a loop for *something*
+	// overclocking the CPU, even at the point where the game is hung, allows them to continue and boot
+	// I'm not sure what the source of this timing problem is, it's not using IRQ3 or StopWatch at the
+	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
+	// too slow and has bad sound.  -- Investigate!
+	
+	_segacd_68k_cpu->set_clock_scale(1.5000f);
+
 }
 
 
@@ -6154,11 +6224,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(offset/2+0x00000/2, data , mem_mask, 1);
+			segacd_1meg_mode_word_write(space->machine, offset/2+0x00000/2, data , mem_mask, 1);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(offset/2+0x20000/2, data, mem_mask, 1);
+			segacd_1meg_mode_word_write(space->machine, offset/2+0x20000/2, data, mem_mask, 1);
 		}
 
 	//	printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x\n", data);
@@ -6202,11 +6272,11 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
 		if (scd_rammode&1)
 		{
-			segacd_1meg_mode_word_write(offset+0x00000/2, data, mem_mask, 0);
+			segacd_1meg_mode_word_write(space->machine,offset+0x00000/2, data, mem_mask, 0);
 		}
 		else
 		{
-			segacd_1meg_mode_word_write(offset+0x20000/2, data, mem_mask, 0);
+			segacd_1meg_mode_word_write(space->machine,offset+0x20000/2, data, mem_mask, 0);
 		}
 
 	}
@@ -6360,63 +6430,9 @@ INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbi
 	return 0;
 }
 
-INLINE void write_pixel_to_imagebuffer( running_machine* machine, UINT32 pix, int line, int xpos )
-{
-
-	UINT32 bufferstart = (segacd_imagebuffer_start_address&0xfff8)*2;
-	UINT32 bufferend = bufferstart + (((segacd_imagebuffer_vcell_size+1) * (segacd_imagebuffer_hdot_size>>3)*0x20)/2);
-	UINT32 offset;
-
-	offset = bufferstart+(((segacd_imagebuffer_vcell_size+1)*0x10)*xpos);
-
-	// lines of each output cell
-	offset+= (line*2);
-
-	while (offset>=bufferend)
-		offset-= bufferend;
 
 
-	switch (segacd_memory_priority_mode)
-	{
-		case 0x00: // normal write, just write the data
-			segacd_dataram[offset] = pix >> 16;
-			segacd_dataram[offset+1] = pix & 0xffff;
-			break;
 
-		case 0x01: // underwrite, only write if the existing data is 0
-			if ((segacd_dataram[offset]&0xf000) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0xf000;
-			if ((segacd_dataram[offset]&0x0f00) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0x0f00;
-			if ((segacd_dataram[offset]&0x00f0) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0x00f0;
-			if ((segacd_dataram[offset]&0x000f) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0x000f;
-			if ((segacd_dataram[offset+1]&0xf000) == 0x0000) segacd_dataram[offset+1] |= (pix)&0xf000;
-			if ((segacd_dataram[offset+1]&0x0f00) == 0x0000) segacd_dataram[offset+1] |= (pix)&0x0f00;
-			if ((segacd_dataram[offset+1]&0x00f0) == 0x0000) segacd_dataram[offset+1] |= (pix)&0x00f0;
-			if ((segacd_dataram[offset+1]&0x000f) == 0x0000) segacd_dataram[offset+1] |= (pix)&0x000f;
-			break;
-
-		case 0x02: // overwrite, only write non-zero data
-			if ((pix>>16)&0xf000) segacd_dataram[offset] = (segacd_dataram[offset] & 0x0fff) | ((pix>>16)&0xf000);
-			if ((pix>>16)&0x0f00) segacd_dataram[offset] = (segacd_dataram[offset] & 0xf0ff) | ((pix>>16)&0x0f00);
-			if ((pix>>16)&0x00f0) segacd_dataram[offset] = (segacd_dataram[offset] & 0xff0f) | ((pix>>16)&0x00f0);
-			if ((pix>>16)&0x000f) segacd_dataram[offset] = (segacd_dataram[offset] & 0xfff0) | ((pix>>16)&0x000f);
-			if ((pix)&0xf000) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0x0fff) | ((pix)&0xf000);
-			if ((pix)&0x0f00) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0xf0ff) | ((pix)&0x0f00);
-			if ((pix)&0x00f0) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0xff0f) | ((pix)&0x00f0);
-			if ((pix)&0x000f) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0xfff0) | ((pix)&0x000f);
-			break;
-
-		default:
-		case 0x03: // invalid?
-			segacd_dataram[offset] = machine->rand();
-			segacd_dataram[offset+1] = machine->rand();
-			break;
-
-	}
-
-	segacd_mark_tiles_dirty(machine, offset);
-	segacd_mark_tiles_dirty(machine, offset+1);
-
-}
 
 // this triggers the conversion operation, which will cause an IRQ1 when finished
 WRITE16_HANDLER( segacd_trace_vector_base_address_w )
@@ -6446,6 +6462,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		int line;
 		//bitmap_t *srcbitmap = tilemap_get_pixmap(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
 		bitmap_t *srcbitmap = 0;
+		UINT32 bufferstart = ((segacd_imagebuffer_start_address&0xfff8)*2)<<3;
 
 		for (line=0;line<segacd_imagebuffer_vdot_size;line++)
 		{
@@ -6466,29 +6483,36 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 			int ybase = tilemapyoffs * 256;
 			int count;
 
-			for (count=0;count<(segacd_imagebuffer_hdot_size>>3);count++)
+			for (count=0;count<(segacd_imagebuffer_hdot_size);count++)
 			{
-				int i;
-				UINT32 pixblock = 0x00000000;
-				for (i=7*4;i>=0;i-=4)
-				{
-					pixblock |= read_pixel_from_stampmap(space->machine, srcbitmap, xbase>>(3+8), ybase>>(3+8)) << (i);
+				//int i;
+				UINT8 pix = 0x0;
 
+				pix = read_pixel_from_stampmap(space->machine, srcbitmap, xbase>>(3+8), ybase>>(3+8));
 
-					xbase += deltax;
-					ybase += deltay;
+				xbase += deltax;
+				ybase += deltay;
 
-					// clamp to 24-bits, seems to be required for all the intro effects to work
-					xbase &= 0xffffff;
-					ybase &= 0xffffff;
+				// clamp to 24-bits, seems to be required for all the intro effects to work
+				xbase &= 0xffffff;
+				ybase &= 0xffffff;
 
+				int countx = count + (segacd_imagebuffer_offset&0x7);
 
-				}
+				UINT32 offset;
 
+				offset = bufferstart+((((segacd_imagebuffer_vcell_size+1)*0x10)*(countx>>3))<<3);
 
+				offset+= ((line*2)<<3);
+				offset+=(segacd_imagebuffer_offset&0x38)<<1;
 
+				offset+=countx & 0x7;
 
-				write_pixel_to_imagebuffer(space->machine, pixblock, line, count);
+				write_pixel( space->machine, pix, offset );
+
+				segacd_mark_tiles_dirty(space->machine, (offset>>3));
+				segacd_mark_tiles_dirty(space->machine, (offset>>3)+1);
+
 			}
 
 		}
@@ -6651,7 +6675,7 @@ WRITE16_HANDLER( segacd_cdfader_w )
 	else
 		cdfader_vol = (cdfader_vol / 1024.0) * 100.0;
 
-	printf("%f\n",cdfader_vol);
+	//printf("%f\n",cdfader_vol);
 
 	cdda_set_volume(space->machine->device("cdda"), cdfader_vol);
 }
@@ -9271,8 +9295,7 @@ MACHINE_RESET( megadriv )
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
-		machine->device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... */
-	//  machine->device("maincpu")->set_clock_scale(0.3800f); /* Fatal Rewind is very fussy... */
+	//	machine->device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
 
 		memset(megadrive_ram,0x00,0x10000);
 	}
