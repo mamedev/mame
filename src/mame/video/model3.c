@@ -567,8 +567,7 @@ static cached_texture *get_texture(running_machine *machine, int page, int texx,
 				for (x = 0; x < pixwidth; x++)
 				{
 					UINT16 pixdata = texsrc[x];
-					dest[x] = MAKE_ARGB(pal1bit(pixdata >> 15), pal5bit(pixdata >> 10), pal5bit(pixdata >> 5), pal5bit(pixdata >> 0));
-					alpha = ~0;
+					alpha &= dest[x] = MAKE_ARGB(pal1bit(~pixdata >> 15), pal5bit(pixdata >> 10), pal5bit(pixdata >> 5), pal5bit(pixdata >> 0));
 				}
 				break;
 
@@ -1110,7 +1109,7 @@ static void draw_model(running_machine *machine, UINT32 addr)
 	UINT32 *model = (addr >= 0x100000) ? &state->vrom[addr] :  &state->polygon_ram[addr];
 	UINT32 header[7];
 	int index = 0;
-	int last_polygon = FALSE, back_face = FALSE;
+	int last_polygon = FALSE, first_polygon = TRUE, back_face = FALSE;
 	int num_vertices;
 	int i, v, vi;
 	float fixed_point_fraction;
@@ -1146,9 +1145,53 @@ static void draw_model(running_machine *machine, UINT32 addr)
 		float dot;
 		int intensity;
 		int polygon_transparency;
+		
+		//
+		// Header bits:
+		//
+		//    0:00FFFC00 - polygon ID
+		//    0:00000300 - ????
+		//    0:00000040 - if set, indicates a quad, else it's a triangle
+		//    0:00000008 - inherit vertex 3 from previous polygon
+		//    0:00000004 - inherit vertex 2 from previous polygon
+		//    0:00000002 - inherit vertex 1 from previous polygon
+		//    0:00000001 - inherit vertex 0 from previous polygon
+		//
+		//    1:FFFFFF00 - polygon normal X coordinate, 2.22
+		//    1:00000040 - if set, U/V is as-is, else divide U/V by 8
+		//    1:00000004 - if set, indicates last polygon in model
+		//
+		//    2:FFFFFF00 - polygon normal Y coordinate, 2.22
+		//    2:00000002 - if set, mirror texture in U
+		//    2:00000001 - if set, mirror texture in V
+		//
+		//    3:FFFFFF00 - polygon normal Z coordinate, 2.22
+		//    3:00000038 - texture width, in tiles
+		//	  3:00000007 - texture height, in tiles
+		//
+		//    4:FFFFFF00 - RGB lighting color
+		//    4:00000040 - texture page
+		//    4:0000001F - upper 5 bits of texture X coordinate
+		//
+		//    5:00000080 - low bit of texture X coordinate
+		//    5:0000001F - low 5 bits of texture Y coordinate
+		//
+		//    6:80000000 - if set, enable alpha test
+		//    6:04000000 - if set, textures enabled
+		//    6:00800000 - if set, force transparency off
+		//    6:007C0000 - 5-bit transparency value (0 is transparent, 0x1F is nearly opaque)
+		//    6:00010000 - if set, disable lighting
+		//    6:0000F800 - 5-bit additional color control
+		//    6:00000380 - 3-bit texture format
+		//    6:00000001 - alpha enable?
+		//
 
 		for (i = 0; i < 7; i++)
 			header[i] = model[index++];
+
+		if (first_polygon && (header[0] & 0x0f) != 0)
+			return;
+		first_polygon = FALSE;
 
 		if (header[6] == 0)
 			return;
@@ -1175,6 +1218,11 @@ static void draw_model(running_machine *machine, UINT32 addr)
 		/* load new vertices */
 		for ( ; vi < num_vertices; vi++)
 		{
+			if ((model[index+0] & 0xf0000000) == 0x70000000 ||
+				(model[index+1] & 0xf0000000) == 0x70000000 ||
+				(model[index+2] & 0xf0000000) == 0x70000000)
+				return;
+
 			vertex[vi].x = (float)((INT32)model[index++]) * fixed_point_fraction;
 			vertex[vi].y = (float)((INT32)model[index++]) * fixed_point_fraction;
 			vertex[vi].pz = (float)((INT32)model[index++]) * fixed_point_fraction;
@@ -1294,7 +1342,7 @@ static void draw_model(running_machine *machine, UINT32 addr)
 				render_one(machine, &tri);
 			}
 		}
-	};
+	}
 }
 
 

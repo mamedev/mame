@@ -140,17 +140,20 @@ static void draw_scanline_alpha(void *dest, INT32 scanline, const poly_extent *e
 			UINT32 pix11 = texture->data[(v2 << width) + u2];
 			UINT32 texel = rgba_bilinear_filter(pix00, pix01, pix10, pix11, u, v);
 			UINT32 fa = texel >> 24;
-			UINT32 combined = ((fa + 1) * polyi) >> 8;
-			UINT32 fr = ((texel & 0x00ff0000) * combined) >> (8+9);
-			UINT32 fg = ((texel & 0x0000ff00) * combined) >> (8+6);
-			UINT32 fb = ((texel & 0x000000ff) * combined) >> (8+3);
-			UINT16 orig = p[x];
-			combined = ((255 - fa) * desttrans) >> 8;
-			fr += ((orig & 0x7c00) * combined) >> 5;
-			fg += ((orig & 0x03e0) * combined) >> 5;
-			fb += ((orig & 0x001f) * combined) >> 5;
-			p[x] = (fr & 0x7c00) | (fg & 0x3e0) | (fb & 0x1f);
-			d[x] = iz;
+			if (fa != 0)
+			{
+				UINT32 combined = ((fa + 1) * polyi) >> 8;
+				UINT32 fr = ((texel & 0x00ff0000) * combined) >> (8+9);
+				UINT32 fg = ((texel & 0x0000ff00) * combined) >> (8+6);
+				UINT32 fb = ((texel & 0x000000ff) * combined) >> (8+3);
+				UINT16 orig = p[x];
+				combined = ((255 - fa) * desttrans) >> 5;
+				fr += ((orig & 0x7c00) * combined) >> 8;
+				fg += ((orig & 0x03e0) * combined) >> 8;
+				fb += ((orig & 0x001f) * combined) >> 8;
+				p[x] = (fr & 0x7c00) | (fg & 0x3e0) | (fb & 0x1f);
+				d[x] = iz;
+			}
 		}
 
 		ooz += doozdx;
