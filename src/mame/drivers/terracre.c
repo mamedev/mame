@@ -530,14 +530,14 @@ static GFXDECODE_START( terracre )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( amazon, terracre_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz
 	MCFG_CPU_PROGRAM_MAP(amazon_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)		// 4mhz? should be derived from XTAL_22MHz? how?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_3526_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_16MHz/4/512)	// ?
 
 	MCFG_MACHINE_START(amazon)
 
@@ -557,7 +557,7 @@ static MACHINE_CONFIG_START( amazon, terracre_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
@@ -568,14 +568,14 @@ static MACHINE_CONFIG_START( amazon, terracre_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ym3526, terracre_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz
 	MCFG_CPU_PROGRAM_MAP(terracre_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)		// 4.0mhz when compared to sound recordings, should be derived from XTAL_22MHz? how?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_3526_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_16MHz/4/512)	// ?
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( 60 )
@@ -593,7 +593,7 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("dac1", DAC, 0)
@@ -604,14 +604,14 @@ static MACHINE_CONFIG_START( ym3526, terracre_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ym2203, terracre_state )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	// 8mhz
 	MCFG_CPU_PROGRAM_MAP(terracre_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)		// 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)		// 4.0mhz when compared to sound recordings, should be derived from XTAL_22MHz? how?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_2203_io_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_8MHz/2/512)	// ?
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, XTAL_16MHz/4/512)	// ?
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -629,13 +629,13 @@ static MACHINE_CONFIG_START( ym2203, terracre_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
