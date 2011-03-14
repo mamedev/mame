@@ -8145,6 +8145,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Sun Electronics / SunSoft games */
 	DRIVER( dai3wksi )	/* 1979.09 Dai San Wakusei (The Third Planet) */
 	DRIVER( speakres )	/* [Sun Electronics] */
+	DRIVER( speakresb )	/* bootleg */
 	DRIVER( stratvox )	/* [1980 Sun Electronics] Taito */
 	DRIVER( stratvoxb )	/* bootleg */
 	DRIVER( spacecho )	/* bootleg */
