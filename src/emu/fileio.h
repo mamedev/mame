@@ -66,7 +66,7 @@ public:
 	path_iterator(const char *searchpath);
 
 	// getters
-	bool next(astring &buffer);
+	bool next(astring &buffer, const char *name = NULL);
 
 	// reset
 	void reset() { m_current = m_base; m_index = 0; }

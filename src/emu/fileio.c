@@ -68,7 +68,7 @@ path_iterator::path_iterator(const char *rawsearchpath)
 //  in a multipath sequence
 //-------------------------------------------------
 
-bool path_iterator::next(astring &buffer)
+bool path_iterator::next(astring &buffer, const char *name)
 {
 	// if none left, return FALSE to indicate we are done
 	if (m_index != 0 && *m_current == 0)
@@ -80,6 +80,15 @@ bool path_iterator::next(astring &buffer)
 		semi = m_current + strlen(m_current);
 	buffer.cpy(m_current, semi - m_current);
 	m_current = (*semi == 0) ? semi : semi + 1;
+	
+	// append the name if we have one
+	if (name != NULL)
+	{
+		// compute the full pathname
+		if (buffer.len() > 0)
+			buffer.cat(PATH_SEPARATOR);
+		buffer.cat(name);
+	}
 
 	// bump the index and return TRUE
 	m_index++;
@@ -350,13 +359,8 @@ file_error emu_file::open_next()
 
 	// loop over paths
 	file_error filerr = FILERR_NOT_FOUND;
-	while (m_iterator.next(m_fullpath))
+	while (m_iterator.next(m_fullpath, m_filename))
 	{
-		// compute the full pathname
-		if (m_fullpath.len() > 0)
-			m_fullpath.cat(PATH_SEPARATOR);
-		m_fullpath.cat(m_filename);
-
 		// attempt to open the file directly
 		filerr = core_fopen(m_fullpath, m_openflags, &m_file);
 		if (filerr == FILERR_NONE)
