@@ -76,7 +76,10 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 		else if (config->type == DEVCB_TYPE_DRIVER)
 			resolved->target = device->machine->driver_data();
 		else
-			resolved->target = device->siblingdevice(config->tag);
+			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
+				resolved->target = device->owner();
+			else
+				resolved->target = device->siblingdevice(config->tag);
 
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read_line: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
@@ -177,7 +180,10 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 		else if (config->type == DEVCB_TYPE_DRIVER)
 			resolved->target = device->machine->driver_data();
 		else
-			resolved->target = device->siblingdevice(config->tag);
+			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
+				resolved->target = device->owner();
+			else
+				resolved->target = device->siblingdevice(config->tag);
 
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_write_line: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
@@ -254,7 +260,11 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 		else if (config->type == DEVCB_TYPE_DRIVER)
 			resolved->target = device->machine->driver_data();
 		else
-			resolved->target = device->siblingdevice(config->tag);
+			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
+				resolved->target = device->owner();
+			else
+				resolved->target = device->siblingdevice(config->tag);
+
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read8: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 
@@ -329,7 +339,11 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 		else if (config->type == DEVCB_TYPE_DRIVER)
 			resolved->target = device->machine->driver_data();
 		else
-			resolved->target = device->siblingdevice(config->tag);
+			if (strcmp(config->tag, DEVICE_SELF_OWNER) == 0)
+				resolved->target = device->owner();
+			else
+				resolved->target = device->siblingdevice(config->tag);
+		
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_write8: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 
