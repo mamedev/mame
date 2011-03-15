@@ -5956,6 +5956,23 @@ READ16_HANDLER( cdc_data_main_r )
 }
 
 
+
+WRITE16_HANDLER( segacd_stopwatch_timer_w )
+{
+	if(data == 0)
+		stopwatch_timer->reset();
+	else
+		printf("Stopwatch timer %04x\n",data);
+}
+
+READ16_HANDLER( segacd_stopwatch_timer_r )
+{
+	INT32 result = (stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
+
+	return result & 0xfff;
+}
+
+
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine* machine )
 {
@@ -5964,7 +5981,7 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_4meg_prgbank = 0;
 
 
-	memory_unmap_readwrite(space, 0x20000,0x3fffff,0,0);
+	memory_unmap_readwrite        (space, 0x020000,0x3fffff,0,0);
 
 //	memory_install_read_bank(space, 0x0020000, 0x003ffff, 0, 0, "scd_4m_prgbank");
 //	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
@@ -5982,11 +5999,13 @@ void segacd_init_main_cpu( running_machine* machine )
 	//memory_install_read16_handler     (cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12008, 0xa12009, 0, 0, cdc_data_main_r);
 
 
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1200c, 0xa1200d, 0, 0, segacd_stopwatch_timer_r, segacd_stopwatch_timer_w); // starblad
 
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1200e, 0xa1200f, 0, 0, segacd_comms_flags_r, segacd_comms_flags_maincpu_w); // communication flags block
 
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12010, 0xa1201f, 0, 0, segacd_comms_main_part1_r, segacd_comms_main_part1_w);
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12020, 0xa1202f, 0, 0, segacd_comms_main_part2_r, segacd_comms_main_part2_w);
+
 
 
 	cpu_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
@@ -6632,20 +6651,6 @@ static TIMER_CALLBACK( segacd_irq3_timer_callback )
 }
 
 
-WRITE16_HANDLER( segacd_stopwatch_timer_w )
-{
-	if(data == 0)
-		stopwatch_timer->reset();
-	else
-		printf("Stopwatch timer %04x\n",data);
-}
-
-READ16_HANDLER( segacd_stopwatch_timer_r )
-{
-	INT32 result = (stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
-
-	return result & 0xfff;
-}
 
 READ16_HANDLER( cdc_dmaaddr_r )
 {
