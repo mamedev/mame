@@ -108,6 +108,8 @@ device_t *_ConfigClass::alloc_device(running_machine &machine) const					\
 #define MCFG_DEVICE_CLOCK(_clock) \
 	device_config::static_set_clock(device, _clock); \
 
+#define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
+	device_config::static_set_input_default(device, DEVICE_INPUT_DEFAULTS_NAME(_config)); \
 
 
 //**************************************************************************
@@ -128,6 +130,7 @@ struct rom_entry;
 class machine_config;
 class emu_timer;
 typedef union _input_port_token input_port_token;
+typedef struct _input_device_default input_device_default;
 
 
 // exception classes
@@ -289,6 +292,7 @@ public:
 	const char *tag() const { return m_tag; }
 	const void *static_config() const { return m_static_config; }
 	const machine_config &mconfig() const { return m_machine_config; }
+	const input_device_default *input_ports_defaults() const  { return m_input_defaults; }
 
 	// methods that wrap both interface-level and device-level behavior
 	void config_complete();
@@ -297,6 +301,7 @@ public:
 	// configuration helpers
 	static void static_set_clock(device_config *device, UINT32 clock) { device->m_clock = clock; }
 	static void static_set_static_config(device_config *device, const void *config) { device->m_static_config = config; }
+	static void static_set_input_default(device_config *device, const input_device_default *config) { device->m_input_defaults = config; }
 
 	//------------------- begin derived class overrides
 
@@ -327,6 +332,7 @@ protected:
 
 	const machine_config &	m_machine_config;		// reference to the machine's configuration
 	const void *			m_static_config;		// static device configuration
+	const input_device_default *m_input_defaults;   // devices input ports default overrides
 
 	astring					m_name;					// name of the device
 	astring					m_shortname;			// short name of the device, used for potential romload

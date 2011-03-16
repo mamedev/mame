@@ -293,6 +293,7 @@ device_config::device_config(const machine_config &mconfig, device_type type, co
 	  m_clock(clock),
 	  m_machine_config(mconfig),
 	  m_static_config(NULL),
+	  m_input_defaults(NULL),
 	  m_name(name),
 	  m_tag(tag),
 	  m_config_complete(false)

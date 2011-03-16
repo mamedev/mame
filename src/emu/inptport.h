@@ -723,7 +723,14 @@ struct _input_field_user_settings
 	UINT8						reverse;		/* for analog controls */
 };
 
-
+/* device defined default input settings */
+typedef struct _input_device_default input_device_default;
+struct _input_device_default
+{
+	const char *				tag;			/* tag of port to update */
+	input_port_value			mask;			/* mask to apply to the port */
+	input_port_value			defvalue;		/* new default value */
+};
 /* a single input port configuration */
 class input_port_config
 {
@@ -1024,6 +1031,20 @@ struct _inp_header
 	TOKEN_STRING(_name),
 
 
+/* name of table */
+#define DEVICE_INPUT_DEFAULTS_NAME(_name) device_iptdef_##_name
+
+/* start of table */
+#define DEVICE_INPUT_DEFAULTS_START(_name) \
+	const input_device_default DEVICE_INPUT_DEFAULTS_NAME(_name)[] = {
+
+/* end of table */
+#define DEVICE_INPUT_DEFAULTS(_tag,_mask,_defval) \
+	{ _tag ,_mask, _defval }, \
+
+/* end of table */
+#define DEVICE_INPUT_DEFAULTS_END \
+	{NULL,0,0} };
 
 /***************************************************************************
     HELPER MACROS

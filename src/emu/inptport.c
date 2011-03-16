@@ -2932,6 +2932,29 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 ***************************************************************************/
 
 /*-------------------------------------------------
+    port_default_value - updates default value
+	of port settings according to device settings
+-------------------------------------------------*/
+
+static UINT32 port_default_value(const char *fulltag, UINT32 mask, UINT32 defval, device_config *owner)
+{
+	astring tempstring;
+	const input_device_default *def = NULL;
+	if (owner!=NULL) {
+		def = owner->input_ports_defaults();
+		if (def!=NULL) {
+			while (def->tag!=NULL) {
+				if ((strcmp(fulltag,owner->subtag(tempstring,def->tag))==0) &&  (def->mask == mask)) {
+					return def->defvalue;
+				}
+				def++;
+			}
+		}
+	}
+	return defval;
+}
+
+/*-------------------------------------------------
     port_config_detokenize - recursively
     detokenize a series of input port tokens
 -------------------------------------------------*/
@@ -3410,6 +3433,7 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				defval = port_default_value(fulltag,mask,defval,owner);	
 				curfield = field_config_alloc(curport, IPT_DIPSWITCH, defval, mask);
 				cursetting = NULL;
 				curfield->name = input_port_string_from_token(*ipt++);
@@ -3488,6 +3512,7 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				defval = port_default_value(fulltag,mask,defval,owner);	
 				curfield = field_config_alloc(curport, IPT_CONFIG, defval, mask);
 				cursetting = NULL;
 				curfield->name = input_port_string_from_token(*ipt++);
@@ -3519,6 +3544,7 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
+				defval = port_default_value(fulltag,mask,defval,owner);
 				curfield = field_config_alloc(curport, IPT_CATEGORY, defval, mask);
 				cursetting = NULL;
 				curfield->name = input_port_string_from_token(*ipt++);
