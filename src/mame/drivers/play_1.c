@@ -44,8 +44,8 @@ MACHINE_CONFIG_END
 /-------------------------------------------------------------------*/
 ROM_START(spcgambl)
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("spcgamba.bin", 0x0000, 0x0400, CRC(da312699) SHA1(b1fabfe23d4e5d512623f9b0f3fa8dd38bdbba43))
-	ROM_LOAD("spcgambb.bin", 0x0400, 0x0400, NO_DUMP)
+	ROM_LOAD("spcgamba.bin", 0x0000, 0x0400, CRC(3b6e5287) SHA1(4d2fae779bb4117a99a9311b96ab79799f40067b))
+	ROM_LOAD("spcgambb.bin", 0x0400, 0x0400, CRC(5c61f25c) SHA1(44b2d74926bf5678146b6d2347b4147e8a29a660))
 ROM_END
 
 /*-------------------------------------------------------------------
