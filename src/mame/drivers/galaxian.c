@@ -1486,6 +1486,47 @@ static ADDRESS_MAP_START( scobra_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( anteateruk_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0400, 0x0bff) AM_RAM
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x1002, 0x1002) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
+	AM_RANGE(0x1003, 0x1003) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
+	AM_RANGE(0x1004, 0x1004) AM_MIRROR(0x01f8) AM_WRITE(galaxian_stars_enable_w)
+	AM_RANGE(0x1005, 0x1005) AM_MIRROR(0x01f8) //POUT2
+	AM_RANGE(0x1006, 0x1006) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
+	AM_RANGE(0x1007, 0x1007) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x0100) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x4000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc100, 0xc103) AM_MIRROR(0x3efc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( anteaterg_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x03ff) AM_ROM
+	AM_RANGE(0x0400, 0x0bff) AM_RAM
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)
+	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(galaxian_objram_w) AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x2400, 0x2403) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x2601, 0x2601) AM_MIRROR(0x01f8) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x2602, 0x2602) AM_MIRROR(0x01f8) AM_WRITE(coin_count_0_w)
+	AM_RANGE(0x2603, 0x2603) AM_MIRROR(0x01f8) AM_WRITE(scramble_background_enable_w)
+	AM_RANGE(0x2604, 0x2604) AM_MIRROR(0x01f8) AM_WRITE(galaxian_stars_enable_w)
+	AM_RANGE(0x2605, 0x2605) AM_MIRROR(0x01f8) //POUT2
+	AM_RANGE(0x2606, 0x2606) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
+	AM_RANGE(0x2607, 0x2607) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
+	AM_RANGE(0x4000, 0xbfff) AM_ROM
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE_MEMBER(galaxian_state, videoram)	/* mirror! */
+	AM_RANGE(0xf400, 0xf400) AM_MIRROR(0x01ff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+ADDRESS_MAP_END
+
+
 /* map derived from schematics */
 static ADDRESS_MAP_START( frogger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -2333,14 +2374,30 @@ static MACHINE_CONFIG_DERIVED( anteater, scobra )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_DERIVED( anteateruk, anteater )
+
+	/* strange memory map, maybe a kind of protection */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(anteateruk_map)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( anteaterg, anteater )
+
+	/* strange memory map, maybe a kind of protection */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(anteaterg_map)
+MACHINE_CONFIG_END
+
+
 static MACHINE_CONFIG_DERIVED( moonwar, scobra )
-	/* same as regular type 1, the only difference is that the bullets are less yellow */
 
 	/* device config overrides */
 	MCFG_PPI8255_RECONFIG( "ppi8255_0", moonwar_ppi8255_0_intf )
 	MCFG_PPI8255_RECONFIG( "ppi8255_1", konami_ppi8255_1_intf )
 
-	MCFG_PALETTE_INIT(moonwar)
+	MCFG_PALETTE_INIT(moonwar) // bullets are less yellow
 MACHINE_CONFIG_END
 
 
@@ -3232,9 +3289,15 @@ static DRIVER_INIT( anteater )
 }
 
 
+static DRIVER_INIT( anteateruk )
+{
+	/* video extensions */
+	common_init(machine, scramble_draw_bullet, anteater_draw_background, NULL, NULL);
+}
+
+
 static DRIVER_INIT( superbon )
 {
-
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
@@ -3245,10 +3308,8 @@ static DRIVER_INIT( superbon )
 
 static DRIVER_INIT( calipso )
 {
-
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, calipso_extend_sprite_info);
-
 }
 
 
