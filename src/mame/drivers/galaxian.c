@@ -2619,8 +2619,6 @@ static void common_init(
 	irq_line = INPUT_LINE_NMI;
 	galaxian_frogger_adjust = FALSE;
 	galaxian_sfx_tilemap = FALSE;
-	galaxian_sprite_clip_start = 16;
-	galaxian_sprite_clip_end = 255;
 	galaxian_draw_bullet_ptr = (draw_bullet != NULL) ? draw_bullet : galaxian_draw_bullet;
 	galaxian_draw_background_ptr = (draw_background != NULL) ? draw_background : galaxian_draw_background;
 	galaxian_extend_tile_info_ptr = extend_tile_info;
@@ -2791,10 +2789,6 @@ static DRIVER_INIT( pacmanbl )
 
 	/* ...but coin lockout disabled/disconnected */
 	memory_install_write8_handler(space, 0x6002, 0x6002, 0, 0x7f8, (write8_space_func)artic_gfxbank_w);
-
-	/* also shift the sprite clip offset */
-	galaxian_sprite_clip_start = 7;
-	galaxian_sprite_clip_end = 246;
 }
 
 static READ8_HANDLER( tenspot_dsw_read )

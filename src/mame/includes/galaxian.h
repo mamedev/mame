@@ -42,8 +42,6 @@ public:
 
 extern UINT8 galaxian_frogger_adjust;
 extern UINT8 galaxian_sfx_tilemap;
-extern UINT8 galaxian_sprite_clip_start;
-extern UINT8 galaxian_sprite_clip_end;
 
 PALETTE_INIT( galaxian );
 PALETTE_INIT( moonwar );

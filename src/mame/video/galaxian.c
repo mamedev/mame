@@ -245,8 +245,6 @@ galaxian_extend_sprite_info_func galaxian_extend_sprite_info_ptr;
 /* global tweaks */
 UINT8 galaxian_frogger_adjust;
 UINT8 galaxian_sfx_tilemap;
-UINT8 galaxian_sprite_clip_start;
-UINT8 galaxian_sprite_clip_end;
 
 
 
@@ -600,13 +598,11 @@ static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	rectangle clip = *cliprect;
 	int sprnum;
-	int clip_ofs = (flipscreen_x ? 16 : 0);
 
 	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
-	/* according to the schematics, it should be the first 16 pixels; however, */
-	/* some bootlegs demonstrate that this can be shifted to other positions. */
-	clip.min_x = MAX(clip.min_x, (galaxian_sprite_clip_start - clip_ofs) * GALAXIAN_XSCALE);
-	clip.max_x = MIN(clip.max_x, (galaxian_sprite_clip_end - clip_ofs + 1) * GALAXIAN_XSCALE - 1);
+	/* according to the schematics, it should be the first 16 pixels */
+	clip.min_x = MAX(clip.min_x, (!flipscreen_x) * 16 * GALAXIAN_XSCALE);
+	clip.max_x = MIN(clip.max_x, (256 - flipscreen_x * 16) * GALAXIAN_XSCALE - 1);
 
 	/* The line buffer is only written if it contains a '0' currently; */
 	/* it is cleared during the visible area, and populated during HBLANK */
