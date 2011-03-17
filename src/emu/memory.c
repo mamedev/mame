@@ -232,9 +232,7 @@ enum
 {
 	STATIC_INVALID = 0,									// invalid - should never be used
 	STATIC_BANK1 = 1,									// first memory bank
-	STATIC_BANKMAX = 122,								// last memory bank
-	STATIC_RAM,											// RAM - reads/writes map to dynamic banks
-	STATIC_ROM,											// ROM - reads = RAM; writes = UNMAP
+	STATIC_BANKMAX = 124,								// last memory bank
 	STATIC_NOP,											// NOP - reads = unmapped value; writes = no-op
 	STATIC_UNMAP,										// unmapped - same as NOP except we log errors
 	STATIC_WATCHPOINT,									// watchpoint - used internally
@@ -1073,7 +1071,7 @@ public:
 		const handler_entry_read &handler = m_read.handler_read(entry);
 
 		// 8-bit case: RAM/ROM
-		if (entry >= STATIC_RAM)
+		if (entry > STATIC_BANKMAX)
 			return NULL;
 		return handler.ramptr(handler.byteoffset(byteaddress));
 	}
@@ -1087,7 +1085,7 @@ public:
 		const handler_entry_write &handler = m_write.handler_write(entry);
 
 		// 8-bit case: RAM/ROM
-		if (entry >= STATIC_RAM)
+		if (entry > STATIC_BANKMAX)
 			return NULL;
 		return handler.ramptr(handler.byteoffset(byteaddress));
 	}
@@ -1107,7 +1105,7 @@ public:
 		// either read directly from RAM, or call the delegate
 		offset = handler.byteoffset(byteaddress);
 		_NativeType result;
-		if (entry < STATIC_RAM) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset));
+		if (entry <= STATIC_BANKMAX) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset));
 		else if (sizeof(_NativeType) == 1) result = handler.read8(*this, offset, mask);
 		else if (sizeof(_NativeType) == 2) result = handler.read16(*this, offset >> 1, mask);
 		else if (sizeof(_NativeType) == 4) result = handler.read32(*this, offset >> 2, mask);
@@ -1132,7 +1130,7 @@ public:
 		// either read directly from RAM, or call the delegate
 		offset = handler.byteoffset(byteaddress);
 		_NativeType result;
-		if (entry < STATIC_RAM) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset));
+		if (entry <= STATIC_BANKMAX) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset));
 		else if (sizeof(_NativeType) == 1) result = handler.read8(*this, offset, 0xff);
 		else if (sizeof(_NativeType) == 2) result = handler.read16(*this, offset >> 1, 0xffff);
 		else if (sizeof(_NativeType) == 4) result = handler.read32(*this, offset >> 2, 0xffffffff);
@@ -1154,7 +1152,7 @@ public:
 
 		// either write directly to RAM, or call the delegate
 		offset = handler.byteoffset(byteaddress);
-		if (entry < STATIC_RAM)
+		if (entry <= STATIC_BANKMAX)
 		{
 			_NativeType *dest = reinterpret_cast<_NativeType *>(handler.ramptr(offset));
 			*dest = (*dest & ~mask) | (data & mask);
@@ -1179,7 +1177,7 @@ public:
 
 		// either write directly to RAM, or call the delegate
 		offset = handler.byteoffset(byteaddress);
-		if (entry < STATIC_RAM) *reinterpret_cast<_NativeType *>(handler.ramptr(offset)) = data;
+		if (entry <= STATIC_BANKMAX) *reinterpret_cast<_NativeType *>(handler.ramptr(offset)) = data;
 		else if (sizeof(_NativeType) == 1) handler.write8(*this, offset, data, 0xff);
 		else if (sizeof(_NativeType) == 2) handler.write16(*this, offset >> 1, data, 0xffff);
 		else if (sizeof(_NativeType) == 4) handler.write32(*this, offset >> 2, data, 0xffffffff);
@@ -3183,9 +3181,10 @@ UINT8 address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask
 			throw emu_fatalerror("Out of handler entries in address table");
 	}
 
-	// configure the entry to our parameters
+	// configure the entry to our parameters (but not for static non-banked cases)
 	handler_entry &curentry = handler(entry);
-	curentry.configure(bytestart, byteend, bytemask);
+	if (entry <= STATIC_BANKMAX || entry >= STATIC_COUNT)
+		curentry.configure(bytestart, byteend, bytemask);
 
 	// populate it
 	populate_range_mirrored(bytestart, byteend, bytemirror, entry);
@@ -3931,7 +3930,7 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 	direct_range *range = find_range(overrideaddress, m_entry);
 
 	// if we don't map to a bank, return FALSE
-	if (m_entry < STATIC_BANK1 || m_entry >= STATIC_RAM)
+	if (m_entry < STATIC_BANK1 || m_entry > STATIC_BANKMAX)
 	{
 		// ensure future updates to land here as well until we get back into a bank
 		m_byteend = 0;
