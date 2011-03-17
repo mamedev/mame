@@ -45,7 +45,7 @@ SCREEN_UPDATE( s3c2440 )
 
 DEVICE_START( s3c2440 )
 {
-	const address_space *space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_readwrite32_device_handler( space, device, 0x48000000, 0x4800003b, 0, 0, s3c24xx_memcon_r, s3c24xx_memcon_w);
 	memory_install_readwrite32_device_handler( space, device, 0x49000000, 0x4900005b, 0, 0, s3c24xx_usb_host_r, s3c24xx_usb_host_w);
 	memory_install_readwrite32_device_handler( space, device, 0x4a000000, 0x4a00001f, 0, 0, s3c24xx_irq_r, s3c24xx_irq_w);

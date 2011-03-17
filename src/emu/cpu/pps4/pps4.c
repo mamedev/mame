@@ -35,10 +35,10 @@ struct _pps4_state
 	UINT8	FF2; // Flip-flop 2
 
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	direct_read_data *direct;
-	const address_space *data;
-	const address_space *io;
+	address_space *data;
+	address_space *io;
 
 	int					icount;
 };

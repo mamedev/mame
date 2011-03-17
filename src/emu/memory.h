@@ -351,7 +351,7 @@ public:
 	int spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map; }
 
-	direct_read_data &direct() const { return const_cast<direct_read_data &>(m_direct); }
+	direct_read_data &direct() const { return m_direct; }
 
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
@@ -620,93 +620,93 @@ protected:
 
 // wrappers for dynamic read handler installation
 #define memory_install_read8_handler(space, start, end, mask, mirror, rhandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler)
 #define memory_install_read16_handler(space, start, end, mask, mirror, rhandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler)
 #define memory_install_read32_handler(space, start, end, mask, mirror, rhandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler)
 #define memory_install_read64_handler(space, start, end, mask, mirror, rhandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler)
 
 #define memory_install_read8_device_handler(space, device, start, end, mask, mirror, rhandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler)
 #define memory_install_read16_device_handler(space, device, start, end, mask, mirror, rhandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler)
 #define memory_install_read32_device_handler(space, device, start, end, mask, mirror, rhandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler)
 #define memory_install_read64_device_handler(space, device, start, end, mask, mirror, rhandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler)
 
 #define memory_install_read_port(space, start, end, mask, mirror, rtag) \
-	const_cast<address_space *>(space)->install_port(start, end, mask, mirror, rtag, NULL)
+	(space)->install_port(start, end, mask, mirror, rtag, NULL)
 #define memory_install_read_bank(space, start, end, mask, mirror, rtag) \
-	const_cast<address_space *>(space)->install_bank(start, end, mask, mirror, rtag, NULL)
+	(space)->install_bank(start, end, mask, mirror, rtag, NULL)
 #define memory_install_rom(space, start, end, mask, mirror, baseptr) \
-	const_cast<address_space *>(space)->install_ram(start, end, mask, mirror, ROW_READ, baseptr)
+	(space)->install_ram(start, end, mask, mirror, ROW_READ, baseptr)
 #define memory_unmap_read(space, start, end, mask, mirror) \
-	const_cast<address_space *>(space)->unmap(start, end, mask, mirror, ROW_READ, false)
+	(space)->unmap(start, end, mask, mirror, ROW_READ, false)
 #define memory_nop_read(space, start, end, mask, mirror) \
-	const_cast<address_space *>(space)->unmap(start, end, mask, mirror, ROW_READ, true)
+	(space)->unmap(start, end, mask, mirror, ROW_READ, true)
 
 // wrappers for dynamic write handler installation
 #define memory_install_write8_handler(space, start, end, mask, mirror, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, whandler, #whandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, whandler, #whandler)
 #define memory_install_write16_handler(space, start, end, mask, mirror, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, whandler, #whandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, whandler, #whandler)
 #define memory_install_write32_handler(space, start, end, mask, mirror, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, whandler, #whandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, whandler, #whandler)
 #define memory_install_write64_handler(space, start, end, mask, mirror, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, whandler, #whandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, whandler, #whandler)
 
 #define memory_install_write8_device_handler(space, device, start, end, mask, mirror, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler)
 #define memory_install_write16_device_handler(space, device, start, end, mask, mirror, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler)
 #define memory_install_write32_device_handler(space, device, start, end, mask, mirror, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler)
 #define memory_install_write64_device_handler(space, device, start, end, mask, mirror, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, whandler, #whandler)
 
 #define memory_install_write_port(space, start, end, mask, mirror, wtag) \
-	const_cast<address_space *>(space)->install_port(start, end, mask, mirror, NULL, wtag)
+	(space)->install_port(start, end, mask, mirror, NULL, wtag)
 #define memory_install_write_bank(space, start, end, mask, mirror, wtag) \
-	const_cast<address_space *>(space)->install_bank(start, end, mask, mirror, NULL, wtag)
+	(space)->install_bank(start, end, mask, mirror, NULL, wtag)
 #define memory_install_writeonly(space, start, end, mask, mirror, baseptr) \
-	const_cast<address_space *>(space)->install_ram(start, end, mask, mirror, ROW_WRITE, baseptr)
+	(space)->install_ram(start, end, mask, mirror, ROW_WRITE, baseptr)
 #define memory_unmap_write(space, start, end, mask, mirror) \
-	const_cast<address_space *>(space)->unmap(start, end, mask, mirror, ROW_WRITE, false)
+	(space)->unmap(start, end, mask, mirror, ROW_WRITE, false)
 #define memory_nop_write(space, start, end, mask, mirror) \
-	const_cast<address_space *>(space)->unmap(start, end, mask, mirror, ROW_WRITE, true)
+	(space)->unmap(start, end, mask, mirror, ROW_WRITE, true)
 
 // wrappers for dynamic read/write handler installation
 #define memory_install_readwrite8_handler(space, start, end, mask, mirror, rhandler, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
 #define memory_install_readwrite16_handler(space, start, end, mask, mirror, rhandler, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
 #define memory_install_readwrite32_handler(space, start, end, mask, mirror, rhandler, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
 #define memory_install_readwrite64_handler(space, start, end, mask, mirror, rhandler, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
+	(space)->install_legacy_handler(start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
 
 #define memory_install_readwrite8_device_handler(space, device, start, end, mask, mirror, rhandler, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
 #define memory_install_readwrite16_device_handler(space, device, start, end, mask, mirror, rhandler, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
 #define memory_install_readwrite32_device_handler(space, device, start, end, mask, mirror, rhandler, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
 #define memory_install_readwrite64_device_handler(space, device, start, end, mask, mirror, rhandler, whandler) \
-	const_cast<address_space *>(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
+	(space)->install_legacy_handler(*(device), start, end, mask, mirror, rhandler, #rhandler, whandler, #whandler)
 
 #define memory_install_readwrite_port(space, start, end, mask, mirror, rtag, wtag) \
-	const_cast<address_space *>(space)->install_port(start, end, mask, mirror, rtag, wtag)
+	(space)->install_port(start, end, mask, mirror, rtag, wtag)
 #define memory_install_readwrite_bank(space, start, end, mask, mirror, tag) \
-	const_cast<address_space *>(space)->install_bank(start, end, mask, mirror, tag, tag)
+	(space)->install_bank(start, end, mask, mirror, tag, tag)
 #define memory_install_ram(space, start, end, mask, mirror, baseptr) \
-	const_cast<address_space *>(space)->install_ram(start, end, mask, mirror, ROW_READWRITE, baseptr)
+	(space)->install_ram(start, end, mask, mirror, ROW_READWRITE, baseptr)
 #define memory_unmap_readwrite(space, start, end, mask, mirror) \
-	const_cast<address_space *>(space)->unmap(start, end, mask, mirror, ROW_READWRITE, false)
+	(space)->unmap(start, end, mask, mirror, ROW_READWRITE, false)
 #define memory_nop_readwrite(space, start, end, mask, mirror) \
-	const_cast<address_space *>(space)->unmap(start, end, mask, mirror, ROW_READWRITE, true)
+	(space)->unmap(start, end, mask, mirror, ROW_READWRITE, true)
 
 
 
