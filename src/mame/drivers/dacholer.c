@@ -606,5 +606,5 @@ ROM_START( kickboy )
 	ROM_LOAD( "k.13d", 0x0000, 0x0020, CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) )
 ROM_END
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_SUPPORTS_SAVE )
