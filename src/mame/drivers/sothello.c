@@ -42,6 +42,19 @@ OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 #include "video/v9938.h"
 #include "deprecat.h"
 
+
+class sothello_state : public driver_device
+{
+public:
+	sothello_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int subcpu_status;
+	int soundcpu_busy;
+	int msm_data;
+};
+
+
 #define VDP_MEM             0x40000
 
 #define MAINCPU_CLOCK       (XTAL_21_477MHz/6)
@@ -50,10 +63,6 @@ OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 #define MSM_CLOCK           (XTAL_384kHz)
 #define SUBCPU_CLOCK        (XTAL_8MHz/4)
 
-
-static int subcpu_status=0;
-static int soundcpu_busy=0;
-static int msm_data = 0;
 
 /* main Z80 */
 
@@ -84,27 +93,31 @@ static TIMER_CALLBACK( subcpu_resume )
 
 static READ8_HANDLER( subcpu_halt_set )
 {
+	sothello_state *state = space->machine->driver_data<sothello_state>();
     space->machine->scheduler().synchronize(FUNC(subcpu_suspend));
-    subcpu_status|=2;
+    state->subcpu_status|=2;
     return 0;
 }
 
 static READ8_HANDLER( subcpu_halt_clear )
 {
+	sothello_state *state = space->machine->driver_data<sothello_state>();
     space->machine->scheduler().synchronize(FUNC(subcpu_resume));
-    subcpu_status&=~1;
-    subcpu_status&=~2;
+    state->subcpu_status&=~1;
+    state->subcpu_status&=~2;
     return 0;
 }
 
 static READ8_HANDLER(subcpu_comm_status )
 {
-    return subcpu_status;
+	sothello_state *state = space->machine->driver_data<sothello_state>();
+    return state->subcpu_status;
 }
 
 static READ8_HANDLER( soundcpu_status_r )
 {
-    return soundcpu_busy;
+	sothello_state *state = space->machine->driver_data<sothello_state>();
+    return state->soundcpu_busy;
 }
 
 static ADDRESS_MAP_START( maincpu_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -149,18 +162,21 @@ static WRITE8_DEVICE_HANDLER(msm_cfg_w)
 
 static WRITE8_HANDLER( msm_data_w )
 {
-    msm_data = data;
+	sothello_state *state = space->machine->driver_data<sothello_state>();
+    state->msm_data = data;
 
 }
 
 static WRITE8_HANDLER(soundcpu_busyflag_set_w)
 {
-    soundcpu_busy=1;
+	sothello_state *state = space->machine->driver_data<sothello_state>();
+    state->soundcpu_busy=1;
 }
 
 static WRITE8_HANDLER(soundcpu_busyflag_reset_w)
 {
-    soundcpu_busy=0;
+	sothello_state *state = space->machine->driver_data<sothello_state>();
+    state->soundcpu_busy=0;
 }
 
 static WRITE8_HANDLER(soundcpu_int_clear_w)
@@ -187,9 +203,10 @@ ADDRESS_MAP_END
 
 static void unlock_shared_ram(address_space *space)
 {
+	sothello_state *state = space->machine->driver_data<sothello_state>();
     if(!space->machine->device<cpu_device>("sub")->suspended(SUSPEND_REASON_HALT))
     {
-        subcpu_status|=1;
+        state->subcpu_status|=1;
     }
     else
     {
@@ -307,8 +324,9 @@ static INTERRUPT_GEN( sothello_interrupt )
 
 static void adpcm_int(device_t *device)
 {
+	sothello_state *state = device->machine->driver_data<sothello_state>();
     /* only 4 bits are used */
-    msm5205_data_w( device, msm_data & 0x0f );
+    msm5205_data_w( device, state->msm_data & 0x0f );
     cputag_set_input_line(device->machine, "soundcpu", 0, ASSERT_LINE );
 }
 
@@ -344,7 +362,7 @@ static const ym2203_interface ym2203_config =
     irqhandler
 };
 
-static MACHINE_CONFIG_START( sothello, driver_device )
+static MACHINE_CONFIG_START( sothello, sothello_state )
 
     /* basic machine hardware */
 

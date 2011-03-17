@@ -25,14 +25,23 @@
 #include "sound/2610intf.h"
 #include "machine/pd4990a.h"
 
-static UINT16* npvidram;
-static UINT16* npvidregs;
-static UINT8 audio_result;
-static UINT8 bank_val;
+
+class neoprint_state : public driver_device
+{
+public:
+	neoprint_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16* npvidram;
+	UINT16* npvidregs;
+	UINT8 audio_result;
+	UINT8 bank_val;
+	UINT8 vblank;
+};
+
 
 VIDEO_START(neoprint)
 {
-
 }
 
 /*
@@ -46,13 +55,14 @@ xxxx xxxx xxxx xxxx [2] scroll Y, signed
 
 static void draw_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer,int data_shift)
 {
+	neoprint_state *state = machine->driver_data<neoprint_state>();
 	int i, y, x;
 	const gfx_element *gfx = machine->gfx[0];
 	INT16 scrollx, scrolly;
 
-	i = (npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
-	scrollx = ((npvidregs[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
-	scrolly = ((npvidregs[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
+	i = (state->npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
+	scrollx = ((state->npvidregs[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
+	scrolly = ((state->npvidregs[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
 
 	scrollx/=2;
 	scrolly/=2;
@@ -61,14 +71,14 @@ static void draw_layer(running_machine *machine, bitmap_t *bitmap,const rectangl
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = npvidram[i*2] >> data_shift; // a video register?
+			UINT16 dat = state->npvidram[i*2] >> data_shift; // a video register?
 			UINT16 color;
-			if(npvidram[i*2+1] & 0x0020) // TODO: 8bpp switch?
-				color = ((npvidram[i*2+1] & 0x8000) << 1) | 0x200 | ((npvidram[i*2+1] & 0xff00) >> 7);
+			if(state->npvidram[i*2+1] & 0x0020) // TODO: 8bpp switch?
+				color = ((state->npvidram[i*2+1] & 0x8000) << 1) | 0x200 | ((state->npvidram[i*2+1] & 0xff00) >> 7);
 			else
-				color = ((npvidram[i*2+1] & 0xff00) >> 8) | ((npvidram[i*2+1] & 0x0010) << 4);
-			UINT8 fx = (npvidram[i*2+1] & 0x0040);
-			UINT8 fy = (npvidram[i*2+1] & 0x0080);
+				color = ((state->npvidram[i*2+1] & 0xff00) >> 8) | ((state->npvidram[i*2+1] & 0x0010) << 4);
+			UINT8 fx = (state->npvidram[i*2+1] & 0x0040);
+			UINT8 fy = (state->npvidram[i*2+1] & 0x0080);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
 			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
@@ -118,23 +128,24 @@ static WRITE16_HANDLER( neoprint_calendar_w )
 
 static READ8_HANDLER( neoprint_unk_r )
 {
-	static UINT8 vblank;
+	neoprint_state *state = space->machine->driver_data<neoprint_state>();
 
 	/* ---x ---- tested in irq routine, odd/even field number? */
 	/* ---- xx-- one of these two must be high */
 	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
 
-	vblank = (space->machine->primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
+	state->vblank = (space->machine->primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
 	//if(cpu_get_pc(space->cpu) != 0x1504 && cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
 	//  printf("%08x\n",cpu_get_pc(space->cpu));
 
-	return vblank| 4 | 3;
+	return state->vblank| 4 | 3;
 }
 
 static READ16_HANDLER( neoprint_audio_result_r )
 {
-	return (audio_result << 8) | 0x00;
+	neoprint_state *state = space->machine->driver_data<neoprint_state>();
+	return (state->audio_result << 8) | 0x00;
 }
 
 static void audio_cpu_assert_nmi(running_machine *machine)
@@ -181,11 +192,12 @@ static READ8_HANDLER( audio_command_r )
 
 static WRITE8_HANDLER( audio_result_w )
 {
+	neoprint_state *state = space->machine->driver_data<neoprint_state>();
 	//neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
 	//if (LOG_CPU_COMM && (state->audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(space->cpu), data);
 
-	audio_result = data;
+	state->audio_result = data;
 }
 
 static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -193,7 +205,7 @@ static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&npvidram)
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE_MEMBER(neoprint_state, npvidram)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
@@ -204,7 +216,7 @@ static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x60000c, 0x60000d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x60000e, 0x60000f) AM_WRITENOP
 
-	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_BASE(&npvidregs)
+	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_BASE_MEMBER(neoprint_state, npvidregs)
 
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
 ADDRESS_MAP_END
@@ -238,22 +250,24 @@ static WRITE16_HANDLER( nprsp_palette_w )
 
 static WRITE8_HANDLER( nprsp_bank_w )
 {
+	neoprint_state *state = space->machine->driver_data<neoprint_state>();
 	/* this register seems flip-flop based ... */
 
 	if((data & 0xf0) == 0x20)
 	{
 		if((data & 0xf) == 0x1)
-			bank_val = 1;
+			state->bank_val = 1;
 		if((data & 0xf) == 0x2)
-			bank_val = 0;
+			state->bank_val = 0;
 	}
 }
 
 static READ16_HANDLER( rom_window_r )
 {
+	neoprint_state *state = space->machine->driver_data<neoprint_state>();
 	UINT16 *rom = (UINT16 *)space->machine->region("maincpu")->base();
 
-	return rom[offset | 0x80000/2 | bank_val*0x40000/2];
+	return rom[offset | 0x80000/2 | state->bank_val*0x40000/2];
 }
 
 static ADDRESS_MAP_START( nprsp_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -268,12 +282,12 @@ static ADDRESS_MAP_START( nprsp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITENOP
 
-	AM_RANGE(0x240000, 0x24001b) AM_RAM AM_BASE(&npvidregs)
+	AM_RANGE(0x240000, 0x24001b) AM_RAM AM_BASE_MEMBER(neoprint_state, npvidregs)
 	AM_RANGE(0x24001e, 0x24001f) AM_WRITENOP //watchdog
 
 	AM_RANGE(0x300000, 0x33ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&npvidram)
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE_MEMBER(neoprint_state, npvidram)
 	AM_RANGE(0x500000, 0x57ffff) AM_RAM_WRITE(nprsp_palette_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
@@ -421,13 +435,6 @@ static GFXDECODE_START( neoprint )
 	GFXDECODE_ENTRY( "gfx1", 0, neoprint_layout,   0x0, 0x1000 )
 GFXDECODE_END
 
-class neoprint_state : public driver_device
-{
-public:
-	neoprint_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
-};
-
 static void audio_cpu_irq(device_t *device, int assert)
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, assert ? ASSERT_LINE : CLEAR_LINE);
@@ -478,7 +485,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_RESET( nprsp )
 {
-	bank_val = 0;
+	neoprint_state *state = machine->driver_data<neoprint_state>();
+	state->bank_val = 0;
 }
 
 static MACHINE_CONFIG_START( nprsp, neoprint_state )

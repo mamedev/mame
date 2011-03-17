@@ -26,8 +26,28 @@ TODO:
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 
-static UINT32 *vga_vram;
-static UINT8 vga_regs[0x19];
+
+class photoply_state : public driver_device
+{
+public:
+	photoply_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *vga_vram;
+	UINT8 vga_regs[0x19];
+	int dma_channel;
+	UINT8 dma_offset[2][4];
+	UINT8 at_pages[0x10];
+	UINT8 vga_address;
+	struct { int r,g,b,offs,offs_internal; } pal;
+
+	device_t	*pit8253;
+	device_t	*pic8259_1;
+	device_t	*pic8259_2;
+	device_t	*dma8237_1;
+	device_t	*dma8237_2;
+};
+
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
@@ -48,7 +68,8 @@ static VIDEO_START(photoply)
 
 static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs,UINT8 gfx_num)
 {
-	static UINT32 offs,x,y,max_x,max_y;
+	photoply_state *state = machine->driver_data<photoply_state>();
+	UINT32 offs,x,y,max_x,max_y;
 	int tile,color;
 
 	/*define the visible area*/
@@ -64,6 +85,8 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 			max_x = 80;
 			max_y = 25;
 			break;
+		default:
+			fatalerror("Unknown size");
 	}
 
 	offs = map_offs;
@@ -71,8 +94,8 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 	for(y=0;y<max_y;y++)
 		for(x=0;x<max_x;x+=2)
 		{
-			tile =  (vga_vram[offs] & 0x00ff0000)>>16;
-			color = (vga_vram[offs] & 0xff000000)>>24;
+			tile =  (state->vga_vram[offs] & 0x00ff0000)>>16;
+			color = (state->vga_vram[offs] & 0xff000000)>>24;
 
 			drawgfx_opaque(bitmap,cliprect,machine->gfx[gfx_num],
 					tile,
@@ -81,8 +104,8 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 					(x+1)*8,y*8);
 
 
-			tile =  (vga_vram[offs] & 0x000000ff);
-			color = (vga_vram[offs] & 0x0000ff00)>>8;
+			tile =  (state->vga_vram[offs] & 0x000000ff);
+			color = (state->vga_vram[offs] & 0x0000ff00)>>8;
 
 			drawgfx_opaque(bitmap,cliprect,machine->gfx[gfx_num],
 					tile,
@@ -102,21 +125,10 @@ static SCREEN_UPDATE(photoply)
 	return 0;
 }
 
-static struct {
-	device_t	*pit8253;
-	device_t	*pic8259_1;
-	device_t	*pic8259_2;
-	device_t	*dma8237_1;
-	device_t	*dma8237_2;
-} photoply_devices;
-
 /******************
 DMA8237 Controller
 ******************/
 
-static int dma_channel;
-static UINT8 dma_offset[2][4];
-static UINT8 at_pages[0x10];
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
@@ -129,7 +141,8 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	photoply_state *state = space->machine->driver_data<photoply_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	return space->read_byte(page_offset + offset);
@@ -138,7 +151,8 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	photoply_state *state = space->machine->driver_data<photoply_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	space->write_byte(page_offset + offset, data);
@@ -146,21 +160,22 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static READ8_HANDLER(dma_page_select_r)
 {
-	UINT8 data = at_pages[offset % 0x10];
+	photoply_state *state = space->machine->driver_data<photoply_state>();
+	UINT8 data = state->at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
 	case 1:
-		data = dma_offset[(offset / 8) & 1][2];
+		data = state->dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = dma_offset[(offset / 8) & 1][3];
+		data = state->dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = dma_offset[(offset / 8) & 1][1];
+		data = state->dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = dma_offset[(offset / 8) & 1][0];
+		data = state->dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
@@ -169,28 +184,30 @@ static READ8_HANDLER(dma_page_select_r)
 
 static WRITE8_HANDLER(dma_page_select_w)
 {
-	at_pages[offset % 0x10] = data;
+	photoply_state *state = space->machine->driver_data<photoply_state>();
+	state->at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
 	{
 	case 1:
-		dma_offset[(offset / 8) & 1][2] = data;
+		state->dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		dma_offset[(offset / 8) & 1][3] = data;
+		state->dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		dma_offset[(offset / 8) & 1][1] = data;
+		state->dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		dma_offset[(offset / 8) & 1][0] = data;
+		state->dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
 
 static void set_dma_channel(device_t *device, int channel, int state)
 {
-	if (!state) dma_channel = channel;
+	photoply_state *drvstate = device->machine->driver_data<photoply_state>();
+	if (!state) drvstate->dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
@@ -242,20 +259,22 @@ static const struct pic8259_interface pic8259_2_config =
 
 static IRQ_CALLBACK(irq_callback)
 {
+	photoply_state *state = device->machine->driver_data<photoply_state>();
 	int r = 0;
-	r = pic8259_acknowledge(photoply_devices.pic8259_2);
+	r = pic8259_acknowledge(state->pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge(photoply_devices.pic8259_1);
+		r = pic8259_acknowledge(state->pic8259_1);
 	}
 	return r;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
 {
-	if ( photoply_devices.pic8259_1 )
+	photoply_state *drvstate = device->machine->driver_data<photoply_state>();
+	if ( drvstate->pic8259_1 )
 	{
-		pic8259_ir0_w(photoply_devices.pic8259_1, state);
+		pic8259_ir0_w(drvstate->pic8259_1, state);
 	}
 }
 
@@ -287,7 +306,7 @@ static const struct pit8253_config at_pit8254_config =
 
 static ADDRESS_MAP_START( photoply_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
-	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE(&vga_vram)
+	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM AM_BASE_MEMBER(photoply_state, vga_vram)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0) //???
 	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM AM_REGION("ex_bios", 0)
@@ -303,32 +322,31 @@ static READ32_HANDLER( kludge_r )
 /* 3c8-3c9 -> ramdac*/
 static WRITE32_HANDLER( vga_ramdac_w )
 {
-	static int pal_offs,r,g,b,internal_pal_offs;
-
+	photoply_state *state = space->machine->driver_data<photoply_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		//printf("%02x X\n",data);
-		pal_offs = internal_pal_offs = data;
+		state->pal.offs = state->pal.offs_internal = data;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
 		//printf("%02x\n",data);
 		data>>=8;
-		switch(internal_pal_offs)
+		switch(state->pal.offs_internal)
 		{
 			case 0:
-				r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				internal_pal_offs++;
+				state->pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				state->pal.offs_internal++;
 				break;
 			case 1:
-				g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				internal_pal_offs++;
+				state->pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				state->pal.offs_internal++;
 				break;
 			case 2:
-				b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(space->machine, 0x200+pal_offs, MAKE_RGB(r, g, b));
-				internal_pal_offs = 0;
-				pal_offs++;
+				state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				palette_set_color(space->machine, 0x200+state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+				state->pal.offs_internal = 0;
+				state->pal.offs++;
 				break;
 		}
 	}
@@ -336,19 +354,19 @@ static WRITE32_HANDLER( vga_ramdac_w )
 
 static WRITE32_HANDLER( vga_regs_w )
 {
-	static UINT8 vga_address;
+	photoply_state *state = space->machine->driver_data<photoply_state>();
 
 	if (ACCESSING_BITS_0_7)
-		vga_address = data;
+		state->vga_address = data;
 	if (ACCESSING_BITS_8_15)
 	{
-		if(vga_address < 0x19)
+		if(state->vga_address < 0x19)
 		{
-			vga_regs[vga_address] = data>>8;
-			logerror("VGA reg %02x with data %02x\n",vga_address,vga_regs[vga_address]);
+			state->vga_regs[state->vga_address] = data>>8;
+			logerror("VGA reg %02x with data %02x\n",state->vga_address,state->vga_regs[state->vga_address]);
 		}
 		else
-			logerror("Warning: used undefined VGA reg %02x with data %02x\n",vga_address,data>>8);
+			logerror("Warning: used undefined VGA reg %02x with data %02x\n",state->vga_address,data>>8);
 	}
 }
 
@@ -458,21 +476,23 @@ static PALETTE_INIT(pcat_286)
 
 static void photoply_set_keyb_int(running_machine *machine, int state)
 {
-	pic8259_ir1_w(photoply_devices.pic8259_1, state);
+	photoply_state *drvstate = machine->driver_data<photoply_state>();
+	pic8259_ir1_w(drvstate->pic8259_1, state);
 }
 
 
 static MACHINE_START( photoply )
 {
+	photoply_state *state = machine->driver_data<photoply_state>();
 //  bank = -1;
 //  lastvalue = -1;
 //  hv_blank = 0;
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
-	photoply_devices.pit8253 = machine->device( "pit8254" );
-	photoply_devices.pic8259_1 = machine->device( "pic8259_1" );
-	photoply_devices.pic8259_2 = machine->device( "pic8259_2" );
-	photoply_devices.dma8237_1 = machine->device( "dma8237_1" );
-	photoply_devices.dma8237_2 = machine->device( "dma8237_2" );
+	state->pit8253 = machine->device( "pit8254" );
+	state->pic8259_1 = machine->device( "pic8259_1" );
+	state->pic8259_2 = machine->device( "pic8259_2" );
+	state->dma8237_1 = machine->device( "dma8237_1" );
+	state->dma8237_2 = machine->device( "dma8237_2" );
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, photoply_set_keyb_int);
 }
@@ -494,7 +514,7 @@ static GFXDECODE_START( photoply )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( photoply, driver_device )
+static MACHINE_CONFIG_START( photoply, photoply_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 75000000)	/* I486DX4, 75 or 100 Mhz */
 	MCFG_CPU_PROGRAM_MAP(photoply_map)

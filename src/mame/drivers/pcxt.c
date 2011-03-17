@@ -70,6 +70,41 @@ the main program is 9th October 1990.
 #include "sound/hc55516.h"
 #include "sound/beep.h"
 
+
+class pcxt_state : public driver_device
+{
+public:
+	pcxt_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *vga_vram;
+	UINT8 *work_ram;
+	UINT8 video_regs[0x19];
+	UINT8 *vga_mode;
+	UINT8 hv_blank;
+	UINT8 *vga_bg_bank;
+	int bank;
+	int lastvalue;
+	UINT8 video_index;
+	UINT8 disk_data[2];
+	UINT8 port_b_data;
+	UINT8 wss1_data;
+	UINT8 wss2_data;
+	UINT8 status;
+	UINT8 clr_status;
+	UINT8 drive_data;
+	int dma_channel;
+	UINT8 dma_offset[2][4];
+	UINT8 at_pages[0x10];
+
+	device_t	*pit8253;
+	device_t	*pic8259_1;
+	device_t	*pic8259_2;
+	device_t	*dma8237_1;
+	device_t	*dma8237_2;
+};
+
+
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
 	rectangle visarea; \
@@ -80,15 +115,6 @@ the main program is 9th October 1990.
 	machine->primary_screen->configure(_x_, _y_, visarea, machine->primary_screen->frame_period().attoseconds ); \
 	} \
 
-
-static UINT8 *vga_vram,*work_ram;
-static UINT8 video_regs[0x19];
-static UINT8 *vga_mode;
-static UINT8 hv_blank;
-static UINT8 *vga_bg_bank;
-
-static int bank;
-static int lastvalue;
 
 /*Add here Video regs defines...*/
 
@@ -113,8 +139,8 @@ static READ8_HANDLER( vga_hvretrace_r )
     ---- x--- Vertical Retrace
     ---- ---x Horizontal Retrace
     */
-	static UINT8 res;
-	static int h,w;
+	UINT8 res;
+	int h,w;
 	res = 0;
 	h = space->machine->primary_screen->height();
 	w = space->machine->primary_screen->width();
@@ -134,18 +160,19 @@ static READ8_HANDLER( vga_hvretrace_r )
 /*TODO: non-black colours should use the bright versions*/
 static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
 {
-	static UINT16 x,y;
-	static UINT32 offs;
+	pcxt_state *state = machine->driver_data<pcxt_state>();
+	UINT16 x,y;
+	UINT32 offs;
 
 	SET_VISIBLE_AREA(320,200);
 	offs = map_offs;
 	for(y=0;y<200;y+=2)
 		for(x=0;x<320;x+=4)
 		{
-			*BITMAP_ADDR16(bitmap, y, x+0) = machine->pens[0x200+(((vga_vram[offs] & 0xc0)>>6)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+1) = machine->pens[0x200+(((vga_vram[offs] & 0x30)>>4)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+2) = machine->pens[0x200+(((vga_vram[offs] & 0x0c)>>2)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+3) = machine->pens[0x200+(((vga_vram[offs] & 0x03)>>0)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+0) = machine->pens[0x200+(((state->vga_vram[offs] & 0xc0)>>6)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+1) = machine->pens[0x200+(((state->vga_vram[offs] & 0x30)>>4)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+2) = machine->pens[0x200+(((state->vga_vram[offs] & 0x0c)>>2)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+3) = machine->pens[0x200+(((state->vga_vram[offs] & 0x03)>>0)<<1)];
 			offs++;
 		}
 
@@ -153,10 +180,10 @@ static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const r
 	for(y=1;y<200;y+=2)
 		for(x=0;x<320;x+=4)
 		{
-			*BITMAP_ADDR16(bitmap, y, x+0) = machine->pens[0x200+(((vga_vram[offs] & 0xc0)>>6)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+1) = machine->pens[0x200+(((vga_vram[offs] & 0x30)>>4)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+2) = machine->pens[0x200+(((vga_vram[offs] & 0x0c)>>2)<<1)];
-			*BITMAP_ADDR16(bitmap, y, x+3) = machine->pens[0x200+(((vga_vram[offs] & 0x03)>>0)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+0) = machine->pens[0x200+(((state->vga_vram[offs] & 0xc0)>>6)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+1) = machine->pens[0x200+(((state->vga_vram[offs] & 0x30)>>4)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+2) = machine->pens[0x200+(((state->vga_vram[offs] & 0x0c)>>2)<<1)];
+			*BITMAP_ADDR16(bitmap, y, x+3) = machine->pens[0x200+(((state->vga_vram[offs] & 0x03)>>0)<<1)];
 			offs++;
 		}
 
@@ -166,7 +193,8 @@ static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const r
 
 static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs,UINT8 gfx_num)
 {
-	static UINT32 offs,x,y,max_x,max_y;
+	pcxt_state *state = machine->driver_data<pcxt_state>();
+	UINT32 offs,x,y,max_x,max_y;
 
 	/*define the visible area*/
 	switch(size)
@@ -181,6 +209,8 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 			max_x = 80;
 			max_y = 25;
 			break;
+		default:
+			fatalerror("Unknown size");
 	}
 
 	offs = map_offs;
@@ -188,8 +218,8 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 	for(y=0;y<max_y;y++)
 		for(x=0;x<max_x;x++)
 		{
-			int tile =  vga_vram[offs] & 0xff;
-			int color = vga_vram[offs+1] & 0xff;
+			int tile =  state->vga_vram[offs] & 0xff;
+			int color = state->vga_vram[offs+1] & 0xff;
 
 			drawgfx_transpen(bitmap,cliprect,machine->gfx[gfx_num],
 					tile,
@@ -205,6 +235,7 @@ static void cga_alphanumeric_tilemap(running_machine *machine, bitmap_t *bitmap,
 
 static SCREEN_UPDATE( filetto )
 {
+	pcxt_state *state = screen->machine->driver_data<pcxt_state>();
 /*          xx1x xxxx  Attribute bit 7. 0=blink, 1=Intesity
             xxx1 xxxx  640x200 mode
             xxxx 1xxx  Enable video signal
@@ -214,13 +245,13 @@ static SCREEN_UPDATE( filetto )
             */
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if(vga_mode[0] & 8)
+	if(state->vga_mode[0] & 8)
 	{
-		if(vga_mode[0] & 2)
+		if(state->vga_mode[0] & 2)
 			cga_graphic_bitmap(screen->machine,bitmap,cliprect,0,0x18000);
 		else
 		{
-			switch(vga_mode[0] & 1)
+			switch(state->vga_mode[0] & 1)
 			{
 				case 0x00:
 					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_320x200,0x18000,2);
@@ -237,12 +268,13 @@ static SCREEN_UPDATE( filetto )
 
 static void vga_bitmap_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
+	pcxt_state *state = machine->driver_data<pcxt_state>();
 	int x,y,z;
 	UINT8 *region = machine->region("user1")->base();
-	static UINT32 cur_bank;
+	UINT32 cur_bank;
 
 	/*TODO: might be a different descramble algorythm plus plain bg bank*/
-	cur_bank = (((8-vga_bg_bank[0]) & 0x1f)*0x10000);
+	cur_bank = (((8-state->vga_bg_bank[0]) & 0x1f)*0x10000);
 
 	for(y=0;y<200;y+=8)
 	{
@@ -257,17 +289,18 @@ static void vga_bitmap_layer(running_machine *machine, bitmap_t *bitmap,const re
 /*S3 Video card,VGA*/
 static SCREEN_UPDATE( tetriskr )
 {
+	pcxt_state *state = screen->machine->driver_data<pcxt_state>();
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if(vga_mode[0] & 8)
+	if(state->vga_mode[0] & 8)
 	{
-		if(vga_mode[0] & 2)
+		if(state->vga_mode[0] & 2)
 			cga_graphic_bitmap(screen->machine,bitmap,cliprect,0,0x18000);
 		else
 		{
 			vga_bitmap_layer(screen->machine,bitmap,cliprect);
 
-			switch(vga_mode[0] & 1)
+			switch(state->vga_mode[0] & 1)
 			{
 				case 0x00:
 					cga_alphanumeric_tilemap(screen->machine,bitmap,cliprect,RES_320x200,0x18000,0);
@@ -290,53 +323,48 @@ static READ8_HANDLER( vga_regs_r )
 
 static WRITE8_HANDLER( vga_regs_w )
 {
-	static UINT8 video_index;
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
 
 	if(offset == 0)
 	{
-		video_index = data;
+		state->video_index = data;
 	}
 	if(offset == 1)
 	{
-		if(video_index <= 0x18)
+		if(state->video_index <= 0x18)
 		{
-			video_regs[video_index] = data;
-			//logerror("write %02x to video register [%02x]",data,video_index);
+			state->video_regs[state->video_index] = data;
+			//logerror("write %02x to video register [%02x]",data,state->video_index);
 		}
 		else
-			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",cpu_get_pc(space->cpu),video_index,data);
+			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",cpu_get_pc(space->cpu),state->video_index,data);
 	}
 }
 
 static WRITE8_HANDLER( vga_vram_w )
 {
-	vga_vram[offset] = data;
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	state->vga_vram[offset] = data;
 }
 
 /*end of Video HW file*/
 
-static struct {
-	device_t	*pit8253;
-	device_t	*pic8259_1;
-	device_t	*pic8259_2;
-	device_t	*dma8237_1;
-	device_t	*dma8237_2;
-} filetto_devices;
 
 
-static UINT8 disk_data[2];
 
 static READ8_HANDLER( disk_iobank_r )
 {
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
 	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(space->cpu));
 	//if(offset == 0) return input_port_read(space->machine, "DSW");
 	if(offset == 1) return input_port_read(space->machine, "IN1");
 
-	return disk_data[offset];
+	return state->disk_data[offset];
 }
 
 static WRITE8_HANDLER( disk_iobank_w )
 {
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
 /*
     BIOS does a single out $0310,$F0 on reset
 
@@ -367,27 +395,27 @@ static WRITE8_HANDLER( disk_iobank_w )
 	}
 	else
 	{
-		if((lastvalue == 0xF0) && (data == 0xF2))
+		if((state->lastvalue == 0xF0) && (data == 0xF2))
 			newbank = 0;
-		else if ((lastvalue == 0xF1) && (data == 0xF2))
+		else if ((state->lastvalue == 0xF1) && (data == 0xF2))
 			newbank = 1;
-		else if ((lastvalue == 0xF0) && (data == 0xF3))
+		else if ((state->lastvalue == 0xF0) && (data == 0xF3))
 			newbank = 2;
-		else if ((lastvalue == 0xF1) && (data == 0xF3))
+		else if ((state->lastvalue == 0xF1) && (data == 0xF3))
 			newbank = 3;
 	}
 
 //  printf("newbank = %d\n", newbank);
 
-	if (newbank != bank)
+	if (newbank != state->bank)
 	{
-		bank = newbank;
-		memory_set_bankptr(space->machine,  "bank1",space->machine->region("user1")->base() + 0x10000 * bank );
+		state->bank = newbank;
+		memory_set_bankptr(space->machine,  "bank1",space->machine->region("user1")->base() + 0x10000 * state->bank );
 	}
 
-	lastvalue = data;
+	state->lastvalue = data;
 
-	disk_data[offset] = data;
+	state->disk_data[offset] = data;
 }
 
 /*********************************
@@ -413,12 +441,11 @@ static const struct pit8253_config pc_pit8253_config =
 	}
 };
 
-static UINT8 port_b_data;
-static UINT8 wss1_data,wss2_data;
 
 static READ8_DEVICE_HANDLER( port_a_r )
 {
-	if(!(port_b_data & 0x80))//???
+	pcxt_state *state = device->machine->driver_data<pcxt_state>();
+	if(!(state->port_b_data & 0x80))//???
 	{
 		/*
         x--- ---- Undefined (Always 0)
@@ -428,7 +455,7 @@ static READ8_DEVICE_HANDLER( port_a_r )
         ---- --x- 8087 NDP installed
         ---- ---x Undefined (Always 1)
         */
-		return wss1_data;
+		return state->wss1_data;
 	}
 	else//keyboard emulation
 	{
@@ -440,12 +467,14 @@ static READ8_DEVICE_HANDLER( port_a_r )
 
 static READ8_DEVICE_HANDLER( port_b_r )
 {
-	return port_b_data;
+	pcxt_state *state = device->machine->driver_data<pcxt_state>();
+	return state->port_b_data;
 }
 
 static READ8_DEVICE_HANDLER( port_c_r )
 {
-	return wss2_data;//???
+	pcxt_state *state = device->machine->driver_data<pcxt_state>();
+	return state->wss2_data;//???
 }
 
 /*'buzzer' sound routes here*/
@@ -453,24 +482,27 @@ static READ8_DEVICE_HANDLER( port_c_r )
 /* The Korean Tetris uses it as a regular buzzer,probably the sound is all in there...*/
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
-	port_b_data = data;
+	pcxt_state *state = device->machine->driver_data<pcxt_state>();
+	state->port_b_data = data;
 // device_t *beep = device->machine->device("beep");
 // device_t *cvsd = device->machine->device("cvsd");
 //  hc55516_digit_w(cvsd, data);
 //  popmessage("%02x\n",data);
 //  beep_set_state(beep, 0);
 //  beep_set_state(beep, 1);
-//  beep_set_frequency(beep, port_b_data);
+//  beep_set_frequency(beep, state->port_b_data);
 }
 
 static WRITE8_DEVICE_HANDLER( wss_1_w )
 {
-	wss1_data = data;
+	pcxt_state *state = device->machine->driver_data<pcxt_state>();
+	state->wss1_data = data;
 }
 
 static WRITE8_DEVICE_HANDLER( wss_2_w )
 {
-	wss2_data = data;
+	pcxt_state *state = device->machine->driver_data<pcxt_state>();
+	state->wss2_data = data;
 }
 
 static WRITE8_DEVICE_HANDLER( sys_reset_w )
@@ -501,7 +533,6 @@ static const ppi8255_interface filetto_ppi8255_intf[2] =
 
 /*Floppy Disk Controller 765 device*/
 /*Currently we only emulate it at a point that the BIOS will pass the checks*/
-static UINT8 status;
 
 #define FDC_BUSY 0x10
 #define FDC_WRITE 0x40
@@ -509,45 +540,45 @@ static UINT8 status;
 
 static READ8_HANDLER( fdc765_status_r )
 {
-	static UINT8 tmp,clr_status;
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	UINT8 tmp;
 //  popmessage("Read FDC status @ PC=%05x",cpu_get_pc(space->cpu));
-	tmp = status | 0x80;
-	clr_status++;
-	if(clr_status == 0x10)
+	tmp = state->status | 0x80;
+	state->clr_status++;
+	if(state->clr_status == 0x10)
 	{
-		status = 0;
-		clr_status = 0;
+		state->status = 0;
+		state->clr_status = 0;
 	}
 	return tmp;
 }
 
 static READ8_HANDLER( fdc765_data_r )
 {
-	status = (FDC_READ);
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	state->status = (FDC_READ);
 	return 0xc0;
 }
 
 static WRITE8_HANDLER( fdc765_data_w )
 {
-	status = (FDC_WRITE);
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	state->status = (FDC_WRITE);
 }
 
-static UINT8 drive_data;
 
 static WRITE8_HANDLER( drive_selection_w )
 {
-	drive_data = data;
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	state->drive_data = data;
 	/*write to this area then expects that location [43e] has the bit 7 activated*/
-	work_ram[0x3e] = 0x80;
+	state->work_ram[0x3e] = 0x80;
 }
 
 /******************
 DMA8237 Controller
 ******************/
 
-static int dma_channel;
-static UINT8 dma_offset[2][4];
-static UINT8 at_pages[0x10];
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
@@ -560,7 +591,8 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	return space->read_byte(page_offset + offset);
@@ -569,7 +601,8 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	space->write_byte(page_offset + offset, data);
@@ -577,20 +610,21 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static READ8_HANDLER(dma_page_select_r)
 {
-	UINT8 data = at_pages[offset % 0x10];
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	UINT8 data = state->at_pages[offset % 0x10];
 
 	switch(offset % 8) {
 	case 1:
-		data = dma_offset[(offset / 8) & 1][2];
+		data = state->dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = dma_offset[(offset / 8) & 1][3];
+		data = state->dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = dma_offset[(offset / 8) & 1][1];
+		data = state->dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = dma_offset[(offset / 8) & 1][0];
+		data = state->dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
@@ -599,27 +633,29 @@ static READ8_HANDLER(dma_page_select_r)
 
 static WRITE8_HANDLER(dma_page_select_w)
 {
-	at_pages[offset % 0x10] = data;
+	pcxt_state *state = space->machine->driver_data<pcxt_state>();
+	state->at_pages[offset % 0x10] = data;
 
 	switch(offset % 8) {
 	case 1:
-		dma_offset[(offset / 8) & 1][2] = data;
+		state->dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		dma_offset[(offset / 8) & 1][3] = data;
+		state->dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		dma_offset[(offset / 8) & 1][1] = data;
+		state->dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		dma_offset[(offset / 8) & 1][0] = data;
+		state->dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
 
 static void set_dma_channel(device_t *device, int channel, int state)
 {
-	if (!state) dma_channel = channel;
+	pcxt_state *drvstate = device->machine->driver_data<pcxt_state>();
+	if (!state) drvstate->dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
@@ -659,20 +695,21 @@ static const struct pic8259_interface pic8259_2_config =
 
 static IRQ_CALLBACK(irq_callback)
 {
+	pcxt_state *state = device->machine->driver_data<pcxt_state>();
 	int r = 0;
-	r = pic8259_acknowledge(filetto_devices.pic8259_2);
+	r = pic8259_acknowledge(state->pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge(filetto_devices.pic8259_1);
+		r = pic8259_acknowledge(state->pic8259_1);
 	}
 	return r;
 }
 
 static ADDRESS_MAP_START( filetto_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //irq vectors
-	AM_RANGE(0x00400, 0x007ff) AM_RAM AM_BASE(&work_ram)
+	AM_RANGE(0x00400, 0x007ff) AM_RAM AM_BASE_MEMBER(pcxt_state, work_ram)
 	AM_RANGE(0x00800, 0x9ffff) AM_RAM //work RAM 640KB
-	AM_RANGE(0xa0000, 0xbffff) AM_RAM_WRITE(vga_vram_w) AM_BASE(&vga_vram)//VGA RAM
+	AM_RANGE(0xa0000, 0xbffff) AM_RAM_WRITE(vga_vram_w) AM_BASE_MEMBER(pcxt_state, vga_vram)//VGA RAM
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -697,7 +734,7 @@ static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
 	AM_RANGE(0x03b4, 0x03b5) AM_READWRITE(vga_regs_r,vga_regs_w) //various VGA/CGA/EGA regs
 	AM_RANGE(0x03d4, 0x03d5) AM_READWRITE(vga_regs_r,vga_regs_w) //mirror of above
-	AM_RANGE(0x03d8, 0x03d9) AM_RAM AM_BASE(&vga_mode)
+	AM_RANGE(0x03d8, 0x03d9) AM_RAM AM_BASE_MEMBER(pcxt_state, vga_mode)
 	AM_RANGE(0x03ba, 0x03bb) AM_READ(vga_hvretrace_r)//Controls H-Blank/V-Blank
 	AM_RANGE(0x03da, 0x03db) AM_READ(vga_hvretrace_r)//mirror of above
 	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(drive_selection_w)
@@ -723,14 +760,14 @@ static ADDRESS_MAP_START( tetriskr_io, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
 //  AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
-	AM_RANGE(0x03c0, 0x03c0) AM_RAM AM_BASE(&vga_bg_bank)
+	AM_RANGE(0x03c0, 0x03c0) AM_RAM AM_BASE_MEMBER(pcxt_state, vga_bg_bank)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1")
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
 	AM_RANGE(0x03b4, 0x03b5) AM_READWRITE(vga_regs_r,vga_regs_w) //various VGA/CGA/EGA regs
 	AM_RANGE(0x03d4, 0x03d5) AM_READWRITE(vga_regs_r,vga_regs_w) //mirror of above
-	AM_RANGE(0x03d8, 0x03d9) AM_RAM AM_BASE(&vga_mode)
+	AM_RANGE(0x03d8, 0x03d9) AM_RAM AM_BASE_MEMBER(pcxt_state, vga_mode)
 	AM_RANGE(0x03ba, 0x03bb) AM_READ(vga_hvretrace_r)//Controls H-Blank/V-Blank
 	AM_RANGE(0x03da, 0x03db) AM_READ(vga_hvretrace_r)//mirror of above
 	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(drive_selection_w)
@@ -906,18 +943,19 @@ static PALETTE_INIT(filetto)
 
 static MACHINE_RESET( filetto )
 {
-	bank = -1;
-	lastvalue = -1;
-	hv_blank = 0;
+	pcxt_state *state = machine->driver_data<pcxt_state>();
+	state->bank = -1;
+	state->lastvalue = -1;
+	state->hv_blank = 0;
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
-	filetto_devices.pit8253 = machine->device( "pit8253" );
-	filetto_devices.pic8259_1 = machine->device( "pic8259_1" );
-	filetto_devices.pic8259_2 = machine->device( "pic8259_2" );
-	filetto_devices.dma8237_1 = machine->device( "dma8237_1" );
-	filetto_devices.dma8237_2 = machine->device( "dma8237_2" );
+	state->pit8253 = machine->device( "pit8253" );
+	state->pic8259_1 = machine->device( "pic8259_1" );
+	state->pic8259_2 = machine->device( "pic8259_2" );
+	state->dma8237_1 = machine->device( "dma8237_1" );
+	state->dma8237_2 = machine->device( "dma8237_2" );
 }
 
-static MACHINE_CONFIG_START( filetto, driver_device )
+static MACHINE_CONFIG_START( filetto, pcxt_state )
 	MCFG_CPU_ADD("maincpu", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
@@ -964,7 +1002,7 @@ static MACHINE_CONFIG_START( filetto, driver_device )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tetriskr, driver_device )
+static MACHINE_CONFIG_START( tetriskr, pcxt_state )
 	MCFG_CPU_ADD("maincpu", I8088, 14318180/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(tetriskr_io)

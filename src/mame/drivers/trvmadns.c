@@ -64,13 +64,23 @@ Technology = NMOS
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static tilemap_t *bg_tilemap;
-static UINT8 *trvmadns_gfxram;
-static UINT8 *trvmadns_tileram;
-static int old_data;
+
+class trvmadns_state : public driver_device
+{
+public:
+	trvmadns_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	tilemap_t *bg_tilemap;
+	UINT8 *gfxram;
+	UINT8 *tileram;
+	int old_data;
+};
+
 
 static WRITE8_HANDLER( trvmadns_banking_w )
 {
+	trvmadns_state *state = space->machine->driver_data<trvmadns_state>();
 
 	UINT8 *rom;
 	int address = 0;
@@ -102,9 +112,9 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 	}
 	else
 	{
-			if(data != old_data)
+			if(data != state->old_data)
 			{
-				old_data = data;
+				state->old_data = data;
 				logerror("port80 = %02X\n",data);
 				//logerror("port80 = %02X\n",data);
 			}
@@ -143,7 +153,8 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 static WRITE8_HANDLER( trvmadns_gfxram_w )
 {
-	trvmadns_gfxram[offset] = data;
+	trvmadns_state *state = space->machine->driver_data<trvmadns_state>();
+	state->gfxram[offset] = data;
 	gfx_element_mark_dirty(space->machine->gfx[0], offset/16);
 }
 
@@ -180,6 +191,7 @@ static WRITE8_HANDLER( w3 )
 
 static WRITE8_HANDLER( trvmadns_tileram_w )
 {
+	trvmadns_state *state = space->machine->driver_data<trvmadns_state>();
 	if(offset==0)
 	{
 		if(cpu_get_previouspc(space->cpu)==0x29e9)// || cpu_get_previouspc(space->cpu)==0x1b3f) //29f5
@@ -191,8 +203,8 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 
 	}
 
-	trvmadns_tileram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset >> 1);
+	state->tileram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset >> 1);
 }
 
 
@@ -200,9 +212,9 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE(&trvmadns_gfxram)
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE_MEMBER(trvmadns_state, gfxram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_BASE(&trvmadns_tileram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_BASE_MEMBER(trvmadns_state, tileram)
 	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(trvmadns_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
@@ -244,10 +256,11 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	trvmadns_state *state = machine->driver_data<trvmadns_state>();
 	int tile,attr,color,flag;
 
-	attr = trvmadns_tileram[tile_index*2 + 0];
-	tile = trvmadns_tileram[tile_index*2 + 1] + ((attr & 0x01) << 8);
+	attr = state->tileram[tile_index*2 + 0];
+	tile = state->tileram[tile_index*2 + 1] + ((attr & 0x01) << 8);
 	color = (attr & 0x18) >> 3;
 	flag = TILE_FLIPXY((attr & 0x06) >> 1);
 
@@ -264,15 +277,17 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( trvmadns )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	trvmadns_state *state = machine->driver_data<trvmadns_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
 //  tilemap_set_transparent_pen(fg_tilemap,1);
 
-	gfx_element_set_source(machine->gfx[0], trvmadns_gfxram);
+	gfx_element_set_source(machine->gfx[0], state->gfxram);
 }
 
 static SCREEN_UPDATE( trvmadns )
 {
+	trvmadns_state *state = screen->machine->driver_data<trvmadns_state>();
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
@@ -284,8 +299,8 @@ static SCREEN_UPDATE( trvmadns )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = trvmadns_tileram[count*2+0];
-			int tile = trvmadns_tileram[count*2+1] | ((attr & 0x01) << 8);
+			int attr = state->tileram[count*2+0];
+			int tile = state->tileram[count*2+1] | ((attr & 0x01) << 8);
 			int color = (attr & 0x18) >> 3;
 			int flipx = attr & 4;
 			int flipy = attr & 2;
@@ -302,8 +317,8 @@ static SCREEN_UPDATE( trvmadns )
 	{
 		for (x=0;x<32;x++)
 		{
-			int attr = trvmadns_tileram[count*2+0];
-			int tile = trvmadns_tileram[count*2+1] | ((attr & 0x01) << 8);
+			int attr = state->tileram[count*2+0];
+			int tile = state->tileram[count*2+1] | ((attr & 0x01) << 8);
 			int color = (attr & 0x18) >> 3;
 			int flipx = attr & 4;
 			int flipy = attr & 2;
@@ -319,10 +334,11 @@ static SCREEN_UPDATE( trvmadns )
 
 static MACHINE_RESET( trvmadns )
 {
-	old_data = -1;
+	trvmadns_state *state = machine->driver_data<trvmadns_state>();
+	state->old_data = -1;
 }
 
-static MACHINE_CONFIG_START( trvmadns, driver_device )
+static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
 	MCFG_CPU_ADD("maincpu", Z80,10000000/2) // ?
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)

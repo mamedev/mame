@@ -83,22 +83,17 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	tilemap_t *tilemap;
+	UINT8 *question_offset;
+	UINT8 question_offset_low;
+	UINT8 question_offset_mid;
+	UINT8 question_offset_high;
+	UINT8 latched_coin;
+	UINT8 last_coin;
 };
 
 
 #define MASTER_CLOCK		12440000
-
-
-static tilemap_t *statriv2_tilemap;
-static UINT8 *question_offset;
-
-static UINT8 question_offset_low;
-static UINT8 question_offset_mid;
-static UINT8 question_offset_high;
-
-static UINT8 latched_coin;
-static UINT8 last_coin;
-
 
 
 /*************************************
@@ -148,12 +143,14 @@ static PALETTE_INIT( statriv2 )
 
 static VIDEO_START( horizontal )
 {
-	statriv2_tilemap = tilemap_create(machine, horizontal_tile_info ,tilemap_scan_rows, 8,15, 64,16);
+	statriv2_state *state = machine->driver_data<statriv2_state>();
+	state->tilemap = tilemap_create(machine, horizontal_tile_info ,tilemap_scan_rows, 8,15, 64,16);
 }
 
 static VIDEO_START( vertical )
 {
-	statriv2_tilemap = tilemap_create(machine, vertical_tile_info, tilemap_scan_rows, 8,8, 32,32);
+	statriv2_state *state = machine->driver_data<statriv2_state>();
+	state->tilemap = tilemap_create(machine, vertical_tile_info, tilemap_scan_rows, 8,8, 32,32);
 }
 
 
@@ -169,7 +166,7 @@ static WRITE8_HANDLER( statriv2_videoram_w )
 	statriv2_state *state = space->machine->driver_data<statriv2_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(statriv2_tilemap, offset & 0x3ff);
+	tilemap_mark_tile_dirty(state->tilemap, offset & 0x3ff);
 }
 
 
@@ -182,10 +179,11 @@ static WRITE8_HANDLER( statriv2_videoram_w )
 
 static SCREEN_UPDATE( statriv2 )
 {
+	statriv2_state *state = screen->machine->driver_data<statriv2_state>();
 	if (tms9927_screen_reset(screen->machine->device("tms")))
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	else
-		tilemap_draw(bitmap, cliprect, statriv2_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->tilemap, 0, 0);
 	return 0;
 }
 
@@ -199,11 +197,12 @@ static SCREEN_UPDATE( statriv2 )
 
 static INTERRUPT_GEN( statriv2_interrupt )
 {
+	statriv2_state *state = device->machine->driver_data<statriv2_state>();
 	UINT8 new_coin = input_port_read(device->machine, "COIN");
 
 	/* check the coin inputs once per frame */
-	latched_coin |= new_coin & (new_coin ^ last_coin);
-	last_coin = new_coin;
+	state->latched_coin |= new_coin & (new_coin ^ state->last_coin);
+	state->last_coin = new_coin;
 
 	cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
 	cpu_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
@@ -219,17 +218,18 @@ static INTERRUPT_GEN( statriv2_interrupt )
 
 static READ8_HANDLER( question_data_r )
 {
+	statriv2_state *state = space->machine->driver_data<statriv2_state>();
 	const UINT8 *qrom = space->machine->region("questions")->base();
 	UINT32 qromsize = space->machine->region("questions")->bytes();
 	UINT32 address;
 
-	if (question_offset_high == 0xff)
-		question_offset[question_offset_low]++;
+	if (state->question_offset_high == 0xff)
+		state->question_offset[state->question_offset_low]++;
 
-	address = question_offset[question_offset_low];
-	address |= question_offset[question_offset_mid] << 8;
-	if (question_offset_high != 0xff)
-		address |= question_offset[question_offset_high] << 16;
+	address = state->question_offset[state->question_offset_low];
+	address |= state->question_offset[state->question_offset_mid] << 8;
+	if (state->question_offset_high != 0xff)
+		address |= state->question_offset[state->question_offset_high] << 16;
 
 	return (address < qromsize) ? qrom[address] : 0xff;
 }
@@ -244,15 +244,17 @@ static READ8_HANDLER( question_data_r )
 
 static CUSTOM_INPUT( latched_coin_r )
 {
-	return latched_coin;
+	statriv2_state *state = field->port->machine->driver_data<statriv2_state>();
+	return state->latched_coin;
 }
 
 
 static WRITE8_DEVICE_HANDLER( ppi_portc_hi_w )
 {
+	statriv2_state *state = device->machine->driver_data<statriv2_state>();
 	data >>= 4;
 	if (data != 0x0f)
-		latched_coin = 0;
+		state->latched_coin = 0;
 }
 
 
@@ -295,7 +297,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE(&question_offset)
+	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE_MEMBER(statriv2_state, question_offset)
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_r, tms9927_w)
@@ -1000,33 +1002,37 @@ ROM_END
 /* question address is stored as L/H/X (low/high/don't care) */
 static DRIVER_INIT( addr_lhx )
 {
-	question_offset_low = 0;
-	question_offset_mid = 1;
-	question_offset_high = 0xff;
+	statriv2_state *state = machine->driver_data<statriv2_state>();
+	state->question_offset_low = 0;
+	state->question_offset_mid = 1;
+	state->question_offset_high = 0xff;
 }
 
 /* question address is stored as X/L/H (don't care/low/high) */
 static DRIVER_INIT( addr_xlh )
 {
-	question_offset_low = 1;
-	question_offset_mid = 2;
-	question_offset_high = 0xff;
+	statriv2_state *state = machine->driver_data<statriv2_state>();
+	state->question_offset_low = 1;
+	state->question_offset_mid = 2;
+	state->question_offset_high = 0xff;
 }
 
 /* question address is stored as X/H/L (don't care/high/low) */
 static DRIVER_INIT( addr_xhl )
 {
-	question_offset_low = 2;
-	question_offset_mid = 1;
-	question_offset_high = 0xff;
+	statriv2_state *state = machine->driver_data<statriv2_state>();
+	state->question_offset_low = 2;
+	state->question_offset_mid = 1;
+	state->question_offset_high = 0xff;
 }
 
 /* question address is stored as L/M/H (low/mid/high) */
 static DRIVER_INIT( addr_lmh )
 {
-	question_offset_low = 0;
-	question_offset_mid = 1;
-	question_offset_high = 2;
+	statriv2_state *state = machine->driver_data<statriv2_state>();
+	state->question_offset_low = 0;
+	state->question_offset_mid = 1;
+	state->question_offset_high = 2;
 }
 
 static DRIVER_INIT( addr_lmhe )

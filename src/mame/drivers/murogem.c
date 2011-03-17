@@ -98,7 +98,15 @@ val (hex):  27  20  22  04  26  00  20  20  00  07  00  00  80  00  00  00  ns  
 #include "cpu/m6800/m6800.h"
 #include "video/mc6845.h"
 
-static UINT8 *murogem_videoram;
+
+class murogem_state : public driver_device
+{
+public:
+	murogem_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
 
 
 static ADDRESS_MAP_START( murogem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -108,7 +116,7 @@ static ADDRESS_MAP_START( murogem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("IN1")
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP // sound? payout?
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&murogem_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(murogem_state, videoram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -169,6 +177,7 @@ static PALETTE_INIT(murogem)
 
 static SCREEN_UPDATE(murogem)
 {
+	murogem_state *state = screen->machine->driver_data<murogem_state>();
 	int xx,yy,count;
 	count = 0x000;
 
@@ -178,8 +187,8 @@ static SCREEN_UPDATE(murogem)
 	{
 		for(xx=0;xx<32;xx++)
 		{
-			int tileno = murogem_videoram[count]&0x3f;
-			int attr = murogem_videoram[count+0x400]&0x0f;
+			int tileno = state->videoram[count]&0x3f;
+			int attr = state->videoram[count+0x400]&0x0f;
 
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tileno,attr,0,0,xx*8,yy*8,0);
 
@@ -207,7 +216,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static MACHINE_CONFIG_START( murogem, driver_device )
+static MACHINE_CONFIG_START( murogem, murogem_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802,8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(murogem_map)

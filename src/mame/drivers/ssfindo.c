@@ -211,36 +211,49 @@ enum
 	MAXIO=128
 };
 
-static UINT32 PS7500_IO[MAXIO];
-static UINT32 PS7500_FIFO[256];
-static UINT32 *vram;
-static UINT32 flashAdr,flashOffset,adrLatch,flashType,flashN;
 
-static void PS7500_startTimer0(void);
-static void PS7500_startTimer1(void);
+class ssfindo_state : public driver_device
+{
+public:
+	ssfindo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-static emu_timer *PS7500timer0;
-static emu_timer *PS7500timer1;
+	UINT32 PS7500_IO[MAXIO];
+	UINT32 PS7500_FIFO[256];
+	UINT32 *vram;
+	UINT32 flashAdr;
+	UINT32 flashOffset;
+	UINT32 adrLatch;
+	UINT32 flashType;
+	UINT32 flashN;
+	emu_timer *PS7500timer0;
+	emu_timer *PS7500timer1;
+	int iocr_hack;
+};
 
-static int iocr_hack;
+
+static void PS7500_startTimer0(running_machine *machine);
+static void PS7500_startTimer1(running_machine *machine);
+
 
 static SCREEN_UPDATE(ssfindo)
 {
+	ssfindo_state *state = screen->machine->driver_data<ssfindo_state>();
 	int s,x,y;
 
-	if( PS7500_IO[VIDCR]&0x20) //video DMA enabled
+	if( state->PS7500_IO[VIDCR]&0x20) //video DMA enabled
 	{
-		s=( (PS7500_IO[VIDINITA]&0x1fffffff)-0x10000000)/4;
+		s=( (state->PS7500_IO[VIDINITA]&0x1fffffff)-0x10000000)/4;
 
 		if(s>=0 && s<(0x10000000/4))
 		{
 			for(y=0;y<256;y++)
 				for(x=0;x<320;x+=4)
 				{
-					*BITMAP_ADDR16(bitmap, y, x+0) = vram[s]&0xff;
-					*BITMAP_ADDR16(bitmap, y, x+1) = (vram[s]>>8)&0xff;
-					*BITMAP_ADDR16(bitmap, y, x+2) = (vram[s]>>16)&0xff;
-					*BITMAP_ADDR16(bitmap, y, x+3) = (vram[s]>>24)&0xff;
+					*BITMAP_ADDR16(bitmap, y, x+0) = state->vram[s]&0xff;
+					*BITMAP_ADDR16(bitmap, y, x+1) = (state->vram[s]>>8)&0xff;
+					*BITMAP_ADDR16(bitmap, y, x+2) = (state->vram[s]>>16)&0xff;
+					*BITMAP_ADDR16(bitmap, y, x+3) = (state->vram[s]>>24)&0xff;
 					s++;
 				}
 		}
@@ -251,67 +264,74 @@ static SCREEN_UPDATE(ssfindo)
 
 static WRITE32_HANDLER(FIFO_w)
 {
-	PS7500_FIFO[data>>28]=data;
+	ssfindo_state *state = space->machine->driver_data<ssfindo_state>();
+	state->PS7500_FIFO[data>>28]=data;
 
 	if(!(data>>28))
 	{
-		palette_set_color_rgb(space->machine, PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
-		PS7500_FIFO[1]++; //autoinc
+		palette_set_color_rgb(space->machine, state->PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
+		state->PS7500_FIFO[1]++; //autoinc
 	}
 }
 static TIMER_CALLBACK( PS7500_Timer0_callback )
 {
-	PS7500_IO[IRQSTA]|=0x20;
-	if(PS7500_IO[IRQMSKA]&0x20)
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
+	state->PS7500_IO[IRQSTA]|=0x20;
+	if(state->PS7500_IO[IRQMSKA]&0x20)
 	{
 		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
 	}
 }
 
-static void PS7500_startTimer0(void)
+static void PS7500_startTimer0(running_machine *machine)
 {
-	int val=((PS7500_IO[T0low]&0xff)|((PS7500_IO[T0high]&0xff)<<8))>>1;
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
+	int val=((state->PS7500_IO[T0low]&0xff)|((state->PS7500_IO[T0high]&0xff)<<8))>>1;
 
 	if(val==0)
-		PS7500timer0->adjust(attotime::never);
+		state->PS7500timer0->adjust(attotime::never);
 	else
-		PS7500timer0->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
+		state->PS7500timer0->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
 static TIMER_CALLBACK( PS7500_Timer1_callback )
 {
-	PS7500_IO[IRQSTA]|=0x40;
-	if(PS7500_IO[IRQMSKA]&0x40)
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
+	state->PS7500_IO[IRQSTA]|=0x40;
+	if(state->PS7500_IO[IRQMSKA]&0x40)
 	{
 		generic_pulse_irq_line(machine->device("maincpu"), ARM7_IRQ_LINE);
 	}
 }
 
-static void PS7500_startTimer1(void)
+static void PS7500_startTimer1(running_machine *machine)
 {
-	int val=((PS7500_IO[T1low]&0xff)|((PS7500_IO[T1high]&0xff)<<8))>>1;
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
+	int val=((state->PS7500_IO[T1low]&0xff)|((state->PS7500_IO[T1high]&0xff)<<8))>>1;
 	if(val==0)
-		PS7500timer1->adjust(attotime::never);
+		state->PS7500timer1->adjust(attotime::never);
 	else
-		PS7500timer1->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
+		state->PS7500timer1->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
 static INTERRUPT_GEN( ssfindo_interrupt )
 {
-	PS7500_IO[IRQSTA]|=0x08;
-		if(PS7500_IO[IRQMSKA]&0x08)
+	ssfindo_state *state = device->machine->driver_data<ssfindo_state>();
+	state->PS7500_IO[IRQSTA]|=0x08;
+		if(state->PS7500_IO[IRQMSKA]&0x08)
 		{
 			generic_pulse_irq_line(device, ARM7_IRQ_LINE);
 		}
 }
 
-static void PS7500_reset(void)
+static void PS7500_reset(running_machine *machine)
 {
-		PS7500_IO[IOCR]			=	0x3f;
-		PS7500_IO[VIDCR]		=	0;
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
+		state->PS7500_IO[IOCR]			=	0x3f;
+		state->PS7500_IO[VIDCR]		=	0;
 
-		PS7500timer0->adjust( attotime::never);
-		PS7500timer1->adjust( attotime::never);
+		state->PS7500timer0->adjust( attotime::never);
+		state->PS7500timer1->adjust( attotime::never);
 }
 
 typedef void (*ssfindo_speedup_func)(address_space *space);
@@ -336,6 +356,7 @@ static void ppcar_speedups(address_space* space)
 
 static READ32_HANDLER(PS7500_IO_r)
 {
+	ssfindo_state *state = space->machine->driver_data<ssfindo_state>();
 	switch(offset)
 	{
 		case MSECR:
@@ -346,21 +367,21 @@ static READ32_HANDLER(PS7500_IO_r)
 		mame_printf_debug("IOLINESR %i @%x\n", offset, cpu_get_pc(space->cpu));
 #endif
 
-		if(flashType == 1)
+		if(state->flashType == 1)
 			return 0;
 		else
 			return space->machine->rand();
 
 		case IRQSTA:
-			return (PS7500_IO[offset] & (~2)) | 0x80;
+			return (state->PS7500_IO[offset] & (~2)) | 0x80;
 
 		case IRQRQA:
-			return (PS7500_IO[IRQSTA] & PS7500_IO[IRQMSKA]) | 0x80;
+			return (state->PS7500_IO[IRQSTA] & state->PS7500_IO[IRQMSKA]) | 0x80;
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
 			if (ssfindo_speedup) ssfindo_speedup(space);
 			
-			if( iocr_hack)
+			if( state->iocr_hack)
 			{
 				return (input_port_read(space->machine, "PS7500") & 0x80) | 0x34 | (space->machine->rand()&3); //eeprom read ?
 			}
@@ -368,7 +389,7 @@ static READ32_HANDLER(PS7500_IO_r)
 			return (input_port_read(space->machine, "PS7500") & 0x80) | 0x37;
 
 		case VIDCR:
-			return (PS7500_IO[offset] | 0x50) & 0xfffffff0;
+			return (state->PS7500_IO[offset] | 0x50) & 0xfffffff0;
 
 		case T1low:
 		case T0low:
@@ -379,29 +400,30 @@ static READ32_HANDLER(PS7500_IO_r)
 		case VIDSTART:
 		case VIDINITA: //TODO: bits 29 ("equal") and 30 (last bit)  p.105
 
-			return PS7500_IO[offset];
+			return state->PS7500_IO[offset];
 
 
 	}
-	return space->machine->rand();//PS7500_IO[offset];
+	return space->machine->rand();//state->PS7500_IO[offset];
 }
 
 static WRITE32_HANDLER(PS7500_IO_w)
 {
-	UINT32 temp=PS7500_IO[offset];
+	ssfindo_state *state = space->machine->driver_data<ssfindo_state>();
+	UINT32 temp=state->PS7500_IO[offset];
 
 	COMBINE_DATA(&temp);
 
 	switch(offset)
 	{
 		case IOLINES: //TODO: eeprom  24c01
-			PS7500_IO[offset]=data;
+			state->PS7500_IO[offset]=data;
 				if(data&0xc0)
-					adrLatch=0;
+					state->adrLatch=0;
 
-			if(cpu_get_pc(space->cpu) == 0xbac0 && flashType == 1)
+			if(cpu_get_pc(space->cpu) == 0xbac0 && state->flashType == 1)
 			{
-				flashN=data&1;
+				state->flashN=data&1;
 			}
 
 #if 0
@@ -410,25 +432,25 @@ static WRITE32_HANDLER(PS7500_IO_w)
 			break;
 
 		case IRQRQA:
-			PS7500_IO[IRQSTA]&=~temp;
+			state->PS7500_IO[IRQSTA]&=~temp;
 		break;
 
 		case IRQMSKA:
-			PS7500_IO[IRQMSKA]=(temp&(~2))|0x80;
+			state->PS7500_IO[IRQMSKA]=(temp&(~2))|0x80;
 		break;
 
 		case T1GO:
-				PS7500_startTimer1();
+				PS7500_startTimer1(space->machine);
 			break;
 
 		case T0GO:
-			PS7500_startTimer0();
+			PS7500_startTimer0(space->machine);
 		break;
 
 		case VIDEND:
 		case VIDSTART:
-			COMBINE_DATA(&PS7500_IO[offset]);
-			PS7500_IO[offset]&=0xfffffff0; // qword align
+			COMBINE_DATA(&state->PS7500_IO[offset]);
+			state->PS7500_IO[offset]&=0xfffffff0; // qword align
 		break;
 
 		case IOCR:
@@ -444,7 +466,7 @@ static WRITE32_HANDLER(PS7500_IO_w)
 		case T0high:
 		case VIDCR:
 		case VIDINITA: //TODO: bit 30 (last bit) p.105
-					COMBINE_DATA(&PS7500_IO[offset]);
+					COMBINE_DATA(&state->PS7500_IO[offset]);
 		break;
 		
 		
@@ -454,26 +476,27 @@ static WRITE32_HANDLER(PS7500_IO_w)
 
 static READ32_HANDLER(io_r)
 {
+	ssfindo_state *state = space->machine->driver_data<ssfindo_state>();
 	UINT16 *FLASH = (UINT16 *)space->machine->region("user2")->base(); //16 bit - WORD access
 
-	int adr=flashAdr*0x200+(flashOffset);
+	int adr=state->flashAdr*0x200+(state->flashOffset);
 
 
-	switch(flashType)
+	switch(state->flashType)
 	{
 		case 0:
-			if(PS7500_IO[IOLINES]&1) //bit 0 of IOLINES  = flash select ( 5/6 or 3/2 )
+			if(state->PS7500_IO[IOLINES]&1) //bit 0 of IOLINES  = flash select ( 5/6 or 3/2 )
 				adr+=0x400000;
 		break;
 
 		case 1:
-			adr+=0x400000*flashN;
+			adr+=0x400000*state->flashN;
 		break;
 	}
 
 	if(adr<0x400000*2)
 	{
-		flashOffset++;
+		state->flashOffset++;
 		return FLASH[adr];
 	}
 	return 0;
@@ -481,21 +504,22 @@ static READ32_HANDLER(io_r)
 
 static WRITE32_HANDLER(io_w)
 {
+	ssfindo_state *state = space->machine->driver_data<ssfindo_state>();
 	UINT32 temp = 0;
 	COMBINE_DATA(&temp);
 
 #if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,cpu_get_pc(space->cpu),adrLatch);
+	logerror("[io_w] = %x @%x [latch=%x]\n",data,cpu_get_pc(space->cpu),state->adrLatch);
 #endif
 
-	if(adrLatch==1)
-		flashAdr=(temp>>16)&0xff;
-	if(adrLatch==2)
+	if(state->adrLatch==1)
+		state->flashAdr=(temp>>16)&0xff;
+	if(state->adrLatch==2)
 	{
-		flashAdr|=(temp>>16)&0xff00;
-		flashOffset=0;
+		state->flashAdr|=(temp>>16)&0xff00;
+		state->flashOffset=0;
 	}
-	adrLatch=(adrLatch+1)%3;
+	state->adrLatch=(state->adrLatch+1)%3;
 }
 
 static WRITE32_HANDLER(debug_w)
@@ -535,7 +559,7 @@ static ADDRESS_MAP_START( ssfindo_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0324f000, 0x0324f003) AM_READ(SIMPLEIO_r)
 	AM_RANGE(0x03245000, 0x03245003) AM_WRITENOP /* sound ? */
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)
-	AM_RANGE(0x10000000, 0x11ffffff) AM_RAM AM_BASE (&vram)
+	AM_RANGE(0x10000000, 0x11ffffff) AM_RAM AM_BASE_MEMBER(ssfindo_state, vram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppcar_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -550,7 +574,7 @@ static ADDRESS_MAP_START( ppcar_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x033c0000, 0x033c0003) AM_READ(io_r) AM_WRITE(io_w)
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_RAM
-	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_BASE (&vram)
+	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM AM_BASE_MEMBER(ssfindo_state, vram)
 ADDRESS_MAP_END
 
 static READ32_HANDLER(tetfight_unk_r)
@@ -572,12 +596,12 @@ static ADDRESS_MAP_START( tetfight_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03240004, 0x03240007) AM_READ_PORT("IN0")
 	AM_RANGE(0x03240008, 0x0324000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x03240020, 0x03240023) AM_READWRITE( tetfight_unk_r, tetfight_unk_w)
-	AM_RANGE(0x10000000, 0x14ffffff) AM_RAM AM_BASE (&vram)
+	AM_RANGE(0x10000000, 0x14ffffff) AM_RAM AM_BASE_MEMBER(ssfindo_state, vram)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( ssfindo )
 {
-	PS7500_reset();
+	PS7500_reset(machine);
 }
 
 static INPUT_PORTS_START( ssfindo )
@@ -716,7 +740,7 @@ static INPUT_PORTS_START( tetfight )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ssfindo, driver_device )
+static MACHINE_CONFIG_START( ssfindo, ssfindo_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 54000000) // guess...
@@ -823,33 +847,37 @@ ROM_END
 
 static DRIVER_INIT(common)
 {
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
 	ssfindo_speedup = 0;
-	PS7500timer0 = machine->scheduler().timer_alloc(FUNC(PS7500_Timer0_callback));
-	PS7500timer1 = machine->scheduler().timer_alloc(FUNC(PS7500_Timer1_callback));
+	state->PS7500timer0 = machine->scheduler().timer_alloc(FUNC(PS7500_Timer0_callback));
+	state->PS7500timer1 = machine->scheduler().timer_alloc(FUNC(PS7500_Timer1_callback));
 
 }
 
 static DRIVER_INIT(ssfindo)
 {
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
 	DRIVER_INIT_CALL(common);
-	flashType=0;
+	state->flashType=0;
 	ssfindo_speedup = ssfindo_speedups;
-	iocr_hack=0;
+	state->iocr_hack=0;
 }
 
 static DRIVER_INIT(ppcar)
 {
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
 	DRIVER_INIT_CALL(common);
-	flashType=1;
+	state->flashType=1;
 	ssfindo_speedup = ppcar_speedups;
-	iocr_hack=0;
+	state->iocr_hack=0;
 }
 
 static DRIVER_INIT(tetfight)
 {
+	ssfindo_state *state = machine->driver_data<ssfindo_state>();
 	DRIVER_INIT_CALL(common);
-	flashType=0; 
-	iocr_hack=1;
+	state->flashType=0; 
+	state->iocr_hack=1;
 }
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo,	ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )

@@ -82,13 +82,13 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *spriteram;
+	UINT8 nAyCtrl;
+	UINT8 nAyData;
+	UINT8 nmi_mask;
+	UINT8 *videoram;
+	UINT8 *colorram;
 };
 
-
-static UINT8 nAyCtrl, nAyData;
-static UINT8 nmi_mask;
-static UINT8 *videoram;
-static UINT8 *colorram;
 
 static VIDEO_START(mirax)
 {
@@ -124,6 +124,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static SCREEN_UPDATE(mirax)
 {
+	mirax_state *state = screen->machine->driver_data<mirax_state>();
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x00000;
 	int y,x;
@@ -132,8 +133,8 @@ static SCREEN_UPDATE(mirax)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = videoram[count];
-			int color = (colorram[x*2]<<8) | (colorram[(x*2)+1]);
+			int tile = state->videoram[count];
+			int color = (state->colorram[x*2]<<8) | (state->colorram[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
 			tile |= ((color & 0xe0)<<3);
 
@@ -154,8 +155,8 @@ static SCREEN_UPDATE(mirax)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = videoram[count];
-			int color = (colorram[x*2]<<8) | (colorram[(x*2)+1]);
+			int tile = state->videoram[count];
+			int color = (state->colorram[x*2]<<8) | (state->colorram[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
 			tile |= ((color & 0xe0)<<3);
 
@@ -176,25 +177,28 @@ static SCREEN_UPDATE(mirax)
 
 static SOUND_START(mirax)
 {
-	nAyCtrl = 0x00;
-	nAyData = 0x00;
+	mirax_state *state = machine->driver_data<mirax_state>();
+	state->nAyCtrl = 0x00;
+	state->nAyData = 0x00;
 }
 
 static WRITE8_HANDLER(audio_w)
 {
+	mirax_state *state = space->machine->driver_data<mirax_state>();
 	if(cpu_get_previouspc(space->cpu)==0x2fd)
 	{
-		nAyCtrl=offset;
-		nAyData=data;
+		state->nAyCtrl=offset;
+		state->nAyData=data;
 	}
 }
 
 static WRITE8_DEVICE_HANDLER(ay_sel)
 {
+	mirax_state *state = device->machine->driver_data<mirax_state>();
 	if(cpu_get_previouspc(device->machine->device("audiocpu"))==0x309)
 	{
-		ay8910_address_w(device,0,nAyCtrl);
-		ay8910_data_w(device,0,nAyData);
+		ay8910_address_w(device,0,state->nAyCtrl);
+		ay8910_data_w(device,0,state->nAyData);
 	}
 }
 
@@ -205,7 +209,8 @@ static READ8_HANDLER( unk_r )
 
 static WRITE8_HANDLER( nmi_mask_w )
 {
-	nmi_mask = data & 1;
+	mirax_state *state = space->machine->driver_data<mirax_state>();
+	state->nmi_mask = data & 1;
 	if(data & 0xfe)
 		printf("Warning: %02x written at $f501\n",data);
 }
@@ -219,9 +224,9 @@ static WRITE8_HANDLER( mirax_sound_cmd_w )
 static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(mirax_state, videoram)
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_MEMBER(mirax_state, spriteram)
-	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE(&colorram) //per-column color + bank bits for the videoram
+	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE_MEMBER(mirax_state, colorram) //per-column color + bank bits for the videoram
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("P2")
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")
@@ -384,7 +389,8 @@ static PALETTE_INIT( mirax )
 
 static INTERRUPT_GEN( mirax_vblank_irq )
 {
-	if(nmi_mask)
+	mirax_state *state = device->machine->driver_data<mirax_state>();
+	if(state->nmi_mask)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 

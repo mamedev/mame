@@ -25,14 +25,20 @@ todo:
 #include "machine/nvram.h"
 
 
+class wldarrow_state : public driver_device
+{
+public:
+	wldarrow_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram_0;
+	UINT8 *videoram_1;
+	UINT8 *videoram_2;
+	size_t videoram_size;
+};
+
+
 #define NUM_PENS	(8)
-
-
-static UINT8 *wldarrow_videoram_0;
-static UINT8 *wldarrow_videoram_1;
-static UINT8 *wldarrow_videoram_2;
-static size_t wldarrow_videoram_size;
-
 
 
 /*************************************
@@ -54,21 +60,22 @@ static void get_pens(pen_t *pens)
 
 static SCREEN_UPDATE( wldarrow )
 {
+	wldarrow_state *state = screen->machine->driver_data<wldarrow_state>();
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
 	get_pens(pens);
 
-	for (offs = 0; offs < wldarrow_videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
 
-		UINT8 data0 = wldarrow_videoram_0[offs];
-		UINT8 data1 = wldarrow_videoram_1[offs];
-		UINT8 data2 = wldarrow_videoram_2[offs];
+		UINT8 data0 = state->videoram_0[offs];
+		UINT8 data1 = state->videoram_1[offs];
+		UINT8 data2 = state->videoram_2[offs];
 
 		/* weird equations, but it matches every flyer screenshot -
            perhaphs they used a look-up PROM? */
@@ -167,9 +174,9 @@ static WRITE8_DEVICE_HANDLER( wldarrow_dac_4_w )
 static ADDRESS_MAP_START( wldarrow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&wldarrow_videoram_0) AM_SIZE(&wldarrow_videoram_size)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&wldarrow_videoram_1)
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(&wldarrow_videoram_2)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(wldarrow_state, videoram_0) AM_SIZE_MEMBER(wldarrow_state, videoram_size)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE_MEMBER(wldarrow_state, videoram_1)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_MEMBER(wldarrow_state, videoram_2)
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BITSW") AM_DEVWRITE("dac", wldarrow_dac_1_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)
@@ -345,7 +352,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( wldarrow, driver_device )
+static MACHINE_CONFIG_START( wldarrow, wldarrow_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)

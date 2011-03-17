@@ -18,15 +18,26 @@ The ppi at 3000-3003 seems to be a dual port communication thing with the z80.
 #include "machine/8255ppi.h"
 #include "sound/ay8910.h"
 
-static UINT8 *vram, *cram;
+
+class rgum_state : public driver_device
+{
+public:
+	rgum_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *vram;
+	UINT8 *cram;
+	UINT8 hbeat;
+};
+
 
 static VIDEO_START(royalgum)
 {
-
 }
 
 static SCREEN_UPDATE(royalgum)
 {
+	rgum_state *state = screen->machine->driver_data<rgum_state>();
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
@@ -36,7 +47,7 @@ static SCREEN_UPDATE(royalgum)
 	{
 		for(x=0;x<66;x++)
 		{
-			int tile = vram[count] | ((cram[count] & 0xf) <<8);
+			int tile = state->vram[count] | ((state->cram[count] & 0xf) <<8);
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 
@@ -61,8 +72,8 @@ static ADDRESS_MAP_START( rgum_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&vram)
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(&cram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(rgum_state, vram)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_MEMBER(rgum_state, cram)
 
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -70,11 +81,11 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( rgum_heartbeat_r )
 {
-	static UINT8 hbeat;
+	rgum_state *state = field->port->machine->driver_data<rgum_state>();
 
-	hbeat ^= 1;
+	state->hbeat ^= 1;
 
-	return hbeat;
+	return state->hbeat;
 }
 
 
@@ -249,7 +260,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( rgum, driver_device )
+static MACHINE_CONFIG_START( rgum, rgum_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02,24000000/16)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(rgum_map)

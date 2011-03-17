@@ -119,6 +119,7 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 blit_ram[8];
 };
 
 
@@ -164,18 +165,17 @@ static WRITE8_HANDLER( blitter_w )
 {
 	vpoker_state *state = space->machine->driver_data<vpoker_state>();
 	UINT8 *videoram = state->videoram;
-	static UINT8 blit_ram[8];
 
-	blit_ram[offset] = data;
+	state->blit_ram[offset] = data;
 
 	if(offset == 2)
 	{
 		int blit_offs;
 
-		blit_offs = (blit_ram[1] & 0x01)<<8|(blit_ram[2] & 0xff);
+		blit_offs = (state->blit_ram[1] & 0x01)<<8|(state->blit_ram[2] & 0xff);
 
-		videoram[blit_offs] = blit_ram[0];
-//      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3],blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]);
+		videoram[blit_offs] = state->blit_ram[0];
+//      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",state->blit_ram[0],state->blit_ram[1],state->blit_ram[2],state->blit_ram[3],state->blit_ram[4],state->blit_ram[5],state->blit_ram[6],state->blit_ram[7]);
 	}
 }
 

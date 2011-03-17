@@ -13,17 +13,19 @@
 #include "cpu/z80/z80.h"
 #include "sound/speaker.h"
 
-/*************************************
- *
- *  Globals
- *
- *************************************/
 
-static UINT8 *spectrum_video_ram;
-static int spectrum_frame_number;    /* Used for handling FLASH 1 */
-static int spectrum_flash_invert;
-static UINT8 spectrum_port_fe;
-static UINT8 nmi_enable = 0;
+class photon2_state : public driver_device
+{
+public:
+	photon2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *spectrum_video_ram;
+	int spectrum_frame_number;
+	int spectrum_flash_invert;
+	UINT8 spectrum_port_fe;
+	UINT8 nmi_enable;
+};
 
 
 /*************************************
@@ -79,8 +81,9 @@ static PALETTE_INIT( spectrum )
 
 static VIDEO_START( spectrum )
 {
-	spectrum_frame_number = 0;
-	spectrum_flash_invert = 0;
+	photon2_state *state = machine->driver_data<photon2_state>();
+	state->spectrum_frame_number = 0;
+	state->spectrum_flash_invert = 0;
 }
 
 /* return the color to be used inverting FLASHing colors if necessary */
@@ -96,11 +99,12 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
    independent of frame skip etc. */
 static SCREEN_EOF( spectrum )
 {
-    spectrum_frame_number++;
-    if (spectrum_frame_number >= 25)
+	photon2_state *state = machine->driver_data<photon2_state>();
+    state->spectrum_frame_number++;
+    if (state->spectrum_frame_number >= 25)
     {
-        spectrum_frame_number = 0;
-        spectrum_flash_invert = !spectrum_flash_invert;
+        state->spectrum_frame_number = 0;
+        state->spectrum_flash_invert = !state->spectrum_flash_invert;
     }
 }
 
@@ -111,26 +115,27 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 
 static SCREEN_UPDATE( spectrum )
 {
+	photon2_state *state = screen->machine->driver_data<photon2_state>();
     /* for now do a full-refresh */
     int x, y, b, scrx, scry;
     unsigned short ink, pap;
     unsigned char *attr, *scr;
 //  int full_refresh = 1;
 
-    scr=spectrum_video_ram;
+    scr=state->spectrum_video_ram;
 
-	bitmap_fill(bitmap, cliprect, spectrum_port_fe & 0x07);
+	bitmap_fill(bitmap, cliprect, state->spectrum_port_fe & 0x07);
 
     for (y=0; y<192; y++)
     {
         scrx=SPEC_LEFT_BORDER;
         scry=((y&7) * 8) + ((y&0x38)>>3) + (y&0xC0);
-        attr=spectrum_video_ram + ((scry>>3)*32) + 0x1800;
+        attr=state->spectrum_video_ram + ((scry>>3)*32) + 0x1800;
 
         for (x=0;x<32;x++)
         {
 				/* Get ink and paper colour with bright */
-                if (spectrum_flash_invert && (*attr & 0x80))
+                if (state->spectrum_flash_invert && (*attr & 0x80))
                 {
                         ink=((*attr)>>3) & 0x0f;
                         pap=((*attr) & 0x07) + (((*attr)>>3) & 0x08);
@@ -192,15 +197,17 @@ static READ8_HANDLER(photon2_fe_r)
 
 static WRITE8_HANDLER(photon2_fe_w)
 {
+	photon2_state *state = space->machine->driver_data<photon2_state>();
 	device_t *speaker = space->machine->device("speaker");
-	spectrum_port_fe = data;
+	state->spectrum_port_fe = data;
 
 	speaker_level_w(speaker, BIT(data,4));
 }
 
 static WRITE8_HANDLER(photon2_misc_w)
 {
-	nmi_enable = !BIT(data,5);
+	photon2_state *state = space->machine->driver_data<photon2_state>();
+	state->nmi_enable = !BIT(data,5);
 }
 
 /*************************************
@@ -211,7 +218,7 @@ static WRITE8_HANDLER(photon2_misc_w)
 
 static ADDRESS_MAP_START (spectrum_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE(&spectrum_video_ram )
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE_MEMBER(photon2_state, spectrum_video_ram )
 	AM_RANGE(0x5b00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -278,13 +285,14 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( spec_interrupt_hack )
 {
+	photon2_state *state = device->machine->driver_data<photon2_state>();
 	if (cpu_getiloops(device) == 1)
 	{
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 	else
 	{
-		if ( nmi_enable )
+		if ( state->nmi_enable )
 		{
 			cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 		}
@@ -296,7 +304,7 @@ static MACHINE_RESET( photon2 )
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 }
 
-static MACHINE_CONFIG_START( photon2, driver_device )
+static MACHINE_CONFIG_START( photon2, photon2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(spectrum_mem)

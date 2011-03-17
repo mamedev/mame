@@ -22,14 +22,24 @@
 #include "cpu/z80/z80.h"
 
 
-static UINT8 *videoram;
-static UINT8 *colorram;
-static tilemap_t *tmap;
+class tattack_state : public driver_device
+{
+public:
+	tattack_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	UINT8 *colorram;
+	tilemap_t *tmap;
+};
+
+
 
 static TILE_GET_INFO( get_tile_info )
 {
-	int code = videoram[tile_index];
-	int color = colorram[tile_index];
+	tattack_state *state = machine->driver_data<tattack_state>();
+	int code = state->videoram[tile_index];
+	int color = state->colorram[tile_index];
 
 	if((color&1 ) || (color>15) )
 		logerror("COLOR %i\n",color);
@@ -45,21 +55,23 @@ static TILE_GET_INFO( get_tile_info )
 
 static SCREEN_UPDATE( tattack )
 {
-	tilemap_mark_all_tiles_dirty(tmap);
-	tilemap_draw(bitmap,cliprect,tmap, 0,0);
+	tattack_state *state = screen->machine->driver_data<tattack_state>();
+	tilemap_mark_all_tiles_dirty(state->tmap);
+	tilemap_draw(bitmap,cliprect,state->tmap, 0,0);
 	return 0;
 }
 
 static VIDEO_START( tattack )
 {
-		tmap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	tattack_state *state = machine->driver_data<tattack_state>();
+		state->tmap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 }
 
 static ADDRESS_MAP_START( mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 //  AM_RANGE(0x4000, 0x4000) AM_READNOP $315
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&colorram)	// color map ? something else .. only bits 1-3 are used
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(tattack_state, videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(tattack_state, colorram)	// color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")		// dsw ? something else ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP
@@ -180,7 +192,7 @@ static PALETTE_INIT( tattack  )
 }
 
 
-static MACHINE_CONFIG_START( tattack, driver_device )
+static MACHINE_CONFIG_START( tattack, tattack_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000 / 2)	/* 4 MHz ? */

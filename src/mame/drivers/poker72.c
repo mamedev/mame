@@ -14,16 +14,26 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static UINT8 *poker72_vram,*poker72_pal;
-static UINT8 tile_bank;
+
+class poker72_state : public driver_device
+{
+public:
+	poker72_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *vram;
+	UINT8 *pal;
+	UINT8 tile_bank;
+};
+
 
 static VIDEO_START(poker72)
 {
-
 }
 
 static SCREEN_UPDATE(poker72)
 {
+	poker72_state *state = screen->machine->driver_data<poker72_state>();
 	int x,y,count;
 
 	count = 0;
@@ -32,12 +42,12 @@ static SCREEN_UPDATE(poker72)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = ((poker72_vram[count+1] & 0x0f) << 8 ) | (poker72_vram[count+0] & 0xff); //TODO: tile bank
-			int fx = (poker72_vram[count+1] & 0x10);
-			int fy = (poker72_vram[count+1] & 0x20);
-			int color = (poker72_vram[count+1] & 0xc0) >> 6;
+			int tile = ((state->vram[count+1] & 0x0f) << 8 ) | (state->vram[count+0] & 0xff); //TODO: tile bank
+			int fx = (state->vram[count+1] & 0x10);
+			int fy = (state->vram[count+1] & 0x20);
+			int color = (state->vram[count+1] & 0xc0) >> 6;
 
-			tile|= tile_bank << 12;
+			tile|= state->tile_bank << 12;
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,fx,fy,x*8,y*8);
 
@@ -50,12 +60,13 @@ static SCREEN_UPDATE(poker72)
 
 static WRITE8_HANDLER( poker72_paletteram_w )
 {
+	poker72_state *state = space->machine->driver_data<poker72_state>();
 	int r,g,b;
-	poker72_pal[offset] = data;
+	state->pal[offset] = data;
 
-	r = poker72_pal[(offset & 0x3ff)+0x000] & 0x3f;
-	g = poker72_pal[(offset & 0x3ff)+0x400] & 0x3f;
-	b = poker72_pal[(offset & 0x3ff)+0x800] & 0x3f;
+	r = state->pal[(offset & 0x3ff)+0x000] & 0x3f;
+	g = state->pal[(offset & 0x3ff)+0x400] & 0x3f;
+	b = state->pal[(offset & 0x3ff)+0x800] & 0x3f;
 
 	palette_set_color_rgb( space->machine, offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
@@ -77,14 +88,15 @@ static WRITE8_HANDLER( output_w )
 
 static WRITE8_HANDLER( tile_bank_w )
 {
-	tile_bank = (data & 4) >> 2;
+	poker72_state *state = space->machine->driver_data<poker72_state>();
+	state->tile_bank = (data & 4) >> 2;
 }
 
 static ADDRESS_MAP_START( poker72_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&poker72_vram)
-	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_BASE(&poker72_pal)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(poker72_state, vram)
+	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_BASE_MEMBER(poker72_state, pal)
 	AM_RANGE(0xfc00, 0xfdff) AM_RAM //???
 	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("IN0")
 	AM_RANGE(0xfe09, 0xfe09) AM_READ_PORT("IN1")
@@ -329,7 +341,7 @@ static MACHINE_RESET( poker72 )
 	memory_set_bankptr(machine, "bank1", &ROM[0]);
 }
 
-static MACHINE_CONFIG_START( poker72, driver_device )
+static MACHINE_CONFIG_START( poker72, poker72_state )
 
 
 	/* basic machine hardware */

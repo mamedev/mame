@@ -64,39 +64,50 @@
 #include "sound/ay8910.h"
 
 
+class nsmpoker_state : public driver_device
+{
+public:
+	nsmpoker_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	UINT8 *colorram;
+	tilemap_t *bg_tilemap;
+};
+
+
 /*************************
 *     Video Hardware     *
 *************************/
 
-static UINT8 *videoram;
-static UINT8 *colorram;
-static tilemap_t *bg_tilemap;
-
 
 static WRITE8_HANDLER( nsmpoker_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	nsmpoker_state *state = space->machine->driver_data<nsmpoker_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static WRITE8_HANDLER( nsmpoker_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	nsmpoker_state *state = space->machine->driver_data<nsmpoker_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	nsmpoker_state *state = machine->driver_data<nsmpoker_state>();
 /*  - bits -
     7654 3210
     ---- ----   bank select.
     ---- ----   color code.
     ---- ----   seems unused.
 */
-//  int attr = colorram[tile_index];
-	int code = videoram[tile_index];
+//  int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index];
 //  int bank = (attr & 0x08) >> 3;
 //  int color = (attr & 0x03);
 
@@ -106,13 +117,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( nsmpoker )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	nsmpoker_state *state = machine->driver_data<nsmpoker_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 static SCREEN_UPDATE( nsmpoker )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	nsmpoker_state *state = screen->machine->driver_data<nsmpoker_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -151,8 +164,8 @@ static ADDRESS_MAP_START( nsmpoker_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0xafff) AM_RAM	// OK... cleared at beginning.
 	AM_RANGE(0xb000, 0xcfff) AM_ROM	// WRONG... just to map the last rom somewhere.
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(nsmpoker_videoram_w) AM_BASE(&videoram) // WRONG... just a placeholder.
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_BASE(&colorram) // WRONG... just a placeholder.
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(nsmpoker_videoram_w) AM_BASE_MEMBER(nsmpoker_state, videoram) // WRONG... just a placeholder.
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_BASE_MEMBER(nsmpoker_state, colorram) // WRONG... just a placeholder.
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nsmpoker_portmap, ADDRESS_SPACE_IO, 8 )
@@ -374,7 +387,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( nsmpoker, driver_device )
+static MACHINE_CONFIG_START( nsmpoker, nsmpoker_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS9995, MASTER_CLOCK/2)	/* guess */

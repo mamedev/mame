@@ -165,8 +165,25 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/2413intf.h"
 
-static UINT16 *magicram;
-static UINT16 *pcab_vregs;
+
+class magicard_state : public driver_device
+{
+public:
+	magicard_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *magicram;
+	UINT16 *pcab_vregs;
+	UINT16 *scc68070_ext_irqc_regs;
+	UINT16 *scc68070_iic_regs;
+	UINT16 *scc68070_uart_regs;
+	UINT16 *scc68070_timer_regs;
+	UINT16 *scc68070_int_irqc_regs;
+	UINT16 *scc68070_dma_ch1_regs;
+	UINT16 *scc68070_dma_ch2_regs;
+	UINT16 *scc68070_mmu_regs;
+	struct { int r,g,b,offs,offs_internal; } pal;
+};
 
 
 /*************************
@@ -200,7 +217,7 @@ TODO: check this register,doesn't seem to be 100% correct.
 */
 
 /*63 at post test,6d all the time.*/
-#define SCC_CSR_VREG    (pcab_vregs[0x00/2] & 0xffff)
+#define SCC_CSR_VREG    (state->pcab_vregs[0x00/2] & 0xffff)
 #define SCC_CG_VREG		((SCC_CSR_VREG & 0x10)>>4)
 
 /*
@@ -226,7 +243,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ ....aaaa  VSR:H = video start address (MSB's)
 */
 
-#define SCC_DCR_VREG    (pcab_vregs[0x02/2] & 0xffff)
+#define SCC_DCR_VREG    (state->pcab_vregs[0x02/2] & 0xffff)
 #define SCC_DE_VREG		((SCC_DCR_VREG & 0x8000)>>15)
 #define SCC_FG_VREG		((SCC_DCR_VREG & 0x0080)>>7)
 #define SCC_VSR_VREG_H  ((SCC_DCR_VREG & 0xf)>>0)
@@ -236,7 +253,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w aaaaaaaa aaaaaaaa  VSR:L = video start address (LSB's)
 */
 
-#define SCC_VSR_VREG_L  (pcab_vregs[0x04/2] & 0xffff)
+#define SCC_VSR_VREG_L  (state->pcab_vregs[0x04/2] & 0xffff)
 #define SCC_VSR_VREG    ((SCC_VSR_VREG_H)<<16) | (SCC_VSR_VREG_L)
 
 /*
@@ -255,7 +272,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ xxxx....  not used
     w ........ ....aaaa  "data" (dunno the purpose...)
 */
-#define SCC_DCR2_VREG  (pcab_vregs[0x08/2] & 0xffff)
+#define SCC_DCR2_VREG  (state->pcab_vregs[0x08/2] & 0xffff)
 
 /*
 (Note: not present on the original vreg listing)
@@ -276,14 +293,14 @@ TODO: check this register,doesn't seem to be 100% correct.
 1ffff0  a = source register a
     w nnnnnnnn nnnnnnnn  source
 */
-#define SCC_SRCA_VREG  (pcab_vregs[0x10/2] & 0xffff)
+#define SCC_SRCA_VREG  (state->pcab_vregs[0x10/2] & 0xffff)
 
 /*
 1ffff2  b = destination register b
    rw nnnnnnnn nnnnnnnn  destination
 */
 
-#define SCC_DSTB_VREG  (pcab_vregs[0x12/2] & 0xffff)
+#define SCC_DSTB_VREG  (state->pcab_vregs[0x12/2] & 0xffff)
 
 /*
 1ffff4  pcr = pixac command register
@@ -330,7 +347,7 @@ TODO: check this register,doesn't seem to be 100% correct.
     w ........ .......0
 */
 
-#define SCC_PCR_VREG  (pcab_vregs[0x14/2] & 0xffff)
+#define SCC_PCR_VREG  (state->pcab_vregs[0x14/2] & 0xffff)
 
 /*
 1ffff6  mask = mask register
@@ -363,6 +380,7 @@ static VIDEO_START(magicard)
 
 static SCREEN_UPDATE(magicard)
 {
+	magicard_state *state = screen->machine->driver_data<magicard_state>();
 	int x,y;
 	UINT32 count;
 
@@ -381,22 +399,22 @@ static SCREEN_UPDATE(magicard)
 			{
 				UINT32 color;
 
-				color = ((magicram[count]) & 0x000f)>>0;
+				color = ((state->magicram[count]) & 0x000f)>>0;
 
 				if(((x*4)+3)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*4)+3) = screen->machine->pens[color];
 
-				color = ((magicram[count]) & 0x00f0)>>4;
+				color = ((state->magicram[count]) & 0x00f0)>>4;
 
 				if(((x*4)+2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*4)+2) = screen->machine->pens[color];
 
-				color = ((magicram[count]) & 0x0f00)>>8;
+				color = ((state->magicram[count]) & 0x0f00)>>8;
 
 				if(((x*4)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*4)+1) = screen->machine->pens[color];
 
-				color = ((magicram[count]) & 0xf000)>>12;
+				color = ((state->magicram[count]) & 0xf000)>>12;
 
 				if(((x*4)+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*4)+0) = screen->machine->pens[color];
@@ -413,12 +431,12 @@ static SCREEN_UPDATE(magicard)
 			{
 				UINT32 color;
 
-				color = ((magicram[count]) & 0x00ff)>>0;
+				color = ((state->magicram[count]) & 0x00ff)>>0;
 
 				if(((x*2)+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
 
-				color = ((magicram[count]) & 0xff00)>>8;
+				color = ((state->magicram[count]) & 0xff00)>>8;
 
 				if(((x*2)+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
@@ -443,32 +461,31 @@ static READ16_HANDLER( test_r )
 
 static WRITE16_HANDLER( paletteram_io_w )
 {
-	static int pal_offs,r,g,b,internal_pal_offs;
-
+	magicard_state *state = space->machine->driver_data<magicard_state>();
 	switch(offset*2)
 	{
 		case 0:
-			pal_offs = data;
-			internal_pal_offs = 0;
+			state->pal.offs = data;
+			state->pal.offs_internal = 0;
 			break;
 		case 4:
 			break;
 		case 2:
-			switch(internal_pal_offs)
+			switch(state->pal.offs_internal)
 			{
 				case 0:
-					r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					internal_pal_offs++;
+					state->pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->pal.offs_internal++;
 					break;
 				case 1:
-					g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					internal_pal_offs++;
+					state->pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->pal.offs_internal++;
 					break;
 				case 2:
-					b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
-					internal_pal_offs = 0;
-					pal_offs++;
+					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					state->pal.offs_internal = 0;
+					state->pal.offs++;
 					break;
 			}
 
@@ -478,6 +495,7 @@ static WRITE16_HANDLER( paletteram_io_w )
 
 static READ16_HANDLER( philips_66470_r )
 {
+	magicard_state *state = space->machine->driver_data<magicard_state>();
 	switch(offset)
 	{
 //      case 0/2:
@@ -487,48 +505,57 @@ static READ16_HANDLER( philips_66470_r )
 	//printf("[%04x]\n",offset*2);
 
 
-	return pcab_vregs[offset];
+	return state->pcab_vregs[offset];
 }
 
 static WRITE16_HANDLER( philips_66470_w )
 {
-	COMBINE_DATA(&pcab_vregs[offset]);
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	COMBINE_DATA(&state->pcab_vregs[offset]);
 
 //  if(offset == 0x10/2)
 //  {
-		//printf("%04x %04x %04x\n",data,pcab_vregs[0x12/2],pcab_vregs[0x14/2]);
-		//pcab_vregs[0x12/2] = pcab_vregs[0x10/2];
+		//printf("%04x %04x %04x\n",data,state->pcab_vregs[0x12/2],state->pcab_vregs[0x14/2]);
+		//state->pcab_vregs[0x12/2] = state->pcab_vregs[0x10/2];
 //  }
 }
 
 /* scc68070 specific stuff (to be moved) */
-static UINT16 *scc68070_ext_irqc_regs;
-static UINT16 *scc68070_iic_regs;
-static UINT16 *scc68070_uart_regs;
-static UINT16 *scc68070_timer_regs;
-static UINT16 *scc68070_int_irqc_regs;
-static UINT16 *scc68070_dma_ch1_regs;
-static UINT16 *scc68070_dma_ch2_regs;
-static UINT16 *scc68070_mmu_regs;
 
-static READ16_HANDLER( scc68070_ext_irqc_r ) { return scc68070_ext_irqc_regs[offset]; }
-static WRITE16_HANDLER( scc68070_ext_irqc_w ){ scc68070_ext_irqc_regs[offset] = data; }
+static READ16_HANDLER( scc68070_ext_irqc_r )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	return state->scc68070_ext_irqc_regs[offset];
+}
+
+static WRITE16_HANDLER( scc68070_ext_irqc_w )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	state->scc68070_ext_irqc_regs[offset] = data;
+}
+
 static READ16_HANDLER( scc68070_iic_r )
 {
+	magicard_state *state = space->machine->driver_data<magicard_state>();
 	//printf("%04x\n",offset*2);
 
 	switch(offset)
 	{
-		case 0x04/2: return scc68070_iic_regs[offset] & 0xef; //iic status register, bit 4 = pending irq
+		case 0x04/2: return state->scc68070_iic_regs[offset] & 0xef; //iic status register, bit 4 = pending irq
 	}
 
-	return scc68070_iic_regs[offset];
+	return state->scc68070_iic_regs[offset];
 }
 
-static WRITE16_HANDLER( scc68070_iic_w ){ scc68070_iic_regs[offset] = data; }
+static WRITE16_HANDLER( scc68070_iic_w )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	state->scc68070_iic_regs[offset] = data;
+}
 
 static READ16_HANDLER( scc68070_uart_r )
 {
+	magicard_state *state = space->machine->driver_data<magicard_state>();
 	//printf("%02x\n",offset*2);
 
 	switch(offset)
@@ -536,23 +563,73 @@ static READ16_HANDLER( scc68070_uart_r )
 		case 0x02/2: return space->machine->rand(); //uart mode register
 	}
 
-	return scc68070_uart_regs[offset];
+	return state->scc68070_uart_regs[offset];
 }
 
-static WRITE16_HANDLER( scc68070_uart_w ) {	scc68070_uart_regs[offset] = data; }
+static WRITE16_HANDLER( scc68070_uart_w )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	state->scc68070_uart_regs[offset] = data;
+}
 
-static READ16_HANDLER( scc68070_timer_r ) { return scc68070_timer_regs[offset]; }
-static WRITE16_HANDLER( scc68070_timer_w ){ scc68070_timer_regs[offset] = data; }
-static READ16_HANDLER( scc68070_int_irqc_r ) { return scc68070_int_irqc_regs[offset]; }
-static WRITE16_HANDLER( scc68070_int_irqc_w ){ scc68070_int_irqc_regs[offset] = data; }
-static READ16_HANDLER( scc68070_dma_ch1_r ) { return scc68070_dma_ch1_regs[offset]; }
-static WRITE16_HANDLER( scc68070_dma_ch1_w ){ scc68070_dma_ch1_regs[offset] = data; }
-static READ16_HANDLER( scc68070_dma_ch2_r ) { return scc68070_dma_ch2_regs[offset]; }
-static WRITE16_HANDLER( scc68070_dma_ch2_w ){ scc68070_dma_ch2_regs[offset] = data; }
-static READ16_HANDLER( scc68070_mmu_r ) { return scc68070_mmu_regs[offset]; }
+static READ16_HANDLER( scc68070_timer_r )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	return state->scc68070_timer_regs[offset];
+}
+
+static WRITE16_HANDLER( scc68070_timer_w )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	state->scc68070_timer_regs[offset] = data;
+}
+
+static READ16_HANDLER( scc68070_int_irqc_r )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	return state->scc68070_int_irqc_regs[offset];
+}
+
+static WRITE16_HANDLER( scc68070_int_irqc_w )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	state->scc68070_int_irqc_regs[offset] = data;
+}
+
+static READ16_HANDLER( scc68070_dma_ch1_r )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	return state->scc68070_dma_ch1_regs[offset];
+}
+
+static WRITE16_HANDLER( scc68070_dma_ch1_w )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	state->scc68070_dma_ch1_regs[offset] = data;
+}
+
+static READ16_HANDLER( scc68070_dma_ch2_r )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	return state->scc68070_dma_ch2_regs[offset];
+}
+
+static WRITE16_HANDLER( scc68070_dma_ch2_w )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	state->scc68070_dma_ch2_regs[offset] = data;
+}
+
+static READ16_HANDLER( scc68070_mmu_r )
+{
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	return state->scc68070_mmu_regs[offset];
+}
+
 static WRITE16_HANDLER( scc68070_mmu_w )
 {
-	scc68070_mmu_regs[offset] = data;
+	magicard_state *state = space->machine->driver_data<magicard_state>();
+	state->scc68070_mmu_regs[offset] = data;
 
 	switch(offset)
 	{
@@ -570,7 +647,7 @@ static WRITE16_HANDLER( scc68070_mmu_w )
 
 static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_BASE(&magicram) /*only 0-7ffff accessed in Magic Card*/
+	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_BASE_MEMBER(magicard_state, magicram) /*only 0-7ffff accessed in Magic Card*/
 	AM_RANGE(0x00180000, 0x001ffbff) AM_MIRROR(0x7fe00000) AM_RAM AM_REGION("maincpu", 0)
 	/* 001ffc00-001ffdff System I/O */
 	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ(test_r)
@@ -581,15 +658,15 @@ static ADDRESS_MAP_START( magicard_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ(test_r)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
 	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
-	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_BASE(&pcab_vregs) //video registers
-	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_BASE(&scc68070_ext_irqc_regs) //lir
-	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_BASE(&scc68070_iic_regs) //i2c
-	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_BASE(&scc68070_uart_regs)
-	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_BASE(&scc68070_timer_regs)
-	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_BASE(&scc68070_int_irqc_regs)
-	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_BASE(&scc68070_dma_ch1_regs)
-	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_BASE(&scc68070_dma_ch2_regs)
-	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_BASE(&scc68070_mmu_regs)
+	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE(philips_66470_r,philips_66470_w) AM_BASE_MEMBER(magicard_state, pcab_vregs) //video registers
+	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_BASE_MEMBER(magicard_state, scc68070_ext_irqc_regs) //lir
+	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE(scc68070_iic_r,scc68070_iic_w) AM_BASE_MEMBER(magicard_state, scc68070_iic_regs) //i2c
+	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE(scc68070_uart_r,scc68070_uart_w) AM_BASE_MEMBER(magicard_state, scc68070_uart_regs)
+	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE(scc68070_timer_r,scc68070_timer_w) AM_BASE_MEMBER(magicard_state, scc68070_timer_regs)
+	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_BASE_MEMBER(magicard_state, scc68070_int_irqc_regs)
+	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_BASE_MEMBER(magicard_state, scc68070_dma_ch1_regs)
+	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_BASE_MEMBER(magicard_state, scc68070_dma_ch2_regs)
+	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE(scc68070_mmu_r,scc68070_mmu_w) AM_BASE_MEMBER(magicard_state, scc68070_mmu_regs)
 ADDRESS_MAP_END
 
 
@@ -603,8 +680,9 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( magicard )
 {
-	UINT16 *src    = (UINT16*)machine->region( "maincpu" )->base();
-	UINT16 *dst    = magicram;
+	magicard_state *state = machine->driver_data<magicard_state>();
+	UINT16 *src    = (UINT16*)machine->region("maincpu" )->base();
+	UINT16 *dst    = state->magicram;
 	memcpy (dst, src, 0x80000);
 	machine->device("maincpu")->reset();
 }
@@ -623,7 +701,7 @@ static INTERRUPT_GEN( magicard_irq )
 		cpu_set_input_line_and_vector(device, 1, HOLD_LINE,0xf0/4);
 }
 
-static MACHINE_CONFIG_START( magicard, driver_device )
+static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
 	MCFG_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */

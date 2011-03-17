@@ -44,7 +44,16 @@ The PCB is Spanish and manufacured by Gamart.
 #include "emu.h"
 #include "cpu/nec/nec.h"
 
-static UINT16 *peno_vram;
+
+class ttchamp_state : public driver_device
+{
+public:
+	ttchamp_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *peno_vram;
+	UINT16 paloff;
+};
 
 
 static VIDEO_START(ttchamp)
@@ -53,6 +62,7 @@ static VIDEO_START(ttchamp)
 
 static SCREEN_UPDATE(ttchamp)
 {
+	ttchamp_state *state = screen->machine->driver_data<ttchamp_state>();
 	int y,x,count;
 //  int i;
 	static const int xxx=320,yyy=204;
@@ -75,18 +85,18 @@ static SCREEN_UPDATE(ttchamp)
 	{
 		for(x=0;x<xxx;x++)
 		{
-			/*if(hotblock_port0&0x40)*/*BITMAP_ADDR16(bitmap, y, x) = ((UINT8 *)peno_vram)[BYTE_XOR_LE(count)]+0x300;
+			/*if(hotblock_port0&0x40)*/*BITMAP_ADDR16(bitmap, y, x) = ((UINT8 *)state->peno_vram)[BYTE_XOR_LE(count)]+0x300;
             count++;
         }
     }
     return 0;
 }
 
-static UINT16 paloff;
 
 static WRITE16_HANDLER( paloff_w )
 {
-    COMBINE_DATA(&paloff);
+	ttchamp_state *state = space->machine->driver_data<ttchamp_state>();
+    COMBINE_DATA(&state->paloff);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -105,7 +115,8 @@ static WRITE16_HANDLER( pcup_prgbank_w )
 
 static WRITE16_HANDLER( paldat_w )
 {
-    palette_set_color_rgb(space->machine,paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+	ttchamp_state *state = space->machine->driver_data<ttchamp_state>();
+    palette_set_color_rgb(space->machine,state->paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 static READ16_HANDLER( peno_rand )
@@ -122,7 +133,7 @@ static READ16_HANDLER( peno_rand2 )
 
 static ADDRESS_MAP_START( ttchamp_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x00000, 0x0ffff) AM_RAM
-    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(&peno_vram)
+    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE_MEMBER(ttchamp_state, peno_vram)
     AM_RANGE(0x20000, 0x7ffff) AM_ROMBANK("bank1") // ?
     AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END
@@ -222,7 +233,7 @@ static INTERRUPT_GEN( ttchamp_irq ) /* right? */
 	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ttchamp, driver_device )
+static MACHINE_CONFIG_START( ttchamp, ttchamp_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ttchamp_map)

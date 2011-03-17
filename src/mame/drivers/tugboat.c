@@ -28,11 +28,19 @@ always false - counter was reloaded and incremented before interrupt occurs
 #include "sound/ay8910.h"
 
 
-static UINT8 *tugboat_ram;
-//UINT8 *tugboat_score;
+class tugboat_state : public driver_device
+{
+public:
+	tugboat_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-
-static UINT8 hd46505_0_reg[18],hd46505_1_reg[18];
+	UINT8 *ram;
+	UINT8 hd46505_0_reg[18];
+	UINT8 hd46505_1_reg[18];
+	int reg0;
+	int reg1;
+	int ctrl;
+};
 
 
 /*  there isn't the usual resistor array anywhere near the color prom,
@@ -63,34 +71,36 @@ static PALETTE_INIT( tugboat )
    because I need the start_addr register to handle scrolling */
 static WRITE8_HANDLER( tugboat_hd46505_0_w )
 {
-	static int reg;
-	if (offset == 0) reg = data & 0x0f;
-	else if (reg < 18) hd46505_0_reg[reg] = data;
+	tugboat_state *state = space->machine->driver_data<tugboat_state>();
+	if (offset == 0) state->reg0 = data & 0x0f;
+	else if (state->reg0 < 18) state->hd46505_0_reg[state->reg0] = data;
 }
 static WRITE8_HANDLER( tugboat_hd46505_1_w )
 {
-	static int reg;
-	if (offset == 0) reg = data & 0x0f;
-	else if (reg < 18) hd46505_1_reg[reg] = data;
+	tugboat_state *state = space->machine->driver_data<tugboat_state>();
+	if (offset == 0) state->reg1 = data & 0x0f;
+	else if (state->reg1 < 18) state->hd46505_1_reg[state->reg1] = data;
 }
 
 
 static WRITE8_HANDLER( tugboat_score_w )
 {
-      if (offset>=0x8) tugboat_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
-      if (offset<0x8 ) tugboat_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
+	tugboat_state *state = space->machine->driver_data<tugboat_state>();
+      if (offset>=0x8) state->ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
+      if (offset<0x8 ) state->ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
 static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,
 		int addr,int gfx0,int gfx1,int transparency)
 {
+	tugboat_state *state = machine->driver_data<tugboat_state>();
 	int x,y;
 
 	for (y = 0;y < 32;y++)
 	{
 		for (x = 0;x < 32;x++)
 		{
-			int code = (tugboat_ram[addr + 0x400] << 8) | tugboat_ram[addr];
+			int code = (state->ram[addr + 0x400] << 8) | state->ram[addr];
 			int color = (code & 0x3c00) >> 10;
 			int rgn;
 
@@ -117,8 +127,9 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static SCREEN_UPDATE( tugboat )
 {
-	int startaddr0 = hd46505_0_reg[0x0c]*256 + hd46505_0_reg[0x0d];
-	int startaddr1 = hd46505_1_reg[0x0c]*256 + hd46505_1_reg[0x0d];
+	tugboat_state *state = screen->machine->driver_data<tugboat_state>();
+	int startaddr0 = state->hd46505_0_reg[0x0c]*256 + state->hd46505_0_reg[0x0d];
+	int startaddr1 = state->hd46505_1_reg[0x0c]*256 + state->hd46505_1_reg[0x0d];
 
 
 	draw_tilemap(screen->machine, bitmap,cliprect,startaddr0,0,1,FALSE);
@@ -127,17 +138,17 @@ static SCREEN_UPDATE( tugboat )
 }
 
 
-static int ctrl;
 
 static READ8_DEVICE_HANDLER( tugboat_input_r )
 {
-	if (~ctrl & 0x80)
+	tugboat_state *state = device->machine->driver_data<tugboat_state>();
+	if (~state->ctrl & 0x80)
 		return input_port_read(device->machine, "IN0");
-	else if (~ctrl & 0x40)
+	else if (~state->ctrl & 0x40)
 		return input_port_read(device->machine, "IN1");
-	else if (~ctrl & 0x20)
+	else if (~state->ctrl & 0x20)
 		return input_port_read(device->machine, "IN2");
-	else if (~ctrl & 0x10)
+	else if (~state->ctrl & 0x10)
 		return input_port_read(device->machine, "IN3");
 	else
 		return input_port_read(device->machine, "IN4");
@@ -145,12 +156,14 @@ static READ8_DEVICE_HANDLER( tugboat_input_r )
 
 static READ8_DEVICE_HANDLER( tugboat_ctrl_r )
 {
-	return ctrl;
+	tugboat_state *state = device->machine->driver_data<tugboat_state>();
+	return state->ctrl;
 }
 
 static WRITE8_DEVICE_HANDLER( tugboat_ctrl_w )
 {
-	ctrl = data;
+	tugboat_state *state = device->machine->driver_data<tugboat_state>();
+	state->ctrl = data;
 }
 
 static const pia6821_interface pia0_intf =
@@ -198,7 +211,7 @@ static MACHINE_RESET( tugboat )
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_BASE(&tugboat_ram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_BASE_MEMBER(tugboat_state, ram)
 	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(tugboat_hd46505_0_w)	/* scrolling is performed changing the start_addr register (0C/0D) */
 	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(tugboat_hd46505_1_w)
@@ -313,7 +326,7 @@ static GFXDECODE_START( tugboat )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tugboat, driver_device )
+static MACHINE_CONFIG_START( tugboat, tugboat_state )
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)

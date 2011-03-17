@@ -91,7 +91,16 @@ Smitdogg
 #include "video/pc_vga.h"
 #include "video/pc_video.h"
 
-static UINT8 *banked_nvram;
+
+class pcat_nit_state : public driver_device
+{
+public:
+	pcat_nit_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *banked_nvram;
+};
+
 
 static void pcat_nit_microtouch_tx_callback(running_machine *machine, UINT8 data)
 {
@@ -126,6 +135,7 @@ static const ins8250_interface pcat_nit_com0_interface =
 
 static WRITE8_HANDLER(pcat_nit_rombank_w)
 {
+	pcat_nit_state *state = space->machine->driver_data<pcat_nit_state>();
 	logerror( "rom bank #%02x at PC=%08X\n", data, cpu_get_pc(space->cpu) );
 	if ( data & 0x40 )
 	{
@@ -149,7 +159,7 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 
 		memory_install_readwrite_bank(space, 0x000d8000, 0x000d9fff, 0, 0, "nvrambank" );
 
-		memory_set_bankptr(space->machine, "nvrambank", banked_nvram);
+		memory_set_bankptr(space->machine, "nvrambank", state->banked_nvram);
 
 	}
 }
@@ -223,7 +233,7 @@ static MACHINE_START( streetg2 )
 	microtouch_init(machine, pcat_nit_microtouch_tx_callback, NULL);
 }
 
-static MACHINE_CONFIG_START( pcat_nit, driver_device )
+static MACHINE_CONFIG_START( pcat_nit, pcat_nit_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)
@@ -379,7 +389,8 @@ ROM_END
 
 static DRIVER_INIT(pcat_nit)
 {
-	banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
+	pcat_nit_state *state = machine->driver_data<pcat_nit_state>();
+	state->banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
 
 	pc_vga_init(machine, &vga_interface, NULL);
 }

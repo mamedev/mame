@@ -184,6 +184,28 @@ public:
 
 	UINT8 *videoram;
 	required_shared_ptr<UINT8> cmos_ram;
+	UINT16 autohold_addr;
+	tilemap_t *bg_tilemap;
+	UINT8 wingboard;
+	UINT8 jumper_e16_e17;
+	UINT8 *program_ram;
+	UINT8 *s3000_ram;
+	UINT8 *s5000_ram;
+	UINT8 *s7000_ram;
+	UINT8 *sb000_ram;
+	UINT8 *sd000_ram;
+	UINT8 *sf000_ram;
+	UINT16 vid_address;
+	UINT8 *palette_ram;
+	UINT8 *palette_ram2;
+	UINT8 *io_port;
+	UINT64 last_cycles;
+	UINT8 coin_state;
+	UINT64 last_door;
+	UINT8 door_open;
+	UINT64 last_coin_out;
+	UINT8 coin_out_state;
+	int sda_dir;
 };
 
 
@@ -192,41 +214,7 @@ public:
 #define MC6845_CLOCK		((MASTER_CLOCK)/8/3)
 #define SOUND_CLOCK			((MASTER_CLOCK)/12)
 
-static UINT16 autohold_addr; /* address to patch in program RAM to enable autohold feature */
 
-static tilemap_t *bg_tilemap;
-static UINT8 wingboard;
-static UINT8 jumper_e16_e17; /* Set this to TRUE when CG chips are 27c512 instead of 27c256 */
-
-/* Pointers to External RAM */
-static UINT8 *program_ram;
-static UINT8 *s3000_ram;
-static UINT8 *s5000_ram;
-static UINT8 *s7000_ram;
-static UINT8 *sb000_ram;
-static UINT8 *sd000_ram;
-static UINT8 *sf000_ram;
-
-/* Variables used instead of CRTC6845 system */
-static UINT16 vid_address = 0;
-
-/* Holds upper video address, palette number and jumper_e16_e17 flag */
-static UINT8 *palette_ram;
-static UINT8 *palette_ram2;
-
-/* IO Ports */
-static UINT8 *io_port;
-
-/* Coin, Door, Hopper and EEPROM States */
-static UINT64 last_cycles;
-static UINT8 coin_state = 0;
-static UINT64 last_door;
-static UINT8 door_open = 0;
-static UINT64 last_coin_out;
-static UINT8 coin_out_state = 0;
-static int sda_dir = 0;
-
-/* Static Variables */
 #define eeprom_NVRAM_SIZE   0x200 // 4k Bit
 
 /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
@@ -260,15 +248,16 @@ static const mc6845_interface mc6845_intf =
 
 static void peplus_load_superdata(running_machine *machine, const char *bank_name)
 {
+	peplus_state *state = machine->driver_data<peplus_state>();
     UINT8 *super_data = machine->region(bank_name)->base();
 
     /* Distribute Superboard Data */
-    memcpy(s3000_ram, &super_data[0x3000], 0x1000);
-    memcpy(s5000_ram, &super_data[0x5000], 0x1000);
-    memcpy(s7000_ram, &super_data[0x7000], 0x1000);
-    memcpy(sb000_ram, &super_data[0xb000], 0x1000);
-    memcpy(sd000_ram, &super_data[0xd000], 0x1000);
-    memcpy(sf000_ram, &super_data[0xf000], 0x1000);
+    memcpy(state->s3000_ram, &super_data[0x3000], 0x1000);
+    memcpy(state->s5000_ram, &super_data[0x5000], 0x1000);
+    memcpy(state->s7000_ram, &super_data[0x7000], 0x1000);
+    memcpy(state->sb000_ram, &super_data[0xb000], 0x1000);
+    memcpy(state->sd000_ram, &super_data[0xd000], 0x1000);
+    memcpy(state->sf000_ram, &super_data[0xf000], 0x1000);
 }
 
 
@@ -311,7 +300,8 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 
 static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
 {
-	vid_address = address;
+	peplus_state *state = device->machine->driver_data<peplus_state>();
+	state->vid_address = address;
 }
 
 static WRITE8_DEVICE_HANDLER( peplus_crtc_mode_w )
@@ -347,11 +337,11 @@ static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 {
 	peplus_state *state = device->machine->driver_data<peplus_state>();
 	UINT8 *videoram = state->videoram;
-	videoram[vid_address] = data;
-	palette_ram[vid_address] = io_port[1];
-	palette_ram2[vid_address] = io_port[3];
+	videoram[state->vid_address] = data;
+	state->palette_ram[state->vid_address] = state->io_port[1];
+	state->palette_ram2[state->vid_address] = state->io_port[3];
 
-	tilemap_mark_tile_dirty(bg_tilemap, vid_address);
+	tilemap_mark_tile_dirty(state->bg_tilemap, state->vid_address);
 
 	/* An access here triggers a device read !*/
 	(void) mc6845_register_r(device, 0);
@@ -359,7 +349,8 @@ static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 
 static WRITE8_HANDLER( peplus_io_w )
 {
-	io_port[offset] = data;
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	state->io_port[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_duart_w )
@@ -373,7 +364,7 @@ static WRITE8_HANDLER( peplus_cmos_w )
 	char bank_name[6];
 
 	/* Test for Wingboard PAL Trigger Condition */
-	if (offset == 0x1fff && wingboard && data < 5)
+	if (offset == 0x1fff && state->wingboard && data < 5)
 	{
 		sprintf(bank_name, "user%d", data + 1);
 		peplus_load_superdata(space->machine, bank_name);
@@ -384,36 +375,43 @@ static WRITE8_HANDLER( peplus_cmos_w )
 
 static WRITE8_HANDLER( peplus_s3000_w )
 {
-	s3000_ram[offset] = data;
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	state->s3000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_s5000_w )
 {
-	s5000_ram[offset] = data;
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	state->s5000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_s7000_w )
 {
-	s7000_ram[offset] = data;
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	state->s7000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_sb000_w )
 {
-	sb000_ram[offset] = data;
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	state->sb000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_sd000_w )
 {
-	sd000_ram[offset] = data;
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	state->sd000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_sf000_w )
 {
-	sf000_ram[offset] = data;
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	state->sf000_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_output_bank_a_w )
 {
+	peplus_state *state = space->machine->driver_data<peplus_state>();
 	output_set_value("pe_bnka0",(data >> 0) & 1); /* Coin Lockout */
 	output_set_value("pe_bnka1",(data >> 1) & 1); /* Diverter */
 	output_set_value("pe_bnka2",(data >> 2) & 1); /* Bell */
@@ -423,9 +421,9 @@ static WRITE8_HANDLER( peplus_output_bank_a_w )
 	output_set_value("pe_bnka6",(data >> 6) & 1); /* specific to a kind of machine */
 	output_set_value("pe_bnka7",(data >> 7) & 1); /* specific to a kind of machine */
 
-    coin_out_state = 0;
+    state->coin_out_state = 0;
     if(((data >> 4) & 1) || ((data >> 5) & 1))
-        coin_out_state = 3;
+        state->coin_out_state = 3;
 }
 
 static WRITE8_HANDLER( peplus_output_bank_b_w )
@@ -454,8 +452,9 @@ static WRITE8_HANDLER( peplus_output_bank_c_w )
 
 static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 {
+	peplus_state *state = device->machine->driver_data<peplus_state>();
 	i2cmem_scl_write(device,BIT(data, 2));
-	sda_dir = BIT(data, 1);
+	state->sda_dir = BIT(data, 1);
 	i2cmem_sda_write(device,BIT(data, 0));
 }
 
@@ -466,7 +465,8 @@ static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 
 static READ8_HANDLER( peplus_io_r )
 {
-    return io_port[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+    return state->io_port[offset];
 }
 
 static READ8_HANDLER( peplus_duart_r )
@@ -483,32 +483,38 @@ static READ8_HANDLER( peplus_cmos_r )
 
 static READ8_HANDLER( peplus_s3000_r )
 {
-	return s3000_ram[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	return state->s3000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_s5000_r )
 {
-	return s5000_ram[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	return state->s5000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_s7000_r )
 {
-	return s7000_ram[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	return state->s7000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_sb000_r )
 {
-	return sb000_ram[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	return state->sb000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_sd000_r )
 {
-	return sd000_ram[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	return state->sd000_ram[offset];
 }
 
 static READ8_HANDLER( peplus_sf000_r )
 {
-	return sf000_ram[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	return state->sf000_ram[offset];
 }
 
 /* Last Color in Every Palette is bgcolor */
@@ -529,6 +535,7 @@ static READ8_HANDLER( peplus_watchdog_r )
 
 static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 {
+	peplus_state *state = device->machine->driver_data<peplus_state>();
 /*
         Bit 0 = COIN DETECTOR A
         Bit 1 = COIN DETECTOR B
@@ -546,25 +553,25 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 	UINT16 door_wait = 500;
 
 	UINT8 sda = 0;
-	if(!sda_dir)
+	if(!state->sda_dir)
 	{
 		sda = i2cmem_sda_read(device);
 	}
 
-	if ((input_port_read_safe(device->machine, "SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
-		coin_state = 1; // Start Coin Cycle
-		last_cycles = device->machine->firstcpu->total_cycles();
+	if ((input_port_read_safe(device->machine, "SENSOR",0x00) & 0x01) == 0x01 && state->coin_state == 0) {
+		state->coin_state = 1; // Start Coin Cycle
+		state->last_cycles = device->machine->firstcpu->total_cycles();
 	} else {
 		/* Process Next Coin Optic State */
-		if (curr_cycles - last_cycles > 600000/6 && coin_state != 0) {
-			coin_state++;
-			if (coin_state > 5)
-				coin_state = 0;
-			last_cycles = device->machine->firstcpu->total_cycles();
+		if (curr_cycles - state->last_cycles > 600000/6 && state->coin_state != 0) {
+			state->coin_state++;
+			if (state->coin_state > 5)
+				state->coin_state = 0;
+			state->last_cycles = device->machine->firstcpu->total_cycles();
 		}
 	}
 
-	switch (coin_state)
+	switch (state->coin_state)
 	{
 		case 0x00: // No Coin
 			coin_optics = 0x00;
@@ -586,29 +593,29 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 			break;
 	}
 
-	if (wingboard)
+	if (state->wingboard)
 		door_wait = 12345;
 
-	if (curr_cycles - last_door > door_wait) {
+	if (curr_cycles - state->last_door > door_wait) {
 		if ((input_port_read_safe(device->machine, "DOOR",0xff) & 0x01) == 0x01) {
-			door_open = (!door_open & 0x01);
+			state->door_open = (!state->door_open & 0x01);
 		} else {
-			door_open = 1;
+			state->door_open = 1;
 		}
-		last_door = device->machine->firstcpu->total_cycles();
+		state->last_door = device->machine->firstcpu->total_cycles();
 	}
 
-	if (curr_cycles - last_coin_out > 600000/12 && coin_out_state != 0) { // Guessing with 600000
-		if (coin_out_state != 2) {
-            coin_out_state = 2; // Coin-Out Off
+	if (curr_cycles - state->last_coin_out > 600000/12 && state->coin_out_state != 0) { // Guessing with 600000
+		if (state->coin_out_state != 2) {
+            state->coin_out_state = 2; // Coin-Out Off
         } else {
-            coin_out_state = 3; // Coin-Out On
+            state->coin_out_state = 3; // Coin-Out On
         }
 
-		last_coin_out = device->machine->firstcpu->total_cycles();
+		state->last_coin_out = device->machine->firstcpu->total_cycles();
 	}
 
-    switch (coin_out_state)
+    switch (state->coin_out_state)
     {
         case 0x00: // No Coin-Out
 	        coin_out = 0x00;
@@ -624,7 +631,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 	        break;
     }
 
-	bank_a = (sda<<7) | bank_a | (door_open<<5) | coin_optics | coin_out;
+	bank_a = (sda<<7) | bank_a | (state->door_open<<5) | coin_optics | coin_out;
 
 	return bank_a;
 }
@@ -638,15 +645,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	peplus_state *state = machine->driver_data<peplus_state>();
 	UINT8 *videoram = state->videoram;
-	int pr = palette_ram[tile_index];
-	int pr2 = palette_ram2[tile_index];
+	int pr = state->palette_ram[tile_index];
+	int pr2 = state->palette_ram2[tile_index];
 	int vr = videoram[tile_index];
 
 	int code = ((pr & 0x0f)*256) | vr;
 	int color = (pr>>4) & 0x0f;
 
 	// Access 2nd Half of CGs and CAP
-	if (jumper_e16_e17 && (pr2 & 0x10) == 0x10)
+	if (state->jumper_e16_e17 && (pr2 & 0x10) == 0x10)
 	{
 		code += 0x1000;
 		color += 0x10;
@@ -657,16 +664,18 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( peplus )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
-	palette_ram = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(palette_ram, 0, 0x3000);
-	palette_ram2 = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(palette_ram2, 0, 0x3000);
+	peplus_state *state = machine->driver_data<peplus_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 40, 25);
+	state->palette_ram = auto_alloc_array(machine, UINT8, 0x3000);
+	memset(state->palette_ram, 0, 0x3000);
+	state->palette_ram2 = auto_alloc_array(machine, UINT8, 0x3000);
+	memset(state->palette_ram2, 0, 0x3000);
 }
 
 static SCREEN_UPDATE( peplus )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	peplus_state *state = screen->machine->driver_data<peplus_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	return 0;
 }
@@ -722,7 +731,7 @@ GFXDECODE_END
 *************************/
 
 static ADDRESS_MAP_START( peplus_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE(&program_ram)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE_MEMBER(peplus_state, program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
@@ -736,14 +745,14 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x2083, 0x2083) AM_DEVREADWRITE("crtc", mc6845_register_r, peplus_crtc_display_w)
 
     // Superboard Data
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE(&s3000_ram)
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE_MEMBER(peplus_state, s3000_ram)
 
 	// Sound and Dipswitches
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE("aysnd", ay8910_data_w)
 
     // Superboard Data
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_BASE(&s5000_ram)
+	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_BASE_MEMBER(peplus_state, s5000_ram)
 
 	// Background Color Latch
 	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
@@ -752,7 +761,7 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE_MEMBER(peplus_state, videoram)
 
     // Superboard Data
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_BASE(&s7000_ram)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_BASE_MEMBER(peplus_state, s7000_ram)
 
 	// Input Bank A, Output Bank C
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("i2cmem",peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
@@ -764,22 +773,22 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") AM_WRITE(peplus_output_bank_b_w)
 
     // Superboard Data
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_BASE(&sb000_ram)
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_BASE_MEMBER(peplus_state, sb000_ram)
 
 	// Output Bank A
 	AM_RANGE(0xc000, 0xc000) AM_READ(peplus_watchdog_r) AM_WRITE(peplus_output_bank_a_w)
 
     // Superboard Data
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(peplus_sd000_r, peplus_sd000_w) AM_BASE(&sd000_ram)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(peplus_sd000_r, peplus_sd000_w) AM_BASE_MEMBER(peplus_state, sd000_ram)
 
 	// DUART
 	AM_RANGE(0xe000, 0xe00f) AM_READWRITE(peplus_duart_r, peplus_duart_w)
 
     // Superboard Data
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_BASE(&sf000_ram)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_BASE_MEMBER(peplus_state, sf000_ram)
 
 	/* Ports start here */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_BASE(&io_port)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_BASE_MEMBER(peplus_state, io_port)
 ADDRESS_MAP_END
 
 
@@ -987,27 +996,28 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( peplus )
 {
-/*
-    AutoHold Feature Currently Disabled
+	/* AutoHold Feature Currently Disabled */
+#if 0
+	peplus_state *state = machine->driver_data<peplus_state>();
 
-    // pepp0158
-    program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
-    program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
-    autohold_addr = 0x5ffe; // AutoHold Address
+	// pepp0158
+	state->program_ram[0xa19f] = 0x22; // RET - Disable Memory Test
+	state->program_ram[0xddea] = 0x22; // RET - Disable Program Checksum
+	state->autohold_addr = 0x5ffe; // AutoHold Address
 
-    // pepp0188
-    program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
-    program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
-    autohold_addr = 0x742f; // AutoHold Address
+	// pepp0188
+	state->program_ram[0x9a8d] = 0x22; // RET - Disable Memory Test
+	state->program_ram[0xf429] = 0x22; // RET - Disable Program Checksum
+	state->autohold_addr = 0x742f; // AutoHold Address
 
-    // pepp0516
-    program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
-    program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
-    autohold_addr = 0x5e7e; // AutoHold Address
+	// pepp0516
+	state->program_ram[0x9a24] = 0x22; // RET - Disable Memory Test
+	state->program_ram[0xd61d] = 0x22; // RET - Disable Program Checksum
+	state->autohold_addr = 0x5e7e; // AutoHold Address
 
-    if (autohold_addr)
-        program_ram[autohold_addr] = input_port_read_safe(machine, "AUTOHOLD",0x00) & 0x01;
-*/
+	if (state->autohold_addr)
+		state->program_ram[state->autohold_addr] = input_port_read_safe(machine, "AUTOHOLD",0x00) & 0x01;
+#endif
 }
 
 
@@ -1056,8 +1066,9 @@ MACHINE_CONFIG_END
 /* Normal board */
 static void peplus_init(running_machine *machine)
 {
+	peplus_state *state = machine->driver_data<peplus_state>();
 	/* default : no address to patch in program RAM to enable autohold feature */
-	autohold_addr = 0;
+	state->autohold_addr = 0;
 }
 
 
@@ -1068,16 +1079,18 @@ static void peplus_init(running_machine *machine)
 /* Normal board */
 static DRIVER_INIT( peplus )
 {
-	wingboard = FALSE;
-	jumper_e16_e17 = FALSE;
+	peplus_state *state = machine->driver_data<peplus_state>();
+	state->wingboard = FALSE;
+	state->jumper_e16_e17 = FALSE;
 	peplus_init(machine);
 }
 
 /* Superboard */
 static DRIVER_INIT( peplussb )
 {
-	wingboard = FALSE;
-	jumper_e16_e17 = FALSE;
+	peplus_state *state = machine->driver_data<peplus_state>();
+	state->wingboard = FALSE;
+	state->jumper_e16_e17 = FALSE;
 	peplus_load_superdata(machine, "user1");
 
 	peplus_init(machine);
@@ -1086,8 +1099,9 @@ static DRIVER_INIT( peplussb )
 /* Superboard with Attached Wingboard */
 static DRIVER_INIT( peplussbw )
 {
-	wingboard = TRUE;
-	jumper_e16_e17 = TRUE;
+	peplus_state *state = machine->driver_data<peplus_state>();
+	state->wingboard = TRUE;
+	state->jumper_e16_e17 = TRUE;
 	peplus_load_superdata(machine, "user1");
 
 	peplus_init(machine);

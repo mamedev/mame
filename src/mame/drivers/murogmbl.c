@@ -37,7 +37,16 @@ Dumped: 06/04/2009 f205v
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 
-static UINT8* murogmbl_video;
+
+class murogmbl_state : public driver_device
+{
+public:
+	murogmbl_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8* video;
+};
+
 
 static PALETTE_INIT( murogmbl )
 {
@@ -68,7 +77,7 @@ static ADDRESS_MAP_START( murogmbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fFf) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
-	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE(&murogmbl_video)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE_MEMBER(murogmbl_state, video)
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")
@@ -83,6 +92,7 @@ static VIDEO_START(murogmbl)
 
 static SCREEN_UPDATE(murogmbl)
 {
+	murogmbl_state *state = screen->machine->driver_data<murogmbl_state>();
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0;
 
@@ -92,7 +102,7 @@ static SCREEN_UPDATE(murogmbl)
 	{
 		for (x = 0; x < 32; x++)
 		{
-			int tile = murogmbl_video[count];
+			int tile = state->video[count];
 			drawgfx_opaque(bitmap, cliprect, gfx, tile, 0, 0, 0, x * 8, y * 8);
 
 			count++;
@@ -166,7 +176,7 @@ static GFXDECODE_START( murogmbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( murogmbl, driver_device )
+static MACHINE_CONFIG_START( murogmbl, murogmbl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MCFG_CPU_PROGRAM_MAP(murogmbl_map)

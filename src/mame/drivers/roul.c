@@ -66,12 +66,21 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "roul.lh"
 #include "machine/nvram.h"
 
+
+class roul_state : public driver_device
+{
+public:
+	roul_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 reg[0x10];
+	UINT8 *videobuf;
+	UINT8 lamp_old;
+};
+
+
 #define VIDEOBUF_SIZE 256*256
 
-static UINT8 reg[0x10];
-static UINT8 *videobuf;
-
-static UINT8 lamp_old = 0;
 
 static PALETTE_INIT( roul )
 {
@@ -112,40 +121,41 @@ bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
 
 static WRITE8_HANDLER( blitter_cmd_w )
 {
-	reg[offset] = data;
+	roul_state *state = space->machine->driver_data<roul_state>();
+	state->reg[offset] = data;
 	if (offset==2)
 	{
 		int i,j;
-		int width	= reg[2];
-		int y		= reg[0];
-		int x		= reg[1];
-		int color	= reg[3] & 0x0f;
+		int width	= state->reg[2];
+		int y		= state->reg[0];
+		int x		= state->reg[1];
+		int color	= state->reg[3] & 0x0f;
 		int xdirection = 1, ydirection = 1;
 
-		if (reg[3] & 0x10) ydirection = -1;
-		if (reg[3] & 0x20) xdirection = -1;
+		if (state->reg[3] & 0x10) ydirection = -1;
+		if (state->reg[3] & 0x20) xdirection = -1;
 
 		if (width == 0x00) width = 0x100;
 
-		switch(reg[3] & 0xc0)
+		switch(state->reg[3] & 0xc0)
 		{
-			case 0x00: // reg[4] used?
+			case 0x00: // state->reg[4] used?
 				for (i = - width / 2; i < width / 2; i++)
 					for (j = - width / 2; j < width / 2; j++)
-						videobuf[(y + j) * 256 + x + i] = color;
-				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",reg[0],reg[1],reg[2],reg[3],reg[4]);
+						state->videobuf[(y + j) * 256 + x + i] = color;
+				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",state->reg[0],state->reg[1],state->reg[2],state->reg[3],state->reg[4]);
 				break;
-			case 0x40: // vertical line - reg[4] not used
+			case 0x40: // vertical line - state->reg[4] not used
 				for (i = 0; i < width; i++ )
-					videobuf[(y + i * ydirection) * 256 + x] = color;
+					state->videobuf[(y + i * ydirection) * 256 + x] = color;
 				break;
-			case 0x80: // horizontal line - reg[4] not used
+			case 0x80: // horizontal line - state->reg[4] not used
 				for (i = 0; i < width; i++ )
-					videobuf[y * 256 + x + i * xdirection] = color;
+					state->videobuf[y * 256 + x + i * xdirection] = color;
 				break;
-			case 0xc0: // diagonal line - reg[4] not used
+			case 0xc0: // diagonal line - state->reg[4] not used
 				for (i = 0; i < width; i++ )
-					videobuf[(y + i * ydirection) * 256 + x + i * xdirection] = color;
+					state->videobuf[(y + i * ydirection) * 256 + x + i * xdirection] = color;
 		}
 	}
 
@@ -159,11 +169,12 @@ static WRITE8_HANDLER( sound_latch_w )
 
 static WRITE8_HANDLER( ball_w )
 {
+	roul_state *state = space->machine->driver_data<roul_state>();
 	int lamp = data;
 
 	output_set_lamp_value(data, 1);
-	output_set_lamp_value(lamp_old, 0);
-	lamp_old = lamp;
+	output_set_lamp_value(state->lamp_old, 0);
+	state->lamp_old = lamp;
 }
 
 static ADDRESS_MAP_START( roul_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -195,15 +206,17 @@ ADDRESS_MAP_END
 
 static VIDEO_START(roul)
 {
-	videobuf = auto_alloc_array_clear(machine, UINT8, VIDEOBUF_SIZE);
+	roul_state *state = machine->driver_data<roul_state>();
+	state->videobuf = auto_alloc_array_clear(machine, UINT8, VIDEOBUF_SIZE);
 }
 
 static SCREEN_UPDATE(roul)
 {
+	roul_state *state = screen->machine->driver_data<roul_state>();
 	int i,j;
 	for (i = 0; i < 256; i++)
 		for (j = 0; j < 256; j++)
-			*BITMAP_ADDR16(bitmap, j, i) = videobuf[j * 256 + 255 - i];
+			*BITMAP_ADDR16(bitmap, j, i) = state->videobuf[j * 256 + 255 - i];
 	return 0;
 }
 
@@ -257,7 +270,7 @@ static INPUT_PORTS_START( roul )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( roul, driver_device )
+static MACHINE_CONFIG_START( roul, roul_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(roul_map)

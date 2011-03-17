@@ -89,17 +89,20 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 class pachifev_state : public driver_device
 {
 public:
-    pachifev_state(running_machine &machine, const driver_device_config_base &config)
+	pachifev_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
- /* controls related */
+	/* controls related */
+	int power;
+	int max_power;
+	int input_power;
+	int previous_power;
+	int cnt;
 
- int power;
- int max_power;
- int input_power;
- int previous_power;
- int cnt;
-
+	UINT32 adpcm_pos;
+	UINT8 adpcm_idle;
+	UINT8 trigger;
+	UINT8 adpcm_data;
 };
 
 static WRITE8_HANDLER(controls_w)
@@ -244,31 +247,29 @@ INPUT_PORTS_END
 
 #if USE_MSM
 
-static UINT32 adpcm_pos;
-static UINT8 adpcm_idle=0;
 
 static void pf_adpcm_int(device_t *device)
 {
-    static UINT8 trigger,adpcm_data;
+	pachifev_state *state = device->machine->driver_data<pachifev_state>();
 
-    if (adpcm_pos >= 0x4000 || adpcm_idle)
+    if (state->adpcm_pos >= 0x4000 || state->adpcm_idle)
     {
-        adpcm_idle = 1;
+        state->adpcm_idle = 1;
         msm5205_reset_w(device,1);
-        trigger = 0;
+        state->trigger = 0;
     }
     else
     {
         UINT8 *ROM = device->machine->region("adpcm")->base();
 
-        adpcm_data = ((trigger ? (ROM[adpcm_pos] & 0x0f) : (ROM[adpcm_pos] & 0xf0)>>4) );
-        msm5205_data_w(device,adpcm_data & 0xf);
-        trigger^=1;
-        if(trigger == 0)
+        state->adpcm_data = ((state->trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0)>>4) );
+        msm5205_data_w(device,state->adpcm_data & 0xf);
+        state->trigger^=1;
+        if(state->trigger == 0)
         {
-            adpcm_pos++;
-            if((ROM[adpcm_pos] & 0xff) == 0xff)
-              adpcm_idle = 1;
+            state->adpcm_pos++;
+            if((ROM[state->adpcm_pos] & 0xff) == 0xff)
+              state->adpcm_idle = 1;
         }
     }
 }
@@ -292,7 +293,7 @@ static MACHINE_RESET( pachifev )
     state->cnt=0;
 
 #if USE_MSM
-    adpcm_pos = 0;
+    state->adpcm_pos = 0;
 #endif
 }
 

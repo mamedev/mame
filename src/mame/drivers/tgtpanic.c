@@ -12,8 +12,16 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static UINT8 *ram;
-static UINT8 color;
+
+class tgtpanic_state : public driver_device
+{
+public:
+	tgtpanic_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram;
+	UINT8 color;
+};
 
 
 /*************************************
@@ -24,18 +32,19 @@ static UINT8 color;
 
 static SCREEN_UPDATE( tgtpanic )
 {
+	tgtpanic_state *state = screen->machine->driver_data<tgtpanic_state>();
 	UINT32 colors[4];
 	UINT32 offs;
 	UINT32 x, y;
 
 	colors[0] = 0;
 	colors[1] = 0xffffffff;
-	colors[2] = MAKE_RGB(pal1bit(color >> 2), pal1bit(color >> 1), pal1bit(color >> 0));
-	colors[3] = MAKE_RGB(pal1bit(color >> 6), pal1bit(color >> 5), pal1bit(color >> 4));
+	colors[2] = MAKE_RGB(pal1bit(state->color >> 2), pal1bit(state->color >> 1), pal1bit(state->color >> 0));
+	colors[3] = MAKE_RGB(pal1bit(state->color >> 6), pal1bit(state->color >> 5), pal1bit(state->color >> 4));
 
 	for (offs = 0; offs < 0x2000; ++offs)
 	{
-		UINT8 val = ram[offs];
+		UINT8 val = state->ram[offs];
 
 		y = (offs & 0x7f) << 1;
 		x = (offs >> 7) << 2;
@@ -59,8 +68,9 @@ static SCREEN_UPDATE( tgtpanic )
 
 static WRITE8_HANDLER( color_w )
 {
+	tgtpanic_state *state = space->machine->driver_data<tgtpanic_state>();
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
-	color = data;
+	state->color = data;
 }
 
 
@@ -72,7 +82,7 @@ static WRITE8_HANDLER( color_w )
 
 static ADDRESS_MAP_START( prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(&ram)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_MEMBER(tgtpanic_state, ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
@@ -117,7 +127,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tgtpanic, driver_device )
+static MACHINE_CONFIG_START( tgtpanic, tgtpanic_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)

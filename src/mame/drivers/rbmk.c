@@ -56,10 +56,19 @@ Notes:
 #include "sound/2151intf.h"
 #include "machine/eeprom.h"
 
-static UINT16 *gms_vidram;
-static UINT16 *gms_vidram2;
 
-static UINT16 tilebank=0;
+class rbmk_state : public driver_device
+{
+public:
+	rbmk_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *gms_vidram;
+	UINT16 *gms_vidram2;
+	UINT16 tilebank;
+	UINT8 mux_data;
+};
+
 
 static READ16_HANDLER( gms_read )
 {
@@ -74,7 +83,8 @@ static WRITE16_HANDLER( gms_write1 )
 
 static WRITE16_HANDLER( gms_write2 )
 {
-	tilebank=data;
+	rbmk_state *state = space->machine->driver_data<rbmk_state>();
+	state->tilebank=data;
 }
 
 static WRITE16_HANDLER( gms_write3 )
@@ -99,10 +109,10 @@ static ADDRESS_MAP_START( rbmk_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_BASE(&gms_vidram2)
+	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_BASE_MEMBER(rbmk_state, gms_vidram2)
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
 	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_BASE(&gms_vidram)
+	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_BASE_MEMBER(rbmk_state, gms_vidram)
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0xC00000, 0xC00001) AM_READ_PORT("IN0") AM_WRITE(gms_write1)
 	AM_RANGE(0xC08000, 0xC08001) AM_READ_PORT("IN1") AM_WRITE(gms_write2)
@@ -112,7 +122,6 @@ static ADDRESS_MAP_START( rbmk_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xC28000, 0xC28001) AM_WRITE(gms_write3)
 ADDRESS_MAP_END
 
-static UINT8 mux_data;
 
 static ADDRESS_MAP_START( rbmk_mcu_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
@@ -120,37 +129,40 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( rbmk_mcu_io_r )
 {
-	if(mux_data & 8)
+	rbmk_state *state = space->machine->driver_data<rbmk_state>();
+	if(state->mux_data & 8)
 	{
 		return ym2151_r(space->machine->device("ymsnd"), offset & 1);
 	}
-	else if(mux_data & 4)
+	else if(state->mux_data & 4)
 	{
 		//printf("%02x R\n",offset);
 		// ...
 		return 0xff;
 	}
 	else
-		printf("Warning: mux data R = %02x",mux_data);
+		printf("Warning: mux data R = %02x",state->mux_data);
 
 	return 0xff;
 }
 
 static WRITE8_HANDLER( rbmk_mcu_io_w )
 {
-	if(mux_data & 8) { ym2151_w(space->machine->device("ymsnd"), offset & 1, data); }
-	else if(mux_data & 4)
+	rbmk_state *state = space->machine->driver_data<rbmk_state>();
+	if(state->mux_data & 8) { ym2151_w(space->machine->device("ymsnd"), offset & 1, data); }
+	else if(state->mux_data & 4)
 	{
 		//printf("%02x %02x W\n",offset,data);
 		// ...
 	}
 	else
-		printf("Warning: mux data W = %02x",mux_data);
+		printf("Warning: mux data W = %02x",state->mux_data);
 }
 
 static WRITE8_HANDLER( mcu_io_mux_w )
 {
-	mux_data = ~data;
+	rbmk_state *state = space->machine->driver_data<rbmk_state>();
+	state->mux_data = ~data;
 }
 
 static ADDRESS_MAP_START( rbmk_mcu_io, ADDRESS_SPACE_IO, 8 )
@@ -480,6 +492,7 @@ static VIDEO_START(rbmk)
 
 static SCREEN_UPDATE(rbmk)
 {
+	rbmk_state *state = screen->machine->driver_data<rbmk_state>();
 	int x,y;
 	int count = 0;
 
@@ -487,8 +500,8 @@ static SCREEN_UPDATE(rbmk)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = gms_vidram2[count+0x600];
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],(tile&0xfff)+((tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
+			int tile = state->gms_vidram2[count+0x600];
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],(tile&0xfff)+((state->tilebank&0x10)>>4)*0x1000,tile>>12,0,0,x*8,y*32);
 			count++;
 		}
 	}
@@ -499,8 +512,8 @@ static SCREEN_UPDATE(rbmk)
 	{
 		for (x=0;x<64;x++)
 		{
-			int tile = gms_vidram[count];
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],(tile&0xfff)+((tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
+			int tile = state->gms_vidram[count];
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[1],(tile&0xfff)+((state->tilebank>>1)&3)*0x1000,tile>>12,0,0,x*8,y*8,0);
 			count++;
 		}
 	}
@@ -512,7 +525,7 @@ static INTERRUPT_GEN( mcu_irq )
 	cputag_set_input_line(device->machine, "mcu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rbmk, driver_device )
+static MACHINE_CONFIG_START( rbmk, rbmk_state )
 	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)

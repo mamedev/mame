@@ -45,16 +45,27 @@ Other bits from DSW2 (but bit 5) don't seem to be read / tested at all ...
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static UINT8 *poo_vram, *poo_scrolly, *poo_sprites;
-static UINT8 vram_colbank;
+
+class poo_state : public driver_device
+{
+public:
+	poo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *vram;
+	UINT8 *scrolly;
+	UINT8 *sprites;
+	UINT8 vram_colbank;
+};
+
 
 static VIDEO_START(unclepoo)
 {
-
 }
 
 static SCREEN_UPDATE(unclepoo)
 {
+	poo_state *state = screen->machine->driver_data<poo_state>();
 	int y,x;
 	int count;
 	const gfx_element *gfx = screen->machine->gfx[0];
@@ -65,12 +76,12 @@ static SCREEN_UPDATE(unclepoo)
 	{
 		for (y=0;y<32;y++)
 		{
-			int tile = poo_vram[count+0x000] | ((poo_vram[count+0x400] & 3) <<8);
-			int color = (poo_vram[count+0x400] & 0x38) >> 3;
-			int scrolly = (poo_scrolly[x*4]);
+			int tile = state->vram[count+0x000] | ((state->vram[count+0x400] & 3) <<8);
+			int color = (state->vram[count+0x400] & 0x38) >> 3;
+			int scrolly = (state->scrolly[x*4]);
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+vram_colbank,0,0,x*8,256-(y*8)+scrolly);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+vram_colbank,0,0,x*8,0-(y*8)+scrolly);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->vram_colbank,0,0,x*8,256-(y*8)+scrolly);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color+state->vram_colbank,0,0,x*8,0-(y*8)+scrolly);
 
 			count++;
 		}
@@ -81,10 +92,10 @@ static SCREEN_UPDATE(unclepoo)
 
 		for(i=0;i<0x80;i+=4)
 		{
-			spr_offs = poo_sprites[i+2] | (poo_sprites[i+3] & 3) << 8;
-			y = poo_sprites[i+0]+8;
-			x = poo_sprites[i+1];
-			col = (poo_sprites[i+3] & 0xf8) >> 3;
+			spr_offs = state->sprites[i+2] | (state->sprites[i+3] & 3) << 8;
+			y = state->sprites[i+0]+8;
+			x = state->sprites[i+1];
+			col = (state->sprites[i+3] & 0xf8) >> 3;
 			fx = 0;
 			fy = 0;
 
@@ -130,8 +141,9 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static WRITE8_HANDLER( poo_vregs_w )
 {
+	poo_state *state = space->machine->driver_data<poo_state>();
 	// bit 2 used, unknown purpose
-	vram_colbank = data & 0x18;
+	state->vram_colbank = data & 0x18;
 }
 
 static ADDRESS_MAP_START( unclepoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -140,8 +152,8 @@ static ADDRESS_MAP_START( unclepoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
 	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE( unk_w )
 
-	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE(&poo_sprites)
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE(&poo_scrolly)
+	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE_MEMBER(poo_state, sprites)
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE_MEMBER(poo_state, scrolly)
 
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(sound_cmd_w)
 
@@ -153,7 +165,7 @@ static ADDRESS_MAP_START( unclepoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(poo_vregs_w)
 
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE(&poo_vram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(poo_state, vram)
 
 ADDRESS_MAP_END
 
@@ -310,7 +322,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( unclepoo, driver_device )
+static MACHINE_CONFIG_START( unclepoo, poo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,18000000/6)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(unclepoo_main_map)

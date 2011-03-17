@@ -40,12 +40,22 @@ Tomasz Slanina 20050225
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 
+
+class vroulet_state : public driver_device
+{
+public:
+	vroulet_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ball;
+	UINT8 *videoram;
+	UINT8 *colorram;
+	tilemap_t *bg_tilemap;
+};
+
+
 /* video */
 
-static UINT8 *vroulet_ball;
-static UINT8 *videoram;
-static UINT8 *colorram;
-static tilemap_t *bg_tilemap;
 
 static WRITE8_HANDLER(vroulet_paletteram_w)
 {
@@ -69,20 +79,23 @@ static WRITE8_HANDLER(vroulet_paletteram_w)
 
 static WRITE8_HANDLER( vroulet_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	vroulet_state *state = space->machine->driver_data<vroulet_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( vroulet_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	vroulet_state *state = space->machine->driver_data<vroulet_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] + ((attr & 0xc0) << 2);
+	vroulet_state *state = machine->driver_data<vroulet_state>();
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0xc0) << 2);
 	int color = attr & 0x1f;
 
 	SET_TILE_INFO(0, code, color, 0);
@@ -90,15 +103,17 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START(vroulet)
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	vroulet_state *state = machine->driver_data<vroulet_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE(vroulet)
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	vroulet_state *state = screen->machine->driver_data<vroulet_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0], 0x320, 1, 0, 0,
-		vroulet_ball[1], vroulet_ball[0] - 12, 0);
+		state->ball[1], state->ball[0] - 12, 0);
 	return 0;
 }
 
@@ -108,9 +123,9 @@ static ADDRESS_MAP_START( vroulet_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x8000) AM_NOP
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE(&vroulet_ball)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_BASE_MEMBER(vroulet_state, videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_BASE_MEMBER(vroulet_state, colorram)
+	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE_MEMBER(vroulet_state, ball)
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc000, 0xc000) AM_NOP
 ADDRESS_MAP_END
@@ -260,7 +275,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vroulet, driver_device )
+static MACHINE_CONFIG_START( vroulet, vroulet_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)	//???
 	MCFG_CPU_PROGRAM_MAP(vroulet_map)
