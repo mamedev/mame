@@ -3444,7 +3444,7 @@ ROM_END
 
 GAMEL(1977, depthch,  0,        depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge", GAME_IMPERFECT_SOUND, layout_depthch )
 GAMEL(1977, depthcho, depthch,  depthch,  depthch,  0, ROT0,   "Gremlin", "Depthcharge (older)", GAME_IMPERFECT_SOUND, layout_depthch )
-GAME( 1977, subhunt,  depthch,  depthch,  depthch,  0, ROT0,   "Gremlin (Taito license)", "Sub Hunter", GAME_IMPERFECT_SOUND )
+GAMEL(1977, subhunt,  depthch,  depthch,  depthch,  0, ROT0,   "Gremlin (Taito license)", "Sub Hunter", GAME_IMPERFECT_SOUND, layout_depthch )
 GAME( 1977, safari,   0,        safari,   safari,   0, ROT0,   "Gremlin", "Safari (set 1)", GAME_NO_SOUND )
 GAME( 1977, safaria,  safari,   safari,   safari,   0, ROT0,   "Gremlin", "Safari (set 2, bootleg?)", GAME_NO_SOUND ) // on a bootleg board, but seems a different code revision too
 GAME( 1978, frogs,    0,        frogs,    frogs,    0, ROT0,   "Gremlin", "Frogs", GAME_IMPERFECT_SOUND )
