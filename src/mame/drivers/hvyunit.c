@@ -716,7 +716,9 @@ ROM_START( hvyunit )
 	ROM_LOAD( "b73_01.1b",  0x140000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
 	ROM_LOAD( "b73_02.1c",  0x160000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
 	ROM_LOAD( "b73_03.1d",  0x180000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
+	/*                      0x190000, 0x010000  no data */
 	ROM_LOAD( "b73_04.1f",  0x1a0000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
+	/*                      0x1b0000, 0x010000  no data */
 	ROM_LOAD( "b73_05.1h",  0x1c0000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
@@ -736,7 +738,7 @@ ROM_START( hvyunitj )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* note, the rom ordering on this is different to the other Japan set */
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
 	ROM_LOAD( "b73_07.2c",  0x100000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
 	ROM_LOAD( "b73_06.2b",  0x110000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
@@ -750,7 +752,7 @@ ROM_START( hvyunitj )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
-ROM_START( hvyunito )
+ROM_START( hvyunitjo )
 	ROM_REGION( 0x20000, "master", 0 )
 	ROM_LOAD( "b73_13.5c",  0x00000, 0x20000, CRC(e2874601) SHA1(7f7f3287113b8622eb365d04135d2d9c35d70554) )
 
@@ -770,8 +772,34 @@ ROM_START( hvyunito )
 	ROM_LOAD( "b73_01.1b",  0x140000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
 	ROM_LOAD( "b73_02.1c",  0x160000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
 	ROM_LOAD( "b73_03.1d",  0x180000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
+	/*                      0x190000, 0x010000  no data */
 	ROM_LOAD( "b73_04.1f",  0x1a0000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
+	/*                      0x1b0000, 0x010000  no data */
 	ROM_LOAD( "b73_05.1h",  0x1c0000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
+ROM_END
+
+ROM_START( hvyunitu )
+	ROM_REGION( 0x20000, "master", 0 )
+	ROM_LOAD( "b73_34.5c",  0x00000, 0x20000, CRC(05c30a90) SHA1(97cc0ded2896e0945d790247c284e5058c28c735) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "b73_35.6p",  0x00000, 0x10000, CRC(aed1669d) SHA1(d0539261d6128fa2d58b529e8383b6d1f3ccac77) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "b73_12.7e",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409) )
+
+	ROM_REGION( 0x1000, "mermaid", 0 )
+	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) )
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) )
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* the data in first half of this actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_05.1h, despite the different label */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
@@ -786,4 +814,5 @@ ROM_END
 
 GAME( 1988, hvyunit, 0,        hvyunit, hvyunit,  0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", GAME_NO_COCKTAIL )
 GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunitj, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", GAME_NO_COCKTAIL )
-GAME( 1988, hvyunito, hvyunit, hvyunit, hvyunitj, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", GAME_NO_COCKTAIL )
+GAME( 1988, hvyunitjo,hvyunit, hvyunit, hvyunitj, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", GAME_NO_COCKTAIL )
+GAME( 1988, hvyunitu, hvyunit, hvyunit, hvyunitj, 0, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", GAME_NO_COCKTAIL )
