@@ -161,6 +161,7 @@ public:
 	/* misc */
 	UINT8 mux_data;
 	UINT8 register_active;
+	struct { int r,g,b,offs,offs_internal; } pal;
 
 	/* devices */
 	device_t *maincpu;
@@ -415,8 +416,8 @@ static WRITE16_HANDLER(wh2_w)
 
 static READ8_DEVICE_HANDLER(t2_r)
 {
-	static UINT8 res;
-	static int h,w;
+	UINT8 res;
+	int h,w;
 	res = 0;
 	h = device->machine->primary_screen->height();
 	w = device->machine->primary_screen->width();
@@ -464,34 +465,33 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( ramdac_io_w )
 {
-	static int pal_offs,r,g,b,internal_pal_offs;
-
+	adp_state *state = space->machine->driver_data<adp_state>();
 	switch(offset)
 	{
 		case 0:
-			pal_offs = data;
-			internal_pal_offs = 0;
+			state->pal.offs = data;
+			state->pal.offs_internal = 0;
 			break;
 		case 2:
 			//mask pen reg
 			break;
 		case 1:
-			switch(internal_pal_offs)
+			switch(state->pal.offs_internal)
 			{
 				case 0:
-					r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					internal_pal_offs++;
+					state->pal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->pal.offs_internal++;
 					break;
 				case 1:
-					g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					internal_pal_offs++;
+					state->pal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					state->pal.offs_internal++;
 					break;
 				case 2:
-					b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-					palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
-					internal_pal_offs = 0;
-					pal_offs++;
-					pal_offs&=0xff;
+					state->pal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					state->pal.offs_internal = 0;
+					state->pal.offs++;
+					state->pal.offs&=0xff;
 					break;
 			}
 

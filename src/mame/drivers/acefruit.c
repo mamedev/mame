@@ -22,21 +22,23 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *spriteram;
+	UINT8 *colorram;
+	UINT8 *videoram;
+	emu_timer *refresh_timer;
 };
 
 
-static UINT8 *colorram;
-static UINT8 *videoram;
 
 static void acefruit_update_irq(running_machine *machine, int vpos )
 {
+	acefruit_state *state = machine->driver_data<acefruit_state>();
 	int col;
 	int row = vpos / 8;
 
 	for( col = 0; col < 32; col++ )
 	{
 		int tile_index = ( col * 32 ) + row;
-		int color = colorram[ tile_index ];
+		int color = state->colorram[ tile_index ];
 
 		switch( color )
 		{
@@ -47,10 +49,10 @@ static void acefruit_update_irq(running_machine *machine, int vpos )
 	}
 }
 
-static emu_timer *acefruit_refresh_timer;
 
 static TIMER_CALLBACK( acefruit_refresh )
 {
+	acefruit_state *state = machine->driver_data<acefruit_state>();
 	int vpos = machine->primary_screen->vpos();
 
 	machine->primary_screen->update_partial(vpos );
@@ -58,18 +60,20 @@ static TIMER_CALLBACK( acefruit_refresh )
 
 	vpos = ( ( vpos / 8 ) + 1 ) * 8;
 
-	acefruit_refresh_timer->adjust( machine->primary_screen->time_until_pos(vpos) );
+	state->refresh_timer->adjust( machine->primary_screen->time_until_pos(vpos) );
 }
 
 static VIDEO_START( acefruit )
 {
-	acefruit_refresh_timer = machine->scheduler().timer_alloc(FUNC(acefruit_refresh));
+	acefruit_state *state = machine->driver_data<acefruit_state>();
+	state->refresh_timer = machine->scheduler().timer_alloc(FUNC(acefruit_refresh));
 }
 
 static INTERRUPT_GEN( acefruit_vblank )
 {
+	acefruit_state *state = device->machine->driver_data<acefruit_state>();
 	cpu_set_input_line(device, 0, HOLD_LINE );
-	acefruit_refresh_timer->adjust( attotime::zero );
+	state->refresh_timer->adjust( attotime::zero );
 }
 
 static SCREEN_UPDATE( acefruit )
@@ -89,8 +93,8 @@ static SCREEN_UPDATE( acefruit )
 		for( col = 0; col < 32; col++ )
 		{
 			int tile_index = ( col * 32 ) + row;
-			int code = videoram[ tile_index ];
-			int color = colorram[ tile_index ];
+			int code = state->videoram[ tile_index ];
+			int color = state->colorram[ tile_index ];
 
 			if( color < 0x4 )
 			{
@@ -213,7 +217,8 @@ static CUSTOM_INPUT( starspnr_payout_r )
 
 static WRITE8_HANDLER( acefruit_colorram_w )
 {
-	colorram[ offset ] = data & 0xf;
+	acefruit_state *state = space->machine->driver_data<acefruit_state>();
+	state->colorram[ offset ] = data & 0xf;
 }
 
 static WRITE8_HANDLER( acefruit_coin_w )
@@ -272,8 +277,8 @@ static PALETTE_INIT( acefruit )
 static ADDRESS_MAP_START( acefruit_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(acefruit_state, videoram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_BASE_MEMBER(acefruit_state, colorram)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")

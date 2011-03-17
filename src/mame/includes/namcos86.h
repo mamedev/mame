@@ -5,12 +5,21 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *spriteram;
+	int wdog;
+	UINT8 *rthunder_videoram1;
+	UINT8 *rthunder_videoram2;
+	UINT8 *rthunder_spriteram;
+	int tilebank;
+	int xscroll[4];
+	int yscroll[4];
+	tilemap_t *bg_tilemap[4];
+	int backcolor;
+	const UINT8 *tile_address_prom;
+	int copy_sprites;
 };
 
 
 /*----------- defined in video/namcos86.c -----------*/
-
-extern UINT8 *rthunder_videoram1, *rthunder_videoram2, *rthunder_spriteram;
 
 PALETTE_INIT( namcos86 );
 VIDEO_START( namcos86 );

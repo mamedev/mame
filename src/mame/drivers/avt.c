@@ -414,38 +414,50 @@
 //#include "machine/z80pio.h"
 
 
+class avt_state : public driver_device
+{
+public:
+	avt_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	UINT8 *colorram;
+	tilemap_t *bg_tilemap;
+};
+
+
+
 /*********************************************
 *               Video Hardware               *
 *********************************************/
 
-static UINT8 *videoram;
-static UINT8 *colorram;
-static tilemap_t *bg_tilemap;
-
 
 static WRITE8_HANDLER( avt_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	avt_state *state = space->machine->driver_data<avt_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static WRITE8_HANDLER( avt_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	avt_state *state = space->machine->driver_data<avt_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	avt_state *state = machine->driver_data<avt_state>();
 /*  - bits -
     7654 3210
     xxxx ----   color code.
     ---- xxxx   seems unused.
 */
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index];
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index];
 	int color = (attr & 0xf0)>>4;
 
 	SET_TILE_INFO( 0, code, color, 0);
@@ -454,13 +466,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( avt )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 28, 32);
+	avt_state *state = machine->driver_data<avt_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 28, 32);
 }
 
 
 static SCREEN_UPDATE( avt )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	avt_state *state = screen->machine->driver_data<avt_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -535,8 +549,8 @@ static ADDRESS_MAP_START( avt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_BASE_MEMBER(avt_state, videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE_MEMBER(avt_state, colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avt_portmap, ADDRESS_SPACE_IO, 8 )
@@ -796,7 +810,7 @@ static const ay8910_interface ay8910_config =
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( avt, driver_device )
+static MACHINE_CONFIG_START( avt, avt_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */

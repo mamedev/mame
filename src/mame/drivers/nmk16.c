@@ -244,7 +244,6 @@ static READ16_HANDLER( tharrier_mcu_r )
 		{
 			0x82,0xc7,0x00,0x2c,0x6c,0x00,0x9f,0xc7,0x00,0x29,0x69,0x00,0x8b,0xc7,0x00
 		};
-		static int prot_count;
 
 		int res;
 
@@ -252,9 +251,9 @@ static READ16_HANDLER( tharrier_mcu_r )
 		else if (cpu_get_pc(space->cpu)==0x8ce) res = (state->mainram[0x9064/2])|0x60; /* Task Force Harrier */
 		else
 		{
-			res = to_main[prot_count++];
-			if (prot_count > sizeof(to_main))
-				prot_count = 0;
+			res = to_main[state->prot_count++];
+			if (state->prot_count > sizeof(to_main))
+				state->prot_count = 0;
 		}
 
 		return res << 8;
@@ -736,23 +735,20 @@ static WRITE16_HANDLER( tdragon_mainram_w )
 static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 {
 	nmk16_state *state = machine->driver_data<nmk16_state>();
-	static UINT8 input_pressed;
 	UINT16 coin_input;
 	UINT8 dsw[2];
-	static UINT8 start_helper = 0;
-	static UINT8 coin_count[2],coin_count_frac[2];
 	UINT8 i;
 
 	/*Accept the start button but needs some m68k processing first,otherwise you can't start a play with 1 credit inserted*/
-	if(start_helper & 1 && state->mainram[0x9000/2] & 0x0200) /*start 1 */
+	if(state->start_helper & 1 && state->mainram[0x9000/2] & 0x0200) /*start 1 */
 	{
 		state->mainram[0xef00/2]--;
-		start_helper = start_helper & 2;
+		state->start_helper = state->start_helper & 2;
 	}
-	if(start_helper & 2 && state->mainram[0x9000/2] & 0x0100) /*start 2*/
+	if(state->start_helper & 2 && state->mainram[0x9000/2] & 0x0100) /*start 2*/
 	{
 		state->mainram[0xef00/2]--;
-		start_helper = start_helper & 1;
+		state->start_helper = state->start_helper & 1;
 	}
 
 	/*needed because of the uncompatibility of the dsw settings.*/
@@ -765,13 +761,13 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 			switch(dsw[i] & 7)
 			{
 				case 0: state->mainram[0x9000/2]|=0x4000; break; //free play
-				case 1: coin_count_frac[i] = 1; coin_count[i] = 4; break;
-				case 2: coin_count_frac[i] = 1; coin_count[i] = 3; break;
-				case 3: coin_count_frac[i] = 1; coin_count[i] = 2; break;
-				case 4: coin_count_frac[i] = 4; coin_count[i] = 1; break;
-				case 5: coin_count_frac[i] = 3; coin_count[i] = 1; break;
-				case 6: coin_count_frac[i] = 2; coin_count[i] = 1; break;
-				case 7: coin_count_frac[i] = 1; coin_count[i] = 1; break;
+				case 1: state->coin_count_frac[i] = 1; state->coin_count[i] = 4; break;
+				case 2: state->coin_count_frac[i] = 1; state->coin_count[i] = 3; break;
+				case 3: state->coin_count_frac[i] = 1; state->coin_count[i] = 2; break;
+				case 4: state->coin_count_frac[i] = 4; state->coin_count[i] = 1; break;
+				case 5: state->coin_count_frac[i] = 3; state->coin_count[i] = 1; break;
+				case 6: state->coin_count_frac[i] = 2; state->coin_count[i] = 1; break;
+				case 7: state->coin_count_frac[i] = 1; state->coin_count[i] = 1; break;
 			}
 		}
 	}
@@ -784,13 +780,13 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 			switch(dsw[i] & 7)
 			{
 				case 0: state->mainram[0x9000/2]|=0x4000; break; //free play
-				case 1: coin_count_frac[i] = 4; coin_count[i] = 1; break;
-				case 2: coin_count_frac[i] = 3; coin_count[i] = 1; break;
-				case 3: coin_count_frac[i] = 2; coin_count[i] = 1; break;
-				case 4: coin_count_frac[i] = 1; coin_count[i] = 4; break;
-				case 5: coin_count_frac[i] = 1; coin_count[i] = 3; break;
-				case 6: coin_count_frac[i] = 1; coin_count[i] = 2; break;
-				case 7: coin_count_frac[i] = 1; coin_count[i] = 1; break;
+				case 1: state->coin_count_frac[i] = 4; state->coin_count[i] = 1; break;
+				case 2: state->coin_count_frac[i] = 3; state->coin_count[i] = 1; break;
+				case 3: state->coin_count_frac[i] = 2; state->coin_count[i] = 1; break;
+				case 4: state->coin_count_frac[i] = 1; state->coin_count[i] = 4; break;
+				case 5: state->coin_count_frac[i] = 1; state->coin_count[i] = 3; break;
+				case 6: state->coin_count_frac[i] = 1; state->coin_count[i] = 2; break;
+				case 7: state->coin_count_frac[i] = 1; state->coin_count[i] = 1; break;
 			}
 		}
 	}
@@ -800,78 +796,78 @@ static void mcu_run(running_machine *machine, UINT8 dsw_setting)
 
 	if(coin_input & 0x01)//coin 1
 	{
-		if((input_pressed & 0x01) == 0)
+		if((state->input_pressed & 0x01) == 0)
 		{
-			if(coin_count_frac[0] != 1)
+			if(state->coin_count_frac[0] != 1)
 			{
-				state->mainram[0xef02/2]+=coin_count[0];
-				if(coin_count_frac[0] == state->mainram[0xef02/2])
+				state->mainram[0xef02/2]+=state->coin_count[0];
+				if(state->coin_count_frac[0] == state->mainram[0xef02/2])
 				{
-					state->mainram[0xef00/2]+=coin_count[0];
+					state->mainram[0xef00/2]+=state->coin_count[0];
 					state->mainram[0xef02/2] = 0;
 				}
 			}
 			else
-				state->mainram[0xef00/2]+=coin_count[0];
+				state->mainram[0xef00/2]+=state->coin_count[0];
 		}
-		input_pressed = (input_pressed & 0xfe) | 1;
+		state->input_pressed = (state->input_pressed & 0xfe) | 1;
 	}
 	else
-		input_pressed = (input_pressed & 0xfe);
+		state->input_pressed = (state->input_pressed & 0xfe);
 
 	if(coin_input & 0x02)//coin 2
 	{
-		if((input_pressed & 0x02) == 0)
+		if((state->input_pressed & 0x02) == 0)
 		{
-			if(coin_count_frac[1] != 1)
+			if(state->coin_count_frac[1] != 1)
 			{
-				state->mainram[0xef02/2]+=coin_count[1];
-				if(coin_count_frac[1] == state->mainram[0xef02/2])
+				state->mainram[0xef02/2]+=state->coin_count[1];
+				if(state->coin_count_frac[1] == state->mainram[0xef02/2])
 				{
-					state->mainram[0xef00/2]+=coin_count[1];
+					state->mainram[0xef00/2]+=state->coin_count[1];
 					state->mainram[0xef02/2] = 0;
 				}
 			}
 			else
-				state->mainram[0xef00/2]+=coin_count[1];
+				state->mainram[0xef00/2]+=state->coin_count[1];
 		}
-		input_pressed = (input_pressed & 0xfd) | 2;
+		state->input_pressed = (state->input_pressed & 0xfd) | 2;
 	}
 	else
-		input_pressed = (input_pressed & 0xfd);
+		state->input_pressed = (state->input_pressed & 0xfd);
 
 	if(coin_input & 0x04)//service 1
 	{
-		if((input_pressed & 0x04) == 0)
+		if((state->input_pressed & 0x04) == 0)
 			state->mainram[0xef00/2]++;
-		input_pressed = (input_pressed & 0xfb) | 4;
+		state->input_pressed = (state->input_pressed & 0xfb) | 4;
 	}
 	else
-		input_pressed = (input_pressed & 0xfb);
+		state->input_pressed = (state->input_pressed & 0xfb);
 
 	/*The 0x9000 ram address is the status */
 	if(state->mainram[0xef00/2] > 0 && state->mainram[0x9000/2] & 0x8000) //enable start button
 	{
 		if(coin_input & 0x08)//start 1
 		{
-			if((input_pressed & 0x08) == 0 && (!(state->mainram[0x9000/2] & 0x0200))) //start 1
-				start_helper = 1;
+			if((state->input_pressed & 0x08) == 0 && (!(state->mainram[0x9000/2] & 0x0200))) //start 1
+				state->start_helper = 1;
 
-			input_pressed = (input_pressed & 0xf7) | 8;
+			state->input_pressed = (state->input_pressed & 0xf7) | 8;
 		}
 		else
-			input_pressed = (input_pressed & 0xf7);
+			state->input_pressed = (state->input_pressed & 0xf7);
 
 		if(coin_input & 0x10)//start 2
 		{
 			/*Decrease two coins to let two players play with one start 2 button and two credits inserted at the insert coin screen.*/
-			if((input_pressed & 0x10) == 0 && (!(state->mainram[0x9000/2] & 0x0100))) // start 2
-				start_helper = (state->mainram[0x9000/2] == 0x8000) ? (3) : (2);
+			if((state->input_pressed & 0x10) == 0 && (!(state->mainram[0x9000/2] & 0x0100))) // start 2
+				state->start_helper = (state->mainram[0x9000/2] == 0x8000) ? (3) : (2);
 
-			input_pressed = (input_pressed & 0xef) | 0x10;
+			state->input_pressed = (state->input_pressed & 0xef) | 0x10;
 		}
 		else
-			input_pressed = (input_pressed & 0xef);
+			state->input_pressed = (state->input_pressed & 0xef);
 	}
 }
 

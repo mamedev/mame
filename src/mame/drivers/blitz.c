@@ -292,30 +292,43 @@
 #include "sound/discrete.h"
 
 
+class blitz_state : public driver_device
+{
+public:
+	blitz_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	UINT8 *colorram;
+	tilemap_t *bg_tilemap;
+	int mux_data;
+};
+
+
+
 /*********************************************
 *               Video Hardware               *
 *********************************************/
 
-static UINT8 *videoram;
-static UINT8 *colorram;
-static tilemap_t *bg_tilemap;
-
 
 static WRITE8_HANDLER( megadpkr_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	blitz_state *state = space->machine->driver_data<blitz_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static WRITE8_HANDLER( megadpkr_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	blitz_state *state = space->machine->driver_data<blitz_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	blitz_state *state = machine->driver_data<blitz_state>();
 /*  - bits -
     7654 3210
     --xx xx--   tiles color.
@@ -324,8 +337,8 @@ static TILE_GET_INFO( get_bg_tile_info )
     xx-- ----   unused.
 */
 
-	int attr = colorram[tile_index];
-	int code = ((attr & 1) << 8) | videoram[tile_index];
+	int attr = state->colorram[tile_index];
+	int code = ((attr & 1) << 8) | state->videoram[tile_index];
 	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
@@ -335,12 +348,14 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( megadpkr )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	blitz_state *state = machine->driver_data<blitz_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE( megadpkr )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	blitz_state *state = screen->machine->driver_data<blitz_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -394,7 +409,6 @@ static PALETTE_INIT( megadpkr )
 *               R/W Handlers               *
 *******************************************/
 
-static int mux_data = 0;
 
 /* Inputs (buttons) are multiplexed.
    There are 4 sets of 5 bits each and are connected to PIA0, portA.
@@ -402,7 +416,8 @@ static int mux_data = 0;
 */
 static READ8_DEVICE_HANDLER( megadpkr_mux_port_r )
 {
-	switch( mux_data & 0xf0 )		/* bits 4-7 */
+	blitz_state *state = device->machine->driver_data<blitz_state>();
+	switch( state->mux_data & 0xf0 )		/* bits 4-7 */
 	{
 		case 0x10: return input_port_read(device->machine, "IN0-0");
 		case 0x20: return input_port_read(device->machine, "IN0-1");
@@ -415,7 +430,8 @@ static READ8_DEVICE_HANDLER( megadpkr_mux_port_r )
 
 static WRITE8_DEVICE_HANDLER( mux_w )
 {
-	mux_data = data ^ 0xff;	/* inverted */
+	blitz_state *state = device->machine->driver_data<blitz_state>();
+	state->mux_data = data ^ 0xff;	/* inverted */
 }
 
 
@@ -469,8 +485,8 @@ static ADDRESS_MAP_START( megadpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 */
 
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(megadpkr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_BASE_MEMBER(blitz_state, videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(megadpkr_colorram_w) AM_BASE_MEMBER(blitz_state, colorram)
 
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -767,7 +783,7 @@ static const mc6845_interface mc6845_intf =
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( megadpkr, driver_device )
+static MACHINE_CONFIG_START( megadpkr, blitz_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)

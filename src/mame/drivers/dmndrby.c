@@ -55,12 +55,23 @@ DD10 DD14  DD18     H5            DD21
 #include "machine/nvram.h"
 #include "video/resnet.h"
 
-static UINT8* dderby_vidchars;
-static UINT8* scroll_ram;
-static UINT8* dderby_vidattribs;
-static UINT8* sprite_ram;
-static UINT8 *racetrack_tilemap_rom;
-static tilemap_t *racetrack_tilemap;
+
+class dmndrby_state : public driver_device
+{
+public:
+	dmndrby_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8* dderby_vidchars;
+	UINT8* scroll_ram;
+	UINT8* dderby_vidattribs;
+	UINT8* sprite_ram;
+	UINT8 *racetrack_tilemap_rom;
+	tilemap_t *racetrack_tilemap;
+	UINT8 io_port[8];
+	int bg;
+};
+
 
 static WRITE8_HANDLER( dderby_sound_w )
 {
@@ -68,7 +79,6 @@ static WRITE8_HANDLER( dderby_sound_w )
 	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE);
 }
 
-static UINT8 io_port[8];
 
 static READ8_HANDLER( input_r )
 {
@@ -89,6 +99,7 @@ static READ8_HANDLER( input_r )
 
 static WRITE8_HANDLER( output_w )
 {
+	dmndrby_state *state = space->machine->driver_data<dmndrby_state>();
 	/*
     ---- x--- refill meter [4]
     ---- x--- token out meter [5]
@@ -100,8 +111,8 @@ static WRITE8_HANDLER( output_w )
     ---- --x- coin lockout [0-3]
     ---- ---x lamp [0-6]
     */
-	io_port[offset] = data;
-//  popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",io_port[0],io_port[1],io_port[2],io_port[3],io_port[4],io_port[5],io_port[6],io_port[7]);
+	state->io_port[offset] = data;
+//  popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",state->io_port[0],state->io_port[1],state->io_port[2],state->io_port[3],state->io_port[4],state->io_port[5],state->io_port[6],state->io_port[7]);
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
@@ -115,10 +126,10 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca01, 0xca01) AM_WRITENOP //watchdog
 	AM_RANGE(0xca02, 0xca02) AM_RAM_WRITE(dderby_sound_w)
 	AM_RANGE(0xca03, 0xca03) AM_WRITENOP//(timer_irq_w) //???
-	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_BASE(&scroll_ram)
-	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_BASE(&sprite_ram) // horse sprites
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE(&dderby_vidchars) // char ram
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE(&dderby_vidattribs) // colours/ attrib ram
+	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_BASE_MEMBER(dmndrby_state, scroll_ram)
+	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_BASE_MEMBER(dmndrby_state, sprite_ram) // horse sprites
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(dmndrby_state, dderby_vidchars) // char ram
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(dmndrby_state, dderby_vidattribs) // colours/ attrib ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dderby_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -302,8 +313,9 @@ GFXDECODE_END
 
 static TILE_GET_INFO( get_dmndrby_tile_info )
 {
-	int code = racetrack_tilemap_rom[tile_index];
-	int attr = racetrack_tilemap_rom[tile_index+0x2000];
+	dmndrby_state *state = machine->driver_data<dmndrby_state>();
+	int code = state->racetrack_tilemap_rom[tile_index];
+	int attr = state->racetrack_tilemap_rom[tile_index+0x2000];
 
 	int col = attr&0x1f;
 	int flipx = (attr&0x40)>>6;
@@ -319,17 +331,18 @@ static TILE_GET_INFO( get_dmndrby_tile_info )
 
 static VIDEO_START(dderby)
 {
-	racetrack_tilemap_rom = machine->region("user1")->base();
-	racetrack_tilemap = tilemap_create(machine,get_dmndrby_tile_info,tilemap_scan_rows,16,16, 16, 512);
-	tilemap_mark_all_tiles_dirty(racetrack_tilemap);
+	dmndrby_state *state = machine->driver_data<dmndrby_state>();
+	state->racetrack_tilemap_rom = machine->region("user1")->base();
+	state->racetrack_tilemap = tilemap_create(machine,get_dmndrby_tile_info,tilemap_scan_rows,16,16, 16, 512);
+	tilemap_mark_all_tiles_dirty(state->racetrack_tilemap);
 
 }
 
 static SCREEN_UPDATE(dderby)
 {
+	dmndrby_state *state = screen->machine->driver_data<dmndrby_state>();
 	int x,y,count;
 	int off,scrolly;
-	static int bg;
 	const gfx_element *gfx = screen->machine->gfx[0];
 	const gfx_element *sprites = screen->machine->gfx[1];
 	const gfx_element *track = screen->machine->gfx[2];
@@ -343,22 +356,22 @@ racetrack seems to be stored in 4th and 5th prom.
 can we draw it with the tilemap? maybe not, the layout is a litle strange
 
 */
-//  base = scroll_ram[0];
+//  base = state->scroll_ram[0];
 
-	off=0x1900-(bg*0x100)+(scroll_ram[1])*0x100;
-	scrolly = 0xff-(scroll_ram[0]);
-	if(scroll_ram[1]==0xff) off=0x1800;
+	off=0x1900-(state->bg*0x100)+(state->scroll_ram[1])*0x100;
+	scrolly = 0xff-(state->scroll_ram[0]);
+	if(state->scroll_ram[1]==0xff) off=0x1800;
 	for(x=0;x<16;x++) {
 		for(y=0;y<16;y++) {
-			int chr = racetrack_tilemap_rom[off];
-			int col = racetrack_tilemap_rom[off+0x2000]&0x1f;
-			int flipx = racetrack_tilemap_rom[off+0x2000]&0x40;
+			int chr = state->racetrack_tilemap_rom[off];
+			int col = state->racetrack_tilemap_rom[off+0x2000]&0x1f;
+			int flipx = state->racetrack_tilemap_rom[off+0x2000]&0x40;
 			drawgfx_opaque(bitmap,cliprect,track,chr,col,flipx,0,y*16+scrolly,x*16);
 			// draw another bit of track
 			// a rubbish way of doing it
-			chr = racetrack_tilemap_rom[off-0x100];
-			col = racetrack_tilemap_rom[off+0x1f00]&0x1f;
-			flipx = racetrack_tilemap_rom[off+0x1f00]&0x40;
+			chr = state->racetrack_tilemap_rom[off-0x100];
+			col = state->racetrack_tilemap_rom[off+0x1f00]&0x1f;
+			flipx = state->racetrack_tilemap_rom[off+0x1f00]&0x40;
 			drawgfx_opaque(bitmap,cliprect,track,chr,col,flipx,0,y*16-256+scrolly,x*16);
 			off++;
 		}
@@ -379,12 +392,12 @@ wouldnt like to say its the most effective way though...
 		int a=0;
 		int b=0;
 		int base = count*4;
-		int sprx=sprite_ram[base+3];
-		int spry=sprite_ram[base+2];
-		//sprite_ram[base+1];
-		int col = (sprite_ram[base+1]&0x1f);
-		int anim = (sprite_ram[base]&0x3)*0x40; // animation frame - probably wrong but seems right
-		int horse = (sprite_ram[base+1]&0x7)*8+7;  // horse label from 1 - 6
+		int sprx=state->sprite_ram[base+3];
+		int spry=state->sprite_ram[base+2];
+		//state->sprite_ram[base+1];
+		int col = (state->sprite_ram[base+1]&0x1f);
+		int anim = (state->sprite_ram[base]&0x3)*0x40; // animation frame - probably wrong but seems right
+		int horse = (state->sprite_ram[base+1]&0x7)*8+7;  // horse label from 1 - 6
 
 		for (a=0;a<8 ;a++)
 		{
@@ -407,10 +420,10 @@ wouldnt like to say its the most effective way though...
 		for(x=0;x<32;x++)
 		{
 			int tileno,bank,color;
-			tileno=dderby_vidchars[count];
-			bank=(dderby_vidattribs[count]&0x20)>>5;
+			tileno=state->dderby_vidchars[count];
+			bank=(state->dderby_vidattribs[count]&0x20)>>5;
 			tileno|=(bank<<8);
-			color=((dderby_vidattribs[count])&0x1f);
+			color=((state->dderby_vidattribs[count])&0x1f);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,tileno,color,0,0,x*8,y*8,(tileno == 0x38) ? 0 : -1);
 
@@ -487,7 +500,7 @@ static INTERRUPT_GEN( dderby_timer_irq )
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
-static MACHINE_CONFIG_START( dderby, driver_device )
+static MACHINE_CONFIG_START( dderby, dmndrby_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)

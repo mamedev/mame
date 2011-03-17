@@ -439,6 +439,7 @@ public:
 
 	int tank_shutter_position;
 	int cable_holder_release;
+	double pad_position[ 6 ];
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
@@ -2625,10 +2626,11 @@ static DRIVER_INIT( mamboagg )
 
 /* punch mania */
 
-static double pad_position[ 6 ];
 
 static double punchmania_inputs_callback( device_t *device, UINT8 input )
 {
+	ksys573_state *state = device->machine->driver_data<ksys573_state>();
+	double *pad_position = state->pad_position;
 	int pads = input_port_read(device->machine, "PADS");
 	for( int i = 0; i < 6; i++ )
 	{
@@ -2664,6 +2666,8 @@ int pad_light[ 6 ];
 
 static void punchmania_output_callback( running_machine *machine, int offset, int data )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+	double *pad_position = state->pad_position;
 	char pad[ 7 ];
 
 	switch( offset )

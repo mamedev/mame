@@ -45,7 +45,17 @@
 #include "sound/okim6295.h"
 
 
-static int test_x, test_y, start_offs;
+class itgambl3_state : public driver_device
+{
+public:
+	itgambl3_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int test_x;
+	int test_y;
+	int start_offs;
+};
+
 
 /*************************
 *     Video Hardware     *
@@ -53,50 +63,52 @@ static int test_x, test_y, start_offs;
 
 static VIDEO_START( itgambl3 )
 {
-	test_x = 256;
-	test_y = 256;
-	start_offs = 0;
+	itgambl3_state *state = machine->driver_data<itgambl3_state>();
+	state->test_x = 256;
+	state->test_y = 256;
+	state->start_offs = 0;
 }
 
 /* (dirty) debug code for looking 8bpps blitter-based gfxs */
 static SCREEN_UPDATE( itgambl3 )
 {
+	itgambl3_state *state = screen->machine->driver_data<itgambl3_state>();
 	int x,y,count;
 	const UINT8 *blit_ram = screen->machine->region("gfx1")->base();
 
 	if(input_code_pressed(screen->machine, KEYCODE_Z))
-		test_x++;
+		state->test_x++;
 
 	if(input_code_pressed(screen->machine, KEYCODE_X))
-		test_x--;
+		state->test_x--;
 
 	if(input_code_pressed(screen->machine, KEYCODE_A))
-		test_y++;
+		state->test_y++;
 
 	if(input_code_pressed(screen->machine, KEYCODE_S))
-		test_y--;
+		state->test_y--;
 
 	if(input_code_pressed(screen->machine, KEYCODE_Q))
-		start_offs+=0x200;
+		state->start_offs+=0x200;
 
 	if(input_code_pressed(screen->machine, KEYCODE_W))
-		start_offs-=0x200;
+		state->start_offs-=0x200;
 
 	if(input_code_pressed(screen->machine, KEYCODE_E))
-		start_offs++;
+		state->start_offs++;
 
 	if(input_code_pressed(screen->machine, KEYCODE_R))
-		start_offs--;
+		state->start_offs--;
 
-	popmessage("%d %d %04x",test_x,test_y,start_offs);
+	popmessage("%d %d %04x",state->test_x,state->test_y,state->start_offs);
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-	count = (start_offs);
+	count = (state->start_offs);
 
-	for(y=0;y<test_y;y++)
+	for(y=0;y<state->test_y;y++)
 	{
-		for(x=0;x<test_x;x++)
+		for(x=0;x<state->test_x;x++)
 		{
 			UINT32 color;
 
@@ -236,7 +248,7 @@ static PALETTE_INIT( itgambl3 )
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgambl3, driver_device )
+static MACHINE_CONFIG_START( itgambl3, itgambl3_state )
 
     /* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a M16C core ATM */

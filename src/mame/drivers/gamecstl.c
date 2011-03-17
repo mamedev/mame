@@ -73,18 +73,30 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 
-static void ide_interrupt(device_t *device, int state);
 
-static UINT32 *cga_ram;
-static UINT32 *bios_ram;
+class gamecstl_state : public driver_device
+{
+public:
+	gamecstl_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
-static struct {
+	UINT32 *cga_ram;
+	UINT32 *bios_ram;
+	UINT8 mxtc_config_reg[256];
+	UINT8 piix4_config_reg[4][256];
+	int dma_channel;
+	UINT8 dma_offset[2][4];
+	UINT8 at_pages[0x10];
+
 	device_t	*pit8254;
 	device_t	*pic8259_1;
 	device_t	*pic8259_2;
 	device_t	*dma8237_1;
 	device_t	*dma8237_2;
-} gamecstl_devices;
+};
+
+
+static void ide_interrupt(device_t *device, int state);
 
 
 static const rgb_t cga_palette[16] =
@@ -126,9 +138,10 @@ static void draw_char(bitmap_t *bitmap, const rectangle *cliprect, const gfx_ele
 
 static SCREEN_UPDATE(gamecstl)
 {
+	gamecstl_state *state = screen->machine->driver_data<gamecstl_state>();
 	int i, j;
 	const gfx_element *gfx = screen->machine->gfx[0];
-	UINT32 *cga = cga_ram;
+	UINT32 *cga = state->cga_ram;
 	int index = 0;
 
 	bitmap_fill(bitmap, cliprect, 0);
@@ -173,17 +186,18 @@ static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 
 
 // Intel 82439TX System Controller (MXTC)
-static UINT8 mxtc_config_reg[256];
 
 static UINT8 mxtc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
+	gamecstl_state *state = busdevice->machine->driver_data<gamecstl_state>();
 //  mame_printf_debug("MXTC: read %d, %02X\n", function, reg);
 
-	return mxtc_config_reg[reg];
+	return state->mxtc_config_reg[reg];
 }
 
 static void mxtc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
+	gamecstl_state *state = busdevice->machine->driver_data<gamecstl_state>();
 //  mame_printf_debug("%s:MXTC: write %d, %02X, %02X\n", busdevice->machine->describe_context(), function, reg, data);
 
 	switch(reg)
@@ -192,7 +206,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine, "bank1", bios_ram);
+				memory_set_bankptr(busdevice->machine, "bank1", state->bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
@@ -202,17 +216,18 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		}
 	}
 
-	mxtc_config_reg[reg] = data;
+	state->mxtc_config_reg[reg] = data;
 }
 
-static void intel82439tx_init(void)
+static void intel82439tx_init(running_machine *machine)
 {
-	mxtc_config_reg[0x60] = 0x02;
-	mxtc_config_reg[0x61] = 0x02;
-	mxtc_config_reg[0x62] = 0x02;
-	mxtc_config_reg[0x63] = 0x02;
-	mxtc_config_reg[0x64] = 0x02;
-	mxtc_config_reg[0x65] = 0x02;
+	gamecstl_state *state = machine->driver_data<gamecstl_state>();
+	state->mxtc_config_reg[0x60] = 0x02;
+	state->mxtc_config_reg[0x61] = 0x02;
+	state->mxtc_config_reg[0x62] = 0x02;
+	state->mxtc_config_reg[0x63] = 0x02;
+	state->mxtc_config_reg[0x64] = 0x02;
+	state->mxtc_config_reg[0x65] = 0x02;
 }
 
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -258,18 +273,19 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 }
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-static UINT8 piix4_config_reg[4][256];
 
 static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
+	gamecstl_state *state = busdevice->machine->driver_data<gamecstl_state>();
 //  mame_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return piix4_config_reg[function][reg];
+	return state->piix4_config_reg[function][reg];
 }
 
 static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
 {
+	gamecstl_state *state = busdevice->machine->driver_data<gamecstl_state>();
 //  mame_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", busdevice->machine->describe_context(), function, reg, data);
-	piix4_config_reg[function][reg] = data;
+	state->piix4_config_reg[function][reg] = data;
 }
 
 static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -358,9 +374,10 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 
 static WRITE32_HANDLER(bios_ram_w)
 {
-	if (mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	gamecstl_state *state = space->machine->driver_data<gamecstl_state>();
+	if (state->mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(bios_ram + offset);
+		COMBINE_DATA(state->bios_ram + offset);
 	}
 }
 
@@ -371,28 +388,26 @@ static WRITE32_HANDLER(bios_ram_w)
  *
  *************************************************************************/
 
-static int dma_channel;
-static UINT8 dma_offset[2][4];
-static UINT8 at_pages[0x10];
 
 
 static READ8_HANDLER(at_page8_r)
 {
-	UINT8 data = at_pages[offset % 0x10];
+	gamecstl_state *state = space->machine->driver_data<gamecstl_state>();
+	UINT8 data = state->at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
 	case 1:
-		data = dma_offset[(offset / 8) & 1][2];
+		data = state->dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = dma_offset[(offset / 8) & 1][3];
+		data = state->dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = dma_offset[(offset / 8) & 1][1];
+		data = state->dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = dma_offset[(offset / 8) & 1][0];
+		data = state->dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
@@ -401,21 +416,22 @@ static READ8_HANDLER(at_page8_r)
 
 static WRITE8_HANDLER(at_page8_w)
 {
-	at_pages[offset % 0x10] = data;
+	gamecstl_state *state = space->machine->driver_data<gamecstl_state>();
+	state->at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
 	{
 	case 1:
-		dma_offset[(offset / 8) & 1][2] = data;
+		state->dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		dma_offset[(offset / 8) & 1][3] = data;
+		state->dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		dma_offset[(offset / 8) & 1][1] = data;
+		state->dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		dma_offset[(offset / 8) & 1][0] = data;
+		state->dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
@@ -432,7 +448,8 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 
 static READ8_HANDLER( pc_dma_read_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	gamecstl_state *state = space->machine->driver_data<gamecstl_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	return space->read_byte(page_offset + offset);
@@ -441,7 +458,8 @@ static READ8_HANDLER( pc_dma_read_byte )
 
 static WRITE8_HANDLER( pc_dma_write_byte )
 {
-	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
+	gamecstl_state *state = space->machine->driver_data<gamecstl_state>();
+	offs_t page_offset = (((offs_t) state->dma_offset[0][state->dma_channel]) << 16)
 		& 0xFF0000;
 
 	space->write_byte(page_offset + offset, data);
@@ -449,7 +467,8 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 
 static void set_dma_channel(device_t *device, int channel, int state)
 {
-	if (!state) dma_channel = channel;
+	gamecstl_state *drvstate = device->machine->driver_data<gamecstl_state>();
+	if (!state) drvstate->dma_channel = channel;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dack0_w ) { set_dma_channel(device, 0, state); }
@@ -496,7 +515,7 @@ static WRITE32_HANDLER(at_page32_w)
 static ADDRESS_MAP_START( gamecstl_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE(&cga_ram)
+	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE_MEMBER(gamecstl_state, cga_ram)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE(bios_ram_w)
@@ -583,22 +602,24 @@ INPUT_PORTS_END
 
 static IRQ_CALLBACK(irq_callback)
 {
+	gamecstl_state *state = device->machine->driver_data<gamecstl_state>();
 	int r = 0;
-	r = pic8259_acknowledge(gamecstl_devices.pic8259_2);
+	r = pic8259_acknowledge(state->pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge(gamecstl_devices.pic8259_1);
+		r = pic8259_acknowledge(state->pic8259_1);
 	}
 	return r;
 }
 
 static MACHINE_START(gamecstl)
 {
-	gamecstl_devices.pit8254 = machine->device( "pit8254" );
-	gamecstl_devices.pic8259_1 = machine->device( "pic8259_1" );
-	gamecstl_devices.pic8259_2 = machine->device( "pic8259_2" );
-	gamecstl_devices.dma8237_1 = machine->device( "dma8237_1" );
-	gamecstl_devices.dma8237_2 = machine->device( "dma8237_2" );
+	gamecstl_state *state = machine->driver_data<gamecstl_state>();
+	state->pit8254 = machine->device( "pit8254" );
+	state->pic8259_1 = machine->device( "pic8259_1" );
+	state->pic8259_2 = machine->device( "pic8259_2" );
+	state->dma8237_1 = machine->device( "dma8237_1" );
+	state->dma8237_2 = machine->device( "dma8237_2" );
 }
 
 static MACHINE_RESET(gamecstl)
@@ -656,7 +677,7 @@ static const struct pit8253_config gamecstl_pit8254_config =
 	}
 };
 
-static MACHINE_CONFIG_START( gamecstl, driver_device )
+static MACHINE_CONFIG_START( gamecstl, gamecstl_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 200000000)
@@ -707,17 +728,20 @@ static void set_gate_a20(running_machine *machine, int a20)
 
 static void keyboard_interrupt(running_machine *machine, int state)
 {
-	pic8259_ir1_w(gamecstl_devices.pic8259_1, state);
+	gamecstl_state *drvstate = machine->driver_data<gamecstl_state>();
+	pic8259_ir1_w(drvstate->pic8259_1, state);
 }
 
 static void ide_interrupt(device_t *device, int state)
 {
-	pic8259_ir6_w(gamecstl_devices.pic8259_2, state);
+	gamecstl_state *drvstate = device->machine->driver_data<gamecstl_state>();
+	pic8259_ir6_w(drvstate->pic8259_2, state);
 }
 
 static int gamecstl_get_out2(running_machine *machine)
 {
-	return pit8253_get_output( gamecstl_devices.pit8254, 2 );
+	gamecstl_state *state = machine->driver_data<gamecstl_state>();
+	return pit8253_get_output( state->pit8254, 2 );
 }
 
 static const struct kbdc8042_interface at8042 =
@@ -727,16 +751,18 @@ static const struct kbdc8042_interface at8042 =
 
 static void gamecstl_set_keyb_int(running_machine *machine, int state)
 {
-	pic8259_ir1_w(gamecstl_devices.pic8259_1, state);
+	gamecstl_state *drvstate = machine->driver_data<gamecstl_state>();
+	pic8259_ir1_w(drvstate->pic8259_1, state);
 }
 
 static DRIVER_INIT( gamecstl )
 {
-	bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
+	gamecstl_state *state = machine->driver_data<gamecstl_state>();
+	state->bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, gamecstl_set_keyb_int);
 
-	intel82439tx_init();
+	intel82439tx_init(machine);
 
 	kbdc8042_init(machine, &at8042);
 }

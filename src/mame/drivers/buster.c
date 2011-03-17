@@ -10,16 +10,25 @@ Video Fruit Machine
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
-static UINT8 *buster_rom;
-static UINT8 *buster_vram;
+
+class buster_state : public driver_device
+{
+public:
+	buster_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *rom;
+	UINT8 *vram;
+};
+
 
 static VIDEO_START(buster)
 {
-
 }
 
 static SCREEN_UPDATE(buster)
 {
+	buster_state *state = screen->machine->driver_data<buster_state>();
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x0000;
 
@@ -30,7 +39,7 @@ static SCREEN_UPDATE(buster)
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = (buster_vram[count+1])|(buster_vram[count]<<8);
+			int tile = (state->vram[count+1])|(state->vram[count]<<8);
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*4);
 
@@ -41,9 +50,9 @@ static SCREEN_UPDATE(buster)
 }
 
 static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(&buster_rom)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(buster_state, rom)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE(&buster_vram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(buster_state, vram)
 //  AM_RANGE(0x6000, 0x6000) MC6845 address
 //  AM_RANGE(0x6001, 0x6001) MC6845 data
 	AM_RANGE(0x7000, 0xafff) AM_ROM
@@ -69,7 +78,7 @@ static GFXDECODE_START( buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( buster, driver_device )
+static MACHINE_CONFIG_START( buster, buster_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmap)
@@ -113,9 +122,10 @@ ROM_END
 
 static DRIVER_INIT( buster )
 {
+	buster_state *state = machine->driver_data<buster_state>();
 	UINT8 *ROM = machine->region("maincpu")->base();
 //  vram = auto_alloc_array(machine, UINT8, 0x2000);
-	memcpy(buster_rom, ROM, 0x4000);
+	memcpy(state->rom, ROM, 0x4000);
 }
 
 GAME( 1987, buster,  0,    buster, buster,  buster, ROT0, "Marian Electronics Ltd.", "Buster", GAME_NOT_WORKING|GAME_NO_SOUND )

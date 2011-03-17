@@ -47,6 +47,10 @@ public:
 	UINT8 mux_data;
 	UINT32 adpcm_pos[2];
 	UINT8 adpcm_idle[2];
+	UINT8 trigger1;
+	UINT8 adpcm_data1;
+	UINT8 trigger2;
+	UINT8 adpcm_data2;
 };
 
 
@@ -276,21 +280,20 @@ static const ppi8255_interface ppi8255_intf[2] =
 static void kfr_adpcm1_int(device_t *device)
 {
 	kungfur_state *state = device->machine->driver_data<kungfur_state>();
-	static UINT8 trigger,adpcm_data;
 
 	if (state->adpcm_pos[0] >= 0x40000 || state->adpcm_idle[0])
 	{
 		msm5205_reset_w(device->machine->device("adpcm1"),1);
-		trigger = 0;
+		state->trigger1 = 0;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine->region("adpcm1")->base();
 
-		adpcm_data = ((trigger ? (ROM[state->adpcm_pos[0]] & 0x0f) : (ROM[state->adpcm_pos[0]] & 0xf0)>>4) );
-		msm5205_data_w(device->machine->device("adpcm1"),adpcm_data & 0xf);
-		trigger^=1;
-		if(trigger == 0)
+		state->adpcm_data1 = ((state->trigger1 ? (ROM[state->adpcm_pos[0]] & 0x0f) : (ROM[state->adpcm_pos[0]] & 0xf0)>>4) );
+		msm5205_data_w(device->machine->device("adpcm1"), state->adpcm_data1 & 0xf);
+		state->trigger1 ^= 1;
+		if(state->trigger1 == 0)
 		{
 			state->adpcm_pos[0]++;
 			if((ROM[state->adpcm_pos[0]] & 0xff) == 0xff)
@@ -303,21 +306,20 @@ static void kfr_adpcm1_int(device_t *device)
 static void kfr_adpcm2_int(device_t *device)
 {
 	kungfur_state *state = device->machine->driver_data<kungfur_state>();
-	static UINT8 trigger,adpcm_data;
 
 	if (state->adpcm_pos[1] >= 0x10000 || state->adpcm_idle[1])
 	{
 		msm5205_reset_w(device->machine->device("adpcm2"),1);
-		trigger = 0;
+		state->trigger2 = 0;
 	}
 	else
 	{
 		UINT8 *ROM = device->machine->region("adpcm2")->base();
 
-		adpcm_data = ((trigger ? (ROM[state->adpcm_pos[1]] & 0x0f) : (ROM[state->adpcm_pos[1]] & 0xf0)>>4) );
-		msm5205_data_w(device->machine->device("adpcm2"),adpcm_data & 0xf);
-		trigger^=1;
-		if(trigger == 0)
+		state->adpcm_data2 = ((state->trigger2 ? (ROM[state->adpcm_pos[1]] & 0x0f) : (ROM[state->adpcm_pos[1]] & 0xf0)>>4) );
+		msm5205_data_w(device->machine->device("adpcm2"), state->adpcm_data2 & 0xf);
+		state->trigger2 ^= 1;
+		if(state->trigger2 == 0)
 		{
 			state->adpcm_pos[1]++;
 			if((ROM[state->adpcm_pos[1]] & 0xff) == 0xff)

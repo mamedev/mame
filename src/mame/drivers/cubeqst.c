@@ -25,6 +25,22 @@
 #include "machine/nvram.h"
 
 
+class cubeqst_state : public driver_device
+{
+public:
+	cubeqst_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *depth_buffer;
+	int video_field;
+	UINT8 io_latch;
+	UINT8 reset_latch;
+	device_t *laserdisc;
+	rgb_t *colormap;
+};
+
+
+
 /*************************************
  *
  *  Constants
@@ -38,23 +54,6 @@
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-static UINT8 *depth_buffer;
-static int video_field;
-
-static UINT8 io_latch;
-static UINT8 reset_latch;
-
-static device_t *laserdisc;
-static rgb_t *colormap;
-
-
-
-/*************************************
- *
  *  Video (move to separate file)
  *
  *************************************/
@@ -63,16 +62,18 @@ static const rectangle overlay_clip = { 0, 320-1, 0, 256-8 };
 
 static VIDEO_START( cubeqst )
 {
-	video_field = 0;
-	depth_buffer = auto_alloc_array(machine, UINT8, 512);
+	cubeqst_state *state = machine->driver_data<cubeqst_state>();
+	state->video_field = 0;
+	state->depth_buffer = auto_alloc_array(machine, UINT8, 512);
 }
 
 /* TODO: Use resistor values */
 static PALETTE_INIT( cubeqst )
 {
+	cubeqst_state *state = machine->driver_data<cubeqst_state>();
 	int i;
 
-	colormap = auto_alloc_array(machine, rgb_t, 65536);
+	state->colormap = auto_alloc_array(machine, rgb_t, 65536);
 	for (i = 0; i < 65536; ++i)
 	{
 		UINT8 a, r, g, b, y;
@@ -83,7 +84,7 @@ static PALETTE_INIT( cubeqst )
 		r = (i >> 8) & 7;
 		y = ((i >> 12) & 0xf) * 2;
 
-		colormap[i] = MAKE_ARGB(a ? 0 : 255, y*r, y*g, y*b);
+		state->colormap[i] = MAKE_ARGB(a ? 0 : 255, y*r, y*g, y*b);
 	}
 }
 
@@ -96,6 +97,7 @@ static WRITE16_HANDLER( palette_w )
 /* TODO: This is a simplified version of what actually happens */
 static SCREEN_UPDATE( cubeqst )
 {
+	cubeqst_state *state = screen->machine->driver_data<cubeqst_state>();
 	int y;
 
 	/*
@@ -104,7 +106,7 @@ static SCREEN_UPDATE( cubeqst )
     */
 
 	/* Bit 3 selects LD/#GRAPHICS */
-	bitmap_fill(bitmap, cliprect, colormap[255]);
+	bitmap_fill(bitmap, cliprect, state->colormap[255]);
 
 	/* TODO: Add 1 for linebuffering? */
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
@@ -116,7 +118,7 @@ static SCREEN_UPDATE( cubeqst )
 		UINT32 pen;
 
 		/* Zap the depth buffer */
-		memset(depth_buffer, 0xff, 512);
+		memset(state->depth_buffer, 0xff, 512);
 
 		/* Process all the spans on this scanline */
 		if (y < 256)
@@ -153,13 +155,13 @@ static SCREEN_UPDATE( cubeqst )
 				}
 
 				/* Draw the span, testing for depth */
-				pen = colormap[screen->machine->generic.paletteram.u16[color]];
+				pen = state->colormap[screen->machine->generic.paletteram.u16[color]];
 				for (x = h1; x <= h2; ++x)
 				{
-					if (!(depth_buffer[x] < depth))
+					if (!(state->depth_buffer[x] < depth))
 					{
 						dest[x] = pen;
-						depth_buffer[x] = depth;
+						state->depth_buffer[x] = depth;
 					}
 				}
 			}
@@ -177,12 +179,13 @@ static READ16_HANDLER( line_r )
 
 static INTERRUPT_GEN( vblank )
 {
-	int int_level = video_field == 0 ? 5 : 6;
+	cubeqst_state *state = device->machine->driver_data<cubeqst_state>();
+	int int_level = state->video_field == 0 ? 5 : 6;
 
 	cpu_set_input_line(device, int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
-	video_field ^= 1;
+	state->video_field ^= 1;
 }
 
 
@@ -194,7 +197,8 @@ static INTERRUPT_GEN( vblank )
 
 static WRITE16_HANDLER( laserdisc_w )
 {
-	laserdisc_data_w(laserdisc, data & 0xff);
+	cubeqst_state *state = space->machine->driver_data<cubeqst_state>();
+	laserdisc_data_w(state->laserdisc, data & 0xff);
 }
 
 /*
@@ -203,8 +207,9 @@ static WRITE16_HANDLER( laserdisc_w )
 */
 static READ16_HANDLER( laserdisc_r )
 {
-	int ldp_command_flag = (laserdisc_line_r(laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
-	int ldp_seek_status = (laserdisc_line_r(laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 1 : 0;
+	cubeqst_state *state = space->machine->driver_data<cubeqst_state>();
+	int ldp_command_flag = (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
+	int ldp_seek_status = (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 1 : 0;
 
 	return (ldp_seek_status << 1) | ldp_command_flag;
 }
@@ -213,7 +218,8 @@ static READ16_HANDLER( laserdisc_r )
 /* LDP audio squelch control */
 static WRITE16_HANDLER( ldaud_w )
 {
-	simutrek_set_audio_squelch(laserdisc, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	cubeqst_state *state = space->machine->driver_data<cubeqst_state>();
+	simutrek_set_audio_squelch(state->laserdisc, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -228,7 +234,8 @@ static WRITE16_HANDLER( ldaud_w )
 */
 static WRITE16_HANDLER( control_w )
 {
-	laserdisc_video_enable(laserdisc, data & 1);
+	cubeqst_state *state = space->machine->driver_data<cubeqst_state>();
+	laserdisc_video_enable(state->laserdisc, data & 1);
 }
 
 
@@ -264,18 +271,19 @@ static void swap_linecpu_banks(running_machine *machine)
 */
 static WRITE16_HANDLER( reset_w )
 {
+	cubeqst_state *state = space->machine->driver_data<cubeqst_state>();
 	cputag_set_input_line(space->machine, "rotate_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	cputag_set_input_line(space->machine, "line_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	cputag_set_input_line(space->machine, "sound_cpu", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
-	if (!BIT(reset_latch, 0) && BIT(data, 0))
+	if (!BIT(state->reset_latch, 0) && BIT(data, 0))
 		swap_linecpu_banks(space->machine);
 
 	if (!BIT(data, 2))
-		laserdisc->reset();
+		state->laserdisc->reset();
 
-	reset_latch = data & 0xff;
+	state->reset_latch = data & 0xff;
 }
 
 
@@ -287,6 +295,7 @@ static WRITE16_HANDLER( reset_w )
 
 static WRITE16_HANDLER( io_w )
 {
+	cubeqst_state *state = space->machine->driver_data<cubeqst_state>();
 	/*
        0: Spare lamp
        1: Spare driver
@@ -299,7 +308,7 @@ static WRITE16_HANDLER( io_w )
     */
 
 	/* TODO: On rising edge of Q7, status LED latch is written */
-	if ( !BIT(io_latch, 7) && BIT(data, 7) )
+	if ( !BIT(state->io_latch, 7) && BIT(data, 7) )
 	{
 		/*
             0: Battery failure
@@ -308,11 +317,12 @@ static WRITE16_HANDLER( io_w )
         */
 	}
 
-	io_latch = data;
+	state->io_latch = data;
 }
 
 static READ16_HANDLER( io_r )
 {
+	cubeqst_state *state = space->machine->driver_data<cubeqst_state>();
 	UINT16 port_data = input_port_read(space->machine, "IO");
 
 	/*
@@ -324,7 +334,7 @@ static READ16_HANDLER( io_r )
          10: Spare  / Trackball V data
     */
 
-	if ( !BIT(io_latch, 7) )
+	if ( !BIT(state->io_latch, 7) )
 		return port_data;
 	else
 		/* Return zeroes for the trackball signals for now */
@@ -427,12 +437,14 @@ ADDRESS_MAP_END
 
 static MACHINE_START( cubeqst )
 {
-	laserdisc = machine->device("laserdisc");
+	cubeqst_state *state = machine->driver_data<cubeqst_state>();
+	state->laserdisc = machine->device("laserdisc");
 }
 
 static MACHINE_RESET( cubeqst )
 {
-	reset_latch = 0;
+	cubeqst_state *state = machine->driver_data<cubeqst_state>();
+	state->reset_latch = 0;
 
 	/* Auxillary CPUs are held in reset */
 	cputag_set_input_line(machine, "sound_cpu", INPUT_LINE_RESET, ASSERT_LINE);
@@ -493,7 +505,7 @@ static const cubeqst_lin_config lin_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cubeqst, driver_device )
+static MACHINE_CONFIG_START( cubeqst, cubeqst_state )
 	MCFG_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 	MCFG_CPU_VBLANK_INT("screen", vblank)

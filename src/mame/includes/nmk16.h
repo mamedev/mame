@@ -37,6 +37,11 @@ public:
 	UINT16 vscroll[4];
 	UINT8 *spriteram;
 	size_t spriteram_size;
+	int prot_count;
+	UINT8 input_pressed;
+	UINT8 start_helper;
+	UINT8 coin_count[2];
+	UINT8 coin_count_frac[2];
 };
 
 

@@ -27,21 +27,28 @@ Todo:
 #include "machine/laserdsc.h"
 #include "machine/nvram.h"
 
+
+class esh_state : public driver_device
+{
+public:
+	esh_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	device_t *laserdisc;
+	UINT8 *tile_ram;
+	UINT8 *tile_control_ram;
+	UINT8 ld_video_visible;
+};
+
+
 /* From daphne */
 #define PCB_CLOCK (18432000)
 
 
-/* Misc variables */
-static device_t *laserdisc;
-
-static UINT8 *tile_ram;
-static UINT8 *tile_control_ram;
-
-static UINT8 ld_video_visible;
-
 /* VIDEO GOODS */
 static SCREEN_UPDATE( esh )
 {
+	esh_state *state = screen->machine->driver_data<esh_state>();
 	int charx, chary;
 
 	/* clear */
@@ -54,13 +61,13 @@ static SCREEN_UPDATE( esh )
 		{
 			int current_screen_character = (chary*32) + charx;
 
-			int palIndex  = (tile_control_ram[current_screen_character] & 0x0f);
-			int tileOffs  = (tile_control_ram[current_screen_character] & 0x10) >> 4;
-			//int blinkLine = (tile_control_ram[current_screen_character] & 0x40) >> 6;
-			//int blinkChar = (tile_control_ram[current_screen_character] & 0x80) >> 7;
+			int palIndex  = (state->tile_control_ram[current_screen_character] & 0x0f);
+			int tileOffs  = (state->tile_control_ram[current_screen_character] & 0x10) >> 4;
+			//int blinkLine = (state->tile_control_ram[current_screen_character] & 0x40) >> 6;
+			//int blinkChar = (state->tile_control_ram[current_screen_character] & 0x80) >> 7;
 
 			drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[0],
-					tile_ram[current_screen_character] + (0x100 * tileOffs),
+					state->tile_ram[current_screen_character] + (0x100 * tileOffs),
 					palIndex,
 					0, 0, charx*8, chary*8, 0);
 		}
@@ -75,23 +82,26 @@ static SCREEN_UPDATE( esh )
 /* MEMORY HANDLERS */
 static READ8_HANDLER(ldp_read)
 {
-	return laserdisc_data_r(laserdisc);
+	esh_state *state = space->machine->driver_data<esh_state>();
+	return laserdisc_data_r(state->laserdisc);
 }
 
 static WRITE8_HANDLER(ldp_write)
 {
-	laserdisc_data_w(laserdisc,data);
+	esh_state *state = space->machine->driver_data<esh_state>();
+	laserdisc_data_w(state->laserdisc,data);
 }
 
 static WRITE8_HANDLER(misc_write)
 {
+	esh_state *state = space->machine->driver_data<esh_state>();
 	/* Bit 0 unknown */
 
 	if (data & 0x02)
 		logerror("BEEP!\n");
 
 	/* Bit 2 unknown */
-	ld_video_visible = !((data & 0x08) >> 3);
+	state->ld_video_visible = !((data & 0x08) >> 3);
 
 	/* Bits 4-7 unknown */
 	/* They cycle through a repeating pattern though */
@@ -144,8 +154,8 @@ static WRITE8_HANDLER(nmi_line_w)
 static ADDRESS_MAP_START( z80_0_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE(&tile_ram)
-	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_BASE(&tile_control_ram)
+	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE_MEMBER(esh_state, tile_ram)
+	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_BASE_MEMBER(esh_state, tile_control_ram)
 ADDRESS_MAP_END
 
 
@@ -273,12 +283,13 @@ static INTERRUPT_GEN( vblank_callback_esh )
 
 static MACHINE_START( esh )
 {
-	laserdisc = machine->device("laserdisc");
+	esh_state *state = machine->driver_data<esh_state>();
+	state->laserdisc = machine->device("laserdisc");
 }
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( esh, driver_device )
+static MACHINE_CONFIG_START( esh, esh_state )
 
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */

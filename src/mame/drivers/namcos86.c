@@ -256,24 +256,24 @@ static WRITE8_HANDLER( int_ack2_w )
 }
 
 
-static int wdog;
-
 static WRITE8_HANDLER( watchdog1_w )
 {
-	wdog |= 1;
-	if (wdog == 3)
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	state->wdog |= 1;
+	if (state->wdog == 3)
 	{
-		wdog = 0;
+		state->wdog = 0;
 		watchdog_reset_w(space,0,0);
 	}
 }
 
 static WRITE8_HANDLER( watchdog2_w )
 {
-	wdog |= 2;
-	if (wdog == 3)
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	state->wdog |= 2;
+	if (state->wdog == 3)
 	{
-		wdog = 0;
+		state->wdog = 0;
 		watchdog_reset_w(space,0,0);
 	}
 }
@@ -334,8 +334,8 @@ static MACHINE_RESET( namco86 )
 
 
 static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_BASE(&rthunder_videoram1)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_BASE(&rthunder_videoram2)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_BASE_MEMBER(namcos86_state, rthunder_videoram1)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_BASE_MEMBER(namcos86_state, rthunder_videoram2)
 
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 
@@ -365,7 +365,7 @@ ADDRESS_MAP_END
 
 #define CPU2_MEMORY(NAME,ADDR_SPRITE,ADDR_VIDEO1,ADDR_VIDEO2,ADDR_ROM,ADDR_BANK,ADDR_WDOG,ADDR_INT)	\
 static ADDRESS_MAP_START( NAME##_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )							\
-	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_BASE(&rthunder_spriteram)	\
+	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_BASE_MEMBER(namcos86_state, rthunder_spriteram)	\
 	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w)	\
 	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w)	\
 	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_ROMBANK("bank2")								\

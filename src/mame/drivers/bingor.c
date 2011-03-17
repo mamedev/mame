@@ -442,15 +442,24 @@
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/saa1099.h"
 
-static UINT16 *blit_ram;
+
+class bingor_state : public driver_device
+{
+public:
+	bingor_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *blit_ram;
+};
+
 
 static VIDEO_START(bingor)
 {
-
 }
 
 static SCREEN_UPDATE(bingor)
 {
+	bingor_state *state = screen->machine->driver_data<bingor_state>();
 	int x,y,count;
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
@@ -463,22 +472,22 @@ static SCREEN_UPDATE(bingor)
 		{
 			UINT32 color;
 
-			color = (blit_ram[count] & 0xf000)>>12;
+			color = (state->blit_ram[count] & 0xf000)>>12;
 
 			if((x+3)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x+3) = screen->machine->pens[color];
 
-			color = (blit_ram[count] & 0x0f00)>>8;
+			color = (state->blit_ram[count] & 0x0f00)>>8;
 
 			if((x+2)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x+2) = screen->machine->pens[color];
 
-			color = (blit_ram[count] & 0x00f0)>>4;
+			color = (state->blit_ram[count] & 0x00f0)>>4;
 
 			if((x+1)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x+1) = screen->machine->pens[color];
 
-			color = (blit_ram[count] & 0x000f)>>0;
+			color = (state->blit_ram[count] & 0x000f)>>0;
 
 			if((x+0)<screen->visible_area().max_x && ((y)+0)<screen->visible_area().max_y)
 				*BITMAP_ADDR32(bitmap, y, x+0) = screen->machine->pens[color];
@@ -501,7 +510,7 @@ static ADDRESS_MAP_START( bingor_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
 	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_BASE_GENERIC(paletteram) //wrong
-	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_BASE(&blit_ram)
+	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_BASE_MEMBER(bingor_state, blit_ram)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
@@ -602,7 +611,7 @@ static GFXDECODE_START( bingor )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( bingor, driver_device )
+static MACHINE_CONFIG_START( bingor, bingor_state )
 	MCFG_CPU_ADD("maincpu", I80186, 14000000 ) //?? Mhz
 	MCFG_CPU_PROGRAM_MAP(bingor_map)
 	MCFG_CPU_IO_MAP(bingor_io)

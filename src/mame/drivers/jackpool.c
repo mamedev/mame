@@ -21,9 +21,16 @@ TODO:
 #include "machine/eeprom.h"
 
 
-static UINT16 *jackpool_vram;
-static UINT8 map_vreg;
-static UINT16 *jackpool_io;
+class jackpool_state : public driver_device
+{
+public:
+	jackpool_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *vram;
+	UINT8 map_vreg;
+	UINT16 *io;
+};
 
 
 static VIDEO_START(jackpool)
@@ -32,36 +39,37 @@ static VIDEO_START(jackpool)
 
 static SCREEN_UPDATE(jackpool)
 {
+	jackpool_state *state = screen->machine->driver_data<jackpool_state>();
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count;// = 0x00000/2;
 
 	int y,x;
 
 	{
-		count = map_vreg*(0x4000/2);
+		count = state->map_vreg*(0x4000/2);
 		for (y=0;y<32;y++)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (jackpool_vram[count+(0x2000/2)] & 0x7fff);
-				int attr = (jackpool_vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
+				int tile = (state->vram[count+(0x2000/2)] & 0x7fff);
+				int attr = (state->vram[count+(0x2000/2)+0x800] & 0x1f00)>>8;
 
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8);
 				count++;
 			}
 		}
 
-		count = map_vreg*(0x4000/2);
+		count = state->map_vreg*(0x4000/2);
 		for (y=0;y<32;y++)
 		{
 			for (x=0;x<64;x++)
 			{
-				int tile = (jackpool_vram[count] & 0x7fff);
+				int tile = (state->vram[count] & 0x7fff);
 
 				if(tile != 0)
 				{
-					int attr = (jackpool_vram[count+0x800] & 0x1f00)>>8;
-					int t_pen = (jackpool_vram[count+0x800] & 0x1000);
+					int attr = (state->vram[count+0x800] & 0x1f00)>>8;
+					int t_pen = (state->vram[count+0x800] & 0x1000);
 
 					drawgfx_transpen(bitmap,cliprect,gfx,tile,attr,0,0,x*8,y*8,(t_pen) ? 0 : -1);
 				}
@@ -82,6 +90,7 @@ static READ16_HANDLER( jackpool_ff_r )
 
 static READ16_HANDLER( jackpool_io_r )
 {
+	jackpool_state *state = space->machine->driver_data<jackpool_state>();
 	switch(offset*2)
 	{
 		case 0x00: return input_port_read(space->machine,"COIN1");
@@ -106,12 +115,13 @@ static READ16_HANDLER( jackpool_io_r )
 	}
 
 //  printf("R %02x\n",offset*2);
-	return jackpool_io[offset];
+	return state->io[offset];
 }
 
 static WRITE16_HANDLER( jackpool_io_w )
 {
-	COMBINE_DATA(&jackpool_io[offset]);
+	jackpool_state *state = space->machine->driver_data<jackpool_state>();
+	COMBINE_DATA(&state->io[offset]);
 
 	switch(offset*2)
 	{
@@ -127,7 +137,7 @@ static WRITE16_HANDLER( jackpool_io_w )
 		case 0x46: /* ---- ---x coin counter */break;
 		case 0x4a: /* ---- ---x Ticket motor */break;
 		case 0x4c: /* ---- ---x Hopper motor */break;
-		case 0x4e: map_vreg = data & 1;        break;
+		case 0x4e: state->map_vreg = data & 1;        break;
 		case 0x50: eeprom_set_cs_line(space->machine->device("eeprom"), (data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
 		case 0x52: eeprom_set_clock_line(space->machine->device("eeprom"), (data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
 		case 0x54: eeprom_write_bit(space->machine->device("eeprom"), data & 1); break;
@@ -160,11 +170,11 @@ static ADDRESS_MAP_START( jackpool_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1200ff) AM_RAM
-	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_BASE(&jackpool_vram)
+	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_BASE_MEMBER(jackpool_state, vram)
 	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
 
 	AM_RANGE(0x360000, 0x3603ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_BASE(&jackpool_io)//AM_READ(jackpool_io_r)
+	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_BASE_MEMBER(jackpool_state, io)//AM_READ(jackpool_io_r)
 
 	AM_RANGE(0x800000, 0x80000f) AM_READ(jackpool_ff_r) AM_WRITENOP //UART
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
@@ -239,7 +249,7 @@ static INTERRUPT_GEN( jackpool_interrupt )
 }
 
 
-static MACHINE_CONFIG_START( jackpool, driver_device )
+static MACHINE_CONFIG_START( jackpool, jackpool_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
 	MCFG_CPU_VBLANK_INT("screen",jackpool_interrupt)  // ?

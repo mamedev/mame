@@ -25,6 +25,17 @@ Todo:
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 
+
+class kingpin_state : public driver_device
+{
+public:
+	kingpin_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *code_base;
+};
+
+
 static READ8_HANDLER( io_read_missing_dips )
 {
 	return 0x00;
@@ -139,7 +150,7 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
-static MACHINE_CONFIG_START( kingpin, driver_device )
+static MACHINE_CONFIG_START( kingpin, kingpin_state )
 /*  MAIN CPU */
 	MCFG_CPU_ADD("maincpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(kingpin_program_map)
@@ -173,13 +184,13 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( kingpin )
 {
-	static UINT8 *code_base;
+	kingpin_state *state = machine->driver_data<kingpin_state>();
 
 	TMS9928A_configure(&tms9928a_interface);
 
 	/* Hacks to keep the emu a'runnin */
-	code_base = machine->region("maincpu")->base();
-	code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
+	state->code_base = machine->region("maincpu")->base();
+	state->code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
 }
 
 ROM_START( kingpin )

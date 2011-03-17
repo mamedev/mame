@@ -39,19 +39,21 @@ public:
 	UINT32 *spriteram;
 	UINT32 *spriteram2;
 	size_t spriteram_size;
+	tilemap_t *bg_tilemap;
+	tilemap_t *md_tilemap;
+	tilemap_t *fg_tilemap;
+	UINT32 *bg_videoram;
+	UINT32 *md_videoram;
+	UINT32 *fg_videoram;
+	UINT32 *videoreg;
+	UINT32 *mainram;
+	int spriteram_bit;
+	bitmap_t *sprites_bitmap;
+	bitmap_t *sprites_bitmap_pri;
+	int prev_sprites_count;
+	UINT8 spotty_sound_cmd;
 };
 
-
-static tilemap_t *bg_tilemap, *md_tilemap, *fg_tilemap;
-static UINT32 *bg_videoram, *md_videoram, *fg_videoram, *limenko_videoreg;
-
-static UINT32 *mainram;
-static int spriteram_bit;
-
-static bitmap_t *sprites_bitmap;
-static bitmap_t *sprites_bitmap_pri;
-
-static int prev_sprites_count = 0;
 
 static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectangle *cliprect, int count);
 
@@ -84,20 +86,23 @@ static WRITE32_HANDLER( limenko_paletteram_w )
 
 static WRITE32_HANDLER( bg_videoram_w )
 {
-	COMBINE_DATA(&bg_videoram[offset]);
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	limenko_state *state = space->machine->driver_data<limenko_state>();
+	COMBINE_DATA(&state->bg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 static WRITE32_HANDLER( md_videoram_w )
 {
-	COMBINE_DATA(&md_videoram[offset]);
-	tilemap_mark_tile_dirty(md_tilemap,offset);
+	limenko_state *state = space->machine->driver_data<limenko_state>();
+	COMBINE_DATA(&state->md_videoram[offset]);
+	tilemap_mark_tile_dirty(state->md_tilemap,offset);
 }
 
 static WRITE32_HANDLER( fg_videoram_w )
 {
-	COMBINE_DATA(&fg_videoram[offset]);
-	tilemap_mark_tile_dirty(fg_tilemap,offset);
+	limenko_state *state = space->machine->driver_data<limenko_state>();
+	COMBINE_DATA(&state->fg_videoram[offset]);
+	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
 }
 
 static WRITE32_HANDLER( spotty_soundlatch_w )
@@ -107,7 +112,8 @@ static WRITE32_HANDLER( spotty_soundlatch_w )
 
 static CUSTOM_INPUT( spriteram_bit_r )
 {
-	return spriteram_bit;
+	limenko_state *state = field->port->machine->driver_data<limenko_state>();
+	return state->spriteram_bit;
 }
 
 static WRITE32_HANDLER( spriteram_buffer_w )
@@ -119,25 +125,25 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 	clip.min_y = 0;
 	clip.max_y = 239;
 
-	bitmap_fill(sprites_bitmap_pri,&clip,0);
-	bitmap_fill(sprites_bitmap,&clip,0);
+	bitmap_fill(state->sprites_bitmap_pri,&clip,0);
+	bitmap_fill(state->sprites_bitmap,&clip,0);
 
 	// toggle spriterams location in the memory map
-	spriteram_bit ^= 1;
+	state->spriteram_bit ^= 1;
 
-	if(spriteram_bit)
+	if(state->spriteram_bit)
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(space->machine,state->spriteram2,&clip,prev_sprites_count);
+		draw_sprites(space->machine,state->spriteram2,&clip,state->prev_sprites_count);
 	}
 	else
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(space->machine,state->spriteram,&clip,prev_sprites_count);
+		draw_sprites(space->machine,state->spriteram,&clip,state->prev_sprites_count);
 	}
 
 	// buffer the next number of sprites to draw
-	prev_sprites_count = (limenko_videoreg[0] & 0x1ff0000) >> 16;
+	state->prev_sprites_count = (state->videoreg[0] & 0x1ff0000) >> 16;
 }
 
 /*****************************************************************************************************
@@ -145,16 +151,16 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 *****************************************************************************************************/
 
 static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(&mainram)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE_MEMBER(limenko_state, mainram)
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("user2",0)
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(limenko_state, fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE_MEMBER(limenko_state, md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(limenko_state, bg_videoram)
 	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_MEMBER(limenko_state, spriteram, spriteram_size)
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_MEMBER(limenko_state, spriteram2)
 	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
+	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE_MEMBER(limenko_state, videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -172,16 +178,16 @@ ADDRESS_MAP_END
 /* Spotty memory map */
 
 static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(&mainram)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE_MEMBER(limenko_state, mainram)
 	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(limenko_state, fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE_MEMBER(limenko_state, md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(limenko_state, bg_videoram)
 	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_MEMBER(limenko_state, spriteram, spriteram_size)
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_MEMBER(limenko_state, spriteram2)
 	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
+	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE_MEMBER(limenko_state, videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -195,10 +201,10 @@ static ADDRESS_MAP_START( spotty_io_map, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x5000, 0x5003) AM_WRITE(spotty_soundlatch_w)
 ADDRESS_MAP_END
 
-static UINT8 spotty_sound_cmd=0;
 static WRITE8_HANDLER( spotty_sound_cmd_w )
 {
-	spotty_sound_cmd = data;
+	limenko_state *state = space->machine->driver_data<limenko_state>();
+	state->spotty_sound_cmd = data;
 }
 
 static READ8_HANDLER( spotty_sound_cmd_r )
@@ -208,9 +214,10 @@ static READ8_HANDLER( spotty_sound_cmd_r )
 
 static READ8_HANDLER( spotty_sound_r )
 {
-	// check spotty_sound_cmd bits...
+	limenko_state *state = space->machine->driver_data<limenko_state>();
+	// check state->spotty_sound_cmd bits...
 
-	if(spotty_sound_cmd == 0xf7)
+	if(state->spotty_sound_cmd == 0xf7)
 		return soundlatch_r(space,0);
 	else
 		return space->machine->device<okim6295_device>("oki")->read(*space,0);
@@ -227,22 +234,25 @@ ADDRESS_MAP_END
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int tile  = bg_videoram[tile_index] & 0x7ffff;
-	int color = (bg_videoram[tile_index]>>28) & 0xf;
+	limenko_state *state = machine->driver_data<limenko_state>();
+	int tile  = state->bg_videoram[tile_index] & 0x7ffff;
+	int color = (state->bg_videoram[tile_index]>>28) & 0xf;
 	SET_TILE_INFO(0,tile,color,0);
 }
 
 static TILE_GET_INFO( get_md_tile_info )
 {
-	int tile  = md_videoram[tile_index] & 0x7ffff;
-	int color = (md_videoram[tile_index]>>28) & 0xf;
+	limenko_state *state = machine->driver_data<limenko_state>();
+	int tile  = state->md_videoram[tile_index] & 0x7ffff;
+	int color = (state->md_videoram[tile_index]>>28) & 0xf;
 	SET_TILE_INFO(0,tile,color,0);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int tile  = fg_videoram[tile_index] & 0x7ffff;
-	int color = (fg_videoram[tile_index]>>28) & 0xf;
+	limenko_state *state = machine->driver_data<limenko_state>();
+	int tile  = state->fg_videoram[tile_index] & 0x7ffff;
+	int color = (state->fg_videoram[tile_index]>>28) & 0xf;
 	SET_TILE_INFO(0,tile,color,0);
 }
 
@@ -250,6 +260,7 @@ static void draw_single_sprite(bitmap_t *dest_bmp,const rectangle *clip,const gf
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
 		int priority)
 {
+	limenko_state *state = gfx->machine->driver_data<limenko_state>();
 	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
 	const UINT8 *source_base = gfx_element_get_data(gfx, code % gfx->total_elements);
 
@@ -323,7 +334,7 @@ static void draw_single_sprite(bitmap_t *dest_bmp,const rectangle *clip,const gf
 			{
 				const UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
 				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
-				UINT8 *pri = BITMAP_ADDR8(sprites_bitmap_pri, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(state->sprites_bitmap_pri, y, 0);
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -350,6 +361,7 @@ static void draw_single_sprite(bitmap_t *dest_bmp,const rectangle *clip,const gf
 // sprites aren't tile based (except for 8x8 ones)
 static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectangle *cliprect, int count)
 {
+	limenko_state *state = machine->driver_data<limenko_state>();
 	int i;
 
 	UINT8 *base_gfx	= machine->region("gfx1")->base();
@@ -393,28 +405,29 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 		/* prepare GfxElement on the fly */
 		gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
 
-		draw_single_sprite(sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
+		draw_single_sprite(state->sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
 
 		// wrap around x
-		draw_single_sprite(sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y,pri);
+		draw_single_sprite(state->sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y,pri);
 
 		// wrap around y
-		draw_single_sprite(sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y-512,pri);
+		draw_single_sprite(state->sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y-512,pri);
 
 		// wrap around x and y
-		draw_single_sprite(sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y-512,pri);
+		draw_single_sprite(state->sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x-512,y-512,pri);
 	}
 }
 
-static void copy_sprites(bitmap_t *bitmap, bitmap_t *sprites_bitmap, bitmap_t *priority_bitmap, const rectangle *cliprect)
+static void copy_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *sprites_bitmap, bitmap_t *priority_bitmap, const rectangle *cliprect)
 {
+	limenko_state *state = machine->driver_data<limenko_state>();
 	int y;
 	for( y=cliprect->min_y; y<=cliprect->max_y; y++ )
 	{
 		UINT16 *source = BITMAP_ADDR16(sprites_bitmap, y, 0);
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 		UINT8 *dest_pri = BITMAP_ADDR8(priority_bitmap, y, 0);
-		UINT8 *source_pri = BITMAP_ADDR8(sprites_bitmap_pri, y, 0);
+		UINT8 *source_pri = BITMAP_ADDR8(state->sprites_bitmap_pri, y, 0);
 
 		int x;
 		for( x=cliprect->min_x; x<=cliprect->max_x; x++ )
@@ -430,41 +443,43 @@ static void copy_sprites(bitmap_t *bitmap, bitmap_t *sprites_bitmap, bitmap_t *p
 
 static VIDEO_START( limenko )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,128,64);
-	md_tilemap = tilemap_create(machine, get_md_tile_info,tilemap_scan_rows,8,8,128,64);
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
+	limenko_state *state = machine->driver_data<limenko_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,128,64);
+	state->md_tilemap = tilemap_create(machine, get_md_tile_info,tilemap_scan_rows,8,8,128,64);
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,128,64);
 
-	tilemap_set_transparent_pen(md_tilemap,0);
-	tilemap_set_transparent_pen(fg_tilemap,0);
+	tilemap_set_transparent_pen(state->md_tilemap,0);
+	tilemap_set_transparent_pen(state->fg_tilemap,0);
 
-	sprites_bitmap     = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED16);
-	sprites_bitmap_pri = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED8);
+	state->sprites_bitmap     = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED16);
+	state->sprites_bitmap_pri = auto_bitmap_alloc(machine,384,240,BITMAP_FORMAT_INDEXED8);
 }
 
 static SCREEN_UPDATE( limenko )
 {
-	// limenko_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
+	limenko_state *state = screen->machine->driver_data<limenko_state>();
+	// state->videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
-	tilemap_set_enable(bg_tilemap, limenko_videoreg[0] & 4);
-	tilemap_set_enable(md_tilemap, limenko_videoreg[0] & 2);
-	tilemap_set_enable(fg_tilemap, limenko_videoreg[0] & 1);
+	tilemap_set_enable(state->bg_tilemap, state->videoreg[0] & 4);
+	tilemap_set_enable(state->md_tilemap, state->videoreg[0] & 2);
+	tilemap_set_enable(state->fg_tilemap, state->videoreg[0] & 1);
 
-	tilemap_set_scrolly(bg_tilemap, 0, limenko_videoreg[3] & 0xffff);
-	tilemap_set_scrolly(md_tilemap, 0, limenko_videoreg[2] & 0xffff);
-	tilemap_set_scrolly(fg_tilemap, 0, limenko_videoreg[1] & 0xffff);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->videoreg[3] & 0xffff);
+	tilemap_set_scrolly(state->md_tilemap, 0, state->videoreg[2] & 0xffff);
+	tilemap_set_scrolly(state->fg_tilemap, 0, state->videoreg[1] & 0xffff);
 
-	tilemap_set_scrollx(bg_tilemap, 0, (limenko_videoreg[3] & 0xffff0000) >> 16);
-	tilemap_set_scrollx(md_tilemap, 0, (limenko_videoreg[2] & 0xffff0000) >> 16);
-	tilemap_set_scrollx(fg_tilemap, 0, (limenko_videoreg[1] & 0xffff0000) >> 16);
+	tilemap_set_scrollx(state->bg_tilemap, 0, (state->videoreg[3] & 0xffff0000) >> 16);
+	tilemap_set_scrollx(state->md_tilemap, 0, (state->videoreg[2] & 0xffff0000) >> 16);
+	tilemap_set_scrollx(state->fg_tilemap, 0, (state->videoreg[1] & 0xffff0000) >> 16);
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->md_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,1);
 
-	if(limenko_videoreg[0] & 8)
-		copy_sprites(bitmap, sprites_bitmap, screen->machine->priority_bitmap, cliprect);
+	if(state->videoreg[0] & 8)
+		copy_sprites(screen->machine, bitmap, state->sprites_bitmap, screen->machine->priority_bitmap, cliprect);
 
 	return 0;
 }
@@ -981,67 +996,75 @@ ROM_END
 
 static READ32_HANDLER( dynabomb_speedup_r )
 {
+	limenko_state *state = space->machine->driver_data<limenko_state>();
 	if(space->machine->firstcpu->pc() == 0xc25b8)
 	{
 		space->machine->firstcpu->eat_cycles(50);
 	}
 
-	return mainram[0xe2784/4];
+	return state->mainram[0xe2784/4];
 }
 
 static READ32_HANDLER( legendoh_speedup_r )
 {
+	limenko_state *state = space->machine->driver_data<limenko_state>();
 	if(space->machine->firstcpu->pc() == 0x23e32)
 	{
 		space->machine->firstcpu->eat_cycles(50);
 	}
 
-	return mainram[0x32ab0/4];
+	return state->mainram[0x32ab0/4];
 }
 
 static READ32_HANDLER( sb2003_speedup_r )
 {
+	limenko_state *state = space->machine->driver_data<limenko_state>();
 	if(space->machine->firstcpu->pc() == 0x26da4)
 	{
 		space->machine->firstcpu->eat_cycles(50);
 	}
 
-	return mainram[0x135800/4];
+	return state->mainram[0x135800/4];
 }
 
 static READ32_HANDLER( spotty_speedup_r )
 {
+	limenko_state *state = space->machine->driver_data<limenko_state>();
 	if(space->machine->firstcpu->pc() == 0x8560)
 	{
 		space->machine->firstcpu->eat_cycles(50);
 	}
 
-	return mainram[0x6626c/4];
+	return state->mainram[0x6626c/4];
 }
 
 static DRIVER_INIT( dynabomb )
 {
+	limenko_state *state = machine->driver_data<limenko_state>();
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
 
-	spriteram_bit = 1;
+	state->spriteram_bit = 1;
 }
 
 static DRIVER_INIT( legendoh )
 {
+	limenko_state *state = machine->driver_data<limenko_state>();
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
 
-	spriteram_bit = 1;
+	state->spriteram_bit = 1;
 }
 
 static DRIVER_INIT( sb2003 )
 {
+	limenko_state *state = machine->driver_data<limenko_state>();
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
 
-	spriteram_bit = 1;
+	state->spriteram_bit = 1;
 }
 
 static DRIVER_INIT( spotty )
 {
+	limenko_state *state = machine->driver_data<limenko_state>();
 	UINT8 *dst    = machine->region("gfx1")->base();
 	UINT8 *src    = machine->region("user2")->base();
 	int x;
@@ -1057,7 +1080,7 @@ static DRIVER_INIT( spotty )
 
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
 
-	spriteram_bit = 1;
+	state->spriteram_bit = 1;
 }
 
 GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_NO_SOUND )

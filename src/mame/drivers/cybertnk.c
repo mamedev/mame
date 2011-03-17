@@ -165,16 +165,33 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "sound/8950intf.h"
 #include "rendlay.h"
 
-static tilemap_t *tx_tilemap;
-static UINT16 *tx_vram,*bg_vram,*fg_vram,*spr_ram;
-static UINT16 *io_ram;
-static UINT16 *cybertnk_roadram;
+
+class cybertnk_state : public driver_device
+{
+public:
+	cybertnk_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	tilemap_t *tx_tilemap;
+	UINT16 *tx_vram;
+	UINT16 *bg_vram;
+	UINT16 *fg_vram;
+	UINT16 *spr_ram;
+	UINT16 *io_ram;
+	UINT16 *roadram;
+	int test_x;
+	int test_y;
+	int start_offs;
+	int color_pen;
+};
+
 
 #define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	int code = tx_vram[tile_index];
+	cybertnk_state *state = machine->driver_data<cybertnk_state>();
+	int code = state->tx_vram[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0x1fff,
@@ -184,8 +201,9 @@ static TILE_GET_INFO( get_tx_tile_info )
 
 static VIDEO_START( cybertnk )
 {
-	tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,128,32);
-	tilemap_set_transparent_pen(tx_tilemap,0);
+	cybertnk_state *state = machine->driver_data<cybertnk_state>();
+	state->tx_tilemap = tilemap_create(machine, get_tx_tile_info,tilemap_scan_rows,8,8,128,32);
+	tilemap_set_transparent_pen(state->tx_tilemap,0);
 }
 
 static void draw_pixel( bitmap_t* bitmap, const rectangle *cliprect, int y, int x, int pen)
@@ -200,6 +218,7 @@ static void draw_pixel( bitmap_t* bitmap, const rectangle *cliprect, int y, int 
 
 static SCREEN_UPDATE( cybertnk )
 {
+	cybertnk_state *state = screen->machine->driver_data<cybertnk_state>();
 	device_t *left_screen  = screen->machine->device("lscreen");
 	device_t *right_screen = screen->machine->device("rscreen");
 	int screen_shift = 0;
@@ -214,7 +233,7 @@ static SCREEN_UPDATE( cybertnk )
 		screen_shift = -256;
 	}
 
-	tilemap_set_scrolldx(tx_tilemap, screen_shift, screen_shift);
+	tilemap_set_scrolldx(state->tx_tilemap, screen_shift, screen_shift);
 
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
@@ -226,8 +245,8 @@ static SCREEN_UPDATE( cybertnk )
 
 		for (i=0;i<0x1000/4;i+=4)
 		{
-			UINT16 param1 = cybertnk_roadram[i+2];
-			UINT16 param2 = cybertnk_roadram[i+0];
+			UINT16 param1 = state->roadram[i+2];
+			UINT16 param2 = state->roadram[i+0];
 
 			drawgfx_transpen(bitmap,cliprect,gfx,param1,0,0,0,-param2+screen_shift,i/4,0);
 
@@ -247,8 +266,8 @@ static SCREEN_UPDATE( cybertnk )
 		{
 			for (x=0;x<128;x++)
 			{
-				UINT16 tile = bg_vram[count] & 0x1fff;
-				UINT16 color = (fg_vram[count] & 0xe000) >> 13;
+				UINT16 tile = state->bg_vram[count] & 0x1fff;
+				UINT16 color = (state->fg_vram[count] & 0xe000) >> 13;
 
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x194,0,0,(x*8)+screen_shift,(y*8),0);
 
@@ -268,8 +287,8 @@ static SCREEN_UPDATE( cybertnk )
 		{
 			for (x=0;x<128;x++)
 			{
-				UINT16 tile = fg_vram[count] & 0x1fff;
-				UINT16 color = (fg_vram[count] & 0xe000) >> 13;
+				UINT16 tile = state->fg_vram[count] & 0x1fff;
+				UINT16 color = (state->fg_vram[count] & 0xe000) >> 13;
 
 				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,(x*8)+screen_shift,(y*8),0);
 
@@ -289,20 +308,20 @@ static SCREEN_UPDATE( cybertnk )
 
 		for(offs=0;offs<0x1000/2;offs+=8)
 		{
-			z = (spr_ram[offs+(0x6/2)] & 0xffff);
-			if(z == 0xffff || spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
+			z = (state->spr_ram[offs+(0x6/2)] & 0xffff);
+			if(z == 0xffff || state->spr_ram[offs+(0x0/2)] == 0x0000) //TODO: check the correct bit
 				continue;
-			x = (spr_ram[offs+(0xa/2)] & 0x3ff);
-			y = (spr_ram[offs+(0x4/2)] & 0xff);
-			if(spr_ram[offs+(0x4/2)] & 0x100)
+			x = (state->spr_ram[offs+(0xa/2)] & 0x3ff);
+			y = (state->spr_ram[offs+(0x4/2)] & 0xff);
+			if(state->spr_ram[offs+(0x4/2)] & 0x100)
 				y = 0x100 - y;
-			spr_offs = (((spr_ram[offs+(0x0/2)] & 7) << 16) | (spr_ram[offs+(0x2/2)])) << 2;
-			xsize = ((spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
-			ysize = (spr_ram[offs+(0x8/2)] & 0x00ff)+1;
-			fx = (spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
-			zoom = (spr_ram[offs+(0xc/2)] & 0xff00) >> 8;
+			spr_offs = (((state->spr_ram[offs+(0x0/2)] & 7) << 16) | (state->spr_ram[offs+(0x2/2)])) << 2;
+			xsize = ((state->spr_ram[offs+(0xc/2)] & 0x000f)+1) << 3;
+			ysize = (state->spr_ram[offs+(0x8/2)] & 0x00ff)+1;
+			fx = (state->spr_ram[offs+(0xa/2)] & 0x8000) >> 15;
+			zoom = (state->spr_ram[offs+(0xc/2)] & 0xff00) >> 8;
 
-			col_bank = (spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
+			col_bank = (state->spr_ram[offs+(0x0/2)] & 0xff00) >> 8;
 
 			xf = 0;
 			yf = 0;
@@ -403,7 +422,7 @@ static SCREEN_UPDATE( cybertnk )
 		}
 	}
 
-	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
 
 
 //0x62 0x9a 1c2d0
@@ -414,54 +433,53 @@ static SCREEN_UPDATE( cybertnk )
 		if(0) //sprite gfx debug viewer
 		{
 			int x,y,count;
-			static int test_x, test_y, start_offs,color_pen;
 			const UINT8 *blit_ram = screen->machine->region("spr_gfx")->base();
 
 			if(input_code_pressed(screen->machine, KEYCODE_Z))
-			test_x++;
+			state->test_x++;
 
 			if(input_code_pressed(screen->machine, KEYCODE_X))
-			test_x--;
+			state->test_x--;
 
 			if(input_code_pressed(screen->machine, KEYCODE_A))
-			test_y++;
+			state->test_y++;
 
 			if(input_code_pressed(screen->machine, KEYCODE_S))
-			test_y--;
+			state->test_y--;
 
 			if(input_code_pressed(screen->machine, KEYCODE_Q))
-			start_offs+=0x200;
+			state->start_offs+=0x200;
 
 			if(input_code_pressed(screen->machine, KEYCODE_W))
-			start_offs-=0x200;
+			state->start_offs-=0x200;
 
 			if(input_code_pressed_once(screen->machine, KEYCODE_T))
-			start_offs+=0x20000;
+			state->start_offs+=0x20000;
 
 			if(input_code_pressed_once(screen->machine, KEYCODE_Y))
-			start_offs-=0x20000;
+			state->start_offs-=0x20000;
 
 			if(input_code_pressed(screen->machine, KEYCODE_E))
-			start_offs+=4;
+			state->start_offs+=4;
 
 			if(input_code_pressed(screen->machine, KEYCODE_R))
-			start_offs-=4;
+			state->start_offs-=4;
 
 			if(input_code_pressed(screen->machine, KEYCODE_D))
-			color_pen++;
+			state->color_pen++;
 
 			if(input_code_pressed(screen->machine, KEYCODE_F))
-			color_pen--;
+			state->color_pen--;
 
-			popmessage("%02x %02x %04x %02x",test_x,test_y,start_offs,color_pen);
+			popmessage("%02x %02x %04x %02x",state->test_x,state->test_y,state->start_offs,state->color_pen);
 
 			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-			count = (start_offs);
+			count = (state->start_offs);
 
-			for(y=0;y<test_y;y++)
+			for(y=0;y<state->test_y;y++)
 			{
-				for(x=0;x<test_x;x+=8)
+				for(x=0;x<state->test_x;x+=8)
 				{
 					UINT32 color;
 					UINT8 dot;
@@ -472,28 +490,28 @@ static SCREEN_UPDATE( cybertnk )
 					color|= ((blit_ram[count+3] & 0xff) << 0);
 
 					dot = (color & 0xf0000000) >> 28;
-					*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot+(color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x0f000000) >> 24;
-					*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot+(color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x00f00000) >> 20;
-					*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot+(color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x000f0000) >> 16;
-					*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot+(color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x0000f000) >> 12;
-					*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot+(color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x00000f00) >> 8;
-					*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot+(color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x000000f0) >> 4;
-					*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot+(color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot+(state->color_pen<<4)];
 
 					dot = (color & 0x0000000f) >> 0;
-					*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot+(color_pen<<4)];
+					*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot+(state->color_pen<<4)];
 
 					count+=4;
 				}
@@ -508,12 +526,14 @@ static SCREEN_UPDATE( cybertnk )
 
 static WRITE16_HANDLER( tx_vram_w )
 {
-	COMBINE_DATA(&tx_vram[offset]);
-	tilemap_mark_tile_dirty(tx_tilemap,offset);
+	cybertnk_state *state = space->machine->driver_data<cybertnk_state>();
+	COMBINE_DATA(&state->tx_vram[offset]);
+	tilemap_mark_tile_dirty(state->tx_tilemap,offset);
 }
 
 static READ16_HANDLER( io_r )
 {
+	cybertnk_state *state = space->machine->driver_data<cybertnk_state>();
 	switch( offset )
 	{
 		case 2/2:
@@ -523,18 +543,18 @@ static READ16_HANDLER( io_r )
 		// 0x001100D5 is controller data
 		// 0x00110004 low is controller data ready
 		case 4/2:
-			switch( (io_ram[6/2]) & 0xff )
+			switch( (state->io_ram[6/2]) & 0xff )
 			{
 				case 0:
-					io_ram[0xd4/2] = input_port_read(space->machine, "TRAVERSE");
+					state->io_ram[0xd4/2] = input_port_read(space->machine, "TRAVERSE");
 					break;
 
 				case 0x20:
-					io_ram[0xd4/2] = input_port_read(space->machine, "ELEVATE");
+					state->io_ram[0xd4/2] = input_port_read(space->machine, "ELEVATE");
 					break;
 
 				case 0x40:
-					io_ram[0xd4/2] = input_port_read(space->machine, "ACCEL");
+					state->io_ram[0xd4/2] = input_port_read(space->machine, "ACCEL");
 					break;
 
 				case 0x42:
@@ -542,11 +562,11 @@ static READ16_HANDLER( io_r )
 					// controller return value is stored in $42(a6)
 					// but I don't see it referenced again.
 					//popmessage("unknown controller device 0x42");
-					io_ram[0xd4/2] = 0;
+					state->io_ram[0xd4/2] = 0;
 					break;
 
 				case 0x60:
-					io_ram[0xd4/2] = input_port_read(space->machine, "HANDLE");
+					state->io_ram[0xd4/2] = input_port_read(space->machine, "HANDLE");
 					break;
 
 				//default:
@@ -564,19 +584,20 @@ static READ16_HANDLER( io_r )
 			return input_port_read(space->machine, "DSW2");
 
 		case 0xd4/2:
-			return io_ram[offset]; // controller data
+			return state->io_ram[offset]; // controller data
 
 		default:
 		{
 			//popmessage("unknown io read 0x%08x", offset);
-			return io_ram[offset];
+			return state->io_ram[offset];
 		}
 	}
 }
 
 static WRITE16_HANDLER( io_w )
 {
-	COMBINE_DATA(&io_ram[offset]);
+	cybertnk_state *state = space->machine->driver_data<cybertnk_state>();
+	COMBINE_DATA(&state->io_ram[offset]);
 
 	switch( offset )
 	{
@@ -637,7 +658,7 @@ static WRITE16_HANDLER( io_w )
 		case 0x80/2:
 		case 0x82/2:
 		case 0x84/2:
-			popmessage("%02x %02x %02x %02x %02x %02x %02x",io_ram[0x40/2],io_ram[0x42/2],io_ram[0x44/2],io_ram[0x46/2],io_ram[0x48/2],io_ram[0x4a/2],io_ram[0x4c/2]);
+			popmessage("%02x %02x %02x %02x %02x %02x %02x",state->io_ram[0x40/2],state->io_ram[0x42/2],state->io_ram[0x44/2],state->io_ram[0x46/2],state->io_ram[0x48/2],state->io_ram[0x4a/2],state->io_ram[0x4c/2]);
 			break;
 
 		default:
@@ -648,25 +669,26 @@ static WRITE16_HANDLER( io_w )
 
 static READ8_HANDLER( soundport_r )
 {
-	return io_ram[0] & 0xff;
+	cybertnk_state *state = space->machine->driver_data<cybertnk_state>();
+	return state->io_ram[0] & 0xff;
 }
 
 static ADDRESS_MAP_START( master_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spr_ram) // non-tile based sprite ram
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tx_vram_w) AM_BASE(&tx_vram)
-	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE(&bg_vram)
-	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE(&fg_vram)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, spr_ram) // non-tile based sprite ram
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tx_vram_w) AM_BASE_MEMBER(cybertnk_state, tx_vram)
+	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, bg_vram)
+	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, fg_vram)
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE(&io_ram)
+	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE_MEMBER(cybertnk_state, io_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_BASE(&cybertnk_roadram)
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, roadram)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
@@ -836,7 +858,7 @@ static const y8950_interface y8950_config = {
 	0 /* TODO */
 };
 
-static MACHINE_CONFIG_START( cybertnk, driver_device )
+static MACHINE_CONFIG_START( cybertnk, cybertnk_state )
 	MCFG_CPU_ADD("maincpu", M68000,20000000/2)
 	MCFG_CPU_PROGRAM_MAP(master_mem)
 	MCFG_CPU_VBLANK_INT("lscreen", irq1_line_hold)

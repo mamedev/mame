@@ -237,7 +237,15 @@
 #include "sound/ay8910.h"
 
 
-static UINT16 *videoram;
+class goldngam_state : public driver_device
+{
+public:
+	goldngam_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *videoram;
+};
+
 
 /*************************
 *     Video Hardware     *
@@ -250,10 +258,11 @@ static VIDEO_START( goldngam )
 
 static SCREEN_UPDATE( goldngam )
 {
+	goldngam_state *state = screen->machine->driver_data<goldngam_state>();
 
 	int x, y;
 
-	UINT8 *tmp = (UINT8 *) videoram;
+	UINT8 *tmp = (UINT8 *) state->videoram;
 	int index = 0;
 
 	for(y = 0; y < 512; ++y)
@@ -297,7 +306,7 @@ static ADDRESS_MAP_START( swisspkr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x402000, 0x402001) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0x402000, 0x402003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff) //wrong
 
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_MEMBER(goldngam_state, videoram)
 	AM_RANGE(0x500200, 0x50020f) AM_RAM //?
 	AM_RANGE(0x503000, 0x503001) AM_RAM //int ack ?
 	AM_RANGE(0x503002, 0x503003) AM_RAM //int ack ?
@@ -341,7 +350,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( moviecrd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_MEMBER(goldngam_state, videoram)
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM //int ack ?
 ADDRESS_MAP_END
 
@@ -541,7 +550,7 @@ static const ay8910_interface goldngam_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( swisspkr, driver_device )
+static MACHINE_CONFIG_START( swisspkr, goldngam_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)

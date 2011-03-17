@@ -8,17 +8,6 @@ Namco System 86 Video Hardware
 #include "includes/namcos86.h"
 
 
-UINT8 *rthunder_videoram1, *rthunder_videoram2, *rthunder_spriteram;
-
-static int tilebank;
-static int xscroll[4], yscroll[4];	/* scroll + priority */
-
-static tilemap_t *bg_tilemap[4];
-
-static int backcolor;
-static const UINT8 *tile_address_prom;
-
-
 /***************************************************************************
 
   Convert the color PROMs into a more useable format.
@@ -45,6 +34,7 @@ static const UINT8 *tile_address_prom;
 
 PALETTE_INIT( namcos86 )
 {
+	namcos86_state *state = machine->driver_data<namcos86_state>();
 	int i;
 	rgb_t palette[512];
 
@@ -85,7 +75,7 @@ PALETTE_INIT( namcos86 )
 
 	/* color_prom now points to the beginning of the tile address decode PROM */
 
-	tile_address_prom = color_prom;	/* we'll need this at run time */
+	state->tile_address_prom = color_prom;	/* we'll need this at run time */
 }
 
 
@@ -99,12 +89,13 @@ PALETTE_INIT( namcos86 )
 
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT8 *vram)
 {
+	namcos86_state *state = machine->driver_data<namcos86_state>();
 	int attr = vram[2*tile_index + 1];
 	int tile_offs;
 	if (layer & 2)
-		tile_offs = ((tile_address_prom[((layer & 1) << 4) + (attr & 0x03)] & 0xe0) >> 5) * 0x100;
+		tile_offs = ((state->tile_address_prom[((layer & 1) << 4) + (attr & 0x03)] & 0xe0) >> 5) * 0x100;
 	else
-		tile_offs = ((tile_address_prom[((layer & 1) << 4) + ((attr & 0x03) << 2)] & 0x0e) >> 1) * 0x100 + tilebank * 0x800;
+		tile_offs = ((state->tile_address_prom[((layer & 1) << 4) + ((attr & 0x03) << 2)] & 0x0e) >> 1) * 0x100 + state->tilebank * 0x800;
 
 	SET_TILE_INFO(
 			(layer & 2) ? 1 : 0,
@@ -113,10 +104,29 @@ INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_
 			0);
 }
 
-static TILE_GET_INFO( get_tile_info0 ) { get_tile_info(machine,tileinfo,tile_index,0,&rthunder_videoram1[0x0000]); }
-static TILE_GET_INFO( get_tile_info1 ) { get_tile_info(machine,tileinfo,tile_index,1,&rthunder_videoram1[0x1000]); }
-static TILE_GET_INFO( get_tile_info2 ) { get_tile_info(machine,tileinfo,tile_index,2,&rthunder_videoram2[0x0000]); }
-static TILE_GET_INFO( get_tile_info3 ) { get_tile_info(machine,tileinfo,tile_index,3,&rthunder_videoram2[0x1000]); }
+static TILE_GET_INFO( get_tile_info0 )
+{
+	namcos86_state *state = machine->driver_data<namcos86_state>();
+	get_tile_info(machine,tileinfo,tile_index,0,&state->rthunder_videoram1[0x0000]);
+}
+
+static TILE_GET_INFO( get_tile_info1 )
+{
+	namcos86_state *state = machine->driver_data<namcos86_state>();
+	get_tile_info(machine,tileinfo,tile_index,1,&state->rthunder_videoram1[0x1000]);
+}
+
+static TILE_GET_INFO( get_tile_info2 )
+{
+	namcos86_state *state = machine->driver_data<namcos86_state>();
+	get_tile_info(machine,tileinfo,tile_index,2,&state->rthunder_videoram2[0x0000]);
+}
+
+static TILE_GET_INFO( get_tile_info3 )
+{
+	namcos86_state *state = machine->driver_data<namcos86_state>();
+	get_tile_info(machine,tileinfo,tile_index,3,&state->rthunder_videoram2[0x1000]);
+}
 
 
 /***************************************************************************
@@ -128,17 +138,17 @@ static TILE_GET_INFO( get_tile_info3 ) { get_tile_info(machine,tileinfo,tile_ind
 VIDEO_START( namcos86 )
 {
 	namcos86_state *state = machine->driver_data<namcos86_state>();
-	bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap[2] = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,8,8,64,32);
-	bg_tilemap[3] = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,8,8,64,32);
+	state->bg_tilemap[0] = tilemap_create(machine, get_tile_info0,tilemap_scan_rows,8,8,64,32);
+	state->bg_tilemap[1] = tilemap_create(machine, get_tile_info1,tilemap_scan_rows,8,8,64,32);
+	state->bg_tilemap[2] = tilemap_create(machine, get_tile_info2,tilemap_scan_rows,8,8,64,32);
+	state->bg_tilemap[3] = tilemap_create(machine, get_tile_info3,tilemap_scan_rows,8,8,64,32);
 
-	tilemap_set_transparent_pen(bg_tilemap[0],7);
-	tilemap_set_transparent_pen(bg_tilemap[1],7);
-	tilemap_set_transparent_pen(bg_tilemap[2],7);
-	tilemap_set_transparent_pen(bg_tilemap[3],7);
+	tilemap_set_transparent_pen(state->bg_tilemap[0],7);
+	tilemap_set_transparent_pen(state->bg_tilemap[1],7);
+	tilemap_set_transparent_pen(state->bg_tilemap[2],7);
+	tilemap_set_transparent_pen(state->bg_tilemap[3],7);
 
-	state->spriteram = rthunder_spriteram + 0x1800;
+	state->spriteram = state->rthunder_spriteram + 0x1800;
 }
 
 
@@ -151,90 +161,98 @@ VIDEO_START( namcos86 )
 
 READ8_HANDLER( rthunder_videoram1_r )
 {
-	return rthunder_videoram1[offset];
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	return state->rthunder_videoram1[offset];
 }
 
 WRITE8_HANDLER( rthunder_videoram1_w )
 {
-	rthunder_videoram1[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap[offset/0x1000],(offset & 0xfff)/2);
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	state->rthunder_videoram1[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap[offset/0x1000],(offset & 0xfff)/2);
 }
 
 READ8_HANDLER( rthunder_videoram2_r )
 {
-	return rthunder_videoram2[offset];
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	return state->rthunder_videoram2[offset];
 }
 
 WRITE8_HANDLER( rthunder_videoram2_w )
 {
-	rthunder_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap[2+offset/0x1000],(offset & 0xfff)/2);
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	state->rthunder_videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap[2+offset/0x1000],(offset & 0xfff)/2);
 }
 
 WRITE8_HANDLER( rthunder_tilebank_select_w )
 {
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
 	int bit = BIT(offset,10);
-	if (tilebank != bit)
+	if (state->tilebank != bit)
 	{
-		tilebank = bit;
-		tilemap_mark_all_tiles_dirty(bg_tilemap[0]);
-		tilemap_mark_all_tiles_dirty(bg_tilemap[1]);
+		state->tilebank = bit;
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap[0]);
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap[1]);
 	}
 }
 
-static void scroll_w(int layer,int offset,int data)
+static void scroll_w(address_space *space, int offset, int data, int layer)
 {
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
 	switch (offset)
 	{
 		case 0:
-			xscroll[layer] = (xscroll[layer]&0xff)|(data<<8);
+			state->xscroll[layer] = (state->xscroll[layer]&0xff)|(data<<8);
 			break;
 		case 1:
-			xscroll[layer] = (xscroll[layer]&0xff00)|data;
+			state->xscroll[layer] = (state->xscroll[layer]&0xff00)|data;
 			break;
 		case 2:
-			yscroll[layer] = data;
+			state->yscroll[layer] = data;
 			break;
 	}
 }
 
 WRITE8_HANDLER( rthunder_scroll0_w )
 {
-	scroll_w(0,offset,data);
+	scroll_w(space,offset,data,0);
 }
 WRITE8_HANDLER( rthunder_scroll1_w )
 {
-	scroll_w(1,offset,data);
+	scroll_w(space,offset,data,1);
 }
 WRITE8_HANDLER( rthunder_scroll2_w )
 {
-	scroll_w(2,offset,data);
+	scroll_w(space,offset,data,2);
 }
 WRITE8_HANDLER( rthunder_scroll3_w )
 {
-	scroll_w(3,offset,data);
+	scroll_w(space,offset,data,3);
 }
 
 WRITE8_HANDLER( rthunder_backcolor_w )
 {
-	backcolor = data;
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	state->backcolor = data;
 }
 
 
-static int copy_sprites;
 
 READ8_HANDLER( rthunder_spriteram_r )
 {
-	return rthunder_spriteram[offset];
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	return state->rthunder_spriteram[offset];
 }
 
 WRITE8_HANDLER( rthunder_spriteram_w )
 {
-	rthunder_spriteram[offset] = data;
+	namcos86_state *state = space->machine->driver_data<namcos86_state>();
+	state->rthunder_spriteram[offset] = data;
 
 	/* a write to this offset tells the sprite chip to buffer the sprite list */
 	if (offset == 0x1ff2)
-		copy_sprites = 1;
+		state->copy_sprites = 1;
 }
 
 
@@ -328,18 +346,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void set_scroll(running_machine *machine, int layer)
 {
+	namcos86_state *state = machine->driver_data<namcos86_state>();
 	static const int xdisp[4] = { 47, 49, 46, 48 };
 	int scrollx,scrolly;
 
-	scrollx = xscroll[layer] - xdisp[layer];
-	scrolly = yscroll[layer] + 9;
+	scrollx = state->xscroll[layer] - xdisp[layer];
+	scrolly = state->yscroll[layer] + 9;
 	if (flip_screen_get(machine))
 	{
 		scrollx = -scrollx;
 		scrolly = -scrolly;
 	}
-	tilemap_set_scrollx(bg_tilemap[layer], 0, scrollx);
-	tilemap_set_scrolly(bg_tilemap[layer], 0, scrolly);
+	tilemap_set_scrollx(state->bg_tilemap[layer], 0, scrollx);
+	tilemap_set_scrolly(state->bg_tilemap[layer], 0, scrolly);
 }
 
 
@@ -359,7 +378,7 @@ SCREEN_UPDATE( namcos86 )
 
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	bitmap_fill(bitmap,cliprect,screen->machine->gfx[0]->color_base + 8*backcolor+7);
+	bitmap_fill(bitmap,cliprect,screen->machine->gfx[0]->color_base + 8*state->backcolor+7);
 
 	for (layer = 0;layer < 8;layer++)
 	{
@@ -367,8 +386,8 @@ SCREEN_UPDATE( namcos86 )
 
 		for (i = 3;i >= 0;i--)
 		{
-			if (((xscroll[i] & 0x0e00) >> 9) == layer)
-				tilemap_draw_primask(bitmap,cliprect,bg_tilemap[i],0,layer,0);
+			if (((state->xscroll[i] & 0x0e00) >> 9) == layer)
+				tilemap_draw_primask(bitmap,cliprect,state->bg_tilemap[i],0,layer,0);
 		}
 	}
 
@@ -380,7 +399,7 @@ SCREEN_UPDATE( namcos86 )
 SCREEN_EOF( namcos86 )
 {
 	namcos86_state *state = machine->driver_data<namcos86_state>();
-	if (copy_sprites)
+	if (state->copy_sprites)
 	{
 		UINT8 *spriteram = state->spriteram;
 		int i,j;
@@ -391,6 +410,6 @@ SCREEN_EOF( namcos86 )
 				spriteram[i+j] = spriteram[i+j - 6];
 		}
 
-		copy_sprites = 0;
+		state->copy_sprites = 0;
 	}
 }

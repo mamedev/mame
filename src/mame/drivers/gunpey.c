@@ -50,15 +50,28 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 
-static UINT16 *blit_buffer;
+
+class gunpey_state : public driver_device
+{
+public:
+	gunpey_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *blit_buffer;
+	UINT16 blit_ram[0x10];
+};
+
 
 static VIDEO_START( gunpey )
 {
-	blit_buffer = auto_alloc_array(machine, UINT16, 512*512);
+	gunpey_state *state = machine->driver_data<gunpey_state>();
+	state->blit_buffer = auto_alloc_array(machine, UINT16, 512*512);
 }
 
 static SCREEN_UPDATE( gunpey )
 {
+	gunpey_state *state = screen->machine->driver_data<gunpey_state>();
+	UINT16 *blit_buffer = state->blit_buffer;
 	int x,y;
 	int count;
 
@@ -115,7 +128,9 @@ static READ8_HANDLER( gunpey_inputs_r )
 
 static WRITE8_HANDLER( gunpey_blitter_w )
 {
-	static UINT16 blit_ram[0x10];
+	gunpey_state *state = space->machine->driver_data<gunpey_state>();
+	UINT16 *blit_buffer = state->blit_buffer;
+	UINT16 *blit_ram = state->blit_ram;
 	UINT8 *blit_rom = space->machine->region("blit_data")->base();
 	int x,y;
 
@@ -313,7 +328,7 @@ static INTERRUPT_GEN( gunpey_interrupt )
 }
 
 /***************************************************************************************/
-static MACHINE_CONFIG_START( gunpey, driver_device )
+static MACHINE_CONFIG_START( gunpey, gunpey_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 57242400 / 4)

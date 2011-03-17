@@ -218,7 +218,16 @@
 #include "sound/ymz280b.h"
 #include "machine/nvram.h"
 
-static UINT16 *vram;
+
+class coinmvga_state : public driver_device
+{
+public:
+	coinmvga_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *vram;
+	struct { int r,g,b,offs,offs_internal; } bgpal, fgpal;
+};
 
 
 /*************************
@@ -228,12 +237,12 @@ static UINT16 *vram;
 
 static VIDEO_START( coinmvga )
 {
-
 }
 
 
 static SCREEN_UPDATE( coinmvga )
 {
+	coinmvga_state *state = screen->machine->driver_data<coinmvga_state>();
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x04000/2;
 
@@ -244,7 +253,7 @@ static SCREEN_UPDATE( coinmvga )
 	{
 		for (x=0;x<128;x++)
 		{
-			int tile = vram[count];
+			int tile = state->vram[count];
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*8);
 
@@ -274,30 +283,29 @@ static PALETTE_INIT( coinmvga )
 
 static WRITE16_HANDLER( ramdac_bg_w )
 {
-	static int pal_offs,internal_pal_offs,r,g,b;
-
+	coinmvga_state *state = space->machine->driver_data<coinmvga_state>();
 	if(ACCESSING_BITS_8_15)
 	{
-		pal_offs = data >> 8;
-		internal_pal_offs = 0;
+		state->bgpal.offs = data >> 8;
+		state->bgpal.offs_internal = 0;
 	}
 	else //if(mem_mask == 0x00ff)
 	{
-		switch(internal_pal_offs)
+		switch(state->bgpal.offs_internal)
 		{
 			case 0:
-				r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				internal_pal_offs++;
+				state->bgpal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				state->bgpal.offs_internal++;
 				break;
 			case 1:
-				g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				internal_pal_offs++;
+				state->bgpal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				state->bgpal.offs_internal++;
 				break;
 			case 2:
-				b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
-				internal_pal_offs = 0;
-				pal_offs++;
+				state->bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				palette_set_color(space->machine, state->bgpal.offs, MAKE_RGB(state->bgpal.r, state->bgpal.g, state->bgpal.b));
+				state->bgpal.offs_internal = 0;
+				state->bgpal.offs++;
 				break;
 		}
 	}
@@ -306,30 +314,29 @@ static WRITE16_HANDLER( ramdac_bg_w )
 
 static WRITE16_HANDLER( ramdac_fg_w )
 {
-	static int pal_offs,internal_pal_offs,r,g,b;
-
+	coinmvga_state *state = space->machine->driver_data<coinmvga_state>();
 	if(ACCESSING_BITS_8_15)
 	{
-		pal_offs = data >> 8;
-		internal_pal_offs = 0;
+		state->fgpal.offs = data >> 8;
+		state->fgpal.offs_internal = 0;
 	}
 	else
 	{
-		switch(internal_pal_offs)
+		switch(state->fgpal.offs_internal)
 		{
 			case 0:
-				r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				internal_pal_offs++;
+				state->fgpal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				state->fgpal.offs_internal++;
 				break;
 			case 1:
-				g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				internal_pal_offs++;
+				state->fgpal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				state->fgpal.offs_internal++;
 				break;
 			case 2:
-				b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(space->machine, 0x100+pal_offs, MAKE_RGB(r, g, b));
-				internal_pal_offs = 0;
-				pal_offs++;
+				state->fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				palette_set_color(space->machine, 0x100+state->fgpal.offs, MAKE_RGB(state->fgpal.r, state->fgpal.g, state->fgpal.b));
+				state->fgpal.offs_internal = 0;
+				state->fgpal.offs++;
 				break;
 		}
 	}
@@ -351,7 +358,7 @@ static ADDRESS_MAP_START( coinmvga_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 //  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
 //  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE(&vram)
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(coinmvga_state, vram)
 //  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
 //  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
@@ -653,7 +660,7 @@ static INTERRUPT_GEN( vblank_irq )
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( coinmvga, driver_device )
+static MACHINE_CONFIG_START( coinmvga, coinmvga_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)	/* xtal */

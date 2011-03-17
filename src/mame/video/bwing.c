@@ -57,7 +57,8 @@ const gfx_layout bwing_tilelayout =
 
 WRITE8_HANDLER( bwing_spriteram_w )
 {
-	space->machine->generic.buffered_spriteram.u8[offset] = data;
+	bwing_state *state = space->machine->driver_data<bwing_state>();
+	state->spriteram[offset] = data;
 }
 
 WRITE8_HANDLER( bwing_videoram_w )
@@ -318,7 +319,7 @@ SCREEN_UPDATE( bwing )
 		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	// draw low priority sprites
-	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u8, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 0);
 
 	// draw foreground
 	if (!(state->mapmask & 2))
@@ -332,7 +333,7 @@ SCREEN_UPDATE( bwing )
 	}
 
 	// draw high priority sprites
-	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u8, 1);
+	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 1);
 
 	// draw text layer
 //  if (state->mapmask & 4)

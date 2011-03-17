@@ -52,36 +52,45 @@
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 
-static UINT32 *vram;
-static int vbuffer = 0;
 
-static int flash_roms;
-static int old_vbuf;
-static UINT32 flash_cmd = 0;
-static INT32 first_offset;
+class dgpix_state : public driver_device
+{
+public:
+	dgpix_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *vram;
+	int vbuffer;
+	int flash_roms;
+	int old_vbuf;
+	UINT32 flash_cmd;
+	INT32 first_offset;
+};
+
 
 static READ32_HANDLER( flash_r )
 {
+	dgpix_state *state = space->machine->driver_data<dgpix_state>();
 	UINT32 *ROM = (UINT32 *)space->machine->region("user1")->base();
 
-	if(offset >= (0x2000000 - flash_roms * 0x400000) / 4)
+	if(offset >= (0x2000000 - state->flash_roms * 0x400000) / 4)
 	{
-		if(flash_cmd == 0x90900000)
+		if(state->flash_cmd == 0x90900000)
 		{
 			//read maker ID and chip ID
 			return 0x00890014;
 		}
-		else if(flash_cmd == 0x00700000)
+		else if(state->flash_cmd == 0x00700000)
 		{
 			//read status
 			return 0x80<<16;
 		}
-		else if(flash_cmd == 0x70700000)
+		else if(state->flash_cmd == 0x70700000)
 		{
 			//read status and ?
 			return 0x82<<16;
 		}
-		else if(flash_cmd == 0xe8e80000)
+		else if(state->flash_cmd == 0xe8e80000)
 		{
 			//read status ?
 			return 0x80<<16;
@@ -93,7 +102,8 @@ static READ32_HANDLER( flash_r )
 
 static WRITE32_HANDLER( flash_w )
 {
-	if(flash_cmd == 0x20200000)
+	dgpix_state *state = space->machine->driver_data<dgpix_state>();
+	if(state->flash_cmd == 0x20200000)
 	{
 		// erase game settings
 		if(data == 0xd0d00000)
@@ -104,16 +114,16 @@ static WRITE32_HANDLER( flash_w )
 			// erase one block
 			memset(rom, 0xff, 0x10000);
 
-			flash_cmd = 0;
+			state->flash_cmd = 0;
 		}
 	}
-	else if(flash_cmd == 0x0f0f0000)
+	else if(state->flash_cmd == 0x0f0f0000)
 	{
-		if(data == 0xd0d00000 && offset == first_offset)
+		if(data == 0xd0d00000 && offset == state->first_offset)
 		{
 			// finished
-			flash_cmd = 0;
-			first_offset = -1;
+			state->flash_cmd = 0;
+			state->first_offset = -1;
 		}
 		else
 		{
@@ -129,18 +139,19 @@ static WRITE32_HANDLER( flash_w )
 	}
 	else
 	{
-		flash_cmd = data;
+		state->flash_cmd = data;
 
-		if(flash_cmd == 0x0f0f0000 && first_offset == -1)
+		if(state->flash_cmd == 0x0f0f0000 && state->first_offset == -1)
 		{
-			first_offset = offset;
+			state->first_offset = offset;
 		}
 	}
 }
 
 static WRITE32_HANDLER( vram_w )
 {
-	UINT32 *dest = &vram[offset+(0x40000/4)*vbuffer];
+	dgpix_state *state = space->machine->driver_data<dgpix_state>();
+	UINT32 *dest = &state->vram[offset+(0x40000/4)*state->vbuffer];
 
 	if (mem_mask == 0xffffffff)
 	{
@@ -157,17 +168,19 @@ static WRITE32_HANDLER( vram_w )
 
 static READ32_HANDLER( vram_r )
 {
-	return vram[offset+(0x40000/4)*vbuffer];
+	dgpix_state *state = space->machine->driver_data<dgpix_state>();
+	return state->vram[offset+(0x40000/4)*state->vbuffer];
 }
 
 static WRITE32_HANDLER( vbuffer_w )
 {
-	if(old_vbuf == 3 && (data & 3) == 2)
+	dgpix_state *state = space->machine->driver_data<dgpix_state>();
+	if(state->old_vbuf == 3 && (data & 3) == 2)
 	{
-		vbuffer ^= 1;
+		state->vbuffer ^= 1;
 	}
 
-	old_vbuf = data & 3;
+	state->old_vbuf = data & 3;
 }
 
 static WRITE32_HANDLER( coin_w )
@@ -268,17 +281,19 @@ INPUT_PORTS_END
 
 static VIDEO_START( dgpix )
 {
-	vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
+	dgpix_state *state = machine->driver_data<dgpix_state>();
+	state->vram = auto_alloc_array(machine, UINT32, 0x40000*2/4);
 }
 
 static SCREEN_UPDATE( dgpix )
 {
+	dgpix_state *state = screen->machine->driver_data<dgpix_state>();
 	int y;
 
 	for (y = 0; y < 240; y++)
 	{
 		int x;
-		UINT32 *src = &vram[(vbuffer ? 0 : 0x10000) | (y << 8)];
+		UINT32 *src = &state->vram[(state->vbuffer ? 0 : 0x10000) | (y << 8)];
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (x = 0; x < 320; x += 2)
@@ -296,14 +311,15 @@ static SCREEN_UPDATE( dgpix )
 
 static MACHINE_RESET( dgpix )
 {
-	vbuffer = 0;
-	flash_cmd = 0;
-	first_offset = -1;
-	old_vbuf = 3;
+	dgpix_state *state = machine->driver_data<dgpix_state>();
+	state->vbuffer = 0;
+	state->flash_cmd = 0;
+	state->first_offset = -1;
+	state->old_vbuf = 3;
 }
 
 
-static MACHINE_CONFIG_START( dgpix, driver_device )
+static MACHINE_CONFIG_START( dgpix, dgpix_state )
 	MCFG_CPU_ADD("maincpu", E132XT, 20000000*4)	/* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -556,6 +572,7 @@ ROM_END
 
 static DRIVER_INIT( xfiles )
 {
+	dgpix_state *state = machine->driver_data<dgpix_state>();
 	UINT8 *rom = (UINT8 *)machine->region("user1")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aa92e)] = 3;
@@ -568,11 +585,12 @@ static DRIVER_INIT( xfiles )
 //  protection related ?
 //  memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c8b440, 0xf0c8b447, 0, 0);
 
-	flash_roms = 2;
+	state->flash_roms = 2;
 }
 
 static DRIVER_INIT( kdynastg )
 {
+	dgpix_state *state = machine->driver_data<dgpix_state>();
 	UINT8 *rom = (UINT8 *)machine->region("user1")->base() + 0x1c00000;
 
 	rom[BYTE4_XOR_BE(0x3aaa10)] = 3; // 129f0 - nopped call
@@ -588,12 +606,13 @@ static DRIVER_INIT( kdynastg )
 //  protection related ?
 //  memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x12341234, 0x12341243, 0, 0);
 
-	flash_roms = 4;
+	state->flash_roms = 4;
 }
 
 static DRIVER_INIT( fmaniac3 )
 {
-	flash_roms = 2;
+	dgpix_state *state = machine->driver_data<dgpix_state>();
+	state->flash_roms = 2;
 }
 
 GAME( 1999, xfiles,   0, dgpix, dgpix, xfiles,   ROT0, "dgPIX Entertainment Inc.", "X-Files",                           GAME_NO_SOUND )

@@ -12,33 +12,6 @@
 
 /*************************************
  *
- *  Global variables
- *
- *************************************/
-
-/* Spy Hunter hardware extras */
-UINT8 spyhunt_sprite_color_mask;
-static INT16 spyhunt_scrollx, spyhunt_scrolly;
-INT16 spyhunt_scroll_offset;
-
-UINT8 *spyhunt_alpharam;
-//size_t spyhunt_alpharam_size;
-
-
-
-/*************************************
- *
- *  Local variables
- *
- *************************************/
-
-static tilemap_t *bg_tilemap;
-static tilemap_t *alpha_tilemap;
-
-
-
-/*************************************
- *
  *  Tilemap callbacks
  *
  *************************************/
@@ -86,7 +59,8 @@ static TILE_GET_INFO( spyhunt_get_bg_tile_info )
 
 static TILE_GET_INFO( spyhunt_get_alpha_tile_info )
 {
-	SET_TILE_INFO(2, spyhunt_alpharam[tile_index], 0, 0);
+	mcr3_state *state = machine->driver_data<mcr3_state>();
+	SET_TILE_INFO(2, state->spyhunt_alpharam[tile_index], 0, 0);
 }
 
 
@@ -117,33 +91,36 @@ PALETTE_INIT( spyhunt )
 #ifdef UNUSED_FUNCTION
 VIDEO_START( mcr3 )
 {
+	mcr3_state *state = machine->driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
 }
 #endif
 
 
 VIDEO_START( mcrmono )
 {
+	mcr3_state *state = machine->driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(machine, mcrmono_get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
+	state->bg_tilemap = tilemap_create(machine, mcrmono_get_bg_tile_info, tilemap_scan_rows,  16,16, 32,30);
 }
 
 
 VIDEO_START( spyhunt )
 {
+	mcr3_state *state = machine->driver_data<mcr3_state>();
 	/* initialize the background tilemap */
-	bg_tilemap = tilemap_create(machine, spyhunt_get_bg_tile_info, spyhunt_bg_scan,  64,32, 64,32);
+	state->bg_tilemap = tilemap_create(machine, spyhunt_get_bg_tile_info, spyhunt_bg_scan,  64,32, 64,32);
 
 	/* initialize the text tilemap */
-	alpha_tilemap = tilemap_create(machine, spyhunt_get_alpha_tile_info, tilemap_scan_cols,  16,16, 32,32);
-	tilemap_set_transparent_pen(alpha_tilemap, 0);
-	tilemap_set_scrollx(alpha_tilemap, 0, 16);
+	state->alpha_tilemap = tilemap_create(machine, spyhunt_get_alpha_tile_info, tilemap_scan_cols,  16,16, 32,32);
+	tilemap_set_transparent_pen(state->alpha_tilemap, 0);
+	tilemap_set_scrollx(state->alpha_tilemap, 0, 16);
 
-	state_save_register_global(machine, spyhunt_sprite_color_mask);
-	state_save_register_global(machine, spyhunt_scrollx);
-	state_save_register_global(machine, spyhunt_scrolly);
-	state_save_register_global(machine, spyhunt_scroll_offset);
+	state_save_register_global(machine, state->spyhunt_sprite_color_mask);
+	state_save_register_global(machine, state->spyhunt_scrollx);
+	state_save_register_global(machine, state->spyhunt_scrolly);
+	state_save_register_global(machine, state->spyhunt_scroll_offset);
 }
 
 
@@ -176,7 +153,7 @@ WRITE8_HANDLER( mcr3_videoram_w )
 	mcr3_state *state = space->machine->driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
 
 
@@ -185,35 +162,37 @@ WRITE8_HANDLER( spyhunt_videoram_w )
 	mcr3_state *state = space->machine->driver_data<mcr3_state>();
 	UINT8 *videoram = state->videoram;
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( spyhunt_alpharam_w )
 {
-	spyhunt_alpharam[offset] = data;
-	tilemap_mark_tile_dirty(alpha_tilemap, offset);
+	mcr3_state *state = space->machine->driver_data<mcr3_state>();
+	state->spyhunt_alpharam[offset] = data;
+	tilemap_mark_tile_dirty(state->alpha_tilemap, offset);
 }
 
 
 WRITE8_HANDLER( spyhunt_scroll_value_w )
 {
+	mcr3_state *state = space->machine->driver_data<mcr3_state>();
 	switch (offset)
 	{
 		case 0:
 			/* low 8 bits of horizontal scroll */
-			spyhunt_scrollx = (spyhunt_scrollx & ~0xff) | data;
+			state->spyhunt_scrollx = (state->spyhunt_scrollx & ~0xff) | data;
 			break;
 
 		case 1:
 			/* upper 3 bits of horizontal scroll and upper 1 bit of vertical scroll */
-			spyhunt_scrollx = (spyhunt_scrollx & 0xff) | ((data & 0x07) << 8);
-			spyhunt_scrolly = (spyhunt_scrolly & 0xff) | ((data & 0x80) << 1);
+			state->spyhunt_scrollx = (state->spyhunt_scrollx & 0xff) | ((data & 0x07) << 8);
+			state->spyhunt_scrolly = (state->spyhunt_scrolly & 0xff) | ((data & 0x80) << 1);
 			break;
 
 		case 2:
 			/* low 8 bits of vertical scroll */
-			spyhunt_scrolly = (spyhunt_scrolly & ~0xff) | data;
+			state->spyhunt_scrolly = (state->spyhunt_scrolly & ~0xff) | data;
 			break;
 	}
 }
@@ -303,11 +282,12 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 SCREEN_UPDATE( mcr3 )
 {
+	mcr3_state *state = screen->machine->driver_data<mcr3_state>();
 	/* update the flip state */
-	tilemap_set_flip(bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	tilemap_set_flip(state->bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 	/* draw the background */
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the sprites */
 	mcr3_update_sprites(screen->machine, bitmap, cliprect, 0x03, 0, 0, 0);
@@ -317,16 +297,17 @@ SCREEN_UPDATE( mcr3 )
 
 SCREEN_UPDATE( spyhunt )
 {
+	mcr3_state *state = screen->machine->driver_data<mcr3_state>();
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
-	tilemap_set_scrollx(bg_tilemap, 0, spyhunt_scrollx * 2 + spyhunt_scroll_offset);
-	tilemap_set_scrolly(bg_tilemap, 0, spyhunt_scrolly * 2);
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_set_scrollx(state->bg_tilemap, 0, state->spyhunt_scrollx * 2 + state->spyhunt_scroll_offset);
+	tilemap_set_scrolly(state->bg_tilemap, 0, state->spyhunt_scrolly * 2);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
 	/* draw the sprites */
-	mcr3_update_sprites(screen->machine, bitmap, cliprect, spyhunt_sprite_color_mask, 0, -12, 0);
+	mcr3_update_sprites(screen->machine, bitmap, cliprect, state->spyhunt_sprite_color_mask, 0, -12, 0);
 
 	/* render any characters on top */
-	tilemap_draw(bitmap, cliprect, alpha_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->alpha_tilemap, 0, 0);
 	return 0;
 }

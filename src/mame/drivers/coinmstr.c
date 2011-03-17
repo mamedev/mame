@@ -36,14 +36,13 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+	UINT8 *attr_ram1;
+	UINT8 *attr_ram2;
+	UINT8 *attr_ram3;
+	tilemap_t *bg_tilemap;
+	UINT8 question_adr[4];
 };
 
-
-
-static UINT8 *attr_ram1, *attr_ram2, *attr_ram3;
-static tilemap_t *bg_tilemap;
-
-static UINT8 question_adr[4];
 
 static WRITE8_HANDLER( quizmstr_bg_w )
 {
@@ -52,7 +51,7 @@ static WRITE8_HANDLER( quizmstr_bg_w )
 	videoram[offset] = data;
 
 	if(offset >= 0x0240)
-		tilemap_mark_tile_dirty(bg_tilemap,offset - 0x0240);
+		tilemap_mark_tile_dirty(state->bg_tilemap,offset - 0x0240);
 }
 
 
@@ -91,13 +90,14 @@ static void coinmstr_set_pal(running_machine *machine, UINT32 paldat, int col)
 
 static WRITE8_HANDLER( quizmstr_attr1_w )
 {
-	attr_ram1[offset] = data;
+	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	state->attr_ram1[offset] = data;
 
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32	paldata = (attr_ram1[offset] & 0x7f) | ((attr_ram2[offset] & 0x7f) << 7);
-		tilemap_mark_tile_dirty(bg_tilemap, offset - 0x0240);
+		UINT32	paldata = (state->attr_ram1[offset] & 0x7f) | ((state->attr_ram2[offset] & 0x7f) << 7);
+		tilemap_mark_tile_dirty(state->bg_tilemap, offset - 0x0240);
 
 		coinmstr_set_pal(space->machine, paldata, offset - 0x240);
 
@@ -106,13 +106,14 @@ static WRITE8_HANDLER( quizmstr_attr1_w )
 
 static WRITE8_HANDLER( quizmstr_attr2_w )
 {
-	attr_ram2[offset] = data;
+	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	state->attr_ram2[offset] = data;
 
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		UINT32	paldata = (attr_ram1[offset] & 0x7f) | ((attr_ram2[offset] & 0x7f) << 7);
-		tilemap_mark_tile_dirty(bg_tilemap, offset - 0x0240);
+		UINT32	paldata = (state->attr_ram1[offset] & 0x7f) | ((state->attr_ram2[offset] & 0x7f) << 7);
+		tilemap_mark_tile_dirty(state->bg_tilemap, offset - 0x0240);
 
 		coinmstr_set_pal(space->machine, paldata, offset - 0x240);
 
@@ -121,70 +122,73 @@ static WRITE8_HANDLER( quizmstr_attr2_w )
 
 static WRITE8_HANDLER( quizmstr_attr3_w )
 {
-	attr_ram3[offset] = data;
+	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	state->attr_ram3[offset] = data;
 
 	if(offset >= 0x0240)
-		tilemap_mark_tile_dirty(bg_tilemap, offset - 0x0240);
+		tilemap_mark_tile_dirty(state->bg_tilemap, offset - 0x0240);
 
 }
 
 
 static READ8_HANDLER( question_r )
 {
+	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
 	int address;
 	UINT8 *questions = space->machine->region("user1")->base();
 
-	switch(question_adr[2])
+	switch(state->question_adr[2])
 	{
-		case 0x38: address = 0x00000; break; // question_adr[3] == 7
-		case 0x39: address = 0x08000; break; // question_adr[3] == 7
-		case 0x3a: address = 0x10000; break; // question_adr[3] == 7
-		case 0x3b: address = 0x18000; break; // question_adr[3] == 7
-		case 0x3c: address = 0x20000; break; // question_adr[3] == 7
-		case 0x3d: address = 0x28000; break; // question_adr[3] == 7
-		case 0x3e: address = 0x30000; break; // question_adr[3] == 7
-		case 0x07: address = 0x38000; break; // question_adr[3] == 7
-		case 0x0f: address = 0x40000; break; // question_adr[3] == 7
-		case 0x17: address = 0x48000; break; // question_adr[3] == 7
-		case 0x1f: address = 0x50000; break; // question_adr[3] == 7
-		case 0x27: address = 0x58000; break; // question_adr[3] == 7
-		case 0x2f: address = 0x60000; break; // question_adr[3] == 7
-		case 0x37: address = 0x68000; break; // question_adr[3] == 7
-		case 0x3f: address = 0x70000 + question_adr[3] * 0x8000; break;
+		case 0x38: address = 0x00000; break; // state->question_adr[3] == 7
+		case 0x39: address = 0x08000; break; // state->question_adr[3] == 7
+		case 0x3a: address = 0x10000; break; // state->question_adr[3] == 7
+		case 0x3b: address = 0x18000; break; // state->question_adr[3] == 7
+		case 0x3c: address = 0x20000; break; // state->question_adr[3] == 7
+		case 0x3d: address = 0x28000; break; // state->question_adr[3] == 7
+		case 0x3e: address = 0x30000; break; // state->question_adr[3] == 7
+		case 0x07: address = 0x38000; break; // state->question_adr[3] == 7
+		case 0x0f: address = 0x40000; break; // state->question_adr[3] == 7
+		case 0x17: address = 0x48000; break; // state->question_adr[3] == 7
+		case 0x1f: address = 0x50000; break; // state->question_adr[3] == 7
+		case 0x27: address = 0x58000; break; // state->question_adr[3] == 7
+		case 0x2f: address = 0x60000; break; // state->question_adr[3] == 7
+		case 0x37: address = 0x68000; break; // state->question_adr[3] == 7
+		case 0x3f: address = 0x70000 + state->question_adr[3] * 0x8000; break;
 
 		default:
 			address = 0;
-			logerror("unknown question rom # = %02X\n",question_adr[2]);
+			logerror("unknown question rom # = %02X\n",state->question_adr[2]);
 	}
 
-	if(question_adr[3] == 6 || question_adr[3] > 7)
-		logerror("question_adr[3] = %02X\n",question_adr[3]);
+	if(state->question_adr[3] == 6 || state->question_adr[3] > 7)
+		logerror("question_adr[3] = %02X\n",state->question_adr[3]);
 
 /*
     in these offsets they set 0x80... why?
 
-    if( (question_adr[0] & 0x5f) == 0x00 ||
-        (question_adr[0] & 0x5f) == 0x01 ||
-        (question_adr[0] & 0x5f) == 0x0f ||
-        (question_adr[0] & 0x5f) == 0x56 )
+    if( (state->question_adr[0] & 0x5f) == 0x00 ||
+        (state->question_adr[0] & 0x5f) == 0x01 ||
+        (state->question_adr[0] & 0x5f) == 0x0f ||
+        (state->question_adr[0] & 0x5f) == 0x56 )
 */
 
 
 //  don't know...
-//  address |= ((question_adr[0] & 0x7f) << 8) | question_adr[1];
-	address |= (question_adr[1] << 7) | (question_adr[0] & 0x7f);
+//  address |= ((state->question_adr[0] & 0x7f) << 8) | state->question_adr[1];
+	address |= (state->question_adr[1] << 7) | (state->question_adr[0] & 0x7f);
 
 	return questions[address];
 }
 
 static WRITE8_HANDLER( question_w )
 {
-	if(data != question_adr[offset])
+	coinmstr_state *state = space->machine->driver_data<coinmstr_state>();
+	if(data != state->question_adr[offset])
 	{
 		logerror("offset = %d data = %02X\n",offset,data);
 	}
 
-	question_adr[offset] = data;
+	state->question_adr[offset] = data;
 }
 
 static READ8_HANDLER( ff_r )
@@ -198,9 +202,9 @@ static ADDRESS_MAP_START( coinmstr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE_MEMBER(coinmstr_state, videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_BASE(&attr_ram1)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_BASE(&attr_ram2)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_BASE(&attr_ram3)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(quizmstr_attr1_w) AM_BASE_MEMBER(coinmstr_state, attr_ram1)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(quizmstr_attr2_w) AM_BASE_MEMBER(coinmstr_state, attr_ram2)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(quizmstr_attr3_w) AM_BASE_MEMBER(coinmstr_state, attr_ram3)
 ADDRESS_MAP_END
 
 // Different I/O mappping for every game
@@ -896,22 +900,24 @@ static TILE_GET_INFO( get_bg_tile_info )
 	int tile = videoram[tile_index + 0x0240];
 	int color = tile_index;
 
-	tile |= (attr_ram1[tile_index + 0x0240] & 0x80) << 1;
-	tile |= (attr_ram2[tile_index + 0x0240] & 0x80) << 2;
+	tile |= (state->attr_ram1[tile_index + 0x0240] & 0x80) << 1;
+	tile |= (state->attr_ram2[tile_index + 0x0240] & 0x80) << 2;
 
-	tile |= (attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
+	tile |= (state->attr_ram3[tile_index + 0x0240] & 0x03) << (6+4);
 
 	SET_TILE_INFO(0, tile, color, 0);
 }
 
 static VIDEO_START( coinmstr )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 46, 32);
+	coinmstr_state *state = machine->driver_data<coinmstr_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 46, 32);
 }
 
 static SCREEN_UPDATE( coinmstr )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	coinmstr_state *state = screen->machine->driver_data<coinmstr_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 

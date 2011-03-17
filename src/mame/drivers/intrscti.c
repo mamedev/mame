@@ -14,17 +14,26 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+
+class intrscti_state : public driver_device
+{
+public:
+	intrscti_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram;
+};
+
+
 static READ8_HANDLER( unk_r )
 {
 	return space->machine->rand();
 }
 
-static UINT8 *intrscti_ram;
-
 static ADDRESS_MAP_START( intrscti_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&intrscti_ram) // video ram
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(intrscti_state, ram) // video ram
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -59,6 +68,7 @@ static VIDEO_START(intrscti)
 
 static SCREEN_UPDATE(intrscti)
 {
+	intrscti_state *state = screen->machine->driver_data<intrscti_state>();
 	int y,x;
 	int count;
 
@@ -70,7 +80,7 @@ static SCREEN_UPDATE(intrscti)
 		for (x=0;x<32;x++)
 		{
 			int dat;
-			dat = intrscti_ram[count];
+			dat = state->ram[count];
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],dat/*+0x100*/,0,0,0,x*8,y*8,0);
 			count++;
 		}
@@ -80,7 +90,7 @@ static SCREEN_UPDATE(intrscti)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( intrscti, driver_device )
+static MACHINE_CONFIG_START( intrscti, intrscti_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(intrscti_map)

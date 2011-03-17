@@ -43,7 +43,18 @@ public:
 		: driver_device(machine, config),
 		  m_nvram(*this, "nvram") { }
 
-	required_shared_ptr<UINT16>	m_nvram;
+	optional_shared_ptr<UINT16>	m_nvram;
+	UINT8 *blit_buffer;
+	UINT16 *frame_buffer;
+	struct { int r,g,b,offs,offs_internal; } pal;
+	struct { UINT8 r, g, b, offs, offs_internal, ram[256*3]; } btpal;
+	UINT16 *blit_romaddr;
+	UINT16 *blit_attr1_ram;
+	UINT16 *blit_dst_ram_loword;
+	UINT16 *blit_attr2_ram;
+	UINT16 *blit_dst_ram_hiword;
+	UINT16 *blit_vregs;
+	UINT16 *blit_transpen;
 };
 
 /*************************************************************************************************************
@@ -51,8 +62,6 @@ public:
     Video
 
 *************************************************************************************************************/
-
-static UINT8 *blit_buffer;
 
 struct blit_t
 {
@@ -69,7 +78,8 @@ struct blit_t
 
 static VIDEO_START(blitz68k)
 {
-	blit_buffer = auto_alloc_array(machine, UINT8, 512*256);
+	blitz68k_state *state = machine->driver_data<blitz68k_state>();
+	state->blit_buffer = auto_alloc_array(machine, UINT8, 512*256);
 	blit.addr_factor = 2;
 }
 
@@ -81,9 +91,10 @@ static VIDEO_START(blitz68k_addr_factor1)
 
 static SCREEN_UPDATE(blitz68k)
 {
+	blitz68k_state *state = screen->machine->driver_data<blitz68k_state>();
 	int x,y;
 
-	UINT8 *src = blit_buffer;
+	UINT8 *src = state->blit_buffer;
 
 	for(y = 0; y < 256; y++)
 	{
@@ -98,13 +109,13 @@ static SCREEN_UPDATE(blitz68k)
 
 // Blitter-less board (SPI-68K)
 
-static UINT16 *frame_buffer;
 
 static SCREEN_UPDATE(blitz68k_noblit)
 {
+	blitz68k_state *state = screen->machine->driver_data<blitz68k_state>();
 	int x,y;
 
-	UINT16 *src = frame_buffer;
+	UINT16 *src = state->frame_buffer;
 
 	for(y = 0; y < 256; y++)
 	{
@@ -129,35 +140,36 @@ static SCREEN_UPDATE(blitz68k_noblit)
 
 static WRITE16_HANDLER( paletteram_io_w )
 {
-	static int pal_offs,r,g,b,internal_pal_offs,pal_data;
+	blitz68k_state *state = space->machine->driver_data<blitz68k_state>();
+	int pal_data;
 
 	switch(offset*2)
 	{
 		case 0:
-			pal_offs = (data & 0xff00) >> 8;
+			state->pal.offs = (data & 0xff00) >> 8;
 			break;
 		case 4:
-			internal_pal_offs = 0;
+			state->pal.offs_internal = 0;
 			break;
 		case 2:
-			switch(internal_pal_offs)
+			switch(state->pal.offs_internal)
 			{
 				case 0:
 					pal_data = (data & 0xff00) >> 8;
-					r = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
-					internal_pal_offs++;
+					state->pal.r = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
+					state->pal.offs_internal++;
 					break;
 				case 1:
 					pal_data = (data & 0xff00) >> 8;
-					g = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
-					internal_pal_offs++;
+					state->pal.g = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
+					state->pal.offs_internal++;
 					break;
 				case 2:
 					pal_data = (data & 0xff00) >> 8;
-					b = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
-					palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
-					internal_pal_offs = 0;
-					pal_offs++;
+					state->pal.b = ((pal_data & 0x3f) << 2) | ((pal_data & 0x30) >> 4);
+					palette_set_color(space->machine, state->pal.offs, MAKE_RGB(state->pal.r, state->pal.g, state->pal.b));
+					state->pal.offs_internal = 0;
+					state->pal.offs++;
 					break;
 			}
 
@@ -172,39 +184,38 @@ static WRITE16_HANDLER( paletteram_io_w )
 
 *************************************************************************************************************/
 
-static UINT8 pal_ram[256*3];
-static UINT8 pal_offs, internal_pal_offs, r, g, b;
 
 static WRITE8_HANDLER( paletteram_bt476_w )
 {
+	blitz68k_state *state = space->machine->driver_data<blitz68k_state>();
 	switch(offset)
 	{
 		case 0:
-			pal_offs = data;
-			internal_pal_offs = 0;
+			state->btpal.offs = data;
+			state->btpal.offs_internal = 0;
 			break;
 		case 2:
-			pal_offs = data;
-			internal_pal_offs = 0;
+			state->btpal.offs = data;
+			state->btpal.offs_internal = 0;
 			break;
 		case 1:
 			data &= 0x3f;
-			pal_ram[pal_offs * 3 + internal_pal_offs] = data;
-			switch(internal_pal_offs)
+			state->btpal.ram[state->btpal.offs * 3 + state->btpal.offs_internal] = data;
+			switch(state->btpal.offs_internal)
 			{
 				case 0:
-					r = data << 2;
-					internal_pal_offs++;
+					state->btpal.r = data << 2;
+					state->btpal.offs_internal++;
 					break;
 				case 1:
-					g = data << 2;
-					internal_pal_offs++;
+					state->btpal.g = data << 2;
+					state->btpal.offs_internal++;
 					break;
 				case 2:
-					b = data << 2;
-					palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
-					internal_pal_offs = 0;
-					pal_offs++;
+					state->btpal.b = data << 2;
+					palette_set_color(space->machine, state->btpal.offs, MAKE_RGB(state->btpal.r, state->btpal.g, state->btpal.b));
+					state->btpal.offs_internal = 0;
+					state->btpal.offs++;
 					break;
 			}
 			break;
@@ -213,21 +224,22 @@ static WRITE8_HANDLER( paletteram_bt476_w )
 
 static READ8_HANDLER( paletteram_bt476_r )
 {
+	blitz68k_state *state = space->machine->driver_data<blitz68k_state>();
 	UINT8 ret = 0xff;
 
 	switch(offset)
 	{
 		case 0:
-			ret = pal_offs;
+			ret = state->btpal.offs;
 			break;
 
 		case 1:
-			ret = pal_ram[pal_offs * 3 + internal_pal_offs];
-			internal_pal_offs++;
-			if (internal_pal_offs >= 3)
+			ret = state->btpal.ram[state->btpal.offs * 3 + state->btpal.offs_internal];
+			state->btpal.offs_internal++;
+			if (state->btpal.offs_internal >= 3)
 			{
-				internal_pal_offs = 0;
-				pal_offs++;
+				state->btpal.offs_internal = 0;
+				state->btpal.offs++;
 			}
 			break;
 	}
@@ -252,26 +264,26 @@ static READ8_HANDLER( paletteram_bt476_r )
 
 *************************************************************************************************************/
 
-static UINT16 *blit_romaddr,*blit_attr1_ram,*blit_dst_ram_loword,*blit_attr2_ram,*blit_dst_ram_hiword,*blit_vregs,*blit_transpen;
 
 static WRITE16_HANDLER( blit_copy_w )
 {
+	blitz68k_state *state = space->machine->driver_data<blitz68k_state>();
 	UINT8 *blit_rom = space->machine->region("blitter")->base();
 	UINT32 blit_dst_xpos;
 	UINT32 blit_dst_ypos;
 	int x,y,x_size,y_size;
 	UINT32 src;
 
-	logerror("blit copy %04x %04x %04x %04x %04x\n", blit_romaddr[0], blit_attr1_ram[0], blit_dst_ram_loword[0], blit_attr2_ram[0], blit_dst_ram_hiword[0] );
-	logerror("blit vregs %04x %04x %04x %04x\n",blit_vregs[0/2],blit_vregs[2/2],blit_vregs[4/2],blit_vregs[6/2]);
-	logerror("blit transpen %04x %04x %04x %04x %04x %04x %04x %04x\n",blit_transpen[0/2],blit_transpen[2/2],blit_transpen[4/2],blit_transpen[6/2],
-	                                                               blit_transpen[8/2],blit_transpen[10/2],blit_transpen[12/2],blit_transpen[14/2]);
+	logerror("blit copy %04x %04x %04x %04x %04x\n", state->blit_romaddr[0], state->blit_attr1_ram[0], state->blit_dst_ram_loword[0], state->blit_attr2_ram[0], state->blit_dst_ram_hiword[0] );
+	logerror("blit vregs %04x %04x %04x %04x\n",state->blit_vregs[0/2],state->blit_vregs[2/2],state->blit_vregs[4/2],state->blit_vregs[6/2]);
+	logerror("blit transpen %04x %04x %04x %04x %04x %04x %04x %04x\n",state->blit_transpen[0/2],state->blit_transpen[2/2],state->blit_transpen[4/2],state->blit_transpen[6/2],
+	                                                               state->blit_transpen[8/2],state->blit_transpen[10/2],state->blit_transpen[12/2],state->blit_transpen[14/2]);
 
-	blit_dst_xpos = (blit_dst_ram_loword[0] & 0x00ff)*2;
-	blit_dst_ypos = ((blit_dst_ram_loword[0] & 0xff00)>>8);
+	blit_dst_xpos = (state->blit_dst_ram_loword[0] & 0x00ff)*2;
+	blit_dst_ypos = ((state->blit_dst_ram_loword[0] & 0xff00)>>8);
 
-	y_size = (0x100-((blit_attr2_ram[0] & 0xff00)>>8));
-	x_size = (blit_attr2_ram[0] & 0x00ff)*2;
+	y_size = (0x100-((state->blit_attr2_ram[0] & 0xff00)>>8));
+	x_size = (state->blit_attr2_ram[0] & 0x00ff)*2;
 
 	/* rounding around for 0 size */
 	if(x_size == 0) { x_size = 0x200; }
@@ -279,8 +291,8 @@ static WRITE16_HANDLER( blit_copy_w )
 	/* TODO: used by steaser "Game Over" msg on attract mode*/
 //  if(y_size == 1) { y_size = 32; }
 
-	src = blit_romaddr[0] | (blit_attr1_ram[0] & 0x1f00)<<8;
-//  src|= (blit_transpen[0xc/2] & 0x0100)<<12;
+	src = state->blit_romaddr[0] | (state->blit_attr1_ram[0] & 0x1f00)<<8;
+//  src|= (state->blit_transpen[0xc/2] & 0x0100)<<12;
 
 	for(y=0;y<y_size;y++)
 	{
@@ -288,20 +300,20 @@ static WRITE16_HANDLER( blit_copy_w )
 		{
 			int drawx = (blit_dst_xpos+x)&0x1ff;
 			int drawy = (blit_dst_ypos+y)&0x0ff;
-			if(blit_transpen[0x8/2] & 0x100)
-				blit_buffer[drawy*512+drawx] = ((blit_vregs[0] & 0xf00)>>8);
+			if(state->blit_transpen[0x8/2] & 0x100)
+				state->blit_buffer[drawy*512+drawx] = ((state->blit_vregs[0] & 0xf00)>>8);
 			else
 			{
 				UINT8 pen_helper;
 
 				pen_helper = blit_rom[src] & 0xff;
-				if(blit_transpen[0xa/2] & 0x100) //pen is opaque register
+				if(state->blit_transpen[0xa/2] & 0x100) //pen is opaque register
 				{
 					if(pen_helper)
-						blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+						state->blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((state->blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
 				}
 				else
-					blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+					state->blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((state->blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
 			}
 
 			src++;
@@ -444,6 +456,7 @@ static WRITE8_HANDLER( blit_flags_w )
 
 static WRITE8_HANDLER( blit_draw_w )
 {
+	blitz68k_state *state = space->machine->driver_data<blitz68k_state>();
 	UINT8 *blit_rom  = space->machine->region("blitter")->base();
 	int blit_romsize = space->machine->region("blitter")->bytes();
 	UINT32 blit_dst_xpos;
@@ -498,7 +511,7 @@ static WRITE8_HANDLER( blit_draw_w )
 				if (pen <= 3)
 					pen = blit.pen[pen] & 0xf;
 
-				blit_buffer[drawy * 512 + drawx] = pen;
+				state->blit_buffer[drawy * 512 + drawx] = pen;
 			}
 		}
 	}
@@ -590,13 +603,13 @@ static ADDRESS_MAP_START( ilpag_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
 
 	AM_RANGE(0x900000, 0x900005) AM_WRITE( paletteram_io_w ) //RAMDAC
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE(&blit_transpen) //video registers for the blitter write
-	AM_RANGE(0x990000, 0x990007) AM_RAM AM_BASE(&blit_vregs) //pens
-	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE(&blit_romaddr)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE(&blit_attr1_ram)
-	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE(&blit_dst_ram_loword)
-	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE(&blit_attr2_ram)
-	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE( blit_copy_w ) AM_BASE(&blit_dst_ram_hiword)
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_transpen) //video registers for the blitter write
+	AM_RANGE(0x990000, 0x990007) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_vregs) //pens
+	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_romaddr)
+	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_attr1_ram)
+	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_dst_ram_loword)
+	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_attr2_ram)
+	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE( blit_copy_w ) AM_BASE_MEMBER(blitz68k_state, blit_dst_ram_hiword)
 	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
 
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
@@ -618,13 +631,13 @@ static ADDRESS_MAP_START( steaser_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x900000, 0x900005) AM_WRITE( paletteram_io_w ) //RAMDAC
 	AM_RANGE(0x940000, 0x940001) AM_WRITENOP //? Seems a dword write for some read, written consecutively
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE(&blit_transpen)//probably transparency pens
-	AM_RANGE(0x990000, 0x990005) AM_RAM AM_BASE(&blit_vregs)
-	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE(&blit_romaddr)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE(&blit_attr1_ram)
-	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE(&blit_dst_ram_loword)
-	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE(&blit_attr2_ram)
-	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE( blit_copy_w ) AM_BASE(&blit_dst_ram_hiword)
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_transpen)//probably transparency pens
+	AM_RANGE(0x990000, 0x990005) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_vregs)
+	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_romaddr)
+	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_attr1_ram)
+	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_dst_ram_loword)
+	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, blit_attr2_ram)
+	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE( blit_copy_w ) AM_BASE_MEMBER(blitz68k_state, blit_dst_ram_hiword)
 	AM_RANGE(0x9c0002, 0x9c0003) AM_READNOP //pen control?
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READNOP //?
 	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
@@ -1231,7 +1244,7 @@ static ADDRESS_MAP_START( maxidbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE(&frame_buffer)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_MEMBER(blitz68k_state, frame_buffer)
 
 	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP	// 0->1 (IRQ3 ack.?)
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITENOP	// 1->0 (MCU related?)
@@ -1769,7 +1782,7 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bankrob, driver_device )
+static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(bankrob_map)
 	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)	// protection prevents correct irq frequency by crtc
@@ -1801,7 +1814,7 @@ static MACHINE_CONFIG_START( bankrob, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bankroba, driver_device )
+static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(bankroba_map)
 	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)	// protection prevents correct irq frequency by crtc
@@ -1831,7 +1844,7 @@ static MACHINE_CONFIG_START( bankroba, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( deucesw2, driver_device )
+static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(deucesw2_map)
 	// irq 2 reads from MCUs
@@ -1860,7 +1873,7 @@ static MACHINE_CONFIG_START( deucesw2, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dualgame, driver_device )
+static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(dualgame_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
@@ -1891,7 +1904,7 @@ static MACHINE_CONFIG_START( dualgame, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hermit, driver_device )
+static MACHINE_CONFIG_START( hermit, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2 )
 	MCFG_CPU_PROGRAM_MAP(hermit_map)
 	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)	// protection prevents correct irq frequency by crtc
@@ -1920,7 +1933,7 @@ static MACHINE_CONFIG_START( hermit, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( maxidbl, driver_device )
+static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(maxidbl_map)
 	MCFG_CPU_VBLANK_INT("screen", irq3_line_hold)	// protection prevents correct irq frequency by crtc

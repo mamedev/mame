@@ -97,38 +97,49 @@
 #include "machine/nvram.h"
 
 
+class jokrwild_state : public driver_device
+{
+public:
+	jokrwild_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	UINT8 *colorram;
+	tilemap_t *bg_tilemap;
+};
+
+
 /*************************
 *     Video Hardware     *
 *************************/
 
-static UINT8 *videoram;
-static UINT8 *colorram;
-static tilemap_t *bg_tilemap;
-
 
 static WRITE8_HANDLER( jokrwild_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	jokrwild_state *state = space->machine->driver_data<jokrwild_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static WRITE8_HANDLER( jokrwild_colorram_w )
 {
-	colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	jokrwild_state *state = space->machine->driver_data<jokrwild_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	jokrwild_state *state = machine->driver_data<jokrwild_state>();
 /*  - bits -
     7654 3210
     xx-- ----   bank select.
     ---- xxxx   color code.
 */
-	int attr = colorram[tile_index];
-	int code = videoram[tile_index] | ((attr & 0xc0) << 2);
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] | ((attr & 0xc0) << 2);
 	int color = (attr & 0x0f);
 
 	SET_TILE_INFO( 0, code , color , 0);
@@ -137,13 +148,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( jokrwild )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 26);
+	jokrwild_state *state = machine->driver_data<jokrwild_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 24, 26);
 }
 
 
 static SCREEN_UPDATE( jokrwild )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	jokrwild_state *state = screen->machine->driver_data<jokrwild_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -179,9 +192,9 @@ static READ8_HANDLER( rng_r )
 *************************/
 
 static ADDRESS_MAP_START( jokrwild_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_BASE_MEMBER(jokrwild_state, videoram)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE_MEMBER(jokrwild_state, colorram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM //stack RAM
 	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w) //optical sensor is here
@@ -455,7 +468,7 @@ static const mc6845_interface mc6845_intf =
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jokrwild, driver_device )
+static MACHINE_CONFIG_START( jokrwild, jokrwild_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)	/* guess */

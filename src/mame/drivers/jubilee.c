@@ -90,25 +90,34 @@
 #include "video/mc6845.h"
 
 
+class jubilee_state : public driver_device
+{
+public:
+	jubilee_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+	tilemap_t *bg_tilemap;
+};
+
 
 /*************************
 *     Video Hardware     *
 *************************/
 
-static UINT8 *videoram;
-static tilemap_t *bg_tilemap;
-
 
 static WRITE8_HANDLER( jubileep_videoram_w )
 {
-	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	jubilee_state *state = space->machine->driver_data<jubilee_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = videoram[tile_index];
+	jubilee_state *state = machine->driver_data<jubilee_state>();
+	int code = state->videoram[tile_index];
 
 	SET_TILE_INFO( 0, code, 0, 0);
 }
@@ -117,13 +126,15 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static VIDEO_START( jubileep )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	jubilee_state *state = machine->driver_data<jubilee_state>();
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 
 static SCREEN_UPDATE( jubileep )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	jubilee_state *state = screen->machine->driver_data<jubilee_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }
 
@@ -152,7 +163,7 @@ static INTERRUPT_GEN( jubileep_interrupt )
 static ADDRESS_MAP_START( jubileep_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_BASE(&videoram)	/* wrong... just placed somewhere */
+	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_BASE_MEMBER(jubilee_state, videoram)	/* wrong... just placed somewhere */
 	AM_RANGE(0x3100, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -397,7 +408,7 @@ static const mc6845_interface mc6845_intf =
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jubileep, driver_device )
+static MACHINE_CONFIG_START( jubileep, jubilee_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS9980, MASTER_CLOCK/2)	/* guess */

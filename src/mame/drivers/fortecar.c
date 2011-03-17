@@ -31,8 +31,17 @@ dip 1X8
 #include "machine/8255ppi.h"
 #include "video/mc6845.h"
 
-static UINT8 *fortecar_ram;
-static int bank;
+
+class fortecar_state : public driver_device
+{
+public:
+	fortecar_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *ram;
+	int bank;
+};
+
 
 static VIDEO_START(fortecar)
 {
@@ -40,6 +49,7 @@ static VIDEO_START(fortecar)
 
 static SCREEN_UPDATE(fortecar)
 {
+	fortecar_state *state = screen->machine->driver_data<fortecar_state>();
 	int x,y,count;
 	count = 0;
 
@@ -49,8 +59,8 @@ static SCREEN_UPDATE(fortecar)
 		{
 			int tile,color;
 
-			tile = (fortecar_ram[(count*4)+1] | (fortecar_ram[(count*4)+2]<<8)) & 0xfff;
-			color = fortecar_ram[(count*4)+3] & 3;
+			tile = (state->ram[(count*4)+1] | (state->ram[(count*4)+2]<<8)) & 0xfff;
+			color = state->ram[(count*4)+3] & 3;
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
 			count++;
@@ -117,7 +127,7 @@ static ADDRESS_MAP_START( fortecar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE(&fortecar_ram)
+	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_MEMBER(fortecar_state, ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
@@ -244,7 +254,8 @@ GFXDECODE_END
 
 static MACHINE_RESET(fortecar)
 {
-	bank = -1;
+	fortecar_state *state = machine->driver_data<fortecar_state>();
+	state->bank = -1;
 }
 
 /* WRONG, just to see something */
@@ -277,7 +288,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 //51f
-static MACHINE_CONFIG_START( fortecar, driver_device )
+static MACHINE_CONFIG_START( fortecar, fortecar_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)
