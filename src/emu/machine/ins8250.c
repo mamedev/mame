@@ -79,9 +79,12 @@ History:
 
 #define LOG(LEVEL,N,M,A)  \
 	do { \
-		if( M ) \
-			logerror("%-24s",(char*)M ); \
-		logerror A; \
+		if(LEVEL>=N) \
+		{ \
+			if( M ) \
+				logerror("%-24s",(char*)M ); \
+			logerror A; \
+		} \
 	} while (0)
 
 

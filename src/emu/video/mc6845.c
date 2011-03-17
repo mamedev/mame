@@ -26,7 +26,7 @@
 #include "mc6845.h"
 
 
-#define LOG		(1)
+#define LOG		(0)
 
 
 /* device types */
