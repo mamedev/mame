@@ -7880,6 +7880,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* SH-4 hardware */
 	DRIVER( atvtrack )	/* (c) 2002 - Ref 020419 */
+	DRIVER( atvtracka )	/* (c) 2002 - Ref 020419 */
 
 	/*
     Remaining Gaelco Games:
