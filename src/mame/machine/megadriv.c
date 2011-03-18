@@ -3796,6 +3796,10 @@ ADDRESS_MAP_END
  Sega CD related
 *************************************************************************************************/
 
+// The perfect syncs should make this unneccessary: forcing syncs on reads is a flawed design pattern anyway,
+// because the sync will only happen AFTER the read, by which time it's too late.
+#define SEGACD_FORCE_SYNCS 0
+
 static UINT8 segacd_ram_writeprotect_bits;
 //int segacd_ram_mode;
 //static int segacd_ram_mode_old;
@@ -3920,6 +3924,24 @@ segacd_t segacd;
 	if (segacd_irq_mask & 0x10) \
 	{ \
 		cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE); \
+	} \
+
+#define CHECK_SCD_LV3_INTERRUPT \
+	if (segacd_irq_mask & 0x08) \
+	{ \
+		cputag_set_input_line(machine, "segacd_68k", 3, HOLD_LINE); \
+	} \
+
+#define CHECK_SCD_LV2_INTERRUPT \
+	if (segacd_irq_mask & 0x04) \
+	{ \
+		cputag_set_input_line(machine, "segacd_68k", 2, HOLD_LINE); \
+	} \
+
+#define CHECK_SCD_LV1_INTERRUPT \
+	if (segacd_irq_mask & 0x02) \
+	{ \
+		cputag_set_input_line(machine, "segacd_68k", 1, HOLD_LINE); \
 	} \
 
 #define CURRENT_TRACK_IS_DATA \
@@ -4160,7 +4182,7 @@ void CDD_Export(void)
 
 	CDD_DoChecksum();
 
-	CDD_CONTROL &= 0xff03;
+	CDD_CONTROL &= ~4; // Clear HOCK bit
 
 }
 
@@ -4905,7 +4927,9 @@ static tilemap_t    *segacd_stampmap[4];
 
 static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+
+	UINT16 old_halt = a12000_halt_reset_reg;
 
 	COMBINE_DATA(&a12000_halt_reset_reg);
 
@@ -4915,24 +4939,24 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 		if (a12000_halt_reset_reg&0x0001)
 		{
 			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, CLEAR_LINE);
-			printf("clear reset slave\n");
+			if (!(old_halt&0x0001)) printf("clear reset slave\n");
 		}
 		else
 		{
 			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, ASSERT_LINE);
-			printf("assert reset slave\n");
+			if ((old_halt&0x0001)) printf("assert reset slave\n");
 		}
 
 		// request BUS
 		if (a12000_halt_reset_reg&0x0002)
 		{
 			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, ASSERT_LINE);
-			printf("halt slave\n");
+			if (!(old_halt&0x0002)) printf("halt slave\n");
 		}
 		else
 		{
 			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, CLEAR_LINE);
-			printf("resume slave\n");
+			if ((old_halt&0x0002)) printf("resume slave\n");
 		}
 	}
 
@@ -4940,12 +4964,13 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 	{
 		if (a12000_halt_reset_reg&0x0100)
 		{
-			// check if it's masked! (irq check function?)
-			cputag_set_input_line(space->machine, "segacd_68k", 2, ASSERT_LINE);
+			running_machine* machine = space->machine;
+			CHECK_SCD_LV2_INTERRUPT
 		}
 
 		if (a12000_halt_reset_reg&0x8000)
 		{
+			// not writable.. but can read irq mask here?
 			//printf("a12000_halt_reset_reg & 0x8000 set\n"); // irq2 mask?
 		}
 
@@ -4955,7 +4980,7 @@ static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 
 static READ16_HANDLER( scd_a12000_halt_reset_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 
 	return a12000_halt_reset_reg;
 }
@@ -4974,7 +4999,7 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 
 static READ16_HANDLER( scd_a12002_memory_mode_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 
 	int temp = scd_rammode;
 	int temp2 = 0;
@@ -5012,7 +5037,7 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_8_15 )
 
 static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 
 
 	//printf("scd_a12002_memory_mode_w_0_7 %04x\n",data);
@@ -5038,7 +5063,7 @@ static WRITE8_HANDLER( scd_a12002_memory_mode_w_0_7 )
 
 static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
 		scd_a12002_memory_mode_w_8_15(space, 0, data>>8);
@@ -5052,7 +5077,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 
 static READ16_HANDLER( segacd_sub_memory_mode_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 
 	int temp = scd_rammode;
 	int temp2 = 0;
@@ -5074,7 +5099,7 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_8_15 )
 
 WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 
 
 	segacd_memory_priority_mode = (data&0x0018)>>3;
@@ -5134,7 +5159,7 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 {
 	//printf("segacd_sub_memory_mode_w %04x %04x\n", data, mem_mask);
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 
 	if (ACCESSING_BITS_8_15)
 		segacd_sub_memory_mode_w_8_15(space, 0, data>>8);
@@ -5157,39 +5182,39 @@ static UINT16 segacd_comms_flags = 0x0000;
 
 static READ16_HANDLER( segacd_comms_flags_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	return segacd_comms_flags;
 }
 
 static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 {
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+
 	if (ACCESSING_BITS_8_15) // Dragon's Lair
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0xff00) | ((data >> 8) & 0x00ff);
-		space->machine->scheduler().synchronize();
 	}
 
 	// flashback needs low bits to take priority in word writes
 	if (ACCESSING_BITS_0_7)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0xff00) | (data & 0x00ff);
-		space->machine->scheduler().synchronize();
 	}
 }
 
 static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 {
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+
 	if (ACCESSING_BITS_8_15)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | (data & 0xff00);
-		space->machine->scheduler().synchronize();
 	}
 
 	// flashback needs low bits to take priority in word writes
 	if (ACCESSING_BITS_0_7)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | ((data << 8) & 0xff00);
-		space->machine->scheduler().synchronize();
 	}
 }
 
@@ -5230,19 +5255,19 @@ UINT16 segacd_comms_part2[0x8];
 
 static READ16_HANDLER( segacd_comms_main_part1_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	return segacd_comms_part1[offset];
 }
 
 static WRITE16_HANDLER( segacd_comms_main_part1_w )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	COMBINE_DATA(&segacd_comms_part1[offset]);
 }
 
 static READ16_HANDLER( segacd_comms_main_part2_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	return segacd_comms_part2[offset];
 }
 
@@ -5254,7 +5279,7 @@ static WRITE16_HANDLER( segacd_comms_main_part2_w )
 
 static READ16_HANDLER( segacd_comms_sub_part1_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	return segacd_comms_part1[offset];
 }
 
@@ -5265,13 +5290,13 @@ static WRITE16_HANDLER( segacd_comms_sub_part1_w )
 
 static READ16_HANDLER( segacd_comms_sub_part2_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	return segacd_comms_part2[offset];
 }
 
 static WRITE16_HANDLER( segacd_comms_sub_part2_w )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	COMBINE_DATA(&segacd_comms_part2[offset]);
 }
 
@@ -5440,25 +5465,22 @@ static READ16_HANDLER( scd_hint_vector_r )
 
 static READ16_HANDLER( scd_a12006_hint_register_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	return segacd_hint_register;
 }
 
 static WRITE16_HANDLER( scd_a12006_hint_register_w )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	COMBINE_DATA(&segacd_hint_register);
 }
 
 
 static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
 {
-	// todo irqmask
-
 	//printf("segacd_gfx_conversion_timer_callback\n");
 
-	if (segacd_irq_mask & 0x02)
-		cputag_set_input_line(machine, "segacd_68k", 1, HOLD_LINE);
+	CHECK_SCD_LV1_INTERRUPT
 
 	segacd_conversion_active = 0;
 
@@ -6305,58 +6327,76 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 
 static READ16_HANDLER( segacd_irq_mask_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	return segacd_irq_mask;
 }
 
 static WRITE16_HANDLER( segacd_irq_mask_w )
 {
-	UINT16 control = CDD_CONTROL;
-	space->machine->scheduler().synchronize();
-//  printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
-
-	if (data & 0x10)
+	if (ACCESSING_BITS_0_7)
 	{
-		if (control & 0x04)
+		UINT16 control = CDD_CONTROL;
+		if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+	//  printf("segacd_irq_mask_w %04x %04x (CDD control is %04x)\n",data, mem_mask, control);
+
+		if (data & 0x10)
 		{
-			if (!(segacd_irq_mask & 0x10))
+			if (control & 0x04)
 			{
-				segacd_irq_mask = data & 0x7e;
-				CDD_Process(space->machine, 0);
-				return;
+				if (!(segacd_irq_mask & 0x10))
+				{
+					segacd_irq_mask = data & 0x7e;
+					CDD_Process(space->machine, 0);
+					return;
+				}
 			}
 		}
-	}
 
-	segacd_irq_mask = data & 0x7e;
+		segacd_irq_mask = data & 0x7e;
+	}
+	else
+	{
+
+		printf("segacd_irq_mask_w only MSB written\n");
+
+	}
 }
 
 static READ16_HANDLER( segacd_cdd_ctrl_r )
 {
-	space->machine->scheduler().synchronize();
+	if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
 	return CDD_CONTROL;
 }
 
 
 static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 {
-	UINT16 control = CDD_CONTROL;
-	space->machine->scheduler().synchronize();
-
-	printf("segacd_cdd_ctrl_w %04x %04x (control %04x irq %04x\n", data, mem_mask, control, segacd_irq_mask);
-
-	if (data & 0x4)
+	if (ACCESSING_BITS_0_7)
 	{
-		if (!(control & 0x4))
+		UINT16 control = CDD_CONTROL;
+		if (SEGACD_FORCE_SYNCS) space->machine->scheduler().synchronize();
+
+		//printf("segacd_cdd_ctrl_w %04x %04x (control %04x irq %04x\n", data, mem_mask, control, segacd_irq_mask);
+
+		data &=0x4; // only HOCK bit is writable
+
+		if (data & 0x4)
 		{
-			if (segacd_irq_mask&0x10)
+			if (!(control & 0x4))
 			{
-				CDD_Process(space->machine, 1);
+				if (segacd_irq_mask&0x10)
+				{
+					CDD_Process(space->machine, 1);
+				}
 			}
 		}
-	}
 
-	CDD_CONTROL |= data;
+		CDD_CONTROL |= data;
+	}
+	else
+	{
+		printf("segacd_cdd_ctrl_w only MSB written\n");
+	}
 }
 
 
@@ -6407,8 +6447,6 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 
 		//if (data&4) printf("    16x16 screens\n");
 		//else printf("    1x1 screen\n");
-
-
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -6644,8 +6682,7 @@ static WRITE16_HANDLER( segacd_irq3timer_w )
 
 static TIMER_CALLBACK( segacd_irq3_timer_callback )
 {
-	if (segacd_irq_mask & 0x08)
-		cputag_set_input_line(machine, "segacd_68k", 3, HOLD_LINE);
+	CHECK_SCD_LV3_INTERRUPT
 
 	segacd_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
 }
