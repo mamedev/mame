@@ -5523,6 +5523,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mastkin )	/* (c) 1988 Du Tech */
 	DRIVER( rocnrope )	/* GX364 (c) 1983 */
 	DRIVER( rocnropek )	/* GX364 (c) 1983 + Kosuka */
+	DRIVER( ropeman )	/* (c) 1983 bootleg */
 	DRIVER( circusc )	/* GX380 (c) 1984 */
 	DRIVER( circusc2 )	/* GX380 (c) 1984 */
 	DRIVER( circusc3 )	/* GX380 (c) 1984 */

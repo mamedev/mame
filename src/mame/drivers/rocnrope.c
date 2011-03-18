@@ -84,15 +84,15 @@ static INPUT_PORTS_START( rocnrope )
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "255 (Cheat)")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x78, 0x78, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x78, 0x58, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("DSW2:4,5,6,7")
 	PORT_DIPSETTING(    0x78, "Easy 1" )
 	PORT_DIPSETTING(    0x70, "Easy 2" )
 	PORT_DIPSETTING(    0x68, "Easy 3" )
@@ -109,12 +109,12 @@ static INPUT_PORTS_START( rocnrope )
 	PORT_DIPSETTING(    0x10, "Difficult 2" )
 	PORT_DIPSETTING(    0x08, "Difficult 3" )
 	PORT_DIPSETTING(    0x00, "Difficult 4" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x07, 0x07, "First Bonus" )
+	PORT_DIPNAME( 0x07, 0x07, "First Bonus" )		PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(    0x07, "20000" )
 	PORT_DIPSETTING(    0x05, "30000" )
 	PORT_DIPSETTING(    0x04, "40000" )
@@ -123,19 +123,20 @@ static INPUT_PORTS_START( rocnrope )
 	PORT_DIPSETTING(    0x01, "70000" )
 	PORT_DIPSETTING(    0x00, "80000" )
 	/* 0x06 gives 20000 */
-	PORT_DIPNAME( 0x38, 0x38, "Repeated Bonus" )
+	PORT_DIPNAME( 0x38, 0x10, "Repeated Bonus" )		PORT_DIPLOCATION("DSW3:4,5,6")
 	PORT_DIPSETTING(    0x38, "40000" )
 	PORT_DIPSETTING(    0x18, "50000" )
 	PORT_DIPSETTING(    0x10, "60000" )
 	PORT_DIPSETTING(    0x08, "70000" )
 	PORT_DIPSETTING(    0x00, "80000" )
 	/* 0x20, 0x28 and 0x30 all gives 40000 */
-	PORT_DIPNAME( 0x40, 0x00, "Grant Repeated Bonus" )
+	PORT_DIPNAME( 0x40, 0x00, "Grant Repeated Bonus" )	PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, "Unknown DSW 8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "DSW3:8" )
+//	PORT_DIPNAME( 0x80, 0x00, "Unknown DSW 8" )
+//	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -284,7 +285,47 @@ ROM_START( rocnropek )
     ROM_LOAD( "h100.6g",      0x0000, 0x0001, NO_DUMP ) /* 20 Pin chip.  Appears to be a PAL.  Schematics obsfucated. */
 ROM_END
 
+/* Rope Man (a pirate of Roc'n'Rope)
 
+4K files were 2732 and were on the sound board
+8K files were 2764
+The SUB devices were 82S153 PLS's
+G06 was a MMI PAL10L8CN
+A17 was a TBP18S030 read as an 82S123 and is probably the colour PROM.
+B16 was a TBP24S10  read as an 82S131
+
+Very popular bootleg that was once in MAME and was taken out due to only being a gfx/copyright hack. */
+
+ROM_START( ropeman )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "j01_rm01.bin",  0x6000, 0x2000, CRC(6310a1fe) SHA1(7a32c5f24175b303bd40726c53c061951b9de594) )
+	ROM_LOAD( "j02_rm02.bin",  0x8000, 0x2000, CRC(75af8697) SHA1(70bb4b838cdafedf3d94425fad84f77815898d83) )
+	ROM_LOAD( "j03_rm03.bin",  0xa000, 0x2000, CRC(b21372b1) SHA1(c08ab3caaa646f4752f890d8339bce6b723864bb) )
+	ROM_LOAD( "j04_rm04.bin",  0xc000, 0x2000, CRC(7acb2a05) SHA1(93762d1890f40abc98372a2aa9fe0f63252b6389) )
+	ROM_LOAD( "j05_rm05.bin",  0xe000, 0x2000, CRC(150a6264) SHA1(930ccf8dcf4971d0a15f406d9114be5ecfaa1727) )
+
+	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_LOAD( "j07_rm12.bin",  0x0000, 0x1000, CRC(75d2c4e2) SHA1(b701019b4e7b06b268be660ce7958b5367318c27) )
+	ROM_LOAD( "j08_rm13.bin",  0x1000, 0x1000, CRC(ca4325ae) SHA1(34ac035c0c2ed6bcafde1491d976bb9e9d2a2a7d) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "a11_rm10.bin",  0x0000, 0x2000, CRC(afdaba5e) SHA1(27c090cb1c3767c997daeedbe1ba24786f9e78f1) )
+	ROM_LOAD( "a12_rm11.bin",  0x2000, 0x2000, CRC(054cafeb) SHA1(4c3cd850b347217af3dd5c9bb84bcff7b30689bd) )
+	ROM_LOAD( "a9_rm08.bin",   0x4000, 0x2000, CRC(9d2166b2) SHA1(42d2b05360e58b1b2b3ad06c98eb46d9da2b1c21) )
+	ROM_LOAD( "a10_rm09.bin",  0x6000, 0x2000, CRC(aff6e22f) SHA1(476d67821519feddc9f9c8537b46e6eede790035) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "j12_rm07.bin",  0x0000, 0x2000, CRC(cd8ac4bf) SHA1(22bfd9ac0188bec6a1e8daa8ab915af1a5de7bd7) )
+	ROM_LOAD( "j11_rm06.bin",  0x2000, 0x2000, CRC(35891835) SHA1(9dc6795e336c61b5349cf7bf69a3dc9438ae9336) )
+
+	ROM_REGION( 0x0220, "proms", 0 )  /* Used from original board */
+	ROM_LOAD( "a17_prom.bin", 0x0000, 0x0020, CRC(22ad2c3e) SHA1(1c2198b286c75aa9e78d000432795b1ce86ad6b9) )
+	ROM_LOAD( "b16_prom.bin", 0x0020, 0x0100, CRC(750a9677) SHA1(7a5b4aed5f87180850657b8852bb3f3138d58b5b) )
+	ROM_LOAD( "rocnrope.pr3", 0x0120, 0x0100, CRC(b5c75a27) SHA1(923d6ccf015fd7458494416cc05426cc922a9238) )
+
+    ROM_REGION( 0x0001, "pal_cpuvidbd", 0 ) /* PAL located on the cpu/video board */
+    ROM_LOAD( "h100.6g",      0x0000, 0x0001, NO_DUMP ) /* 20 Pin chip.  Appears to be a PAL.  Schematics obsfucated. */
+ROM_END
 
 /*************************************
  *
@@ -313,3 +354,4 @@ static DRIVER_INIT( rocnropk )
 
 GAME( 1983, rocnrope, 0,        rocnrope, rocnrope, rocnrope, ROT270, "Konami", "Roc'n Rope", GAME_SUPPORTS_SAVE )
 GAME( 1983, rocnropek,rocnrope, rocnrope, rocnrope, rocnropk, ROT270, "Konami / Kosuka", "Roc'n Rope (Kosuka)", GAME_SUPPORTS_SAVE )
+GAME( 1983, ropeman,  rocnrope, rocnrope, rocnrope, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", GAME_SUPPORTS_SAVE )
