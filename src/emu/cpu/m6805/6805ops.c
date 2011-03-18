@@ -34,13 +34,6 @@ OP_HANDLER_BIT( brset )
 	if (r&bit) {
 		SEC;
 		PC+=SIGNED(t);
-
-		if (t==0xfd)
-		{
-			/* speed up busy loops */
-			if(cpustate->iCount > 0)
-				cpustate->iCount = 0;
-		}
 	}
 }
 
@@ -56,13 +49,6 @@ OP_HANDLER_BIT( brclr )
 	if (!(r&bit)) {
 		CLC;
 		PC+=SIGNED(t);
-
-		if (t==0xfd)
-		{
-			/* speed up busy loops */
-			if(cpustate->iCount > 0)
-				cpustate->iCount = 0;
-	    }
 	}
 }
 
@@ -88,12 +74,6 @@ OP_HANDLER( bra )
 	UINT8 t;
 	IMMBYTE(t);
 	PC+=SIGNED(t);
-	if (t==0xfe)
-	{
-		/* speed up busy loops */
-		if(cpustate->iCount > 0)
-			cpustate->iCount = 0;
-    }
 }
 
 /* $21 BRN relative ---- */

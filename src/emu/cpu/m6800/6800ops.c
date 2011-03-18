@@ -230,8 +230,6 @@ OP_HANDLER( bra )
 	UINT8 t;
 	IMMBYTE(t);
 	PC+=SIGNED(t);
-	/* speed up busy loops */
-	if (t==0xfe) EAT_CYCLES;
 }
 
 /* $21 BRN relative ----- */
