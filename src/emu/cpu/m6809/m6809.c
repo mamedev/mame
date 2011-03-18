@@ -664,7 +664,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0x85: EA=X+SIGNED(B);										   break;
 	case 0x86: EA=X+SIGNED(A);										   break;
 	case 0x87: EA=0;												   break; /*   ILLEGAL*/
-	case 0x88: IMMBYTE(EA); 	EA=X+SIGNED(EA);					   break; /* this is a hack to make Vectrex work. It should be m68_state->icount-=1. Dunno where the cycle was lost :( */
+	case 0x88: IMMBYTE(EA); 	EA=X+SIGNED(EA);					   break;
 	case 0x89: IMMWORD(EAP);	EA+=X;								   break;
 	case 0x8a: EA=0;												   break; /*   IIError*/
 	case 0x8b: EA=X+D;												   break;
