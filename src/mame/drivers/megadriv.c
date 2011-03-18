@@ -686,6 +686,8 @@ static DRIVER_INIT( mess_32x )
 {
 	DRIVER_INIT_CALL(_32x);
 	DRIVER_INIT_CALL(mess_md_common);
+	megadrive_region_export = 1;
+	megadrive_region_pal = 0;
 }
 
 static MACHINE_CONFIG_DERIVED( ms_32x, genesis_32x )
@@ -1101,4 +1103,4 @@ CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md,     md_jpn,    "
 CONS( 1993, wmegam2,    xeye,      0,      genesis_scd,     md,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, cdx,        0,         0,      genesis_scd,     md,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32x_scd,    segacd,    0,      genesis_32x_scd, md_sel, mess_32x,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
+CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md_sel, mess_32x,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )

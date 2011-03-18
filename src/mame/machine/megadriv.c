@@ -2742,7 +2742,7 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 
 			if((a15106_reg & 4) == 0)
 			{
-				printf("attempting to WRITE FIFO with 68S cleared!");
+				printf("attempting to WRITE FIFO with 68S cleared!\n"); // corpse32
 				return;
 			}
 
@@ -4744,13 +4744,13 @@ UINT8 CDC_Reg_r(void)
 {
 	int reg = CDC_REG0 & 0xF;
 	UINT8 ret = 0;
-	int decode[0x10] = { 0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 0 };
+	UINT16 decoderegs = 0x73F2;
 
-	if (decode[reg])
+	if ((decoderegs>>reg)&1)
 		CDC_DECODE |= (1 << reg);
 
-	if (reg!=REG_R_STAT3)
-		CDC_REG0 = (CDC_REG0 & 0xFFF0) | (reg+1);
+	//if (reg!=REG_R_STAT3)
+		CDC_REG0 = (CDC_REG0 & 0xFFF0) | ((reg+1)&0xf);
 
 
 	switch (reg)
@@ -4777,7 +4777,7 @@ UINT8 CDC_Reg_r(void)
 			// ??
 			if ((CDC_CTRLB0 & 0x80) && (CDC_IFCTRL & 0x20))
 			{
-				if ((CDC_DECODE & 0x73F2) == 0x73F2)
+				if ((CDC_DECODE & decoderegs) == decoderegs)
 				CDC_STATB3 = 0x80;
 			}
 			break;
@@ -9781,7 +9781,7 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
 
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("segacd_68k") // perfect sync to the fastest cpu
 MACHINE_CONFIG_END
 
 /* Different Softlists for different regions (for now at least) */
@@ -9808,6 +9808,10 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
+	MCFG_TIMER_ADD("sw_timer", NULL) //stopwatch timer
+	MCFG_NVRAM_ADD_0FILL("backupram")
+	MCFG_TIMER_ADD("scd_dma_timer", scd_dma_timer_callback)
+
 	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
@@ -9817,6 +9821,10 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
 	MCFG_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_INTERFACE("scd_cdrom")
+	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
+
+	MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
 MACHINE_CONFIG_END
 
 
