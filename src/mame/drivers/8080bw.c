@@ -2761,12 +2761,22 @@ ROM_START( galxwars )
 	ROM_LOAD( "univgw6.3",    0x0c00, 0x0400, CRC(7b7d22ff) SHA1(74364cf2b04dcfbbc8e0131fa12c0e574f693d34) )
 	ROM_LOAD( "univgw1.4",    0x4000, 0x0400, CRC(0871156e) SHA1(3726d0bfe153a0afc62ea56737662074986064b0) )
 	ROM_LOAD( "univgw2.5",    0x4400, 0x0400, CRC(6036d7bf) SHA1(36c2ad2ffdb47bbecc40fd67ced6ab51a5cd2f3e) )
+
+	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	/* !! not dumped yet, these were taken from sisv/intruder */
+	ROM_LOAD( "01.bin",       0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "02.bin",       0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
 ROM_START( galxwars2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "3192.h6",      0x0000, 0x1000, CRC(bde6860b) SHA1(e04b8add32d8f7ea588fae6d6a387f1d40495f1b) )
 	ROM_LOAD( "3193.h7",      0x4000, 0x1000, CRC(a17cd507) SHA1(554ab0e8bdc0e7af4a30b0ddc8aa053c8e70255c) ) /* 2nd half unused */
+
+	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	/* !! not dumped yet, these were taken from sisv/intruder */
+	ROM_LOAD( "01.bin",       0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "02.bin",       0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
 ROM_START( galxwarst )
@@ -2777,6 +2787,11 @@ ROM_START( galxwarst )
 	ROM_LOAD( "galxwars.3",   0x0c00, 0x0400, CRC(c88f886c) SHA1(4d705fbb97e3868c3f6c90c5e5753ad17cfbf5d6) )
 	ROM_LOAD( "galxwars.4",   0x4000, 0x0400, CRC(ae4fe8fb) SHA1(494f44167dc84e4515b769c12f6e24419461dce4) )
 	ROM_LOAD( "galxwars.5",   0x4400, 0x0400, CRC(37708a35) SHA1(df6fd521ddfa146ef93e390e47741bdbfda1e7ba) )
+
+	ROM_REGION( 0x0800, "proms", 0 )		/* color maps player 1/player 2 */
+	/* !! not dumped yet, these were taken from sisv/intruder */
+	ROM_LOAD( "01.bin",       0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "02.bin",       0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
 ROM_START( starw )
@@ -3379,10 +3394,10 @@ GAMEL(1978, sitv,     invaders, invaders, sitv,     0, ROT270, "Taito", "Space I
 GAME( 1979, sicv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (CV Version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1978, sisv,     invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1978, sisv2,    invaders, invadpt2, sicv,     0, ROT270, "Taito", "Space Invaders (SV Version 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL(1979, galxwars, 0,        invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 1)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, galxwars2,galxwars, invaders, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 2)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1979, galxwarst,galxwars, invaders, galxwars, 0, ROT270, "Universal (Taito license?)", "Galaxy Wars (Taito?)" , GAME_SUPPORTS_SAVE, layout_invaders) /* Copyright Not Displayed */
-GAMEL(1979, starw,    galxwars, invaders, galxwars, 0, ROT270, "bootleg", "Star Wars", GAME_SUPPORTS_SAVE, layout_invaders )
+GAME( 1979, galxwars, 0,        invadpt2, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 1)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, galxwars2,galxwars, invadpt2, galxwars, 0, ROT270, "Universal", "Galaxy Wars (Universal set 2)", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1979, galxwarst,galxwars, invadpt2, galxwars, 0, ROT270, "Universal (Taito license?)", "Galaxy Wars (Taito?)" , GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE ) /* Copyright Not Displayed */
+GAME( 1979, starw,    galxwars, invaders, galxwars, 0, ROT270, "bootleg", "Star Wars", GAME_SUPPORTS_SAVE )
 GAME( 1979, lrescue,  0,        lrescue,  lrescue,  0, ROT270, "Taito", "Lunar Rescue", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, mlander,  lrescue,  invaders, lrescue,  0, ROT270, "bootleg (Leisure Time Electronics)", "Moon Lander (bootleg of Lunar Rescue)", GAME_SUPPORTS_SAVE )
 GAME( 1978, lrescuem, lrescue,  lrescue,  lrescue,  0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
