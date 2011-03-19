@@ -44,7 +44,7 @@ Rock 'n Rage /      GX620*1986    6309 007342        007420               007327
   Koi no Hotrock
 Mr Kabuki/Mr Goemon GX621*1986     Z80           005849
 Jackal              GX631*1986    6809           005885(x2)               007327 007343 (address decoder)
-Contra / Gryzor     GX633*1987    6809?          007121(x2)               007593
+Contra / Gryzor     GX633*1987    6309           007121(x2)               007593
 Flak Attack         GX669*1987    6309           007121                   007327 007452
 Devil World / Dark  GX687*1987 2x68000           TWIN16
   Adventure / Majuu no Oukoku
