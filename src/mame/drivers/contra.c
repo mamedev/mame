@@ -17,6 +17,7 @@ Dip locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "cpu/hd6309/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "video/konicdev.h"
@@ -24,10 +25,19 @@ Dip locations and factory settings verified with manual
 #include "includes/contra.h"
 
 
+static INTERRUPT_GEN( contra_interrupt )
+{
+	contra_state *state = device->machine->driver_data<contra_state>();
+	if (k007121_ctrlram_r(state->k007121_1, 7) & 0x02)
+		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+}
+
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
 	if ((data & 0x0f) < 12)	/* for safety */
 		memory_set_bank(space->machine, "bank1", data & 0x0f);
+	else
+		popmessage("bankswitch %X", data & 0xf);
 }
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
@@ -184,14 +194,14 @@ static MACHINE_START( contra )
 static MACHINE_CONFIG_START( contra, contra_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_24MHz/16) /* 1500000? */
+	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
 	MCFG_CPU_PROGRAM_MAP(contra_map)
-	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen", contra_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/12) /* 2000000? */
+	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/8) /* 3000000? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))	/* enough for the sound CPU to read all commands */
 
 	MCFG_MACHINE_START(contra)
 
