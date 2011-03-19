@@ -24,7 +24,7 @@ TODO:
   Execution timing of the Z80 is important because it maintains music tempo
   by polling the 2203's second timer. Even when working alone with no
   context-switch the chip shouldn't be running at 1.5MHz otherwise it won't
-  keep the right pace. Similar Konmai games from the same period(mainevt,
+  keep the right pace. Similar Konami games from the same period(mainevt,
   battlnts, flkatck...etc.) all have a 3.579545MHz Z80 for sound.
 
   In spite of adjusting clock speed polling is deemed inaccurate when
