@@ -167,6 +167,18 @@ PALETTE_INIT( astrocde )
 }
 
 
+PALETTE_INIT( astrocde_bw )
+{
+	int i;
+
+	PALETTE_INIT_CALL(astrocde);
+
+	// B/W: set whole palette to luma only
+	for (i = 16; i < 512; i++)
+		palette_set_color(machine, i, palette_get_color(machine, i & 15));
+}
+
+
 PALETTE_INIT( profpac )
 {
 	/* Professor Pac-Man uses a more standard 12-bit RGB palette layout */

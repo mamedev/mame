@@ -27,6 +27,7 @@ extern UINT8 astrocade_video_config;
 extern UINT8 astrocade_sparkle[4];
 
 PALETTE_INIT( astrocde );
+PALETTE_INIT( astrocde_bw );
 PALETTE_INIT( profpac );
 
 VIDEO_START( astrocde );
