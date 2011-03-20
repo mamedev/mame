@@ -3272,9 +3272,9 @@ GAME( 1981, galagamk, galaga,  galaga,  galaga,   galaga,  ROT90, "Namco (Midway
 GAME( 1981, galagamf, galaga,  galaga,  galaga,   galaga,  ROT90, "Namco (Midway license)", "Galaga (Midway set 1 with fast shoot hack)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1982, xevious,  0,       xevious, xevious,  xevious, ROT90, "Namco", "Xevious (Namco)", GAME_SUPPORTS_SAVE )
-GAME( 1982, xeviousa, xevious, xevious, xeviousa, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, xeviousb, xevious, xevious, xeviousb, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, xeviousc, xevious, xevious, xeviousa, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1982, xeviousa, xevious, xevious, xeviousa, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari, harder)", GAME_SUPPORTS_SAVE )
+GAME( 1982, xeviousb, xevious, xevious, xeviousb, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari)", GAME_SUPPORTS_SAVE )
+GAME( 1982, xeviousc, xevious, xevious, xeviousa, xevious, ROT90, "Namco (Atari license)", "Xevious (Atari, Namco PCB)", GAME_SUPPORTS_SAVE )
 GAME( 1984, sxevious, xevious, xevious, sxevious, xevious, ROT90, "Namco", "Super Xevious", GAME_SUPPORTS_SAVE )
 GAME( 1984, sxeviousj,xevious, xevious, sxevious, xevious, ROT90, "Namco", "Super Xevious (Japan)", GAME_SUPPORTS_SAVE )
 
