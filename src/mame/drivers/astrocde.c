@@ -835,6 +835,14 @@ static INPUT_PORTS_START( ebases )
 INPUT_PORTS_END
 
 
+static INPUT_CHANGED( spacezap_monitor )
+{
+	if (newval)
+		astrocade_video_config &= ~AC_MONITOR_BW;
+	else
+		astrocade_video_config |= AC_MONITOR_BW;
+}
+
 static INPUT_PORTS_START( spacezap )
 	PORT_START("P1HANDLE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )	// manual says this dip is unused on cocktail cabs
@@ -879,6 +887,13 @@ static INPUT_PORTS_START( spacezap )
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "S1:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "S1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "S1:8" )
+
+	PORT_START("FAKE")
+	/* Dedicated cabinets had a B/W monitor and color overlay,
+	   some (unofficial/repaired?) cabinets had a color monitor. */
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED(spacezap_monitor, 0)
+	PORT_CONFSETTING(    0x00, "B/W" )
+	PORT_CONFSETTING(    0x01, "Color" )
 INPUT_PORTS_END
 
 
@@ -1383,9 +1398,6 @@ static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spacezap_map)
 	MCFG_CPU_IO_MAP(port_map_mono_pattern)
-
-	/* video hardware */
-	MCFG_PALETTE_INIT(astrocde_bw)
 MACHINE_CONFIG_END
 
 
@@ -1733,7 +1745,7 @@ static DRIVER_INIT( ebases )
 
 static DRIVER_INIT( spacezap )
 {
-	astrocade_video_config = AC_SOUND_PRESENT;
+	astrocade_video_config = AC_SOUND_PRESENT | AC_MONITOR_BW;
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x13, 0x13, 0x03ff, 0xff00, spacezap_io_r);
 }
 
@@ -1826,7 +1838,7 @@ GAME( 1978, seawolf2, 0,    seawolf2, seawolf2, seawolf2, ROT0,   "Midway", "Sea
 /* 91354 CPU board + 90700 game board + 91356 RAM board */
 GAME( 1980, ebases,   0,    ebases,   ebases,   ebases,   ROT0,   "Midway", "Extra Bases", GAME_SUPPORTS_SAVE )
 
-/* 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board. Has B/W monitor and color overlay */
+/* 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board */
 GAME( 1980, spacezap, 0,    spacezap, spacezap, spacezap, ROT0,   "Midway", "Space Zap", GAME_SUPPORTS_SAVE )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board */

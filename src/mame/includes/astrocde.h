@@ -9,6 +9,7 @@
 #define AC_SOUND_PRESENT	(0x01)
 #define AC_LIGHTPEN_INTS	(0x02)
 #define AC_STARS			(0x04)
+#define AC_MONITOR_BW		(0x08)
 
 
 class astrocde_state : public driver_device
@@ -27,7 +28,6 @@ extern UINT8 astrocade_video_config;
 extern UINT8 astrocade_sparkle[4];
 
 PALETTE_INIT( astrocde );
-PALETTE_INIT( astrocde_bw );
 PALETTE_INIT( profpac );
 
 VIDEO_START( astrocde );

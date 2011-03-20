@@ -167,18 +167,6 @@ PALETTE_INIT( astrocde )
 }
 
 
-PALETTE_INIT( astrocde_bw )
-{
-	int i;
-
-	PALETTE_INIT_CALL(astrocde);
-
-	// B/W: set whole palette to luma only
-	for (i = 16; i < 512; i++)
-		palette_set_color(machine, i, palette_get_color(machine, i & 15));
-}
-
-
 PALETTE_INIT( profpac )
 {
 	/* Professor Pac-Man uses a more standard 12-bit RGB palette layout */
@@ -317,8 +305,9 @@ SCREEN_UPDATE( astrocde )
 {
 	astrocde_state *state = screen->machine->driver_data<astrocde_state>();
 	UINT8 *videoram = state->videoram;
-	int xystep = 2 - video_mode;
 	UINT32 sparklebase = 0;
+	int colormask = (astrocade_video_config & AC_MONITOR_BW) ? 0xf : screen->machine->total_colors() - 1;
+	int xystep = 2 - video_mode;
 	int y;
 
 	/* compute the starting point of sparkle for the current frame */
@@ -383,7 +372,7 @@ SCREEN_UPDATE( astrocde )
 					if (++sparkleoffs >= RNG_PERIOD)
 						sparkleoffs = 0;
 				}
-				color = (coldata & 0x1f0) | luma;
+				color = ((coldata & 0x1f0) | luma) & colormask;
 
 				/* store the final color to the destination and shift */
 				*dest++ = color;
