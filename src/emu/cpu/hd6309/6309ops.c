@@ -271,10 +271,6 @@ OP_HANDLER( lbra )
 {
 	IMMWORD(EAP);
 	PC += EA;
-
-	if ( EA == 0xfffd )  /* EHC 980508 speed up busy loop */
-		if ( m68_state->icount > 0)
-			m68_state->icount = 0;
 }
 
 /* $17 LBSR relative ----- */
@@ -479,9 +475,6 @@ OP_HANDLER( bra )
 	UINT8 t;
 	IMMBYTE(t);
 	PC += SIGNED(t);
-	/* JB 970823 - speed up busy loops */
-	if( t == 0xfe )
-		if( m68_state->icount > 0 ) m68_state->icount = 0;
 }
 
 /* $21 BRN relative ----- */
