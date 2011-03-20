@@ -53,7 +53,7 @@ PCB Layout
 837-13544-01
 171-7772F
 837-13707 (sticker)
-(C) SEGA 1999
+(C) SEGA 1999 
 |---------------------------------------------------|
 |    CN1                           CN3              |
 |PC910  62256   EPF8452AQC160-3                     |
@@ -61,13 +61,13 @@ PCB Layout
 |A179B    315-6188.IC31     3771                3773|
 |ADM485  BIOS.IC27   5264165            5264165     |
 |                    5264165  |-----|   5264165     |
-|    CN3                      |POWER|               |
-|                             |VR2  | 33.3333MHZ    |
+|    CN3                      | SH4 |               |
+|                             |     | 33.3333MHZ    |
 |CN26                         |-----|          27MHZ|
 |                                         CY2308SC-3|
 |        KM416S4030      |------|     HY57V161610   |
-|                        | SH4  |     HY57V161610   |
-| C844G        315-6232  |      |             32MHZ |
+|                        | POWER|     HY57V161610   |
+| C844G        315-6232  | VR2  |             32MHZ |
 |            33.8688MHZ  |------|     HY57V161610   |
 |                         xMHz        HY57V161610   |
 |      PCM1725    JP1                    62256      |
@@ -103,8 +103,8 @@ Notes:
       62256           - 32kx8 SRAM
       PCM1725         - Burr-Brown PCM1725
       xMHz            - Small round XTAL (possibly 32.768kHz for a clock?)
-      SH4             - Hitachi SH4 CPU (BGAxxx, with heatsink and fan)
-      POWERVR2        - POWERVR2 video generator (BGAxxx, with heatsink)
+      SH4             - Hitachi SH4 CPU (BGAxxx, with heatsink)
+      POWERVR2        - POWERVR2 video generator (BGAxxx, with heatsink and fan)
 
 
 Filter Board
