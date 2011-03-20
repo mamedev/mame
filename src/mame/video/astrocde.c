@@ -306,7 +306,7 @@ SCREEN_UPDATE( astrocde )
 	astrocde_state *state = screen->machine->driver_data<astrocde_state>();
 	UINT8 *videoram = state->videoram;
 	UINT32 sparklebase = 0;
-	int colormask = (astrocade_video_config & AC_MONITOR_BW) ? 0xf : screen->machine->total_colors() - 1;
+	const int colormask = (astrocade_video_config & AC_MONITOR_BW) ? 0 : 0x1f0;
 	int xystep = 2 - video_mode;
 	int y;
 
@@ -350,8 +350,8 @@ SCREEN_UPDATE( astrocde )
 			for (xx = 0; xx < 4; xx++)
 			{
 				UINT8 pixdata = (data >> 6) & 3;
-				int coldata = colorbase[pixdata] << 1;
-				int luma = coldata & 0x0f;
+				int colordata = colorbase[pixdata] << 1;
+				int luma = colordata & 0x0f;
 				rgb_t color;
 
 				/* handle stars/sparkle */
@@ -364,7 +364,7 @@ SCREEN_UPDATE( astrocde )
 						if (pixdata != 0 || (sparklestar[staroffs] & 0x10))
 							luma = sparklestar[sparkleoffs] & 0x0f;
 						else if (pixdata == 0)
-							coldata = luma = 0;
+							colordata = luma = 0;
 					}
 
 					/* update sparkle/star offsets */
@@ -372,7 +372,7 @@ SCREEN_UPDATE( astrocde )
 					if (++sparkleoffs >= RNG_PERIOD)
 						sparkleoffs = 0;
 				}
-				color = ((coldata & 0x1f0) | luma) & colormask;
+				color = (colordata & colormask) | luma;
 
 				/* store the final color to the destination and shift */
 				*dest++ = color;
