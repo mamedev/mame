@@ -2122,6 +2122,10 @@ static MACHINE_CONFIG_DERIVED( zigzag, galaxian_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galaxian_map_base)  /* no discrete sound */
 
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(zigzag)
+
 	/* sound hardware */
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)
 
@@ -2886,6 +2890,7 @@ static DRIVER_INIT( zigzag )
 
 	/* video extensions */
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
+	galaxian_draw_bullet_ptr = NULL;
 
 	/* make ROMs 2 & 3 swappable */
 	memory_install_read_bank(space, 0x2000, 0x2fff, 0, 0, "bank1");
