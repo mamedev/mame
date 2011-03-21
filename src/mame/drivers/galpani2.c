@@ -21,10 +21,11 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/okim6295.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
 #include "includes/kaneko16.h"
-#include "sound/okim6295.h"
+#include "includes/galpani2.h"
 
 /***************************************************************************
 

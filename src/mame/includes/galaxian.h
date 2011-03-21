@@ -4,7 +4,6 @@
 
 ***************************************************************************/
 
-#include "sound/discrete.h"
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE			3
 
@@ -25,8 +24,6 @@
 #define GALAXIAN_VTOTAL			(264)
 #define GALAXIAN_VBEND			(16)
 #define GALAXIAN_VBSTART		(224+16)
-
-#define GAL_AUDIO	"discrete"
 
 class galaxian_state : public driver_device
 {
@@ -134,17 +131,4 @@ void jumpbug_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 
 /* Ten Spot extensions */
 void tenspot_set_game_bank(running_machine *machine, int bank, int from_game);
-
-/*----------- defined in audio/galaxian.c -----------*/
-
-MACHINE_CONFIG_EXTERN( mooncrst_audio );
-MACHINE_CONFIG_EXTERN( galaxian_audio );
-
-WRITE8_DEVICE_HANDLER( galaxian_sound_w );
-WRITE8_DEVICE_HANDLER( galaxian_pitch_w );
-WRITE8_DEVICE_HANDLER( galaxian_vol_w );
-WRITE8_DEVICE_HANDLER( galaxian_noise_enable_w );
-WRITE8_DEVICE_HANDLER( galaxian_background_enable_w );
-WRITE8_DEVICE_HANDLER( galaxian_shoot_enable_w );
-WRITE8_DEVICE_HANDLER( galaxian_lfo_freq_w );
 

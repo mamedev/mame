@@ -157,9 +157,21 @@ Notes:
 #include "includes/tnzs.h"
 
 
+class champbwl_state : public tnzs_state
+{
+public:
+	champbwl_state(running_machine &machine, const driver_device_config_base &config)
+		: tnzs_state(machine, config) { }
+
+	UINT8    last_trackball_val[2];
+//  UINT8 *  nvram; // currently this uses generic_nvram
+};
+
+
+
 static READ8_HANDLER( trackball_r )
 {
-	tnzs_state *state = space->machine->driver_data<tnzs_state>();
+	champbwl_state *state = space->machine->driver_data<champbwl_state>();
 	UINT8 ret;
 	UINT8 port4 = input_port_read(space->machine, "FAKEX");
 	UINT8 port5 = input_port_read(space->machine, "FAKEY");
@@ -185,7 +197,7 @@ static WRITE8_HANDLER( champbwl_misc_w )
 
 static WRITE8_HANDLER( champbwl_objctrl_w )
 {
-	tnzs_state *state = space->machine->driver_data<tnzs_state>();
+	champbwl_state *state = space->machine->driver_data<champbwl_state>();
 	if(offset != 0)
 		data ^= 0xff;
 
@@ -196,12 +208,12 @@ static ADDRESS_MAP_START( champbwl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(tnzs_state, objram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(champbwl_state, objram)
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("x1snd", seta_sound_r, seta_sound_w)
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_MEMBER(tnzs_state, vdcram)
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(tnzs_state, scrollram) /* scrolling info */
-	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_WRITE(champbwl_objctrl_w) AM_BASE_MEMBER(tnzs_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(tnzs_state, bg_flag)	/* enable / disable background transparency */
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_MEMBER(champbwl_state, vdcram)
+	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_MEMBER(champbwl_state, scrollram) /* scrolling info */
+	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_WRITE(champbwl_objctrl_w) AM_BASE_MEMBER(champbwl_state, objctrl) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(champbwl_state, bg_flag)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
@@ -333,7 +345,7 @@ static const x1_010_interface champbwl_sound_intf =
 
 static MACHINE_START( champbwl )
 {
-	tnzs_state *state = machine->driver_data<tnzs_state>();
+	champbwl_state *state = machine->driver_data<champbwl_state>();
 	UINT8 *ROM = machine->region("maincpu")->base();
 
 	state->mcu = NULL;
@@ -346,7 +358,7 @@ static MACHINE_START( champbwl )
 
 static MACHINE_RESET( champbwl )
 {
-	tnzs_state *state = machine->driver_data<tnzs_state>();
+	champbwl_state *state = machine->driver_data<champbwl_state>();
 
 	state->screenflip = 0;
 	state->mcu_type = -1;
@@ -355,7 +367,7 @@ static MACHINE_RESET( champbwl )
 
 }
 
-static MACHINE_CONFIG_START( champbwl, tnzs_state )
+static MACHINE_CONFIG_START( champbwl, champbwl_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */

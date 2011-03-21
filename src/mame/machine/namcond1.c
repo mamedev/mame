@@ -11,17 +11,16 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "video/ygv608.h"
 #include "includes/namcond1.h"
 
 /* Perform basic machine initialisation */
 
 UINT8 namcond1_h8_irq5_enabled;
-UINT8 namcond1_gfxbank;
 
 MACHINE_START( namcond1 )
 {
 	state_save_register_global(machine, namcond1_h8_irq5_enabled);
-	state_save_register_global(machine, namcond1_gfxbank);
 }
 
 MACHINE_RESET( namcond1 )
@@ -103,7 +102,7 @@ WRITE16_HANDLER( namcond1_cuskey_w )
             break;
 
 		case (0x0c>>1):
-			namcond1_gfxbank = (data & 0x0002) >>1; // i think
+			ygv608_set_gfxbank((data & 0x0002) >> 1); // i think
 			// should mark tilemaps dirty but i think they already are
 			break;
 

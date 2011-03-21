@@ -412,7 +412,7 @@ static TILE_GET_INFO( get_tile_info )
        timing signals, while x flip is done by selecting the 2nd character set.
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	galaga_state *state =  machine->driver_data<galaga_state>();
     int color = state->videoram[tile_index + 0x400] & 0x3f;
 	SET_TILE_INFO(
 			0,
@@ -432,7 +432,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( galaga )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	galaga_state *state =  machine->driver_data<galaga_state>();
 	state->fg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan,8,8,36,28);
 	colortable_configure_tilemap_groups(machine->colortable, state->fg_tilemap, machine->gfx[0], 0x1f);
 
@@ -454,7 +454,7 @@ VIDEO_START( galaga )
 
 WRITE8_HANDLER( galaga_videoram_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	galaga_state *state =  space->machine->driver_data<galaga_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
@@ -462,7 +462,7 @@ WRITE8_HANDLER( galaga_videoram_w )
 
 WRITE8_HANDLER ( gatsbee_bank_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	galaga_state *state =  space->machine->driver_data<galaga_state>();
 
 	state->galaga_gfxbank = data & 0x1;
 	tilemap_mark_all_tiles_dirty(state->fg_tilemap);
@@ -478,7 +478,7 @@ WRITE8_HANDLER ( gatsbee_bank_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	galaga_state *state =  machine->driver_data<galaga_state>();
 
 	UINT8 *spriteram = state->galaga_ram1 + 0x380;
 	UINT8 *spriteram_2 = state->galaga_ram2 + 0x380;
@@ -531,7 +531,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	galaga_state *state =  machine->driver_data<galaga_state>();
 	/* draw the stars */
 
 	/* $a005 controls the stars ON/OFF */
@@ -568,7 +568,7 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 
 SCREEN_UPDATE( galaga )
 {
-	_galaga_state *state =  screen->machine->driver_data<_galaga_state>();
+	galaga_state *state =  screen->machine->driver_data<galaga_state>();
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_stars(screen->machine,bitmap,cliprect);
@@ -581,7 +581,7 @@ SCREEN_UPDATE( galaga )
 
 SCREEN_EOF( galaga )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	galaga_state *state =  machine->driver_data<galaga_state>();
 	/* this function is called by galaga_interrupt_1() */
 	int s0,s1,s2;
 	static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };

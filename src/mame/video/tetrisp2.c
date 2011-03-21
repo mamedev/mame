@@ -377,7 +377,7 @@ VIDEO_START( rocknms )
 /* sprites should be able to create shadows too, how?
   -- it appears that sprites which should be shadows are often rendered *UNDER* the tilemaps, maybe related?
 */
-void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder, int flip, int allowzoom)
+static void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT8* priority_ram, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int flip)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
@@ -385,22 +385,12 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 	int pri;
 	int xzoom, yzoom;
 	UINT32 primask;
-	UINT8 *priority_ram;
 	gfx_element *gfx = machine->gfx[gfxnum];
 
 	UINT16		*source	=	sprram_top;
 	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
 
-	if (reverseorder == 1)
-	{
-		source	= sprram_top + (sprram_size - 0x10) / 2;
-		finish	= sprram_top;
-	}
-
-	priority_ram = priram;
-
-
-	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
+	for (; source<finish; source+=8)
 	{
 		attr	=	source[ 0 ];
 
@@ -418,53 +408,20 @@ void tetrisp2_draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t 
 		ty		=	(code >> 8) & 0xff;
 
 		code	=	(color & 0x0fff);
-
 		color	=	(color >> 12) & 0xf;
-
 		size	=	source[ 3 ];
 
 		xsize	=	((size >> 0) & 0xff) + 1;
 		ysize	=	((size >> 8) & 0xff) + 1;
 
-		sy		=	source[ 4 ];
-		sx		=	source[ 5 ];
+		sx		=	(source[5] & 0x3ff) - (source[5] & 0x400);
+		sy		=	(source[4] & 0x1ff) - (source[4] & 0x200);
 
-		sx		=	(sx & 0x3ff) - (sx & 0x400);
-		sy		=	(sy & 0x1ff) - (sy & 0x200);
-
-		xzoom	=	(source[ 6 ]&0xffff);
-		yzoom	=	(source[ 7 ]&0xffff);
-
-		// tetrisp2 hardware doesn't work with zoom?
-		if (allowzoom)
-		{
-			if (!yzoom || !xzoom)
-				continue;
-
-			yzoom = 0x1000000/yzoom;
-			xzoom = 0x1000000/xzoom;
-		}
-		else
-		{
-			xzoom = 0x10000;
-			yzoom = 0x10000;
-		}
-
+		xzoom = 0x10000;
+		yzoom = 0x10000;
 
 		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
 
-		if (priority_ram == NULL)
-		{
-			// passes the priority as the upper bits of the colour
-			// for post-processing in mixer instead
-			pdrawgfxzoom_transpen_raw(bitmap, cliprect, gfx,
-					code,
-					color<<8 | pri<<8,
-					flipx, flipy,
-					sx,sy,
-					xzoom, yzoom, bitmap_pri,0, 0);
-		}
-		else
 		{
 			primask = 0;
 			if (priority_ram[(pri | 0x0a00 | 0x1500) / 2] & 0x38) primask |= 1 << 0;
@@ -579,7 +536,7 @@ SCREEN_UPDATE( tetrisp2 )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap, cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
+	tetrisp2_draw_sprites(screen->machine, bitmap, screen->machine->priority_bitmap, cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, (tetrisp2_systemregs[0x00] & 0x02));
 	return 0;
 }
 
@@ -663,7 +620,7 @@ SCREEN_UPDATE( rockntread )
 	else if (asc_pri == 2)
 		tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-	tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
+	tetrisp2_draw_sprites(screen->machine, bitmap, screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, (tetrisp2_systemregs[0x00] & 0x02));
 	return 0;
 }
 
@@ -730,7 +687,7 @@ SCREEN_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, tilemap_sub_fg,  0, 1 << 2);
 
-		tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram2.u16, screen->machine->generic.spriteram2_size, 4, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
+		tetrisp2_draw_sprites(screen->machine, bitmap, screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram2.u16, screen->machine->generic.spriteram2_size, 4, (tetrisp2_systemregs[0x00] & 0x02));
 	}
 	else if (screen == right_screen) /* game screen */
 	{
@@ -783,7 +740,7 @@ SCREEN_UPDATE( rocknms )
 		else if (asc_pri == 2)
 			tilemap_draw(bitmap,cliprect, tilemap_fg,  0, 1 << 2);
 
-		tetrisp2_draw_sprites(screen->machine, bitmap,screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, 0, (tetrisp2_systemregs[0x00] & 0x02), 0);
+		tetrisp2_draw_sprites(screen->machine, bitmap, screen->machine->priority_bitmap,cliprect, tetrisp2_priority, screen->machine->generic.spriteram.u16, screen->machine->generic.spriteram_size, 0, (tetrisp2_systemregs[0x00] & 0x02));
 	}
 
 	return 0;

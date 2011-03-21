@@ -176,7 +176,7 @@ PALETTE_INIT( battles )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	xevious_state *state =  machine->driver_data<xevious_state>();
 
 	UINT8 attr = state->xevious_fg_colorram[tile_index];
 
@@ -195,7 +195,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	xevious_state *state =  machine->driver_data<xevious_state>();
 
 	UINT8 code = state->xevious_bg_videoram[tile_index];
 	UINT8 attr = state->xevious_bg_colorram[tile_index];
@@ -217,7 +217,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( xevious )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	xevious_state *state =  machine->driver_data<xevious_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     8,8,64,32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
@@ -243,7 +243,7 @@ VIDEO_START( xevious )
 
 WRITE8_HANDLER( xevious_fg_videoram_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	xevious_state *state =  space->machine->driver_data<xevious_state>();
 
 	state->xevious_fg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
@@ -251,7 +251,7 @@ WRITE8_HANDLER( xevious_fg_videoram_w )
 
 WRITE8_HANDLER( xevious_fg_colorram_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	xevious_state *state =  space->machine->driver_data<xevious_state>();
 
 	state->xevious_fg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset);
@@ -259,7 +259,7 @@ WRITE8_HANDLER( xevious_fg_colorram_w )
 
 WRITE8_HANDLER( xevious_bg_videoram_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	xevious_state *state =  space->machine->driver_data<xevious_state>();
 
 	state->xevious_bg_videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -267,7 +267,7 @@ WRITE8_HANDLER( xevious_bg_videoram_w )
 
 WRITE8_HANDLER( xevious_bg_colorram_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	xevious_state *state =  space->machine->driver_data<xevious_state>();
 
 	state->xevious_bg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
@@ -275,7 +275,7 @@ WRITE8_HANDLER( xevious_bg_colorram_w )
 
 WRITE8_HANDLER( xevious_vh_latch_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	xevious_state *state =  space->machine->driver_data<xevious_state>();
 
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
@@ -309,14 +309,14 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 /* emulation for schematic 9B */
 WRITE8_HANDLER( xevious_bs_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	xevious_state *state =  space->machine->driver_data<xevious_state>();
 
 	state->xevious_bs[offset & 1] = data;
 }
 
 READ8_HANDLER( xevious_bb_r )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	xevious_state *state =  space->machine->driver_data<xevious_state>();
 
 	UINT8 *rom2a = space->machine->region("gfx4")->base();
 	UINT8 *rom2b = rom2a+0x1000;
@@ -416,7 +416,7 @@ ROM 3M,3L color replace table for sprite
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	xevious_state *state =  machine->driver_data<xevious_state>();
 
 	UINT8 *spriteram = state->xevious_sr3 + 0x780;
 	UINT8 *spriteram_2 = state->xevious_sr1 + 0x780;
@@ -499,7 +499,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 SCREEN_UPDATE( xevious )
 {
-	_galaga_state *state =  screen->machine->driver_data<_galaga_state>();
+	xevious_state *state =  screen->machine->driver_data<xevious_state>();
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect);

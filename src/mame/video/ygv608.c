@@ -30,7 +30,6 @@
  */
 
 #include "emu.h"
-#include "includes/namcond1.h"   // only while debugging
 #include "video/ygv608.h"
 
 #define _ENABLE_SPRITES
@@ -40,6 +39,14 @@
 //#define _ENABLE_ROTATE_ZOOM
 //#define _SHOW_VIDEO_DEBUG
 
+#define GFX_8X8_4BIT    0
+#define GFX_16X16_4BIT  1
+#define GFX_32X32_4BIT  2
+#define GFX_64X64_4BIT  3
+#define GFX_8X8_8BIT    4
+#define GFX_16X16_8BIT  5
+
+static UINT8 namcond1_gfxbank;
 static YGV608 ygv608;
 
 static tilemap_t *tilemap_A_cache_8[3];
@@ -58,6 +65,11 @@ static void SetPostShortcuts( running_machine *machine, int reg );
 #ifdef MAME_DEBUG
 static void ShowYGV608Registers( void );
 #endif
+
+void ygv608_set_gfxbank(UINT8 gfxbank)
+{
+	namcond1_gfxbank = gfxbank;
+}
 
 /* interrupt generated every 1ms second */
 INTERRUPT_GEN( ygv608_timed_interrupt )
@@ -509,6 +521,7 @@ VIDEO_START( ygv608 )
 	ygv608.screen_resize = 1;
 	ygv608.tilemap_resize = 1;
 	namcond1_gfxbank = 0;
+	state_save_register_global(machine, namcond1_gfxbank);
 
 	/* create tilemaps of all sizes and combinations */
 	tilemap_A_cache_8[0] = tilemap_create(machine, get_tile_info_A_8, get_tile_offset,  8,8, 32,32);

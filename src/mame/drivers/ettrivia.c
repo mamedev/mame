@@ -28,7 +28,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
-#include "includes/naughtyb.h"
+#include "video/resnet.h"
 
 
 class ettrivia_state : public driver_device
@@ -211,6 +211,42 @@ static TILE_GET_INFO( get_tile_info_fg )
 	get_tile_info(machine, tileinfo, tile_index, state->fg_videoram, 1);
 }
 
+static PALETTE_INIT( ettrivia )
+{
+	static const int resistances[2] = { 270, 130 };
+	double weights[2];
+	int i;
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0, 255, -1.0,
+			2, resistances, weights, 0, 0,
+			2, resistances, weights, 0, 0,
+			0, 0, 0, 0, 0);
+
+	for (i = 0;i < machine->total_colors(); i++)
+	{
+		int bit0, bit1;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i+0x100] >> 0) & 0x01;
+		r = combine_2_weights(weights, bit0, bit1);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 2) & 0x01;
+		bit1 = (color_prom[i+0x100] >> 2) & 0x01;
+		g = combine_2_weights(weights, bit0, bit1);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 1) & 0x01;
+		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
+		b = combine_2_weights(weights, bit0, bit1);
+
+		palette_set_color(machine, BITSWAP8(i,5,7,6,2,1,0,4,3), MAKE_RGB(r, g, b));
+	}
+}
+
 static VIDEO_START( ettrivia )
 {
 	ettrivia_state *state = machine->driver_data<ettrivia_state>();
@@ -277,7 +313,7 @@ static MACHINE_CONFIG_START( ettrivia, ettrivia_state )
 	MCFG_GFXDECODE(ettrivia)
 	MCFG_PALETTE_LENGTH(256)
 
-	MCFG_PALETTE_INIT(naughtyb)
+	MCFG_PALETTE_INIT(ettrivia)
 	MCFG_VIDEO_START(ettrivia)
 
 	/* sound hardware */

@@ -1,18 +1,16 @@
 #include "sound/discrete.h"
 
-class _galaga_state : public driver_device
+class galaga_state : public driver_device
 {
 public:
-	_galaga_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config)
-	{
-		xevious_bs[0] = 0;
-		xevious_bs[1] = 0;
-	}
+	galaga_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *galaga_ram1,*galaga_ram2,*galaga_ram3;
 	UINT8 *galaga_starcontrol;	// 6 addresses
+	emu_timer *cpu3_interrupt_timer;
+	UINT8 custom_mod;
 
 	/* machine state */
 	UINT32 stars_scrollx;
@@ -28,8 +26,13 @@ public:
 	UINT8 *videoram;
 	tilemap_t *fg_tilemap;
 	tilemap_t *bg_tilemap;
+};
 
-	/* xevious */
+class xevious_state : public galaga_state
+{
+public:
+	xevious_state(running_machine &machine, const driver_device_config_base &config)
+		: galaga_state(machine, config) { }
 
 	UINT8 *xevious_fg_videoram;
 	UINT8 *xevious_fg_colorram;
@@ -39,34 +42,39 @@ public:
 	UINT8 *xevious_sr2;
 	UINT8 *xevious_sr3;
 
-	/* xevious static */
 	INT32 xevious_bs[2];
+};
 
-	/* bosco */
+
+class bosco_state : public galaga_state
+{
+public:
+	bosco_state(running_machine &machine, const driver_device_config_base &config)
+		: galaga_state(machine, config) { }
 
 	UINT8 *bosco_radarattr;
-
-	/* bosco static */
 
 	UINT8 *bosco_starcontrol;
 	UINT8 *bosco_starblink;
 
 	UINT8 *bosco_radarx;
 	UINT8 *bosco_radary;
+};
 
-	/* digdug */
+class digdug_state : public galaga_state
+{
+public:
+	digdug_state(running_machine &machine, const driver_device_config_base &config)
+		: galaga_state(machine, config) { }
 
 	UINT8 *digdug_objram;
 	UINT8 *digdug_posram;
 	UINT8 *digdug_flpram;
 
-	/* digdug static*/
-
 	UINT8 bg_select;
 	UINT8 tx_color_mode;
 	UINT8 bg_disable;
 	UINT8 bg_color_bank;
-
 };
 
 

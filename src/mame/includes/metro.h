@@ -68,17 +68,6 @@ public:
 	/* misc */
 	int         gakusai_oki_bank_lo, gakusai_oki_bank_hi;
 
-	/* used by vmetal.c */
-	UINT16 *vmetal_texttileram;
-	UINT16 *vmetal_mid1tileram;
-	UINT16 *vmetal_mid2tileram;
-	UINT16 *vmetal_tlookup;
-	UINT16 *vmetal_videoregs;
-
-	tilemap_t *vmetal_texttilemap;
-	tilemap_t *vmetal_mid1tilemap;
-	tilemap_t *vmetal_mid2tilemap;
-
 	/* devices */
 	required_device<cpu_device> maincpu;
 	optional_device<cpu_device> audiocpu;

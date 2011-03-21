@@ -736,6 +736,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
+#include "machine/seibuspi.h"
 #include "includes/seibuspi.h"
 
 UINT32 *spimainram;

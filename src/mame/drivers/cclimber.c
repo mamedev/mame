@@ -207,6 +207,7 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 #include "machine/segacrpt.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
+#include "audio/cclimber.h"
 #include "includes/cclimber.h"
 
 

@@ -93,7 +93,7 @@ static TILEMAP_MAPPER( fg_tilemap_scan )
 
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int ram_offs)
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	bosco_state *state =  machine->driver_data<bosco_state>();
 
 	UINT8 attr = state->videoram[ram_offs + tile_index + 0x800];
 	tileinfo->category = (attr & 0x20) >> 5;
@@ -125,7 +125,7 @@ static TILE_GET_INFO( fg_get_tile_info )
 
 VIDEO_START( bosco )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	bosco_state *state =  machine->driver_data<bosco_state>();
 
 	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan_rows,8,8,32,32);
 	state->fg_tilemap = tilemap_create(machine, fg_get_tile_info,fg_tilemap_scan,  8,8, 8,32);
@@ -156,7 +156,7 @@ VIDEO_START( bosco )
 
 WRITE8_HANDLER( bosco_videoram_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	bosco_state *state =  space->machine->driver_data<bosco_state>();
 
 	state->videoram[offset] = data;
 	if (offset & 0x400)
@@ -167,14 +167,14 @@ WRITE8_HANDLER( bosco_videoram_w )
 
 WRITE8_HANDLER( bosco_scrollx_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	bosco_state *state =  space->machine->driver_data<bosco_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap,0,data);
 }
 
 WRITE8_HANDLER( bosco_scrolly_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	bosco_state *state =  space->machine->driver_data<bosco_state>();
 	tilemap_set_scrolly(state->bg_tilemap,0,data);
 }
 
@@ -217,7 +217,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	bosco_state *state =  machine->driver_data<bosco_state>();
 	int offs;
 
 	for (offs = 4; offs < 0x10;offs++)
@@ -239,7 +239,7 @@ static void draw_bullets(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int flip)
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	bosco_state *state =  machine->driver_data<bosco_state>();
 
 	if (1)
 	{
@@ -275,7 +275,7 @@ static void draw_stars(running_machine *machine, bitmap_t *bitmap, const rectang
 
 SCREEN_UPDATE( bosco )
 {
-	_galaga_state *state =  screen->machine->driver_data<_galaga_state>();
+	bosco_state *state =  screen->machine->driver_data<bosco_state>();
 
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
        the screen, and clip it to only the position where it is supposed to be shown */
@@ -312,7 +312,7 @@ SCREEN_UPDATE( bosco )
 
 SCREEN_EOF( bosco )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	bosco_state *state =  machine->driver_data<bosco_state>();
 	static const int speedsx[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
 	static const int speedsy[8] = { 0, -1, -2, -3, 0, 3, 2, 1 };
 

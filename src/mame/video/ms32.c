@@ -13,7 +13,6 @@ priority should be given to
 
 
 #include "emu.h"
-#include "includes/tetrisp2.h"
 #include "includes/ms32.h"
 
 
@@ -206,10 +205,74 @@ WRITE32_HANDLER( ms32_gfxctrl_w )
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-/* now using function in tetrisp2.c */
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *bitmap_pri, const rectangle *cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
+{
+	int tx, ty, sx, sy, flipx, flipy;
+	int xsize, ysize;
+	int code, attr, color, size;
+	int pri;
+	int xzoom, yzoom;
+	gfx_element *gfx = machine->gfx[gfxnum];
+
+	UINT16		*source	=	sprram_top;
+	UINT16	*finish	=	sprram_top + (sprram_size - 0x10) / 2;
+
+	if (reverseorder == 1)
+	{
+		source	= sprram_top + (sprram_size - 0x10) / 2;
+		finish	= sprram_top;
+	}
+
+	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
+	{
+		attr	=	source[ 0 ];
+		pri = (attr & 0x00f0);
+
+		if ((attr & 0x0004) == 0)			continue;
+
+		flipx	=	attr & 1;
+		flipy	=	attr & 2;
+		code	=	source[ 1 ];
+		color	=	source[ 2 ];
+		tx		=	(code >> 0) & 0xff;
+		ty		=	(code >> 8) & 0xff;
+
+		code	=	(color & 0x0fff);
+		color	=	(color >> 12) & 0xf;
+		size	=	source[ 3 ];
+
+		xsize	=	((size >> 0) & 0xff) + 1;
+		ysize	=	((size >> 8) & 0xff) + 1;
+
+		sx		=	(source[5] & 0x3ff) - (source[5] & 0x400);
+		sy		=	(source[4] & 0x1ff) - (source[4] & 0x200);
+
+		xzoom	=	(source[ 6 ]&0xffff);
+		yzoom	=	(source[ 7 ]&0xffff);
+
+		{
+			if (!yzoom || !xzoom)
+				continue;
+
+			yzoom = 0x1000000/yzoom;
+			xzoom = 0x1000000/xzoom;
+		}
 
 
+		gfx_element_set_source_clip(gfx, tx, xsize, ty, ysize);
 
+		{
+			// passes the priority as the upper bits of the colour
+			// for post-processing in mixer instead
+			pdrawgfxzoom_transpen_raw(bitmap, cliprect, gfx,
+					code,
+					color<<8 | pri<<8,
+					flipx, flipy,
+					sx,sy,
+					xzoom, yzoom, bitmap_pri,0, 0);
+		}
+	}	/* end sprite loop */
+}
 
 
 static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int priority)
@@ -341,7 +404,7 @@ SCREEN_UPDATE( ms32 )
 	bitmap_fill(state->temp_bitmap_sprites,cliprect,0);
 	bitmap_fill(state->temp_bitmap_sprites_pri,cliprect,0);
 
-	tetrisp2_draw_sprites(screen->machine, state->temp_bitmap_sprites, state->temp_bitmap_sprites_pri, cliprect, NULL, state->sprram_16, 0x20000, 0, state->reverse_sprite_order, 0, 1 );
+	draw_sprites(screen->machine, state->temp_bitmap_sprites, state->temp_bitmap_sprites_pri, cliprect, state->sprram_16, 0x20000, 0, state->reverse_sprite_order);
 
 
 

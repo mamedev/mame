@@ -90,7 +90,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 static TILE_GET_INFO( bg_get_tile_info )
 {
 	UINT8 *rom = machine->region("gfx4")->base();
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	digdug_state *state =  machine->driver_data<digdug_state>();
 
 	int code = rom[tile_index | (state->bg_select << 10)];
 	/* when the background is "disabled", it is actually still drawn, but using
@@ -108,7 +108,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 static TILE_GET_INFO( tx_get_tile_info )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	digdug_state *state =  machine->driver_data<digdug_state>();
 	UINT8 code = state->videoram[tile_index];
 	int color;
 
@@ -144,7 +144,7 @@ static TILE_GET_INFO( tx_get_tile_info )
 
 VIDEO_START( digdug )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	digdug_state *state =  machine->driver_data<digdug_state>();
 
 	state->bg_tilemap = tilemap_create(machine, bg_get_tile_info,tilemap_scan,     8,8,36,28);
 	state->fg_tilemap = tilemap_create(machine, tx_get_tile_info,tilemap_scan,8,8,36,28);
@@ -167,7 +167,7 @@ VIDEO_START( digdug )
 
 WRITE8_HANDLER( digdug_videoram_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	digdug_state *state =  space->machine->driver_data<digdug_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap,offset & 0x3ff);
@@ -175,7 +175,7 @@ WRITE8_HANDLER( digdug_videoram_w )
 
 WRITE8_HANDLER( digdug_PORT_w )
 {
-	_galaga_state *state =  space->machine->driver_data<_galaga_state>();
+	digdug_state *state =  space->machine->driver_data<digdug_state>();
 
 	switch (offset)
 	{
@@ -248,7 +248,7 @@ static const rectangle spritevisiblearea =
 
 static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	_galaga_state *state =  machine->driver_data<_galaga_state>();
+	digdug_state *state =  machine->driver_data<digdug_state>();
 	UINT8 *spriteram = state->digdug_objram + 0x380;
 	UINT8 *spriteram_2 = state->digdug_posram + 0x380;
 	UINT8 *spriteram_3 = state->digdug_flpram + 0x380;
@@ -307,7 +307,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 SCREEN_UPDATE( digdug )
 {
-	_galaga_state *state =  screen->machine->driver_data<_galaga_state>();
+	digdug_state *state =  screen->machine->driver_data<digdug_state>();
 
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->fg_tilemap,0,0);

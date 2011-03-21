@@ -48,14 +48,6 @@ public:
 	int      bank1;
 	int      bank2;
 
-	/* game-specific */
-	// champbwl
-	UINT8    last_trackball_val[2];
-//  UINT8 *  nvram; // currently this uses generic_nvram
-	// cchance
-	UINT8    hop_io, bell_io;
-
-
 	/* devices */
 	device_t *audiocpu;
 	device_t *subcpu;
