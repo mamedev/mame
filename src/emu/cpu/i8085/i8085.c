@@ -277,6 +277,7 @@ INLINE i8085_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
 	assert(device->type() == I8080 ||
+		   device->type() == I8080A||
 		   device->type() == I8085A);
 	return (i8085_state *)downcast<legacy_cpu_device *>(device)->token();
 }
