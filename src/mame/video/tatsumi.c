@@ -529,7 +529,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	tatsumi_state *state = machine->driver_data<tatsumi_state>();
 	UINT16 *spriteram16 = state->spriteram;
-	int offs,fx,x,y,color;
+	int offs,fx,fy,x,y,color;
 	int w,h,index,lines,scale,rotate;
 	UINT8 *src1, *src2;
 
@@ -549,7 +549,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
             Word 0: 0xf000 - ?
                     0x0fff - Index into ROM sprite table
             Word 1: 0x8000 - X Flip
-                    0x7ff8 - Colour (TODO:  Check top bit on Apache 3/Round up)
+                    0x4000 - Y Flip
+                    0x3000 - ?
+                    0x0ff8 - Color
                     0x0007 - ?
             Word 2: 0xffff - X position
             Word 3: 0xffff - Y position
@@ -576,6 +578,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		scale = spriteram16[offs+4]&0x1ff;
 		color = (spriteram16[offs+1]>>3)&0x1ff;
 		fx = spriteram16[offs+1]&0x8000;
+		fy = spriteram16[offs+1]&0x4000;
 		rotate = 0;//spriteram16[offs+5]&0x1ff; // Todo:  Turned off for now
 
 		index = spriteram16[offs];
@@ -601,7 +604,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		render_y=y<<16;
 		scale=scale<<9; /* 0x80 becomes 0x10000 */
 
-		render_y+=y_offset * scale;
+		if (fy)
+			render_y-=y_offset * scale;
+		else
+			render_y+=y_offset * scale;
 
 		if (rotate)
 		{
@@ -647,13 +653,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						roundupt_drawgfxzoomrotate(
 								state->temp_bitmap,cliprect,machine->gfx[0],
 								base,
-								color,fx,0,x_pos,render_y,
+								color,fx,fy,x_pos,render_y,
 								scale,scale,0,write_priority_only);
 					else
 						roundupt_drawgfxzoomrotate(
 								bitmap,cliprect,machine->gfx[0],
 								base,
-								color,fx,0,x_pos,render_y,
+								color,fx,fy,x_pos,render_y,
 								scale,scale,0,write_priority_only);
 					base++;
 
@@ -673,7 +679,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					extent_x=this_extent;
 				this_extent=0;
 
-				render_y+=8 * scale;
+				if (fy)
+					render_y-=8 * scale;
+				else
+					render_y+=8 * scale;
+
 				extent_y+=8 * scale;
 				h++;
 				lines-=8;
