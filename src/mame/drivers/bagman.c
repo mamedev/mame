@@ -28,7 +28,7 @@ write:
 a000      interrupt enable
 a001      horizontal flip
 a002      vertical flip
-a003      video enable?? (seems to be unused in the schems)
+a003      video enable, not available on earlier hardware revision(s)
 a004      coin counter
 a007      ? /SCS line in the schems connected to AY8910 pin A4 or AA (schems are unreadable)
 
@@ -928,21 +928,25 @@ ROM_START( squaitsa )
 	ROM_LOAD( "mmi6331.3r",    0x0020, 0x0020,CRC(86c1e7db) SHA1(5c974b51d770a555ddab5c23f03a666c6f286cbf) )
 ROM_END
 
-static DRIVER_INIT( bagnarda )
+static DRIVER_INIT( bagman )
 {
 	bagman_state *state = machine->driver_data<bagman_state>();
-	/* initialize video enable because it's not done in the code */
+	
+	/* Unmap video enable register, not available on earlier hardware revision(s)
+	   Bagman is supposed to have glitches during screen transitions */
+	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0);
 	*state->video_enable = 1;
 }
 
-GAME( 1982, bagman,	   0,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Bagman", 0 )
-GAME( 1982, bagnard,  bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Le Bagnard (set 1)", 0 )
-GAME( 1982, bagnarda, bagman,  bagman,  bagman,  bagnarda, ROT270, "Valadon Automation", "Le Bagnard (set 2)", 0 )
-GAME( 1982, bagmans,  bagman,  bagman,  bagmans, 0,        ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", 0 )
-GAME( 1982, bagmans2, bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", 0 )
-GAME( 1984, sbagman,       0,  bagman,  sbagman, 0,        ROT270, "Valadon Automation", "Super Bagman", 0 )
-GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", 0 )
-GAME( 1983, pickin,	   0,  pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
-GAME( 1984, botanic,       0,  botanic, botanic, 0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
-GAME( 1984, squaitsa,      0,  squaitsa,squaitsa,0,        ROT0,   "Itisa",              "Squash (Itisa)", 0 )
 
+GAME( 1982, bagman,   0,       bagman,  bagman,  bagman,  ROT270, "Valadon Automation", "Bagman", 0 )
+GAME( 1982, bagnard,  bagman,  bagman,  bagman,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 1)", 0 )
+GAME( 1982, bagnarda, bagman,  bagman,  bagman,  bagman,  ROT270, "Valadon Automation", "Le Bagnard (set 2)", 0 )
+GAME( 1982, bagmans,  bagman,  bagman,  bagmans, bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", 0 )
+GAME( 1982, bagmans2, bagman,  bagman,  bagman,  bagman,  ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", 0 )
+
+GAME( 1984, sbagman,  0,       bagman,  sbagman, 0,       ROT270, "Valadon Automation", "Super Bagman", 0 )
+GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,       ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", 0 )
+GAME( 1983, pickin,   0,       pickin,  pickin,  0,       ROT270, "Valadon Automation", "Pickin'", 0 )
+GAME( 1984, botanic,  0,       botanic, botanic, 0,       ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
+GAME( 1984, squaitsa, 0,       squaitsa,squaitsa,0,       ROT0,   "Itisa", "Squash (Itisa)", 0 )
