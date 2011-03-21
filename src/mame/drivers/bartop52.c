@@ -23,6 +23,16 @@
 #include "sound/pokey.h"
 #include "video/gtia.h"
 
+
+class bartop52_state : public driver_device
+{
+public:
+	bartop52_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START(a5200_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
@@ -107,7 +117,7 @@ static const pokey_interface atari_pokey_interface =
 	atari_interrupt_cb,
 };
 
-static MACHINE_CONFIG_START( a5200, driver_device )
+static MACHINE_CONFIG_START( a5200, bartop52_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)

@@ -59,6 +59,16 @@
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
+
+class comebaby_state : public driver_device
+{
+public:
+	comebaby_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START(comebaby)
 {
 }
@@ -76,7 +86,7 @@ static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( comebaby, driver_device )
+static MACHINE_CONFIG_START( comebaby, comebaby_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
 	MCFG_CPU_PROGRAM_MAP(comebaby_map)

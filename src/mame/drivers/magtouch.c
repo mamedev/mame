@@ -81,6 +81,16 @@ video card
 #include "video/pc_vga.h"
 #include "video/pc_video.h"
 
+
+class magtouch_state : public driver_device
+{
+public:
+	magtouch_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /*************************************
  *
  *  Microtouch <-> ins8250 interface
@@ -192,7 +202,7 @@ static MACHINE_START( magtouch )
 	microtouch_init(machine, magtouch_microtouch_tx_callback, NULL);
 }
 
-static MACHINE_CONFIG_START( magtouch, driver_device )
+static MACHINE_CONFIG_START( magtouch, magtouch_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(magtouch_map)

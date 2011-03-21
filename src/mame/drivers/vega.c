@@ -15,6 +15,16 @@
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 
+
+class vega_state : public driver_device
+{
+public:
+	vega_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START( vega_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -35,7 +45,7 @@ static SCREEN_UPDATE(vega)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( vega, driver_device )
+static MACHINE_CONFIG_START( vega, vega_state )
 	MCFG_CPU_ADD("maincpu", I8035, 6000000) // what CPU? what speed?
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 

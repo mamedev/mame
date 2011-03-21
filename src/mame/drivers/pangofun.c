@@ -99,6 +99,16 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 #include "video/pc_vga.h"
 #include "video/pc_video.h"
 
+
+class pangofun_state : public driver_device
+{
+public:
+	pangofun_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START( pcat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
@@ -188,7 +198,7 @@ static MACHINE_START( pangofun )
 }
 
 
-static MACHINE_CONFIG_START( pangofun, driver_device )
+static MACHINE_CONFIG_START( pangofun, pangofun_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 40000000 )	/* I486 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)

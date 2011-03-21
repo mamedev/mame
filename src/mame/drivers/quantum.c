@@ -50,6 +50,16 @@
 #include "sound/pokey.h"
 #include "machine/nvram.h"
 
+
+class quantum_state : public driver_device
+{
+public:
+	quantum_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 #define MASTER_CLOCK (12096000)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
@@ -226,7 +236,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( quantum, driver_device )
+static MACHINE_CONFIG_START( quantum, quantum_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)

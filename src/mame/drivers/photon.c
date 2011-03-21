@@ -21,6 +21,16 @@
 #include "machine/i8255a.h"
 #include "sound/speaker.h"
 
+
+class photon_state : public driver_device
+{
+public:
+	photon_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static void pk8000_set_bank(running_machine *machine,UINT8 data)
 {
 	UINT8 *rom = machine->region("maincpu")->base();
@@ -192,7 +202,7 @@ static SCREEN_UPDATE( photon )
 	return pk8000_video_update(screen, bitmap, cliprect, screen->machine->region("maincpu")->base());
 }
 
-static MACHINE_CONFIG_START( photon, driver_device )
+static MACHINE_CONFIG_START( photon, photon_state )
 
     /* basic machine hardware */
     MCFG_CPU_ADD("maincpu",I8080, 1780000)

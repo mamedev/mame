@@ -19,6 +19,16 @@ I/O Board with Altera Flex EPF15K50EQC240-3
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
+
+class tokyocop_state : public driver_device
+{
+public:
+	tokyocop_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START(tokyocop)
 {
 }
@@ -36,7 +46,7 @@ static INPUT_PORTS_START( tokyocop )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( tokyocop, driver_device )
+static MACHINE_CONFIG_START( tokyocop, tokyocop_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
 	MCFG_CPU_PROGRAM_MAP(tokyocop_map)

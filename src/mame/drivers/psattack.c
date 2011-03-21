@@ -78,6 +78,16 @@ GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
 #include "sound/vrender0.h"
 #include "machine/nvram.h"
 
+
+class psattack_state : public driver_device
+{
+public:
+	psattack_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static READ32_HANDLER( psattack_unk_r )
 {
 	return 0xffffffff;
@@ -158,7 +168,7 @@ static const vr0_interface vr0_config =
 };
 
 
-static MACHINE_CONFIG_START( psattack, driver_device )
+static MACHINE_CONFIG_START( psattack, psattack_state )
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(psattack_mem)
 	MCFG_CPU_VBLANK_INT("screen", psattack_interrupt)

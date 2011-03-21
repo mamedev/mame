@@ -52,7 +52,7 @@ MACHINE_CONFIG_END
 
 /* with Sound & Speech Board */
 /* Note: hh uses this but it does not have the Votrax chip (?) */
-static MACHINE_CONFIG_START( gts80_ss, driver_device )
+static MACHINE_CONFIG_START( gts80_ss, gts80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 850000)
 	MCFG_CPU_PROGRAM_MAP(gts80_map)

@@ -26,6 +26,16 @@ TODO:
 #include "video/pc_vga.h"
 #include "video/pc_video.h"
 
+
+class pcat_dyn_state : public driver_device
+{
+public:
+	pcat_dyn_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 //ce9b8
 /* TODO: understand the proper ROM loading.*/
 static ADDRESS_MAP_START( pcat_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -124,7 +134,7 @@ static MACHINE_START( pcat_dyn )
 	kbdc8042_init(machine, &at8042);
 }
 
-static MACHINE_CONFIG_START( pcat_dyn, driver_device )
+static MACHINE_CONFIG_START( pcat_dyn, pcat_dyn_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 40000000)	/* Am486 DX-40 */
 	MCFG_CPU_PROGRAM_MAP(pcat_map)

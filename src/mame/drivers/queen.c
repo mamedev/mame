@@ -22,6 +22,16 @@ processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -
 #include "emu.h"
 #include "cpu/i386/i386.h"
 
+
+class queen_state : public driver_device
+{
+public:
+	queen_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START(queen)
 {
 
@@ -71,7 +81,7 @@ static INPUT_PORTS_START( queen )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( queen, driver_device )
+static MACHINE_CONFIG_START( queen, queen_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 533000000) // Celeron or Pentium 3, 533 Mhz
 	MCFG_CPU_PROGRAM_MAP(queen_map)
 	MCFG_CPU_IO_MAP(queen_io)

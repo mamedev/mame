@@ -13,6 +13,15 @@
 #include "video/tia.h"
 
 
+class tourtabl_state : public driver_device
+{
+public:
+	tourtabl_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 #define MASTER_CLOCK	XTAL_3_579545MHz
 
 
@@ -165,7 +174,7 @@ static INPUT_PORTS_START( tourtabl )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( tourtabl, driver_device )
+static MACHINE_CONFIG_START( tourtabl, tourtabl_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
 	MCFG_CPU_PROGRAM_MAP(main_map)

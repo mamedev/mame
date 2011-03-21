@@ -16,6 +16,16 @@
 #include "cpu/mips/mips3.h"
 #include "machine/idectrl.h"
 
+
+class vp101_state : public driver_device
+{
+public:
+	vp101_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static SCREEN_UPDATE( vp101 )
 {
 	return 0;
@@ -55,7 +65,7 @@ static const mips3_config r5000_config =
 	100000000			/* system (bus) clock */
 };
 
-static MACHINE_CONFIG_START( vp101, driver_device )
+static MACHINE_CONFIG_START( vp101, vp101_state )
 	MCFG_CPU_ADD("maincpu", R5000LE, 300000000)	/* actually VR5500 with added NEC VR-series custom instructions */
 	MCFG_CPU_CONFIG(r5000_config)
 	MCFG_CPU_PROGRAM_MAP(main_map)

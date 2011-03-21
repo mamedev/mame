@@ -179,6 +179,16 @@
 #include "machine/nvram.h"
 #include "includes/funworld.h"
 
+
+class _4roses_state : public driver_device
+{
+public:
+	_4roses_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /**********************
 * Read/Write Handlers *
 **********************/
@@ -370,7 +380,7 @@ static const mc6845_interface mc6845_intf =
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( 4roses, driver_device )
+static MACHINE_CONFIG_START( 4roses, _4roses_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MCFG_CPU_PROGRAM_MAP(4roses_map)

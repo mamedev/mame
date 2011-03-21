@@ -34,6 +34,16 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 
+
+class savquest_state : public driver_device
+{
+public:
+	savquest_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START(savquest)
 {
 }
@@ -54,7 +64,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( savquest )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( savquest, driver_device )
+static MACHINE_CONFIG_START( savquest, savquest_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 450000000)	// actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
 	MCFG_CPU_IO_MAP(savquest_io)

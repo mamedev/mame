@@ -58,6 +58,15 @@
 #include "cpu/powerpc/ppc.h"
 
 
+class taitopjc_state : public driver_device
+{
+public:
+	taitopjc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START( taitopjc )
 {
 
@@ -86,7 +95,7 @@ static const powerpc_config ppc603e_config =
 	XTAL_66_6667MHz		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 };
 
-static MACHINE_CONFIG_START( taitopjc, driver_device )
+static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_CPU_CONFIG(ppc603e_config)
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)

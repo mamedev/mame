@@ -114,6 +114,15 @@ Medium size chip with heat sink on it
 #include "cpu/mips/mips3.h"
 
 
+class magictg_state : public driver_device
+{
+public:
+	magictg_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START(magictg)
 {
 
@@ -139,7 +148,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( magictg, driver_device )
+static MACHINE_CONFIG_START( magictg, magictg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4600BE, 10000000)  // ?? what cpu?
 	MCFG_CPU_CONFIG(r4600_config)

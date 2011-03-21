@@ -23,6 +23,16 @@
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
 
+
+class midqslvr_state : public driver_device
+{
+public:
+	midqslvr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START(midqslvr)
 {
 }
@@ -43,7 +53,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( midqslvr )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( midqslvr, driver_device )
+static MACHINE_CONFIG_START( midqslvr, midqslvr_state )
 	MCFG_CPU_ADD("maincpu", PENTIUM, 333000000)	// actually Celeron 333
 	MCFG_CPU_PROGRAM_MAP(midqslvr_map)
 	MCFG_CPU_IO_MAP(midqslvr_io)

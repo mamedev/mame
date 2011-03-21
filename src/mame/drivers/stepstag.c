@@ -20,6 +20,16 @@
 #include "rendlay.h"
 #include "stepstag.lh"
 
+
+class stepstag_state : public driver_device
+{
+public:
+	stepstag_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static READ16_HANDLER( unknown_read_0xc00000 )
 {
 	return space->machine->rand();
@@ -108,7 +118,7 @@ static SCREEN_UPDATE(stepstag)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( stepstag, driver_device )
+static MACHINE_CONFIG_START( stepstag, stepstag_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 ) //??
 	MCFG_CPU_PROGRAM_MAP(stepstag_map)

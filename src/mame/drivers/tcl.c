@@ -46,6 +46,15 @@ Notes:
 #include "sound/ay8910.h"
 
 
+class tcl_state : public driver_device
+{
+public:
+	tcl_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START( tcl )
 {
 }
@@ -112,7 +121,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 };
 
 
-static MACHINE_CONFIG_START( tcl, driver_device )
+static MACHINE_CONFIG_START( tcl, tcl_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4)

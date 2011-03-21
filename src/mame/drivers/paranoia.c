@@ -42,6 +42,16 @@ HuC6280A (Hudson)
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 
+
+class paranoia_state : public driver_device
+{
+public:
+	paranoia_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static INPUT_PORTS_START( paranoia )
     PORT_START( "JOY" )
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
@@ -135,7 +145,7 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-static MACHINE_CONFIG_START( paranoia, driver_device )
+static MACHINE_CONFIG_START( paranoia, paranoia_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)

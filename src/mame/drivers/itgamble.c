@@ -58,6 +58,15 @@
 #include "sound/okim6295.h"
 
 
+class itgamble_state : public driver_device
+{
+public:
+	itgamble_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /*************************
 *     Video Hardware     *
 *************************/
@@ -179,7 +188,7 @@ static MACHINE_RESET( itgamble )
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgamble, driver_device )
+static MACHINE_CONFIG_START( itgamble, itgamble_state )
 
     /* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, MAIN_CLOCK/2)	/* probably the wrong CPU */

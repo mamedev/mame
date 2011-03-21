@@ -23,6 +23,16 @@
 #include "cpu/h6280/h6280.h"
 #include "sound/c6280.h"
 
+
+class ggconnie_state : public driver_device
+{
+public:
+	ggconnie_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static INPUT_PORTS_START(ggconnie)
     PORT_START("IN0")
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Medal" )
@@ -143,7 +153,7 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-static MACHINE_CONFIG_START( ggconnie, driver_device )
+static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)

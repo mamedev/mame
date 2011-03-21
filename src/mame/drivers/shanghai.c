@@ -27,6 +27,16 @@ displayed.
 #include "audio/seibu.h"
 #include "video/hd63484.h"
 
+
+class shanghai_state : public driver_device
+{
+public:
+	shanghai_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static PALETTE_INIT( shanghai )
 {
 	int i;
@@ -424,7 +434,7 @@ static const ym2203_interface kothello_ym2203_interface =
 
 static const hd63484_interface shanghai_hd63484_intf = { 0 };
 
-static MACHINE_CONFIG_START( shanghai, driver_device )
+static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
@@ -459,7 +469,7 @@ static MACHINE_CONFIG_START( shanghai, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shangha2, driver_device )
+static MACHINE_CONFIG_START( shangha2, shanghai_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
@@ -493,7 +503,7 @@ static MACHINE_CONFIG_START( shangha2, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kothello, driver_device )
+static MACHINE_CONFIG_START( kothello, shanghai_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */

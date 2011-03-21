@@ -9,6 +9,16 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 
+
+class neptunp2_state : public driver_device
+{
+public:
+	neptunp2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START( neptunp2 )
 {
 
@@ -66,7 +76,7 @@ static GFXDECODE_START( neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( neptunp2, driver_device )
+static MACHINE_CONFIG_START( neptunp2, neptunp2_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD

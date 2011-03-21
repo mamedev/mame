@@ -28,6 +28,16 @@ Note
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 
+
+class _3super8_state : public driver_device
+{
+public:
+	_3super8_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START(3super8)
 {
 
@@ -64,7 +74,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( 3super8, driver_device )
+static MACHINE_CONFIG_START( 3super8, _3super8_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,24000000/4)		 /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(map)

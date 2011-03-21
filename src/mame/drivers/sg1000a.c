@@ -118,6 +118,16 @@ CN4               CN5
 #include "machine/i8255a.h"
 #include "machine/segacrpt.h"
 
+
+class sg1000a_state : public driver_device
+{
+public:
+	sg1000a_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /*************************************
  *
  *  CPU memory handlers
@@ -263,7 +273,7 @@ static I8255A_INTERFACE( ppi8255_intf )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( sg1000a, driver_device )
+static MACHINE_CONFIG_START( sg1000a, sg1000a_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(program_map)

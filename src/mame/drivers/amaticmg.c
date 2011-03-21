@@ -389,6 +389,15 @@
 #include "sound/dac.h"
 
 
+class amaticmg_state : public driver_device
+{
+public:
+	amaticmg_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 /************************************
 *          Video Hardware           *
 ************************************/
@@ -610,7 +619,7 @@ GFXDECODE_END
 *          Machine Drivers          *
 ************************************/
 
-static MACHINE_CONFIG_START( amaticmg, driver_device )
+static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)		/* WRONG! */
 	MCFG_CPU_PROGRAM_MAP(amaticmg_map)

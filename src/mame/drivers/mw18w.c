@@ -19,6 +19,15 @@ To diagnose game, turn on service mode and:
 #include "18w.lh"
 
 
+class mw18w_state : public driver_device
+{
+public:
+	mw18w_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static WRITE8_HANDLER( mw18w_sound0_w )
 {
 	// sound write (airhorn, brake, crash) plus motor speed for backdrop, and coin counter
@@ -159,7 +168,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( mw18w, driver_device )
+static MACHINE_CONFIG_START( mw18w, mw18w_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
 	MCFG_CPU_PERIODIC_INT(irq0_line_assert,960.516)	// 555 IC

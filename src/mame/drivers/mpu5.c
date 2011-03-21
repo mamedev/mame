@@ -16,6 +16,15 @@
 #include "cpu/m68000/m68000.h"
 
 
+class mpu5_state : public driver_device
+{
+public:
+	mpu5_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START( mpu5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 ADDRESS_MAP_END
@@ -33,7 +42,7 @@ static SCREEN_UPDATE(mpu5)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mpu5, driver_device )
+static MACHINE_CONFIG_START( mpu5, mpu5_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	 // ?
 	MCFG_CPU_PROGRAM_MAP(mpu5_map)
 

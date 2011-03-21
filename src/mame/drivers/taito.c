@@ -26,7 +26,7 @@ static DRIVER_INIT( taito )
 {
 }
 
-static MACHINE_CONFIG_START( taito, driver_device )
+static MACHINE_CONFIG_START( taito, taito_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 19000000/9)
 	MCFG_CPU_PROGRAM_MAP(taito_map)

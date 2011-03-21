@@ -59,6 +59,16 @@ Notes:
 #include "emu.h"
 #include "cpu/sh4/sh4.h"
 
+
+class atvtrack_state : public driver_device
+{
+public:
+	atvtrack_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 VIDEO_START(atvtrack)
 {
 }
@@ -84,7 +94,7 @@ INPUT_PORTS_END
 // ?
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, ATV_CPU_CLOCK };
 
-static MACHINE_CONFIG_START( atvtrack, driver_device )
+static MACHINE_CONFIG_START( atvtrack, atvtrack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4, ATV_CPU_CLOCK)
 	MCFG_CPU_CONFIG(sh4cpu_config)

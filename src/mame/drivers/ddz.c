@@ -16,6 +16,14 @@
 #include "sound/vrender0.h"
 
 
+class ddz_state : public driver_device
+{
+public:
+	ddz_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
 
 static ADDRESS_MAP_START( ddz_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_WRITENOP
@@ -52,7 +60,7 @@ static const vr0_interface vr0_config =
 };
 
 
-static MACHINE_CONFIG_START( ddz, driver_device )
+static MACHINE_CONFIG_START( ddz, ddz_state )
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
 	MCFG_CPU_PROGRAM_MAP(ddz_mem)
 	MCFG_CPU_VBLANK_INT("screen", ddz_interrupt)

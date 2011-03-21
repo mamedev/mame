@@ -49,6 +49,16 @@ so even the Main CPU is unknown, assuming the 8085 is the sound CPU
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 
+
+class rcorsair_state : public driver_device
+{
+public:
+	rcorsair_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static ADDRESS_MAP_START( rcorsair_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -106,7 +116,7 @@ static SCREEN_UPDATE( rcorsair )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( rcorsair, driver_device )
+static MACHINE_CONFIG_START( rcorsair, rcorsair_state )
 
 	/* Main CPU is probably inside Custom Block with
        program code, unknown type */

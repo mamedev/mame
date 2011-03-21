@@ -223,6 +223,14 @@
 #include "rendlay.h"
 
 
+class omegrace_state : public driver_device
+{
+public:
+	omegrace_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
 
 /*************************************
  *
@@ -467,7 +475,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( omegrace, driver_device )
+static MACHINE_CONFIG_START( omegrace, omegrace_state )
 
 	/* basic machine hardware */
 

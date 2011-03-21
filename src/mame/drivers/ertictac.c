@@ -25,6 +25,16 @@
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
 
+
+class ertictac_state : public driver_device
+{
+public:
+	ertictac_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static READ32_HANDLER( ertictac_podule_r )
 {
 	ioc_regs[IRQ_STATUS_B] &= ~ARCHIMEDES_IRQB_PODULE_IRQ;
@@ -206,7 +216,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
 };
 
-static MACHINE_CONFIG_START( ertictac, driver_device )
+static MACHINE_CONFIG_START( ertictac, ertictac_state )
 
 	MCFG_CPU_ADD("maincpu", ARM, 8000000) /* guess */
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
