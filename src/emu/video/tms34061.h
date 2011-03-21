@@ -8,6 +8,9 @@
  ****************************************************************************/
 
 
+#ifndef __TMS34061_H__
+#define __TMS34061_H__
+
 /* register constants */
 enum
 {
@@ -68,3 +71,5 @@ WRITE8_HANDLER( tms34061_latch_w );
 
 /* video update handling */
 void tms34061_get_display_state(struct tms34061_display *state);
+
+#endif

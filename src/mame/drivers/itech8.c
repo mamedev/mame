@@ -521,25 +521,6 @@
 
 /*************************************
  *
- *  Static data
- *
- *************************************/
-
-static UINT8 blitter_int;
-static UINT8 tms34061_int;
-static UINT8 periodic_int;
-
-static UINT8 sound_data;
-
-static UINT8 pia_porta_data;
-static UINT8 pia_portb_data;
-
-static const rectangle *visarea;
-
-
-
-/*************************************
- *
  *  6821 PIA interface
  *
  *************************************/
@@ -590,12 +571,13 @@ static const via6522_interface via_interface =
 
 void itech8_update_interrupts(running_machine *machine, int periodic, int tms34061, int blitter)
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	device_type main_cpu_type = machine->device("maincpu")->type();
 
 	/* update the states */
-	if (periodic != -1) periodic_int = periodic;
-	if (tms34061 != -1) tms34061_int = tms34061;
-	if (blitter != -1) blitter_int = blitter;
+	if (periodic != -1) state->periodic_int = periodic;
+	if (tms34061 != -1) state->tms34061_int = tms34061;
+	if (blitter != -1) state->blitter_int = blitter;
 
 	/* handle the 6809 case */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
@@ -609,8 +591,8 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 	/* handle the 68000 case */
 	else
 	{
-		cputag_set_input_line(machine, "maincpu", 2, blitter_int ? ASSERT_LINE : CLEAR_LINE);
-		cputag_set_input_line(machine, "maincpu", 3, periodic_int ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 2, state->blitter_int ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "maincpu", 3, state->periodic_int ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -669,6 +651,7 @@ static MACHINE_START( sstrike )
 
 static MACHINE_RESET( itech8 )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	device_type main_cpu_type = machine->device("maincpu")->type();
 
 	/* make sure bank 0 is selected */
@@ -679,10 +662,10 @@ static MACHINE_RESET( itech8 )
 	}
 
 	/* set the visible area */
-	if (visarea)
+	if (state->visarea)
 	{
-		machine->primary_screen->set_visible_area(visarea->min_x, visarea->max_x, visarea->min_y, visarea->max_y);
-		visarea = NULL;
+		machine->primary_screen->set_visible_area(state->visarea->min_x, state->visarea->max_x, state->visarea->min_y, state->visarea->max_y);
+		state->visarea = NULL;
 	}
 }
 
@@ -745,7 +728,8 @@ static WRITE8_HANDLER( rimrockn_bank_w )
 
 static CUSTOM_INPUT( special_r )
 {
-	return pia_portb_data & 0x01;
+	itech8_state *state = field->port->machine->driver_data<itech8_state>();
+	return state->pia_portb_data & 0x01;
 }
 
 
@@ -757,20 +741,22 @@ static CUSTOM_INPUT( special_r )
 
 static WRITE8_DEVICE_HANDLER( pia_porta_out )
 {
+	itech8_state *state = device->machine->driver_data<itech8_state>();
 	logerror("PIA port A write = %02x\n", data);
-	pia_porta_data = data;
+	state->pia_porta_data = data;
 }
 
 
 static WRITE8_HANDLER( pia_portb_out )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
 	logerror("PIA port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	pia_portb_data = data;
+	state->pia_portb_data = data;
 	ticket_dispenser_w(space->machine->device("ticket"), 0, (data & 0x10) << 3);
 	coin_counter_w(space->machine, 0, (data & 0x20) >> 5);
 }
@@ -778,13 +764,14 @@ static WRITE8_HANDLER( pia_portb_out )
 
 static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 {
+	itech8_state *state = device->machine->driver_data<itech8_state>();
 	logerror("YM2203 port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
-	pia_portb_data = data;
+	state->pia_portb_data = data;
 	ticket_dispenser_w(device->machine->device("ticket"), 0, data & 0x80);
 	coin_counter_w(device->machine, 0, (data & 0x20) >> 5);
 }
@@ -799,7 +786,8 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	sound_data = param;
+	itech8_state *state = machine->driver_data<itech8_state>();
+	state->sound_data = param;
 	cputag_set_input_line(machine, "soundcpu", M6809_IRQ_LINE, ASSERT_LINE);
 }
 
@@ -823,8 +811,9 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
 	cputag_set_input_line(space->machine, "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
-	return sound_data;
+	return state->sound_data;
 }
 
 
@@ -837,8 +826,9 @@ static READ8_HANDLER( sound_data_r )
 
 static WRITE16_HANDLER( grom_bank16_w )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
 	if (ACCESSING_BITS_8_15)
-		*itech8_grom_bank = data >> 8;
+		*state->grom_bank = data >> 8;
 }
 
 
@@ -868,7 +858,7 @@ static ADDRESS_MAP_START( tmslo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITENOP
 	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
-	AM_RANGE(0x1140, 0x1140) AM_READ_PORT("40") AM_WRITEONLY AM_BASE(&itech8_grom_bank)
+	AM_RANGE(0x1140, 0x1140) AM_READ_PORT("40") AM_WRITEONLY AM_BASE_MEMBER(itech8_state, grom_bank)
 	AM_RANGE(0x1160, 0x1160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
 	AM_RANGE(0x1180, 0x1180) AM_READ_PORT("80") AM_WRITE(tms34061_latch_w)
 	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(itech8_nmi_ack_w)
@@ -884,7 +874,7 @@ static ADDRESS_MAP_START( tmshi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x0100, 0x0100) AM_WRITENOP
 	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
-	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("40") AM_WRITEONLY AM_BASE(&itech8_grom_bank)
+	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("40") AM_WRITEONLY AM_BASE_MEMBER(itech8_state, grom_bank)
 	AM_RANGE(0x0160, 0x0160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
 	AM_RANGE(0x0180, 0x0180) AM_READ_PORT("80") AM_WRITE(tms34061_latch_w)
 	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(itech8_nmi_ack_w)
@@ -901,7 +891,7 @@ static ADDRESS_MAP_START( gtg2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
 	AM_RANGE(0x0140, 0x015f) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("80")
-	AM_RANGE(0x0160, 0x0160) AM_WRITEONLY AM_BASE(&itech8_grom_bank)
+	AM_RANGE(0x0160, 0x0160) AM_WRITEONLY AM_BASE_MEMBER(itech8_state, grom_bank)
 	AM_RANGE(0x0180, 0x019f) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_WRITE(tms34061_latch_w)
@@ -917,7 +907,7 @@ static ADDRESS_MAP_START( ninclown_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x004000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
-	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w) AM_BASE((UINT16 **)&itech8_grom_bank)
+	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w) AM_BASE_MEMBER(itech8_state, grom_bank)
 	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
 	AM_RANGE(0x100240, 0x100241) AM_WRITE8(tms34061_latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP
@@ -1691,7 +1681,7 @@ static const ym3812_interface ym3812_config =
 
 /************* core pieces ******************/
 
-static MACHINE_CONFIG_START( itech8_core_lo, driver_device )
+static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
@@ -2668,29 +2658,33 @@ static DRIVER_INIT( sstrike )
 
 static DRIVER_INIT( hstennis )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	static const rectangle visible = { 0, 375, 0, 239 };
-	visarea = &visible;
+	state->visarea = &visible;
 }
 
 
 static DRIVER_INIT( arligntn )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	static const rectangle visible = { 16, 389, 0, 239 };
-	visarea = &visible;
+	state->visarea = &visible;
 }
 
 
 static DRIVER_INIT( peggle )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	static const rectangle visible = { 18, 367, 0, 239 };
-	visarea = &visible;
+	state->visarea = &visible;
 }
 
 
 static DRIVER_INIT( neckneck )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	static const rectangle visible = { 8, 375, 0, 239 };
-	visarea = &visible;
+	state->visarea = &visible;
 }
 
 

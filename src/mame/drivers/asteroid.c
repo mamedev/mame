@@ -221,9 +221,9 @@ static WRITE8_HANDLER( llander_led_w )
 	{
 		"lamp0", "lamp1", "lamp2", "lamp3", "lamp4"
 	};
-    int i;
+	int i;
 
-    for (i = 0; i < 5; i++)
+	for (i = 0; i < 5; i++)
 		output_set_value(lampname[i], (data >> (4 - i)) & 1);
 }
 
@@ -237,8 +237,8 @@ static WRITE8_HANDLER( llander_led_w )
 static ADDRESS_MAP_START( asteroid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE(&asteroid_ram1)
-	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE(&asteroid_ram2)
+	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(asteroid_state, ram1)
+	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE_MEMBER(asteroid_state, ram2)
 	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)	/* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
@@ -258,8 +258,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( astdelux_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE(&asteroid_ram1)
-	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE(&asteroid_ram2)
+	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(asteroid_state, ram1)
+	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE_MEMBER(asteroid_state, ram2)
 	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)	/* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
@@ -501,18 +501,19 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPSETTING (	0xc0, "1 Coin Each 2 Coins" )
 	PORT_DIPSETTING (	0xe0, DEF_STR( None ) )
 
-	/* The manual includes a 3rd DIP controlling the number & configuration of coin counters, defined as:
-    PORT_START("DSW3")                                  // 4-Toggle switch located on game PCB at M12
-    PORT_DIPNAME( 0x03, 0x00, "Coin Counters" )             PORT_DIPLOCATION("M12:1,2")
-    PORT_DIPSETTING (   0x00, "1=Left, Center & Right" )    // "For games having these coin doors: Thai 1Baht/1Baht, German 1DM/1DM, US 25c/25c,
+	/* The manual includes a 3rd DIP controlling the number & configuration of coin counters, defined as: */
+#if 0
+	PORT_START("DSW3")                                  // 4-Toggle switch located on game PCB at M12
+	PORT_DIPNAME( 0x03, 0x00, "Coin Counters" )             PORT_DIPLOCATION("M12:1,2")
+	PORT_DIPSETTING (   0x00, "1=Left, Center & Right" )    // "For games having these coin doors: Thai 1Baht/1Baht, German 1DM/1DM, US 25c/25c,
                                                             // Belgian or French 5Fr/5Fr, Swiss or French 1Fr/1Fr, US 25c/25c/25c,
                                                             // Japanese 100Y/100Y, Swedish 1Kr/1Kr, UK 10P/10P, Australian 20c/20c, or Italian 100L/100L."
-    PORT_DIPSETTING (   0x01, "1=Left & Center, 2=Right" )  // "For games having these coin doors: German 2DM/1DM, German 1DM/5DM, US 25c/25c/1$, or US 25c/1$."
-    PORT_DIPSETTING (   0x02, "1=Left, 2=Center & Right" )  // "No coin door is currently designed for this configuration."
-    PORT_DIPSETTING (   0x03, "1=Left, 2=Center, 3=Right" ) // "For games having these coin doors: German 1DM/2DM/5DM."
-    PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "M12:3" )            // Listed as "Unused"
-    PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "M12:4" )            // Listed as "Unused"
-    */
+	PORT_DIPSETTING (   0x01, "1=Left & Center, 2=Right" )  // "For games having these coin doors: German 2DM/1DM, German 1DM/5DM, US 25c/25c/1$, or US 25c/1$."
+	PORT_DIPSETTING (   0x02, "1=Left, 2=Center & Right" )  // "No coin door is currently designed for this configuration."
+	PORT_DIPSETTING (   0x03, "1=Left, 2=Center, 3=Right" ) // "For games having these coin doors: German 1DM/2DM/5DM."
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "M12:3" )            // Listed as "Unused"
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "M12:4" )            // Listed as "Unused"
+#endif
 INPUT_PORTS_END
 
 
@@ -609,7 +610,7 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( asteroid, driver_device )
+static MACHINE_CONFIG_START( asteroid, asteroid_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)

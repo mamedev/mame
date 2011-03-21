@@ -7,9 +7,53 @@
 #include "video/mc6845.h"
 
 
+class twincobr_state : public driver_device
+{
+public:
+	twincobr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	int toaplan_main_cpu;
+	int wardner_membank;
+	UINT8 *sharedram;
+	INT32 fg_rom_bank;
+	INT32 bg_ram_bank;
+	INT32 wardner_sprite_hack;
+	int intenable;
+	int dsp_on;
+	int dsp_BIO;
+	int fsharkbt_8741;
+	int dsp_execute;
+	UINT32 dsp_addr_w;
+	UINT32 main_ram_seg;
+	UINT16 *bgvideoram16;
+	UINT16 *fgvideoram16;
+	UINT16 *txvideoram16;
+	size_t bgvideoram_size;
+	size_t fgvideoram_size;
+	size_t txvideoram_size;
+	INT32 txscrollx;
+	INT32 txscrolly;
+	INT32 fgscrollx;
+	INT32 fgscrolly;
+	INT32 bgscrollx;
+	INT32 bgscrolly;
+	INT32 txoffs;
+	INT32 fgoffs;
+	INT32 bgoffs;
+	INT32 scroll_x;
+	INT32 scroll_y;
+	INT32 display_on;
+	INT32 flip_screen;
+	tilemap_t *bg_tilemap;
+	tilemap_t *fg_tilemap;
+	tilemap_t *tx_tilemap;
+};
+
+
 /*----------- defined in drivers/wardner.c -----------*/
 
-extern STATE_POSTLOAD( wardner_restore_bank );
+STATE_POSTLOAD( wardner_restore_bank );
 
 /*----------- defined in machine/twincobr.c -----------*/
 
@@ -41,17 +85,14 @@ MACHINE_RESET( wardner );
 extern void twincobr_driver_savestate(running_machine *machine);
 extern void wardner_driver_savestate(running_machine *machine);
 
-extern int toaplan_main_cpu;	/* Main CPU type.  0 = 68000, 1 = Z80 */
-extern int wardner_membank;
 
-extern UINT8 *twincobr_sharedram;
 
 
 /*----------- defined in video/twincobr.c -----------*/
 extern const mc6845_interface twincobr_mc6845_intf;
 
 extern void twincobr_flipscreen(running_machine *machine, int flip);
-extern void twincobr_display(int enable);
+extern void twincobr_display(running_machine *machine, int enable);
 
 READ16_HANDLER(  twincobr_txram_r );
 READ16_HANDLER(  twincobr_bgram_r );
@@ -78,9 +119,6 @@ WRITE8_HANDLER( wardner_exscroll_w );
 READ8_HANDLER(  wardner_sprite_r );
 WRITE8_HANDLER( wardner_sprite_w );
 
-extern INT32 twincobr_fg_rom_bank;
-extern INT32 twincobr_bg_ram_bank;
-extern INT32 wardner_sprite_hack;
 
 VIDEO_START( toaplan0 );
 SCREEN_UPDATE( toaplan0 );

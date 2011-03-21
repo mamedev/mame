@@ -138,11 +138,9 @@ TODO:
 #define MASTER_CLOCK		XTAL_18_432MHz
 
 
-
-static int handle_joystick;
-
 static READ8_HANDLER( geebee_in_r )
 {
+	warpwarp_state *state = space->machine->driver_data<warpwarp_state>();
 	int res;
 	static const char *const portnames[] = { "SW0", "SW1", "DSW2", "PLACEHOLDER" };	// "IN1" & "IN2" are read separately when offset==3
 
@@ -151,7 +149,7 @@ static READ8_HANDLER( geebee_in_r )
 	if (offset == 3)
 	{
 		res = input_port_read(space->machine, (flip_screen_get(space->machine) & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
-		if (handle_joystick)
+		if (state->handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
 			if (res & 2) return 0x9f;
@@ -164,13 +162,14 @@ static READ8_HANDLER( geebee_in_r )
 
 static WRITE8_HANDLER( geebee_out6_w )
 {
+	warpwarp_state *state = space->machine->driver_data<warpwarp_state>();
 	switch (offset & 3)
 	{
 		case 0:
-			warpwarp_ball_h = data;
+			state->ball_h = data;
 			break;
 		case 1:
-			warpwarp_ball_v = data;
+			state->ball_v = data;
 			break;
 		case 2:
 			/* n.c. */
@@ -183,6 +182,7 @@ static WRITE8_HANDLER( geebee_out6_w )
 
 static WRITE8_HANDLER( geebee_out7_w )
 {
+	warpwarp_state *state = space->machine->driver_data<warpwarp_state>();
 	switch (offset & 7)
 	{
 		case 0:
@@ -202,12 +202,12 @@ static WRITE8_HANDLER( geebee_out7_w )
 				coin_lockout_global_w(space->machine, ~data & 1);
 			break;
 		case 5:
-			if( geebee_bgw != (data & 1) )
+			if( state->geebee_bgw != (data & 1) )
 				tilemap_mark_all_tiles_dirty_all(space->machine);
-			geebee_bgw = data & 1;
+			state->geebee_bgw = data & 1;
 			break;
 		case 6:
-			warpwarp_ball_on = data & 1;
+			state->ball_on = data & 1;
 			break;
 		case 7:
 			flip_screen_set(space->machine, data & 1);
@@ -231,10 +231,11 @@ static READ8_DEVICE_HANDLER( warpwarp_dsw1_r )
 /* Read mux Controller Inputs */
 static READ8_DEVICE_HANDLER( warpwarp_vol_r )
 {
+	warpwarp_state *state = device->machine->driver_data<warpwarp_state>();
 	int res;
 
 	res = input_port_read(device->machine, (flip_screen_get(device->machine) & 1) ? "VOLIN2" : "VOLIN1");
-	if (handle_joystick)
+	if (state->handle_joystick)
 	{
 		if (res & 1) return 0x0f;
 		if (res & 2) return 0x3f;
@@ -247,13 +248,14 @@ static READ8_DEVICE_HANDLER( warpwarp_vol_r )
 
 static WRITE8_HANDLER( warpwarp_out0_w )
 {
+	warpwarp_state *state = space->machine->driver_data<warpwarp_state>();
 	switch (offset & 3)
 	{
 		case 0:
-			warpwarp_ball_h = data;
+			state->ball_h = data;
 			break;
 		case 1:
-			warpwarp_ball_v = data;
+			state->ball_v = data;
 			break;
 		case 2:
 			warpwarp_sound_w(space->machine->device("warpwarp"),0,data);
@@ -266,6 +268,7 @@ static WRITE8_HANDLER( warpwarp_out0_w )
 
 static WRITE8_HANDLER( warpwarp_out3_w )
 {
+	warpwarp_state *state = space->machine->driver_data<warpwarp_state>();
 	switch (offset & 7)
 	{
 		case 0:
@@ -287,7 +290,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 			coin_counter_w(space->machine, 0,data & 1);
 			break;
 		case 6:
-			warpwarp_ball_on = data & 1;
+			state->ball_on = data & 1;
 			cpu_interrupt_enable(space->machine->device("maincpu"), data & 1);
 			if (~data & 1)
 				cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
@@ -302,7 +305,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 
 static ADDRESS_MAP_START( geebee_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_BASE(&geebee_videoram) // mirror used by kaitei due to a bug
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_BASE_MEMBER(warpwarp_state, geebee_videoram) // mirror used by kaitei due to a bug
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("gfx1", 0) // 3000-33ff in geebee
     AM_RANGE(0x4000, 0x40ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_READ(geebee_in_r)
@@ -320,7 +323,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bombbee_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE(&warpwarp_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE_MEMBER(warpwarp_state, videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x6000, 0x600f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
 	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("warpwarp", warpwarp_vol_r, warpwarp_music1_w)
@@ -331,7 +334,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( warpwarp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE(&warpwarp_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE_MEMBER(warpwarp_state, videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
 	AM_RANGE(0xc010, 0xc01f) AM_DEVREADWRITE("warpwarp", warpwarp_vol_r, warpwarp_music1_w)
@@ -718,7 +721,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( geebee, driver_device )
+static MACHINE_CONFIG_START( geebee, warpwarp_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
@@ -755,7 +758,7 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 	MCFG_VIDEO_START(navarone)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombbee, driver_device )
+static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)		/* 18.432 MHz / 9 */
@@ -918,65 +921,72 @@ ROM_END
 
 static DRIVER_INIT( geebee )
 {
-	handle_joystick = 0;
+	warpwarp_state *state = machine->driver_data<warpwarp_state>();
+	state->handle_joystick = 0;
 
-	warpwarp_ball_pen = 1;
-	warpwarp_ball_sizex = 4;
-	warpwarp_ball_sizey = 4;
+	state->ball_pen = 1;
+	state->ball_sizex = 4;
+	state->ball_sizey = 4;
 }
 
 static DRIVER_INIT( navarone )
 {
-	handle_joystick = 1;
+	warpwarp_state *state = machine->driver_data<warpwarp_state>();
+	state->handle_joystick = 1;
 
-	warpwarp_ball_pen = 1;
-	warpwarp_ball_sizex = 4;
-	warpwarp_ball_sizey = 4;
+	state->ball_pen = 1;
+	state->ball_sizex = 4;
+	state->ball_sizey = 4;
 }
 
 static DRIVER_INIT( kaitein )
 {
-	handle_joystick = 1;
+	warpwarp_state *state = machine->driver_data<warpwarp_state>();
+	state->handle_joystick = 1;
 
-	warpwarp_ball_pen = 1;
-	warpwarp_ball_sizex = 1;
-	warpwarp_ball_sizey = 16;
+	state->ball_pen = 1;
+	state->ball_sizex = 1;
+	state->ball_sizey = 16;
 }
 
 static DRIVER_INIT( kaitei )
 {
-	handle_joystick = 0;
+	warpwarp_state *state = machine->driver_data<warpwarp_state>();
+	state->handle_joystick = 0;
 
-	warpwarp_ball_pen = 1;
-	warpwarp_ball_sizex = 1;
-	warpwarp_ball_sizey = 16;
+	state->ball_pen = 1;
+	state->ball_sizex = 1;
+	state->ball_sizey = 16;
 }
 
 static DRIVER_INIT( sos )
 {
-	handle_joystick = 1;
+	warpwarp_state *state = machine->driver_data<warpwarp_state>();
+	state->handle_joystick = 1;
 
-	warpwarp_ball_pen = 0;
-	warpwarp_ball_sizex = 4;
-	warpwarp_ball_sizey = 2;
+	state->ball_pen = 0;
+	state->ball_sizex = 4;
+	state->ball_sizey = 2;
 }
 
 static DRIVER_INIT( bombbee )
 {
-	handle_joystick = 0;
+	warpwarp_state *state = machine->driver_data<warpwarp_state>();
+	state->handle_joystick = 0;
 
-	warpwarp_ball_pen = 0x200;
-	warpwarp_ball_sizex = 4;
-	warpwarp_ball_sizey = 4;
+	state->ball_pen = 0x200;
+	state->ball_sizex = 4;
+	state->ball_sizey = 4;
 }
 
 static DRIVER_INIT( warpwarp )
 {
-	handle_joystick = 1;
+	warpwarp_state *state = machine->driver_data<warpwarp_state>();
+	state->handle_joystick = 1;
 
-	warpwarp_ball_pen = 0x200;
-	warpwarp_ball_sizex = 4;
-	warpwarp_ball_sizey = 4;
+	state->ball_pen = 0x200;
+	state->ball_sizex = 4;
+	state->ball_sizey = 4;
 }
 
 

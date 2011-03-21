@@ -62,6 +62,18 @@ TODO:
 #include "machine/pic8259.h"
 /* Insert IBM PC includes here */
 
+
+class quakeat_state : public driver_device
+{
+public:
+	quakeat_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	device_t	*pic8259_1;
+	device_t	*pic8259_2;
+};
+
+
 static VIDEO_START(quake)
 {
 }
@@ -70,11 +82,6 @@ static SCREEN_UPDATE(quake)
 {
 	return 0;
 }
-
-static struct {
-	device_t	*pic8259_1;
-	device_t	*pic8259_2;
-} quakeat_devices;
 
 static ADDRESS_MAP_START( quake_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM AM_REGION("pc_bios", 0) /* BIOS */
@@ -129,25 +136,27 @@ INPUT_PORTS_END
 
 static IRQ_CALLBACK(irq_callback)
 {
+	quakeat_state *state = device->machine->driver_data<quakeat_state>();
 	int r = 0;
-	r = pic8259_acknowledge( quakeat_devices.pic8259_2);
+	r = pic8259_acknowledge( state->pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge( quakeat_devices.pic8259_1);
+		r = pic8259_acknowledge( state->pic8259_1);
 	}
 	return r;
 }
 
 static MACHINE_START(quakeat)
 {
+	quakeat_state *state = machine->driver_data<quakeat_state>();
 	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
-	quakeat_devices.pic8259_1 = machine->device( "pic8259_1" );
-	quakeat_devices.pic8259_2 = machine->device( "pic8259_2" );
+	state->pic8259_1 = machine->device( "pic8259_1" );
+	state->pic8259_2 = machine->device( "pic8259_2" );
 }
 /*************************************************************/
 
-static MACHINE_CONFIG_START( quake, driver_device )
+static MACHINE_CONFIG_START( quake, quakeat_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 233000000) /* Pentium II, 233MHz */
 	MCFG_CPU_PROGRAM_MAP(quake_map)

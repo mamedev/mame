@@ -10,6 +10,62 @@
 #define ATAXX_EXTRA_TRAM_SIZE 0x800
 
 
+struct vram_state_data
+{
+	UINT16	addr;
+	UINT8	latch[2];
+};
+
+
+
+class leland_state : public driver_device
+{
+public:
+	leland_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 dac_control;
+	UINT8 *alleymas_kludge_mem;
+	UINT8 *ataxx_qram;
+	UINT8 gfx_control;
+	UINT8 wcol_enable;
+	emu_timer *master_int_timer;
+	UINT8 *master_base;
+	UINT8 *slave_base;
+	UINT8 *xrom_base;
+	UINT32 master_length;
+	UINT32 slave_length;
+	UINT32 xrom_length;
+	int dangerz_x;
+	int dangerz_y;
+	UINT8 analog_result;
+	UINT8 dial_last_input[4];
+	UINT8 dial_last_result[4];
+	UINT8 keycard_shift;
+	UINT8 keycard_bit;
+	UINT8 keycard_state;
+	UINT8 keycard_clock;
+	UINT8 keycard_command[3];
+	UINT8 top_board_bank;
+	UINT8 sound_port_bank;
+	UINT8 alternate_bank;
+	UINT8 master_bank;
+	void (*update_master_bank)(running_machine *machine);
+	UINT32 xrom1_addr;
+	UINT32 xrom2_addr;
+	UINT8 battery_ram_enable;
+	UINT8 *battery_ram;
+	UINT8 *extra_tram;
+	UINT8 *video_ram;
+	struct vram_state_data vram_state[2];
+	UINT16 xscroll;
+	UINT16 yscroll;
+	UINT8 gfxbank;
+	UINT16 last_scanline;
+	emu_timer *scanline_timer;
+};
+
+
 /*----------- defined in machine/leland.c -----------*/
 
 #define SERIAL_TYPE_NONE		0
@@ -18,13 +74,9 @@
 #define SERIAL_TYPE_ENCRYPT		3
 #define SERIAL_TYPE_ENCRYPT_XOR	4
 
-extern UINT8 leland_dac_control;
-extern void (*leland_update_master_bank)(running_machine *machine);
-
 READ8_HANDLER( cerberus_dial_1_r );
 READ8_HANDLER( cerberus_dial_2_r );
 
-extern UINT8 *alleymas_kludge_mem;
 WRITE8_HANDLER( alleymas_joystick_kludge );
 
 READ8_HANDLER( dangerz_input_y_r );
@@ -119,8 +171,6 @@ ADDRESS_MAP_EXTERN(ataxx_80186_map_io, 16);
 
 
 /*----------- defined in video/leland.c -----------*/
-
-extern UINT8 *ataxx_qram;
 
 WRITE8_HANDLER( leland_scroll_w );
 WRITE8_DEVICE_HANDLER( leland_gfx_port_w );

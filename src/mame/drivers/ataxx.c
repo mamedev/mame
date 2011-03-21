@@ -310,7 +310,7 @@ static const eeprom_interface eeprom_intf =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ataxx, driver_device )
+static MACHINE_CONFIG_START( ataxx, leland_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, 6000000)

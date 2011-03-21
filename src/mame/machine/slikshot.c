@@ -72,25 +72,7 @@
 #include "includes/itech8.h"
 
 
-#define YBUFFER_COUNT	15
 #define MINDY			100
-
-static UINT8 z80_ctrl;
-static UINT8 z80_port_val;
-static UINT8 z80_clear_to_send;
-
-static UINT16 sensor0, sensor1, sensor2, sensor3;
-
-static UINT8 curvx, curvy, curx;
-
-static INT8 xbuffer[YBUFFER_COUNT];
-static INT8 ybuffer[YBUFFER_COUNT];
-static int ybuffer_next;
-static int curxpos;
-static int last_ytotal;
-
-static UINT8 crosshair_vis;
-
 
 
 /*************************************
@@ -402,20 +384,21 @@ static void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 bea
 
 static void compute_sensors(running_machine *machine)
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	UINT16 inter1, inter2, inter3;
 	UINT16 word1 = 0, word2 = 0, word3 = 0;
 	UINT8 beams;
 
 	/* skip if we're not ready */
-	if (sensor0 != 0 || sensor1 != 0 || sensor2 != 0 || sensor3 != 0)
+	if (state->sensor0 != 0 || state->sensor1 != 0 || state->sensor2 != 0 || state->sensor3 != 0)
 		return;
 
 	/* reverse map the inputs */
-	vels_to_inters(curx, curvx, curvy, &inter1, &inter2, &inter3, &beams);
+	vels_to_inters(state->curx, state->curvx, state->curvy, &inter1, &inter2, &inter3, &beams);
 	inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
-	words_to_sensors(word1, word2, word3, beams, &sensor0, &sensor1, &sensor2, &sensor3);
+	words_to_sensors(word1, word2, word3, beams, &state->sensor0, &state->sensor1, &state->sensor2, &state->sensor3);
 
-	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", machine->time().as_double(), sensor0, sensor1, sensor2, sensor3);
+	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", machine->time().as_double(), state->sensor0, state->sensor1, state->sensor2, state->sensor3);
 }
 
 
@@ -428,22 +411,23 @@ static void compute_sensors(running_machine *machine)
 
 READ8_HANDLER( slikz80_port_r )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
 	int result = 0;
 
 	/* if we have nothing, return 0x03 */
-	if (!sensor0 && !sensor1 && !sensor2 && !sensor3)
-		return 0x03 | (z80_clear_to_send << 7);
+	if (!state->sensor0 && !state->sensor1 && !state->sensor2 && !state->sensor3)
+		return 0x03 | (state->z80_clear_to_send << 7);
 
 	/* 1 bit for each sensor */
-	if (sensor0)
-		result |= 1, sensor0--;
-	if (sensor1)
-		result |= 2, sensor1--;
-	if (sensor2)
-		result |= 4, sensor2--;
-	if (sensor3)
-		result |= 8, sensor3--;
-	result |= z80_clear_to_send << 7;
+	if (state->sensor0)
+		result |= 1, state->sensor0--;
+	if (state->sensor1)
+		result |= 2, state->sensor1--;
+	if (state->sensor2)
+		result |= 4, state->sensor2--;
+	if (state->sensor3)
+		result |= 8, state->sensor3--;
+	result |= state->z80_clear_to_send << 7;
 
 	return result;
 }
@@ -458,8 +442,9 @@ READ8_HANDLER( slikz80_port_r )
 
 WRITE8_HANDLER( slikz80_port_w )
 {
-	z80_port_val = data;
-	z80_clear_to_send = 0;
+	itech8_state *state = space->machine->driver_data<itech8_state>();
+	state->z80_port_val = data;
+	state->z80_clear_to_send = 0;
 }
 
 
@@ -472,9 +457,10 @@ WRITE8_HANDLER( slikz80_port_w )
 
 READ8_HANDLER( slikshot_z80_r )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
 	/* allow the Z80 to send us stuff now */
-	z80_clear_to_send = 1;
-	return z80_port_val;
+	state->z80_clear_to_send = 1;
+	return state->z80_port_val;
 }
 
 
@@ -487,7 +473,8 @@ READ8_HANDLER( slikshot_z80_r )
 
 READ8_HANDLER( slikshot_z80_control_r )
 {
-	return z80_ctrl;
+	itech8_state *state = space->machine->driver_data<itech8_state>();
+	return state->z80_ctrl;
 }
 
 
@@ -500,6 +487,7 @@ READ8_HANDLER( slikshot_z80_control_r )
 
 static TIMER_CALLBACK( delayed_z80_control_w )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	int data = param;
 
 	/* bit 4 controls the reset line on the Z80 */
@@ -511,15 +499,15 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* on the rising edge, make the crosshair visible again */
-		if ((data & 0x10) && !(z80_ctrl & 0x10))
-			crosshair_vis = 1;
+		if ((data & 0x10) && !(state->z80_ctrl & 0x10))
+			state->crosshair_vis = 1;
 	}
 
 	/* boost the interleave whenever this is written to */
 	machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 
 	/* stash the new value */
-	z80_ctrl = data;
+	state->z80_ctrl = data;
 }
 
 
@@ -539,18 +527,19 @@ WRITE8_HANDLER( slikshot_z80_control_w )
 
 VIDEO_START( slikshot )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	VIDEO_START_CALL( itech8 );
 
-	z80_ctrl = 0;
-	z80_port_val = 0;
-	z80_clear_to_send = 0;
+	state->z80_ctrl = 0;
+	state->z80_port_val = 0;
+	state->z80_clear_to_send = 0;
 
-	sensor0 = sensor1 = sensor2 = sensor3 = 0;
-	curvx = 0, curvy = 1, curx = 0;
-	ybuffer_next = 0;
-	curxpos = 0;
-	last_ytotal = 0;
-	crosshair_vis = 0;
+	state->sensor0 = state->sensor1 = state->sensor2 = state->sensor3 = 0;
+	state->curvx = 0, state->curvy = 1, state->curx = 0;
+	state->ybuffer_next = 0;
+	state->curxpos = 0;
+	state->last_ytotal = 0;
+	state->crosshair_vis = 0;
 }
 
 
@@ -562,6 +551,7 @@ VIDEO_START( slikshot )
 
 SCREEN_UPDATE( slikshot )
 {
+	itech8_state *state = screen->machine->driver_data<itech8_state>();
 	int totaldy, totaldx;
 	int temp, i;
 
@@ -569,53 +559,53 @@ SCREEN_UPDATE( slikshot )
 	SCREEN_UPDATE_CALL(itech8_2page);
 
 	/* add the current X,Y positions to the list */
-	xbuffer[ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEX", 0);
-	ybuffer[ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEY", 0);
-	ybuffer_next++;
+	state->xbuffer[state->ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEX", 0);
+	state->ybuffer[state->ybuffer_next % YBUFFER_COUNT] = input_port_read_safe(screen->machine, "FAKEY", 0);
+	state->ybuffer_next++;
 
 	/* determine where to draw the starting point */
-	curxpos += xbuffer[(ybuffer_next + 1) % YBUFFER_COUNT];
-	if (curxpos < -0x80) curxpos = -0x80;
-	if (curxpos >  0x80) curxpos =  0x80;
+	state->curxpos += state->xbuffer[(state->ybuffer_next + 1) % YBUFFER_COUNT];
+	if (state->curxpos < -0x80) state->curxpos = -0x80;
+	if (state->curxpos >  0x80) state->curxpos =  0x80;
 
 	/* compute the total X/Y movement */
 	totaldx = totaldy = 0;
 	for (i = 0; i < YBUFFER_COUNT - 1; i++)
 	{
-		totaldx += xbuffer[(ybuffer_next + i + 1) % YBUFFER_COUNT];
-		totaldy += ybuffer[(ybuffer_next + i + 1) % YBUFFER_COUNT];
+		totaldx += state->xbuffer[(state->ybuffer_next + i + 1) % YBUFFER_COUNT];
+		totaldy += state->ybuffer[(state->ybuffer_next + i + 1) % YBUFFER_COUNT];
 	}
 
 	/* if the shoot button is pressed, fire away */
-	if (totaldy < last_ytotal && last_ytotal > 50 && crosshair_vis)
+	if (totaldy < state->last_ytotal && state->last_ytotal > 50 && state->crosshair_vis)
 	{
 		/* compute the updated values */
 		temp = totaldx;
 		if (temp <= -0x80) temp = -0x7f;
 		if (temp >=  0x80) temp =  0x7f;
-		curvx = temp;
+		state->curvx = temp;
 
-		temp = last_ytotal - 50;
+		temp = state->last_ytotal - 50;
 		if (temp <=  0x10) temp =  0x10;
 		if (temp >=  0x7f) temp =  0x7f;
-		curvy = temp;
+		state->curvy = temp;
 
-		temp = 0x60 + (curxpos * 0x30 / 0x80);
+		temp = 0x60 + (state->curxpos * 0x30 / 0x80);
 		if (temp <=  0x30) temp =  0x30;
 		if (temp >=  0x90) temp =  0x90;
-		curx = temp;
+		state->curx = temp;
 
 		compute_sensors(screen->machine);
-//      popmessage("V=%02x,%02x  X=%02x", curvx, curvy, curx);
-		crosshair_vis = 0;
+//      popmessage("V=%02x,%02x  X=%02x", state->curvx, state->curvy, state->curx);
+		state->crosshair_vis = 0;
 	}
-	last_ytotal = totaldy;
+	state->last_ytotal = totaldy;
 
 	/* clear the buffer while the crosshair is not visible */
-	if (!crosshair_vis)
+	if (!state->crosshair_vis)
 	{
-		memset(xbuffer, 0, sizeof(xbuffer));
-		memset(ybuffer, 0, sizeof(ybuffer));
+		memset(state->xbuffer, 0, sizeof(state->xbuffer));
+		memset(state->ybuffer, 0, sizeof(state->ybuffer));
 	}
 
 	return 0;

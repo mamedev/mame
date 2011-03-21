@@ -18,6 +18,16 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 
+
+class kongambl_state : public driver_device
+{
+public:
+	kongambl_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+};
+
+
 static VIDEO_START(kongambl)
 {
 	device_t *k056832 = machine->device("k056832");
@@ -126,7 +136,7 @@ static const k053247_interface k053247_intf =
 	kongambl_sprite_callback
 };
 
-static MACHINE_CONFIG_START( kongambl, driver_device )
+static MACHINE_CONFIG_START( kongambl, kongambl_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(kongambl_map)
 

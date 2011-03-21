@@ -9,8 +9,18 @@
 #define BZONE_MASTER_CLOCK (XTAL_12_096MHz)
 #define BZONE_CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
-/*----------- defined in audio/bzone.c -----------*/
+class bzone_state : public driver_device
+{
+public:
+	bzone_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
+	UINT8 analog_data;
+	UINT8 rb_input_select;
+};
+
+
+/*----------- defined in audio/bzone.c -----------*/
 
 WRITE8_DEVICE_HANDLER( bzone_sounds_w );
 

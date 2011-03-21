@@ -127,16 +127,16 @@ out:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/tms32010/tms32010.h"
+#include "sound/3812intf.h"
 #include "includes/toaplipt.h"
 #include "includes/twincobr.h"
-#include "sound/3812intf.h"
 
 
-class wardner_state : public driver_device
+class wardner_state : public twincobr_state
 {
 public:
 	wardner_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: twincobr_state(machine, config) { }
 
 	UINT8 *rambase_ae00;
 	UINT8 *rambase_c000;
@@ -146,14 +146,14 @@ public:
 static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 {
 	wardner_state *state = space->machine->driver_data<wardner_state>();
-	if (wardner_membank != data) {
+	if (state->wardner_membank != data) {
 		int bankaddress = 0;
 
 		address_space *mainspace;
 		UINT8 *RAM = space->machine->region("maincpu")->base();
 
 		mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-		wardner_membank = data;
+		state->wardner_membank = data;
 
 		if (data)
 		{
@@ -187,10 +187,11 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 
 STATE_POSTLOAD( wardner_restore_bank )
 {
+	wardner_state *state = machine->driver_data<wardner_state>();
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	wardner_ramrom_bank_sw(space,0,1);	/* Dummy value to ensure restoration */
-	wardner_ramrom_bank_sw(space,0,wardner_membank);
+	wardner_ramrom_bank_sw(space,0,state->wardner_membank);
 }
 
 

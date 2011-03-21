@@ -134,34 +134,6 @@
 
 /*************************************
  *
- *  Global variables
- *
- *************************************/
-
-UINT8 *itech8_grom_bank;
-
-static UINT8 blitter_data[16];
-static UINT8 blit_in_progress;
-
-static UINT8 page_select;
-
-static offs_t fetch_offset;
-static UINT8 fetch_rle_count;
-static UINT8 fetch_rle_value;
-static UINT8 fetch_rle_literal;
-
-static struct tms34061_display tms_state;
-static UINT8 *grom_base;
-static UINT32 grom_size;
-
-static UINT8 grmatch_palcontrol;
-static UINT8 grmatch_xscroll;
-static rgb_t grmatch_palette[2][16];
-
-
-
-/*************************************
- *
  *  TMS34061 interfacing
  *
  *************************************/
@@ -192,18 +164,19 @@ static const struct tms34061_interface tms34061intf =
 
 VIDEO_START( itech8 )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	/* initialize TMS34061 emulation */
-    tms34061_start(machine, &tms34061intf);
+	tms34061_start(machine, &tms34061intf);
 
 	/* get the TMS34061 display state */
-	tms34061_get_display_state(&tms_state);
+	tms34061_get_display_state(&state->tms_state);
 
 	/* reset statics */
-	page_select = 0xc0;
+	state->page_select = 0xc0;
 
 	/* fetch the GROM base */
-	grom_base = machine->region("grom")->base();
-	grom_size = machine->region("grom")->bytes();
+	state->grom_base = machine->region("grom")->base();
+	state->grom_size = machine->region("grom")->bytes();
 }
 
 
@@ -229,9 +202,10 @@ WRITE8_HANDLER( itech8_palette_w )
 
 WRITE8_HANDLER( itech8_page_w )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	logerror("%04x:display_page = %02X (%d)\n", cpu_get_pc(space->cpu), data, space->machine->primary_screen->vpos());
-	page_select = data;
+	state->page_select = data;
 }
 
 
@@ -243,60 +217,60 @@ WRITE8_HANDLER( itech8_page_w )
  *
  *************************************/
 
-INLINE UINT8 fetch_next_raw(void)
+INLINE UINT8 fetch_next_raw(itech8_state *state)
 {
-	return grom_base[fetch_offset++ % grom_size];
+	return state->grom_base[state->fetch_offset++ % state->grom_size];
 }
 
 
-INLINE void consume_raw(int count)
+INLINE void consume_raw(itech8_state *state, int count)
 {
-	fetch_offset += count;
+	state->fetch_offset += count;
 }
 
 
-INLINE UINT8 fetch_next_rle(void)
+INLINE UINT8 fetch_next_rle(itech8_state *state)
 {
-	if (fetch_rle_count == 0)
+	if (state->fetch_rle_count == 0)
 	{
-		fetch_rle_count = grom_base[fetch_offset++ % grom_size];
-		fetch_rle_literal = fetch_rle_count & 0x80;
-		fetch_rle_count &= 0x7f;
+		state->fetch_rle_count = state->grom_base[state->fetch_offset++ % state->grom_size];
+		state->fetch_rle_literal = state->fetch_rle_count & 0x80;
+		state->fetch_rle_count &= 0x7f;
 
-		if (!fetch_rle_literal)
-			fetch_rle_value = grom_base[fetch_offset++ % grom_size];
+		if (!state->fetch_rle_literal)
+			state->fetch_rle_value = state->grom_base[state->fetch_offset++ % state->grom_size];
 	}
 
-	fetch_rle_count--;
-	if (fetch_rle_literal)
-		fetch_rle_value = grom_base[fetch_offset++ % grom_size];
+	state->fetch_rle_count--;
+	if (state->fetch_rle_literal)
+		state->fetch_rle_value = state->grom_base[state->fetch_offset++ % state->grom_size];
 
-	return fetch_rle_value;
+	return state->fetch_rle_value;
 }
 
 
-INLINE void consume_rle(int count)
+INLINE void consume_rle(itech8_state *state, int count)
 {
 	while (count)
 	{
 		int num_to_consume;
 
-		if (fetch_rle_count == 0)
+		if (state->fetch_rle_count == 0)
 		{
-			fetch_rle_count = grom_base[fetch_offset++ % grom_size];
-			fetch_rle_literal = fetch_rle_count & 0x80;
-			fetch_rle_count &= 0x7f;
+			state->fetch_rle_count = state->grom_base[state->fetch_offset++ % state->grom_size];
+			state->fetch_rle_literal = state->fetch_rle_count & 0x80;
+			state->fetch_rle_count &= 0x7f;
 
-			if (!fetch_rle_literal)
-				fetch_rle_value = grom_base[fetch_offset++ % grom_size];
+			if (!state->fetch_rle_literal)
+				state->fetch_rle_value = state->grom_base[state->fetch_offset++ % state->grom_size];
 		}
 
-		num_to_consume = (count < fetch_rle_count) ? count : fetch_rle_count;
+		num_to_consume = (count < state->fetch_rle_count) ? count : state->fetch_rle_count;
 		count -= num_to_consume;
 
-		fetch_rle_count -= num_to_consume;
-		if (fetch_rle_literal)
-			fetch_offset += num_to_consume;
+		state->fetch_rle_count -= num_to_consume;
+		if (state->fetch_rle_literal)
+			state->fetch_offset += num_to_consume;
 	}
 }
 
@@ -310,7 +284,10 @@ INLINE void consume_rle(int count)
 
 static void perform_blit(address_space *space)
 {
-	offs_t addr = tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8);
+	itech8_state *state = space->machine->driver_data<itech8_state>();
+	struct tms34061_display &tms_state = state->tms_state;
+	UINT8 *blitter_data = state->blitter_data;
+	offs_t addr = state->tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8);
 	UINT8 shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
 	int transparent = (BLITTER_FLAGS & BLITFLAG_TRANSPARENT);
 	int ydir = (BLITTER_FLAGS & BLITFLAG_YFLIP) ? -1 : 1;
@@ -329,17 +306,17 @@ static void perform_blit(address_space *space)
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
 				space->machine->primary_screen->vpos(),
-				(*itech8_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
+				(*state->grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
 
 	/* initialize the fetcher */
-	fetch_offset = (*itech8_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO;
-	fetch_rle_count = 0;
+	state->fetch_offset = (*state->grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO;
+	state->fetch_rle_count = 0;
 
 	/* RLE starts with a couple of extra 0's */
 	if (rle)
-		fetch_offset += 2;
+		state->fetch_offset += 2;
 
 	/* select 4-bit versus 8-bit transparency */
 	if (BLITTER_OUTPUT & 0x40)
@@ -371,9 +348,9 @@ static void perform_blit(address_space *space)
 		/* skip src and dest */
 		addr += xdir * (width + skip[0] + skip[1]);
 		if (rle)
-			consume_rle(width + skip[0] + skip[1]);
+			consume_rle(state, width + skip[0] + skip[1]);
 		else
-			consume_raw(width + skip[0] + skip[1]);
+			consume_raw(state, width + skip[0] + skip[1]);
 
 		/* back up one and reverse directions */
 		addr -= xdir;
@@ -388,14 +365,14 @@ static void perform_blit(address_space *space)
 		/* skip left */
 		addr += xdir * skip[y & 1];
 		if (rle)
-			consume_rle(skip[y & 1]);
+			consume_rle(state, skip[y & 1]);
 		else
-			consume_raw(skip[y & 1]);
+			consume_raw(state, skip[y & 1]);
 
 		/* loop over width */
 		for (x = 0; x < width; x++)
 		{
-			UINT8 pix = rle ? fetch_next_rle() : fetch_next_raw();
+			UINT8 pix = rle ? fetch_next_rle(state) : fetch_next_raw(state);
 
 			/* swap pixels for X flip in 4bpp mode */
 			if (xflip && transmaskhi != 0xff)
@@ -424,9 +401,9 @@ static void perform_blit(address_space *space)
 		/* skip right */
 		addr += xdir * skip[~y & 1];
 		if (rle)
-			consume_rle(skip[~y & 1]);
+			consume_rle(state, skip[~y & 1]);
 		else
-			consume_raw(skip[~y & 1]);
+			consume_raw(state, skip[~y & 1]);
 
 		/* back up one and reverse directions */
 		addr -= xdir;
@@ -446,8 +423,9 @@ static void perform_blit(address_space *space)
 
 static TIMER_CALLBACK( blitter_done )
 {
+	itech8_state *state = machine->driver_data<itech8_state>();
 	/* turn off blitting and generate an interrupt */
-	blit_in_progress = 0;
+	state->blit_in_progress = 0;
 	itech8_update_interrupts(machine, -1, -1, 1);
 
 	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", machine->primary_screen->vpos());
@@ -463,7 +441,8 @@ static TIMER_CALLBACK( blitter_done )
 
 READ8_HANDLER( itech8_blitter_r )
 {
-	int result = blitter_data[offset / 2];
+	itech8_state *state = space->machine->driver_data<itech8_state>();
+	int result = state->blitter_data[offset / 2];
 	static const char *const portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 	/* debugging */
@@ -476,7 +455,7 @@ READ8_HANDLER( itech8_blitter_r )
 	if (offset == 3)
 	{
 		itech8_update_interrupts(space->machine, -1, -1, 0);
-		if (blit_in_progress)
+		if (state->blit_in_progress)
 			result |= 0x80;
 		else
 			result &= 0x7f;
@@ -492,6 +471,10 @@ READ8_HANDLER( itech8_blitter_r )
 
 WRITE8_HANDLER( itech8_blitter_w )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
+	UINT8 *blitter_data = state->blitter_data;
+	struct tms34061_display &tms_state = state->tms_state;
+
 	/* low bit seems to be ignored */
 	offset /= 2;
 	blitter_data[offset] = data;
@@ -504,7 +487,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 		{
 			logerror("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
 						(tms_state.regs[TMS34061_XYOFFSET] >> 8) & 0x0f, tms_state.regs[TMS34061_XYADDRESS],
-						*itech8_grom_bank, blitter_data[0], blitter_data[1],
+						*state->grom_bank, blitter_data[0], blitter_data[1],
 						blitter_data[4], blitter_data[5],
 						blitter_data[2]);
 			logerror("   %02X %02X %02X [%02X] %02X %02X %02X [%02X]-%02X %02X %02X %02X [%02X %02X %02X %02X]\n",
@@ -520,7 +503,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 
 		/* perform the blit */
 		perform_blit(space);
-		blit_in_progress = 1;
+		state->blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
 		space->machine->scheduler().timer_set(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12), FUNC(blitter_done));
@@ -577,26 +560,30 @@ READ8_HANDLER( itech8_tms34061_r )
 
 WRITE8_HANDLER( grmatch_palette_w )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
 	/* set the palette control; examined in the scanline callback */
-	grmatch_palcontrol = data;
+	state->grmatch_palcontrol = data;
 }
 
 
 WRITE8_HANDLER( grmatch_xscroll_w )
 {
+	itech8_state *state = space->machine->driver_data<itech8_state>();
 	/* update the X scroll value */
 	space->machine->primary_screen->update_now();
-	grmatch_xscroll = data;
+	state->grmatch_xscroll = data;
 }
 
 
 TIMER_DEVICE_CALLBACK( grmatch_palette_update )
 {
+	itech8_state *state = timer.machine->driver_data<itech8_state>();
+	struct tms34061_display &tms_state = state->tms_state;
 	/* if the high bit is set, we are supposed to latch the palette values */
-	if (grmatch_palcontrol & 0x80)
+	if (state->grmatch_palcontrol & 0x80)
 	{
 		/* the TMS34070s latch at the start of the frame, based on the first few bytes */
-		UINT32 page_offset = (tms_state.dispstart & 0x0ffff) | grmatch_xscroll;
+		UINT32 page_offset = (tms_state.dispstart & 0x0ffff) | state->grmatch_xscroll;
 		int page, x;
 
 		/* iterate over both pages */
@@ -607,7 +594,7 @@ TIMER_DEVICE_CALLBACK( grmatch_palette_update )
 			{
 				UINT8 data0 = base[x * 2 + 0];
 				UINT8 data1 = base[x * 2 + 1];
-				grmatch_palette[page][x] = MAKE_RGB(pal4bit(data0 >> 0), pal4bit(data1 >> 4), pal4bit(data1 >> 0));
+				state->grmatch_palette[page][x] = MAKE_RGB(pal4bit(data0 >> 0), pal4bit(data1 >> 4), pal4bit(data1 >> 0));
 			}
 		}
 	}
@@ -623,6 +610,8 @@ TIMER_DEVICE_CALLBACK( grmatch_palette_update )
 
 SCREEN_UPDATE( itech8_2layer )
 {
+	itech8_state *state = screen->machine->driver_data<itech8_state>();
+	struct tms34061_display &tms_state = state->tms_state;
 	UINT32 page_offset;
 	int x, y;
 	const rgb_t *pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
@@ -659,6 +648,8 @@ SCREEN_UPDATE( itech8_2layer )
 
 SCREEN_UPDATE( itech8_grmatch )
 {
+	itech8_state *state = screen->machine->driver_data<itech8_state>();
+	struct tms34061_display &tms_state = state->tms_state;
 	UINT32 page_offset;
 	int x, y;
 
@@ -677,7 +668,7 @@ SCREEN_UPDATE( itech8_grmatch )
 	/* bottom layer @ 0x20000 is 4bpp, colors come from TMS34070, enabled via palette control */
 	/* 4bpp pixels are packed 2 to a byte */
 	/* xscroll is set via a separate register */
-	page_offset = (tms_state.dispstart & 0x0ffff) | grmatch_xscroll;
+	page_offset = (tms_state.dispstart & 0x0ffff) | state->grmatch_xscroll;
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT8 *base0 = &tms_state.vram[0x00000 + ((page_offset + y * 256) & 0xffff)];
@@ -690,14 +681,14 @@ SCREEN_UPDATE( itech8_grmatch )
 			UINT8 pix2 = base2[x / 2];
 
 			if ((pix0 & 0xf0) != 0)
-				dest[x] = grmatch_palette[0][pix0 >> 4];
+				dest[x] = state->grmatch_palette[0][pix0 >> 4];
 			else
-				dest[x] = grmatch_palette[1][pix2 >> 4];
+				dest[x] = state->grmatch_palette[1][pix2 >> 4];
 
 			if ((pix0 & 0x0f) != 0)
-				dest[x + 1] = grmatch_palette[0][pix0 & 0x0f];
+				dest[x + 1] = state->grmatch_palette[0][pix0 & 0x0f];
 			else
-				dest[x + 1] = grmatch_palette[1][pix2 & 0x0f];
+				dest[x + 1] = state->grmatch_palette[1][pix2 & 0x0f];
 		}
 	}
 	return 0;
@@ -706,6 +697,8 @@ SCREEN_UPDATE( itech8_grmatch )
 
 SCREEN_UPDATE( itech8_2page )
 {
+	itech8_state *state = screen->machine->driver_data<itech8_state>();
+	struct tms34061_display &tms_state = state->tms_state;
 	UINT32 page_offset;
 	int x, y;
 	const rgb_t *pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
@@ -722,7 +715,7 @@ SCREEN_UPDATE( itech8_2page )
 
 	/* there are two pages, each of which is a full 8bpp */
 	/* page index is selected by the top bit of the page_select register */
-	page_offset = ((page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
+	page_offset = ((state->page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];
@@ -737,6 +730,8 @@ SCREEN_UPDATE( itech8_2page )
 
 SCREEN_UPDATE( itech8_2page_large )
 {
+	itech8_state *state = screen->machine->driver_data<itech8_state>();
+	struct tms34061_display &tms_state = state->tms_state;
 	UINT32 page_offset;
 	int x, y;
 	const rgb_t *pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
@@ -755,7 +750,7 @@ SCREEN_UPDATE( itech8_2page_large )
 	/* the low 4 bits come from the bitmap directly */
 	/* the upper 4 bits were latched on each write into a separate bitmap */
 	/* page index is selected by the top bit of the page_select register */
-	page_offset = ((~page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
+	page_offset = ((~state->page_select & 0x80) << 10) | (tms_state.dispstart & 0x0ffff);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 	{
 		UINT8 *base = &tms_state.vram[(page_offset + y * 256) & 0x3ffff];

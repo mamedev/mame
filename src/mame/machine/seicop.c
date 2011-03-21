@@ -1529,18 +1529,19 @@ static UINT16 seibu_vregs[0x50/2];
 
 static WRITE16_HANDLER( seibu_common_video_regs_w )
 {
+	legionna_state *state = space->machine->driver_data<legionna_state>();
 	COMBINE_DATA(&seibu_vregs[offset]);
 
 	switch(offset)
 	{
 		case (0x01a/2): { flip_screen_set(space->machine, seibu_vregs[offset] & 0x01); break; }
-		case (0x01c/2): { legionna_layer_disable =  seibu_vregs[offset]; break; }
-		case (0x020/2): { legionna_scrollram16[0] = seibu_vregs[offset]; break; }
-		case (0x022/2): { legionna_scrollram16[1] = seibu_vregs[offset]; break; }
-		case (0x024/2): { legionna_scrollram16[2] = seibu_vregs[offset]; break; }
-		case (0x026/2): { legionna_scrollram16[3] = seibu_vregs[offset]; break; }
-		case (0x028/2): { legionna_scrollram16[4] = seibu_vregs[offset]; break; }
-		case (0x02a/2): { legionna_scrollram16[5] = seibu_vregs[offset]; break; }
+		case (0x01c/2): { state->layer_disable =  seibu_vregs[offset]; break; }
+		case (0x020/2): { state->scrollram16[0] = seibu_vregs[offset]; break; }
+		case (0x022/2): { state->scrollram16[1] = seibu_vregs[offset]; break; }
+		case (0x024/2): { state->scrollram16[2] = seibu_vregs[offset]; break; }
+		case (0x026/2): { state->scrollram16[3] = seibu_vregs[offset]; break; }
+		case (0x028/2): { state->scrollram16[4] = seibu_vregs[offset]; break; }
+		case (0x02a/2): { state->scrollram16[5] = seibu_vregs[offset]; break; }
 		default: { logerror("seibu_common_video_regs_w unhandled offset %02x %04x\n",offset,data); break; }
 	}
 }
@@ -1689,6 +1690,7 @@ READ16_HANDLER( copdxbl_0_r )
 
 WRITE16_HANDLER( copdxbl_0_w )
 {
+	legionna_state *state = space->machine->driver_data<legionna_state>();
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
 	switch(offset)
@@ -1700,14 +1702,14 @@ WRITE16_HANDLER( copdxbl_0_w )
 		}
 
 		/*TODO: kludge on x-axis.*/
-		case (0x660/2): { legionna_scrollram16[0] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x662/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x664/2): { legionna_scrollram16[2] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x666/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x668/2): { legionna_scrollram16[4] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x66a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
-		case (0x66c/2): { legionna_scrollram16[6] = cop_mcu_ram[offset] - 0x1f0; break; }
-		case (0x66e/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
+		case (0x660/2): { state->scrollram16[0] = cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x662/2): { state->scrollram16[1] = cop_mcu_ram[offset]; break; }
+		case (0x664/2): { state->scrollram16[2] = cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x666/2): { state->scrollram16[3] = cop_mcu_ram[offset]; break; }
+		case (0x668/2): { state->scrollram16[4] = cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x66a/2): { state->scrollram16[5] = cop_mcu_ram[offset]; break; }
+		case (0x66c/2): { state->scrollram16[6] = cop_mcu_ram[offset] - 0x1f0; break; }
+		case (0x66e/2): { state->scrollram16[7] = cop_mcu_ram[offset]; break; }
 
 		case (0x740/2):
 		{
@@ -1908,7 +1910,7 @@ static UINT32 cop_sprite_dma_param;
 
 static WRITE16_HANDLER( generic_cop_w )
 {
-	static UINT32 temp32;
+	UINT32 temp32;
 
 	switch (offset)
 	{
@@ -2140,7 +2142,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* "automatic" movement */
 			if(COP_CMD(0x188,0x282,0x082,0xb8e,0x98e,0x000,0x000,0x000,6,0xffeb))
 			{
-				static UINT8 offs;
+				UINT8 offs;
 
 				offs = (offset & 3) * 4;
 
@@ -2151,7 +2153,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* "automatic" movement, for arks in Legionnaire / Zero Team (expression adjustment) */
 			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
 			{
-				static UINT8 offs;
+				UINT8 offs;
 
 				offs = (offset & 3) * 4;
 
@@ -2373,8 +2375,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			// grainbow 0d | a | fff3 | 6980 | b80 ba0
 			if(COP_CMD(0xb80,0xba0,0x000,0x000,0x000,0x000,0x000,0x000,10,0xfff3))
 			{
-				static UINT8 offs;
-				static int abs_x,abs_y,rel_xy;
+				UINT8 offs;
+				int abs_x,abs_y,rel_xy;
 
 				offs = (offset & 3) * 4;
 
@@ -2398,7 +2400,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			// grainbow 18 | a | ff00 | c480 | 080 882
 			if(COP_CMD(0x080,0x882,0x000,0x000,0x000,0x000,0x000,0x000,10,0xff00))
 			{
-				static UINT8 offs;
+				UINT8 offs;
 
 				offs = (offset & 3) * 4;
 
@@ -2412,9 +2414,9 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* FIXME: x/ys are offsetted */
 			if(COP_CMD(0xf80,0xaa2,0x984,0x0c2,0x000,0x000,0x000,0x000,5,0x7ff7))
 			{
-				static UINT8 offs;
-				static int div;
-				static INT16 offs_val;
+				UINT8 offs;
+				int div;
+				INT16 offs_val;
 
 				//printf("%08x %08x %08x %08x %08x %08x %08x\n",cop_register[0],cop_register[1],cop_register[2],cop_register[3],cop_register[4],cop_register[5],cop_register[6]);
 
@@ -2433,7 +2435,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(cupsoc)   | 8 | f3e7 | 6200 | 3a0 3a6 380 aa0 2a6
 			if(COP_CMD(0x3a0,0x3a6,0x380,0xaa0,0x2a6,0x000,0x000,0x000,8,0xf3e7))
 			{
-				static INT8 cur_angle;
+				INT8 cur_angle;
 
 				cur_angle = space->read_byte(cop_register[1] + (0xc ^ 3));
 				space->write_byte(cop_register[1] + (0^3),space->read_byte(cop_register[1] + (0^3)) & 0xfb); //correct?
@@ -2466,7 +2468,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* FIXME: still doesn't work ... */
 			if(COP_CMD(0x380,0x39a,0x380,0xa80,0x29a,0x000,0x000,0x000,8,0xf3e7))
 			{
-				static INT8 cur_angle;
+				INT8 cur_angle;
 
 				cur_angle = space->read_byte(cop_register[0] + (0x34 ^ 3));
 				//space->write_byte(cop_register[0] + (0^3),space->read_byte(cop_register[0] + (0^3)) & 0xfb); //correct?
@@ -2507,7 +2509,7 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			if (cop_dma_trigger >= 0x80 && cop_dma_trigger <= 0x87)
 			{
-				static UINT32 src,dst,size,i;
+				UINT32 src,dst,size,i;
 
 				/*
                 Apparently all of those are just different DMA channels, brightness effects are done thru a RAM table and the pal_brightness_val / mode
@@ -2532,7 +2534,7 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				for(i = 0;i < size;i++)
 				{
-					static UINT16 pal_val;
+					UINT16 pal_val;
 					int r,g,b;
 					int rt,gt,bt;
 
@@ -2597,7 +2599,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* Seibu Cup Soccer trigger this*/
 			if (cop_dma_trigger == 0x0e)
 			{
-				static UINT32 src,dst,size,i;
+				UINT32 src,dst,size,i;
 
 				src = (cop_dma_src[cop_dma_trigger] << 6);
 				dst = (cop_dma_dst[cop_dma_trigger] << 6);
@@ -2671,15 +2673,15 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		case (0x2fe/2):
 		{
-			static UINT16 sort_size;
+			UINT16 sort_size;
 
 			sort_size = cop_mcu_ram[offset];
 
 			{
-				static int i,j;
-				static UINT8 xchg_flag;
-				static UINT32 addri,addrj;
-				static UINT16 vali,valj;
+				int i,j;
+				UINT8 xchg_flag;
+				UINT32 addri,addrj;
+				UINT16 vali,valj;
 
 				/* TODO: use a better algorythm than bubble sort! */
 				for(i=2;i<sort_size;i+=2)
@@ -2703,7 +2705,7 @@ static WRITE16_HANDLER( generic_cop_w )
 
 						if(xchg_flag)
 						{
-							static UINT16 xch_val;
+							UINT16 xch_val;
 
 							xch_val = space->read_word(cop_sort_lookup+i);
 							space->write_word(cop_sort_lookup+i,space->read_word(cop_sort_lookup+j));
@@ -2745,7 +2747,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 	/* external pin register, used for banking */
 	if(offset == 0x070/2)
 	{
-		heatbrl_setgfxbank( cop_mcu_ram[offset] );
+		heatbrl_setgfxbank(space->machine, cop_mcu_ram[offset]);
 		return;
 	}
 
@@ -2888,7 +2890,7 @@ WRITE16_HANDLER( godzilla_mcu_w )
 
 	if(offset == 0x070/2)
 	{
-		denjinmk_setgfxbank(cop_mcu_ram[offset]);
+		denjinmk_setgfxbank(space->machine, cop_mcu_ram[offset]);
 		return;
 	}
 
@@ -2943,7 +2945,7 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 
 	if(offset == 0x070/2)
 	{
-		denjinmk_setgfxbank(cop_mcu_ram[offset]);
+		denjinmk_setgfxbank(space->machine, cop_mcu_ram[offset]);
 		return;
 	}
 
