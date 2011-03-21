@@ -35,9 +35,7 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 
     TODO:
     - generic video timing (vsync, vblank, # of scanlines)
-    - circus/ripcord collision detection:
-      * is accurate?
-      * move away from video update (fails with frameskipping)
+    - circus/ripcord collision detection is accurate?
     - crash: irq timing
     - improve discrete sound
 
@@ -290,16 +288,17 @@ static MACHINE_RESET( circus )
 static MACHINE_CONFIG_START( circus, circus_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16)	/* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 
 	MCFG_MACHINE_START(circus)
 	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)			/* needed for proper hardware collisions */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500) /* frames per second, vblank duration (complete guess) */)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)	/* frames per second, vblank duration (complete guess) */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
@@ -411,9 +410,10 @@ static MACHINE_CONFIG_START( ripcord, circus_state )
 	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)			/* needed for proper hardware collisions */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500) /* frames per second, vblank duration (complete guess) */)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)	/* frames per second, vblank duration (complete guess) */)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
