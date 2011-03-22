@@ -19,6 +19,7 @@
 #include "cpu/arm/arm.h"
 #include "video/deco16ic.h"
 #include "rendlay.h"
+#include "video/decospr.h"
 
 class backfire_state : public driver_device
 {
@@ -27,8 +28,8 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT32 *  spriteram_1;
-	UINT32 *  spriteram_2;
+	UINT16 *  spriteram_1;
+	UINT16 *  spriteram_2;
 	UINT32 *  mainram;
 	UINT32 *  left_priority;
 	UINT32 *  right_priority;
@@ -58,6 +59,9 @@ static VIDEO_START( backfire )
 {
 	backfire_state *state = machine->driver_data<backfire_state>();
 
+	state->spriteram_1 = auto_alloc_array(machine, UINT16, 0x2000/2);
+	state->spriteram_2 = auto_alloc_array(machine, UINT16, 0x2000/2);
+
 	/* and register the allocated ram so that save states still work */
 	state->save_item(NAME(state->pf1_rowscroll));
 	state->save_item(NAME(state->pf2_rowscroll));
@@ -66,89 +70,12 @@ static VIDEO_START( backfire )
 
 	state->left =  auto_bitmap_alloc(machine, 80*8, 32*8, BITMAP_FORMAT_INDEXED16);
 	state->right = auto_bitmap_alloc(machine, 80*8, 32*8, BITMAP_FORMAT_INDEXED16);
+	
+	state->save_pointer(NAME(state->spriteram_1), 0x2000/2);
+	state->save_pointer(NAME(state->spriteram_2), 0x2000/2);
 
 	state->save_item(NAME(*state->left));
 	state->save_item(NAME(*state->right));
-}
-
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 *spriteram, int region )
-{
-	int offs;
-
-	flip_screen_set_no_update(machine, 1);
-
-	for (offs = (0x1400 / 4) - 4; offs >= 0; offs -= 4) // 0x1400 for charlien
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult, pri;
-
-		sprite = spriteram[offs + 1] & 0xffff;
-
-		y = spriteram[offs] & 0xffff;
-		flash = y & 0x1000;
-		if (flash && (machine->primary_screen->frame_number() & 1))
-			continue;
-
-		x = spriteram[offs + 2] & 0xffff;
-		colour = (x >> 9) & 0x1f;
-
-		pri = (x & 0xc000); // 2 bits or 1?
-
-		switch (pri & 0xc000)
-		{
-			case 0x0000: pri = 0;   break; // numbers, people, cars when in the air, status display..
-			case 0x4000: pri = 0xf0;break; // cars most of the time
-			case 0x8000: pri = 0;   break; // car wheels during jump?
-			case 0xc000: pri = 0xf0;break; /* car wheels in race? */
-		}
-
-		// pri 0 = ontop of everything//
-
-		// pri = 0;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-		y = 240 - y;
-		x = 304 - x;
-
-		if (x > 320) continue;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_x_get(machine))
-		{
-			y = 240 - y;
-			x = 304 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else mult = -16;
-
-		while (multi >= 0)
-		{
-			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[region],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					machine->priority_bitmap,pri,0);
-
-			multi--;
-		}
-	}
 }
 
 
@@ -156,6 +83,9 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 static SCREEN_UPDATE( backfire )
 {
 	backfire_state *state = screen->machine->driver_data<backfire_state>();
+
+	//FIXME: flip_screen_x should not be written!
+	flip_screen_set_no_update(screen->machine, 1);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -172,13 +102,13 @@ static SCREEN_UPDATE( backfire )
 		{
 			deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 1);
 			deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 2);
-			draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_1, 3);
+			screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_1, 0x800);
 		}
 		else if (state->left_priority[0] == 2)
 		{
 			deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 2);
 			deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 4);
-			draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_1, 3);
+			screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_1, 0x800);
 		}
 		else
 			popmessage( "unknown left priority %08x", state->left_priority[0]);
@@ -192,13 +122,13 @@ static SCREEN_UPDATE( backfire )
 		{
 			deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, 0, 1);
 			deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
-			draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_2, 4);
+			screen->machine->device<decospr_device>("spritegen2")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_2, 0x800);
 		}
 		else if (state->right_priority[0] == 2)
 		{
 			deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
 			deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, 0, 4);
-			draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_2, 4);
+			screen->machine->device<decospr_device>("spritegen2")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_2, 0x800);
 		}
 		else
 			popmessage( "unknown right priority %08x", state->right_priority[0]);
@@ -284,6 +214,38 @@ READ32_HANDLER( backfire_wheel2_r )
 #endif
 
 
+static READ32_HANDLER( backfire_spriteram1_r )
+{
+	backfire_state *state = space->machine->driver_data<backfire_state>();
+	return state->spriteram_1[offset] ^ 0xffff0000;
+}
+
+static WRITE32_HANDLER( backfire_spriteram1_w )
+{
+	backfire_state *state = space->machine->driver_data<backfire_state>();
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
+
+	COMBINE_DATA(&state->spriteram_1[offset]);
+}
+
+static READ32_HANDLER( backfire_spriteram2_r )
+{
+	backfire_state *state = space->machine->driver_data<backfire_state>();
+	return state->spriteram_2[offset] ^ 0xffff0000;
+}
+
+static WRITE32_HANDLER( backfire_spriteram2_w )
+{
+	backfire_state *state = space->machine->driver_data<backfire_state>();
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
+
+	COMBINE_DATA(&state->spriteram_2[offset]);
+}
+
+
+
 static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
@@ -302,8 +264,8 @@ static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE(&backfire_180010) // always 180010 ?
 //  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE(&backfire_188010) // always 188010 ?
 
-	AM_RANGE(0x184000, 0x185fff) AM_RAM AM_BASE_MEMBER(backfire_state, spriteram_1)
-	AM_RANGE(0x18c000, 0x18dfff) AM_RAM AM_BASE_MEMBER(backfire_state, spriteram_2)
+	AM_RANGE(0x184000, 0x185fff) AM_READWRITE(backfire_spriteram1_r, backfire_spriteram1_w)
+	AM_RANGE(0x18c000, 0x18dfff) AM_READWRITE(backfire_spriteram2_r, backfire_spriteram2_w)
 	AM_RANGE(0x190000, 0x190003) AM_DEVREAD("eeprom", backfire_eeprom_r)
 	AM_RANGE(0x194000, 0x194003) AM_READ(backfire_control2_r)
 	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE("eeprom", backfire_eeprom_w)
@@ -473,6 +435,18 @@ static MACHINE_START( backfire )
 	state->eeprom = machine->device("eeprom");
 }
 
+UINT16 backfire_pri_callback(UINT16 x)
+{
+	switch (x & 0xc000)
+	{
+		case 0x0000: return 0;   break; // numbers, people, cars when in the air, status display..
+		case 0x4000: return 0xf0;break; // cars most of the time
+		case 0x8000: return 0;   break; // car wheels during jump?
+		case 0xc000: return 0xf0;break; /* car wheels in race? */
+	}
+	return 0;
+}
+
 static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	/* basic machine hardware */
@@ -508,6 +482,14 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 	MCFG_VIDEO_START(backfire)
 
 	MCFG_DECO16IC_ADD("deco_custom", backfire_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+	decospr_device_config::set_pri_callback(device, backfire_pri_callback);
+
+	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 4);
+	decospr_device_config::set_pri_callback(device, backfire_pri_callback);
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -95,7 +95,7 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-
+#include "video/decospr.h"
 
 static INPUT_PORTS_START( simpl156 )
 	PORT_START("IN0")
@@ -251,7 +251,7 @@ static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 static ADDRESS_MAP_START( joemacr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram
-	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_MEMBER(simpl156_state, spriteram, spriteram_size)
+	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) 
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(simpl156_palette_r, simpl156_palette_w)
 	AM_RANGE(0x130000, 0x130003) AM_READWRITE(simpl156_system_r, simpl156_eeprom_w)
 	AM_RANGE(0x140000, 0x14001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( chainrec_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, systemram) // work ram (32-bit)
 	AM_RANGE(0x3c0000, 0x3c0003) AM_DEVREADWRITE8_MODERN("okimusic", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x400000, 0x407fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram?
-	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_MEMBER(simpl156_state, spriteram, spriteram_size)
+	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) 
 	AM_RANGE(0x420000, 0x420fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x430000, 0x430003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x440000, 0x44001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( magdrop_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, systemram) // work ram (32-bit)
 	AM_RANGE(0x340000, 0x340003) AM_DEVREADWRITE8_MODERN("okimusic", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x380000, 0x387fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram?
-	AM_RANGE(0x390000, 0x391fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_MEMBER(simpl156_state, spriteram, spriteram_size)
+	AM_RANGE(0x390000, 0x391fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) 
 	AM_RANGE(0x3a0000, 0x3a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x3c0000, 0x3c001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
@@ -317,7 +317,7 @@ static ADDRESS_MAP_START( magdropp_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, systemram) // work ram (32-bit)
 	AM_RANGE(0x4c0000, 0x4c0003) AM_DEVREADWRITE8_MODERN("okimusic", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x680000, 0x687fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram?
-	AM_RANGE(0x690000, 0x691fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_MEMBER(simpl156_state, spriteram, spriteram_size)
+	AM_RANGE(0x690000, 0x691fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) 
 	AM_RANGE(0x6a0000, 0x6a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x6b0000, 0x6b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x6c0000, 0x6c001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( mitchell156_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8_MODERN("okisfx", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8_MODERN("okimusic", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, mainram) // main ram
-	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) AM_BASE_SIZE_MEMBER(simpl156_state, spriteram, spriteram_size)
+	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w) 
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(simpl156_palette_r,simpl156_palette_w)
 	AM_RANGE(0x1b0000, 0x1b0003) AM_READWRITE(simpl156_system_r,simpl156_eeprom_w)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
@@ -417,6 +417,20 @@ static const deco16ic_interface simpl156_deco16ic_intf =
 	NULL
 };
 
+UINT16 simpl156_pri_callback(UINT16 x)
+{
+	switch (x & 0xc000)
+	{
+		case 0x0000: return 0;
+		case 0x4000: return 0xf0;
+		case 0x8000: return 0xf0 | 0xcc;
+		case 0xc000: return 0xf0 | 0xcc;; /*  or 0xf0|0xcc|0xaa ? */
+	}
+
+	return 0;
+}
+
+
 static MACHINE_CONFIG_START( chainrec, simpl156_state )
 
 	/* basic machine hardware */
@@ -440,6 +454,9 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 	MCFG_VIDEO_START(simpl156)
 
 	MCFG_DECO16IC_ADD("deco_custom", simpl156_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 2);
+	decospr_device_config::set_pri_callback(device, simpl156_pri_callback);
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

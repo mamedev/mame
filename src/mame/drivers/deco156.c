@@ -21,6 +21,7 @@
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 #include "video/deco16ic.h"
+#include "video/decospr.h"
 
 class deco156_state : public driver_device
 {
@@ -39,102 +40,27 @@ public:
 	/* memory */
 	UINT16   pf1_rowscroll[0x800/2];
 	UINT16   pf2_rowscroll[0x800/2];
+	UINT16* spriteram;
 };
 
 
 static VIDEO_START( wcvol95 )
 {
 	deco156_state *state = machine->driver_data<deco156_state>();
+	state->spriteram = auto_alloc_array(machine, UINT16, 0x2000/2);
 
 	/* and register the allocated ram so that save states still work */
 	state->save_item(NAME(state->pf1_rowscroll));
 	state->save_item(NAME(state->pf2_rowscroll));
+	state->save_pointer(NAME(state->spriteram), 0x2000/2);
 }
-
-/* spriteram is really 16-bit.. this can be changed to use 16-bit ram like the tilemaps
- its the same sprite chip Data East used on many, many 16-bit era titles */
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
-{
-	UINT32 *spriteram = machine->generic.spriteram.u32;
-	int offs;
-
-	flip_screen_set_no_update(machine, 1);
-
-	for (offs = (0x1400 / 4) - 4; offs >= 0; offs -= 4) // 0x1400 for charlien
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult, pri;
-
-		sprite = spriteram[offs + 1] & 0xffff;
-
-		y = spriteram[offs] & 0xffff;
-		flash = y & 0x1000;
-		if (flash && (machine->primary_screen->frame_number() & 1))
-			continue;
-
-		x = spriteram[offs + 2] & 0xffff;
-		colour = (x >> 9) & 0x1f;
-
-		pri = (x & 0xc000); // 2 bits or 1?
-
-		switch (pri & 0xc000)
-		{
-		case 0x0000: pri = 0; break;
-		case 0x4000: pri = 0xf0; break;
-		case 0x8000: pri = 0xf0 | 0xcc; break;
-		case 0xc000: pri = 0xf0 | 0xcc; break; /*  or 0xf0|0xcc|0xaa ? */
-		}
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-		y = 240 - y;
-		x = 304 - x;
-
-		if (x > 320)
-			continue;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_x_get(machine))
-		{
-			y = 240 - y;
-			x = 304 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else mult = -16;
-
-		while (multi >= 0)
-		{
-			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[2],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					machine->priority_bitmap,pri,0);
-
-			multi--;
-		}
-	}
-}
-
 
 
 static SCREEN_UPDATE( wcvol95 )
 {
+	//FIXME: flip_screen_x should not be written!
+	flip_screen_set_no_update(screen->machine, 1);
+
 	deco156_state *state = screen->machine->driver_data<deco156_state>();
 
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
@@ -143,7 +69,7 @@ static SCREEN_UPDATE( wcvol95 )
 	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 0x800);
 	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -188,8 +114,10 @@ static WRITE32_HANDLER( deco156_nonbuffered_palette_w )
 
 static READ32_HANDLER( wcvol95_pf1_rowscroll_r ) { deco156_state *state = space->machine->driver_data<deco156_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
 static READ32_HANDLER( wcvol95_pf2_rowscroll_r ) { deco156_state *state = space->machine->driver_data<deco156_state>();	return state->pf2_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( wcvol95_spriteram_r )     { deco156_state *state = space->machine->driver_data<deco156_state>(); return state->spriteram[offset] ^ 0xffff0000; }
 static WRITE32_HANDLER( wcvol95_pf1_rowscroll_w ) { deco156_state *state = space->machine->driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
 static WRITE32_HANDLER( wcvol95_pf2_rowscroll_w ) { deco156_state *state = space->machine->driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( wcvol95_spriteram_w )    { deco156_state *state = space->machine->driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&state->spriteram[offset]); }
 
 
 static ADDRESS_MAP_START( hvysmsh_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -209,7 +137,7 @@ static ADDRESS_MAP_START( hvysmsh_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(deco156_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
-	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wcvol95_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -222,7 +150,7 @@ static ADDRESS_MAP_START( wcvol95_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x130000, 0x137fff) AM_RAM
 	AM_RANGE(0x140000, 0x140003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x150000, 0x150003) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x160000, 0x161fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
 	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
@@ -397,6 +325,20 @@ static const deco16ic_interface deco156_deco16ic_intf =
 	NULL
 };
 
+UINT16 deco156_pri_callback(UINT16 x)
+{
+	switch (x & 0xc000)
+	{
+		case 0x0000: return 0;
+		case 0x4000: return 0xf0;
+		case 0x8000: return 0xf0 | 0xcc;
+		case 0xc000: return 0xf0 | 0xcc;
+	}
+
+	return 0;
+}
+
+
 static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 
 	/* basic machine hardware */
@@ -405,9 +347,6 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MCFG_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -423,6 +362,9 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MCFG_VIDEO_START(wcvol95)
 
 	MCFG_DECO16IC_ADD("deco_custom", deco156_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 2);
+	decospr_device_config::set_pri_callback(device, deco156_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -445,9 +387,6 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
@@ -462,6 +401,9 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MCFG_VIDEO_START(wcvol95)
 
 	MCFG_DECO16IC_ADD("deco_custom", deco156_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 2);
+	decospr_device_config::set_pri_callback(device, deco156_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

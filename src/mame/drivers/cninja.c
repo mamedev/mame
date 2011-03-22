@@ -51,7 +51,7 @@ Note about version levels using Mutant Fighter as the example:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-
+#include "video/decospr.h"
 
 static WRITE16_HANDLER( cninja_sound_w )
 {
@@ -842,6 +842,21 @@ static MACHINE_RESET( cninja )
 	state->irq_mask = 0;
 }
 
+UINT16 cninja_pri_callback(UINT16 x)
+{
+	/* Sprite/playfield priority */
+	switch (x & 0xc000)
+	{
+		case 0x0000: return 0;
+		case 0x4000: return 0xf0;
+		case 0x8000: return 0xf0 | 0xcc;
+		case 0xc000: return 0xf0 | 0xcc; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
+	}
+
+	return 0;
+}
+
+
 static MACHINE_CONFIG_START( cninja, cninja_state )
 
 	/* basic machine hardware */
@@ -871,6 +886,9 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", cninja_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -921,6 +939,9 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_VIDEO_START(stoneage)
 
 	MCFG_DECO16IC_ADD("deco_custom", cninja_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1010,6 +1031,9 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", edrandy_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

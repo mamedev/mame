@@ -24,6 +24,7 @@ Protection TODO:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
+#include "video/decospr.h"
 
 class dblewing_state : public driver_device
 {
@@ -70,125 +71,21 @@ public:
 	device_t *deco16ic;
 };
 
-/*
-
-offs +0
--------- --------
- fFbSssy yyyyyyyy
-
-s = size (multipart)
-S = size (x?) (does any other game use this?)
-f = flipy
-b = flash
-F = flipx
-y = ypos
-
-offs +1
--------- --------
-tttttttt tttttttt
-
-t = sprite tile
-
-offs +2
--------- --------
-ppcccccx xxxxxxxx
-
-c = colour palette
-p = priority
-x = xpos
-
-*/
-
-
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+UINT16 dblwings_pri_callback(UINT16 x)
 {
-	dblewing_state *state = machine->driver_data<dblewing_state>();
-	UINT16 *spriteram = state->spriteram;
-	int offs;
-
-	for (offs = 0x400 - 4; offs >= 0; offs -= 4)
+	UINT16 pri = (x & 0xc000); // 2 bits or 1?
+	switch (pri & 0xc000)
 	{
-		int x, y, sprite, colour, multi, mult2, fx, fy, inc, flash, mult, xsize, pri;
-
-		sprite = spriteram[offs + 1];
-
-		y = spriteram[offs];
-		flash = y & 0x1000;
-		xsize = y & 0x0800;
-		if (flash && (machine->primary_screen->frame_number() & 1))
-			continue;
-
-		x = spriteram[offs + 2];
-		colour = (x >> 9) & 0x1f;
-
-		pri = (x & 0xc000); // 2 bits or 1?
-
-		switch (pri & 0xc000)
-		{
 		case 0x0000: pri = 0; break;
 		case 0x4000: pri = 0xf0; break;
 		case 0x8000: pri = 0xf0 | 0xcc; break;
 		case 0xc000: pri = 0xf0 | 0xcc; break; /*  or 0xf0|0xcc|0xaa ? */
-		}
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-		y = 240 - y;
-		x = 304 - x;
-
-		if (x > 320)
-			continue;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_get(machine))
-		{
-			y = 240 - y;
-			x = 304 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else
-			mult = -16;
-
-		mult2 = multi + 1;
-
-		while (multi >= 0)
-		{
-			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[2],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					machine->priority_bitmap,pri,0);
-
-			if (xsize)
-			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[2],
-					(sprite - multi * inc)-mult2,
-					colour,
-					fx,fy,
-					x-16,y + mult * multi,
-					machine->priority_bitmap,pri,0);
-
-
-			multi--;
-		}
 	}
+
+	return pri;
 }
+
+
 
 static SCREEN_UPDATE(dblewing)
 {
@@ -203,7 +100,7 @@ static SCREEN_UPDATE(dblewing)
 
 	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 4);
-	draw_sprites(screen->machine, bitmap, cliprect);
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 0x400);
 	return 0;
 }
 
@@ -759,6 +656,9 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_GFXDECODE(dblewing)
 
 	MCFG_DECO16IC_ADD("deco_custom", dblewing_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 2);
+	decospr_device_config::set_pri_callback(device, dblwings_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
