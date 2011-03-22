@@ -1,12 +1,19 @@
 /*----------- defined in drivers/suprnova.c -----------*/
 
+class skns_state : public driver_device
+{
+public:
+	skns_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	sknsspr_device* spritegen;
+};
+
 extern UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
 extern UINT32 *skns_palette_ram;
 extern UINT32 *skns_pal_regs, *skns_v3_regs, *skns_spc_regs;
 
 /*----------- defined in video/suprnova.c -----------*/
-
-extern int suprnova_alt_enable_sprites;
 
 void skns_sprite_kludge(int x, int y);
 void skns_draw_sprites(

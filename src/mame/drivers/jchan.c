@@ -172,9 +172,8 @@ there are 9 PALS on the pcb (not dumped)
 #include "deprecat.h"
 #include "machine/nvram.h"
 #include "sound/ymz280b.h"
-#include "includes/suprnova.h"
 #include "includes/kaneko16.h"
-
+#include "video/sknsspr.h"
 
 class jchan_state : public driver_device
 {
@@ -198,20 +197,15 @@ public:
 	UINT16 *mcu_ram;
 	UINT16 mcu_com[4];
 	UINT16 *ctrl;
+
+	sknsspr_device* spritegen1;
+	sknsspr_device* spritegen2;
 };
 
 
 /***************************************************************************
 
                             MCU Code Simulation
-                (follows the implementation of kaneko16.c)
-
-Provided we find a working PCB, trojan code will help:
-- to get this game working (but there are many #4 sub-commands!)
-- to have more patterns and eventualy defeat the MCU 'encryption'
-- decapping and manually recovering the interal ROM is being persued
-
-This will benefit galpani3 and other kaneko16 games with TOYBOX MCU.
 
 ***************************************************************************/
 
@@ -359,7 +353,12 @@ static VIDEO_START(jchan)
 	state->sprite_bitmap_1 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 	state->sprite_bitmap_2 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 
-	suprnova_alt_enable_sprites = 1;
+	state->spritegen1 = machine->device<sknsspr_device>("spritegen1");
+	state->spritegen2 = machine->device<sknsspr_device>("spritegen2");
+
+
+	state->spritegen1->skns_sprite_kludge(0,0);
+	state->spritegen2->skns_sprite_kludge(0,0);
 
 	VIDEO_START_CALL( kaneko16_1xVIEW2_tilemaps );
 }
@@ -387,8 +386,8 @@ static SCREEN_UPDATE(jchan)
 	bitmap_fill(state->sprite_bitmap_1, cliprect, 0x0000);
 	bitmap_fill(state->sprite_bitmap_2, cliprect, 0x0000);
 
-	skns_draw_sprites(screen->machine, state->sprite_bitmap_1, cliprect, state->sprite_ram32_1, 0x4000, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), state->sprite_regs32_1 );
-	skns_draw_sprites(screen->machine, state->sprite_bitmap_2, cliprect, state->sprite_ram32_2, 0x4000, screen->machine->region("gfx2")->base(), screen->machine->region ("gfx2")->bytes(), state->sprite_regs32_2 );
+	state->spritegen1->skns_draw_sprites(screen->machine, state->sprite_bitmap_1, cliprect, state->sprite_ram32_1, 0x4000, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), state->sprite_regs32_1 );
+	state->spritegen2->skns_draw_sprites(screen->machine, state->sprite_bitmap_2, cliprect, state->sprite_ram32_2, 0x4000, screen->machine->region("gfx2")->base(), screen->machine->region ("gfx2")->bytes(), state->sprite_regs32_2 );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)
@@ -689,6 +688,9 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(jchan)
+
+	MCFG_DEVICE_ADD("spritegen1", sknsspr_, 0)
+	MCFG_DEVICE_ADD("spritegen2", sknsspr_, 0)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

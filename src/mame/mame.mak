@@ -776,6 +776,7 @@ $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/kaneko16.o $(MACHINE)/kaneko16.o $(VIDEO)/kaneko16.o \
 	$(DRIVERS)/sandscrp.o \
 	$(DRIVERS)/suprnova.o $(VIDEO)/suprnova.o \
+	$(VIDEO)/sknsspr.o \
 
 $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/88games.o $(VIDEO)/88games.o \

@@ -65,9 +65,8 @@ Dumped by Uki
 #include "cpu/m68000/m68000.h"
 #include "deprecat.h"
 #include "sound/ymz280b.h"
-#include "includes/suprnova.h"
 #include "includes/kaneko16.h"
-
+#include "video/sknsspr.h"
 
 class galpani3_state : public driver_device
 {
@@ -115,6 +114,8 @@ public:
 	UINT16 regs1_address_regs[0x20];
 	UINT16 regs2_address_regs[0x20];
 	UINT16 regs3_address_regs[0x20];
+
+	sknsspr_device* spritegen;
 };
 
 
@@ -146,11 +147,11 @@ static VIDEO_START(galpani3)
 	state->spriteram32 = auto_alloc_array(machine, UINT32, 0x4000/4);
 	machine->generic.spriteram_size = 0x4000;
 	state->spc_regs = auto_alloc_array(machine, UINT32, 0x40/4);
-	suprnova_alt_enable_sprites = 1;
-
 
 	state->sprite_bitmap_1 = auto_bitmap_alloc(machine,1024,1024,BITMAP_FORMAT_INDEXED16);
 
+	state->spritegen = machine->device<sknsspr_device>("spritegen");
+	state->spritegen->skns_sprite_kludge(0,0);
 }
 
 
@@ -346,7 +347,7 @@ static SCREEN_UPDATE(galpani3)
 
 	bitmap_fill(state->sprite_bitmap_1, cliprect, 0x0000);
 
-	skns_draw_sprites(screen->machine, state->sprite_bitmap_1, cliprect, state->spriteram32, screen->machine->generic.spriteram_size, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), state->spc_regs );
+	state->spritegen->skns_draw_sprites(screen->machine, state->sprite_bitmap_1, cliprect, state->spriteram32, screen->machine->generic.spriteram_size, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), state->spc_regs );
 
 	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
@@ -962,6 +963,8 @@ static MACHINE_CONFIG_START( galpani3, galpani3_state )
 	MCFG_PALETTE_LENGTH(0x4303)
 
 	MCFG_VIDEO_START(galpani3)
+
+	MCFG_DEVICE_ADD("spritegen", sknsspr_, 0)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
