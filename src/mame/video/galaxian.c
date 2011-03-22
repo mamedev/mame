@@ -520,7 +520,7 @@ SCREEN_UPDATE( zigzag )
 {
 	SCREEN_UPDATE_CALL(galaxian);
 
-	/* zigzag has an extra sprite generator instead of bullets */
+	/* zigzag has an extra sprite generator instead of bullets (note: ideally, this should be rendered in parallel) */
 	sprites_draw(screen->machine, bitmap, cliprect, &screen->machine->generic.spriteram.u8[0x60]);
 
 	return 0;
