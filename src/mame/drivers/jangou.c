@@ -1240,22 +1240,22 @@ ROM_END
 
 ROM_START( cntrygrl )
 	ROM_REGION( 0x10000, "cpu0", 0 )
-	ROM_LOAD( "rom4.bin", 0x00000, 0x02000, CRC(adba8e2f) SHA1(2aae77838e3de6e665b32a7fe4ac3f627c35b871)  )
-	ROM_LOAD( "rom5.bin", 0x02000, 0x02000, CRC(24d210ed) SHA1(6a0eae9d459975fbaad75bf21284baac3ba4f872) )
+	ROM_LOAD( "rom4.7l", 0x00000, 0x02000, CRC(adba8e2f) SHA1(2aae77838e3de6e665b32a7fe4ac3f627c35b871)  )
+	ROM_LOAD( "rom5.7k", 0x02000, 0x02000, CRC(24d210ed) SHA1(6a0eae9d459975fbaad75bf21284baac3ba4f872) )
 
-	/*wtf,these 2 roms are next to the CPU roms, one is a CPU rom from Moon Quasar, the other a GFX rom from Crazy Climber,
-      I dunno what's going on,the game doesn't appear to need these two....*/
+	/* wtf,these 2 roms are next to the CPU roms, one is a CPU rom from Moon Quasar, the other a GFX rom from Crazy Climber,
+        I dunno what's going on,the game doesn't appear to need these two....*/
 	ROM_REGION( 0x1000, "user1", 0 )
-	ROM_LOAD( "rom6.bin", 0x00000, 0x0800, CRC(33965a89) SHA1(92912cea76a472d9b709c664d9818844a07fcc32)  ) // = mq3    Moon Quasar
-	ROM_LOAD( "rom7.bin", 0x00800, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7)  ) // = cc06   Crazy Climber (US)
+	ROM_LOAD( "rom6.7h", 0x00000, 0x0800, CRC(33965a89) SHA1(92912cea76a472d9b709c664d9818844a07fcc32)  ) // = mq3    Moon Quasar
+	ROM_LOAD( "rom7.7j", 0x00800, 0x0800, CRC(481b64cc) SHA1(3f35c545fc784ed4f969aba2d7be6e13a5ae32b7)  ) // = cc06   Crazy Climber (US)
 
 	ROM_REGION( 0x10000, "gfx", 0 )
-	ROM_LOAD( "rom1.bin", 0x00000, 0x02000, CRC(92033f37) SHA1(aa407c2feb1cbb7cbc6c59656338453c5a670749)  )
-	ROM_LOAD( "rom2.bin", 0x02000, 0x02000, CRC(0588cc48) SHA1(f769ece2955eb9f055c499b6243a2fead9d07984)  )
-	ROM_LOAD( "rom3.bin", 0x04000, 0x02000, CRC(ce00ff56) SHA1(c5e58707a5dd0f57c34b09de542ef30e96ab95d1)  )
+	ROM_LOAD( "rom1.5m", 0x00000, 0x02000, CRC(92033f37) SHA1(aa407c2feb1cbb7cbc6c59656338453c5a670749)  )
+	ROM_LOAD( "rom2.5l", 0x02000, 0x02000, CRC(0588cc48) SHA1(f769ece2955eb9f055c499b6243a2fead9d07984)  )
+	ROM_LOAD( "rom3.5k", 0x04000, 0x02000, CRC(ce00ff56) SHA1(c5e58707a5dd0f57c34b09de542ef30e96ab95d1)  )
 
 	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "countrygirl_prom.bin", 0x00, 0x20, CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46)  )
+	ROM_LOAD( "countrygirl_prom.4f", 0x00, 0x20, CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46)  )
 ROM_END
 
 ROM_START( fruitbun )
@@ -1291,9 +1291,9 @@ ROM_START( cntrygrla )
 	ROM_LOAD( "5bunny.7j", 0x00800, 0x0800, CRC(06666bbf) SHA1(3d8eb4ea2d4fc6f3f327e710e19bcb68d8466d80) )
 
 	ROM_REGION( 0x10000, "gfx", 0 )
-	ROM_LOAD( "rom1.bin", 0x00000, 0x02000, CRC(92033f37) SHA1(aa407c2feb1cbb7cbc6c59656338453c5a670749)  ) //5bunny.m5
-	ROM_LOAD( "rom2.bin", 0x02000, 0x02000, CRC(0588cc48) SHA1(f769ece2955eb9f055c499b6243a2fead9d07984)  ) //5bunny.l5
-	ROM_LOAD( "rom3.bin", 0x04000, 0x02000, CRC(ce00ff56) SHA1(c5e58707a5dd0f57c34b09de542ef30e96ab95d1)  ) //5bunny.k5
+	ROM_LOAD( "rom1.5m", 0x00000, 0x02000, CRC(92033f37) SHA1(aa407c2feb1cbb7cbc6c59656338453c5a670749)  ) //5bunny.m5
+	ROM_LOAD( "rom2.5l", 0x02000, 0x02000, CRC(0588cc48) SHA1(f769ece2955eb9f055c499b6243a2fead9d07984)  ) //5bunny.l5
+	ROM_LOAD( "rom3.5k", 0x04000, 0x02000, CRC(ce00ff56) SHA1(c5e58707a5dd0f57c34b09de542ef30e96ab95d1)  ) //5bunny.k5
 
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "tbp18s30n.4f", 0x00, 0x20, CRC(dc54dc52) SHA1(db91a7ae05eb6b6e4b42f91dfe20ac0da6680b46) ) //verified on real hardware
