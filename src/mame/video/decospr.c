@@ -4,7 +4,7 @@
    note, we have pri callbacks and checks to drop back to plain drawgfx because not all drivers are using pdrawgfx yet, they probably should be...
    some games have different visible areas, but are confirmed as the same sprite chip.
 
-   games with alpha aren't supported here yet, in most cases they need better mixing anyway.
+   games with alpha aren't supported here yet, in most cases they need better mixing anyway, probably rendering to screen buffers and manual mixing.
 
    used by:
    
@@ -16,15 +16,18 @@
    deco156.c
    pktgaldx.c
    backfire.c
+   darkseal.c
 
    partially converted:
    cninja.c (mutantf uses alpha etc.)
 
    difficult to convert:
    rohga.c - alpha effects, extra rom banking on the sprites etc. causes problems
-
-   todo:
-   cbuster.c - needs updating to use proper priority, not multipass
+   lemmings.c - priority stuff
+   dassault.c - video mixing
+   deco32.c - video mixing
+   cbuster.c - needs updating to use proper priority (pdrawgfx), not multipass
+   mirage.c - needs updating to use proper priority (pdrawgfx), not multipass
 
    many more
 */
@@ -76,7 +79,7 @@ decospr_device::decospr_device(running_machine &_machine, const decospr_device_c
 void decospr_device::device_start()
 {
 //	sprite_kludge_x = sprite_kludge_y = 0;
-	printf("decospr_device::device_start()\n");
+//	printf("decospr_device::device_start()\n");
 }
 
 void decospr_device::device_reset()

@@ -87,8 +87,7 @@ Sprites - Data East custom chip 52
 
 #include "emu.h"
 #include "includes/darkseal.h"
-
-
+#include "video/decospr.h"
 
 
 /***************************************************************************/
@@ -167,72 +166,6 @@ WRITE16_HANDLER( darkseal_palette_24bit_b_w )
 }
 
 /******************************************************************************/
-
-static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect)
-{
-	darkseal_state *state = machine->driver_data<darkseal_state>();
-	UINT16 *buffered_spriteram16 = machine->generic.buffered_spriteram.u16;
-	int offs;
-
-	for (offs = 0;offs < 0x400;offs += 4)
-	{
-		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult;
-
-		sprite = buffered_spriteram16[offs+1] & 0x1fff;
-		if (!sprite) continue;
-
-		y = buffered_spriteram16[offs];
-		x = buffered_spriteram16[offs+2];
-
-		flash=y&0x1000;
-		if (flash && (machine->primary_screen->frame_number() & 1)) continue;
-
-		colour = (x >> 9) &0x1f;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 256) x -= 512;
-		if (y >= 256) y -= 512;
-		x = 240 - x;
-		y = 240 - y;
-
-		if (x>256) continue; /* Speedup */
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (state->flipscreen)
-		{
-			y=240-y;
-			x=240-x;
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
-			mult=16;
-		}
-		else mult=-16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,0);
-
-			multi--;
-		}
-	}
-}
 
 /******************************************************************************/
 
@@ -316,7 +249,9 @@ SCREEN_UPDATE( darkseal )
 
 	tilemap_draw(bitmap,cliprect,state->pf3_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,cliprect);
+
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0x400);
+
 	tilemap_draw(bitmap,cliprect,state->pf1_tilemap,0,0);
 	return 0;
 }

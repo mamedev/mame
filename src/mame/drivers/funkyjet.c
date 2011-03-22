@@ -96,7 +96,7 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-
+#include "video/decospr.h"
 
 /******************************************************************************/
 
@@ -330,6 +330,8 @@ static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DECO16IC_ADD("deco_custom", funkyjet_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 2);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

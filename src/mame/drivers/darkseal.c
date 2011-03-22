@@ -20,7 +20,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/darkseal.h"
-
+#include "video/decospr.h"
 
 /******************************************************************************/
 
@@ -249,6 +249,9 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 
 	MCFG_GFXDECODE(darkseal)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
 
 	MCFG_VIDEO_START(darkseal)
 
