@@ -3635,7 +3635,7 @@ ROM_START( zigzag2 )
 	ROM_IGNORE(                      0x0800 )
 
 	ROM_REGION( 0x1000, "gfx2", 0 )
-	ROM_LOAD( "zz_6.h1",     0x0000, 0x0800, CRC(780c162a) SHA1(b0cac68258281917bcada52ce26e0ce38721d633) )
+	ROM_LOAD( "zz_6.1h",     0x0000, 0x0800, CRC(780c162a) SHA1(b0cac68258281917bcada52ce26e0ce38721d633) )
 	ROM_CONTINUE(            0x0000, 0x0800 )
 	ROM_LOAD( "zz_5.1k",     0x0800, 0x0800, CRC(f3cdfec5) SHA1(798d631c72d8e6b2e372b4b3ab0c10d8365a1359) )
 	ROM_CONTINUE(            0x0800, 0x0800 )
