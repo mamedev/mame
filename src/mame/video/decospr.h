@@ -25,6 +25,7 @@ public:
 	void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram, int sizewords, bool invert_flip = false );
 	void set_pri_callback(decospr_priority_callback_func callback);
 	void set_gfxregion(int region) { m_gfxregion = region; };
+	void set_sprite_bitmap(bitmap_t* bitmap);
 
 protected:
 	virtual void device_start();
@@ -32,7 +33,7 @@ protected:
 	const decospr_device_config &m_config;
 	UINT8						m_gfxregion;
 	decospr_priority_callback_func m_pricallback;
-
+	bitmap_t *m_sprite_bitmap;// optional sprite bitmap (should be INDEXED16)
 private:
 
 };

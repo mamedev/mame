@@ -236,7 +236,7 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "sound/bsmt2000.h"
-
+#include "video/decospr.h"
 
 /**********************************************************************************/
 
@@ -694,6 +694,26 @@ static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
 ADDRESS_MAP_END
 
+static READ32_HANDLER( deco32_spriteram_r )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	return state->spriteram16[offset] ^ 0xffff0000;
+}
+
+static WRITE32_HANDLER( deco32_spriteram_w )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
+	COMBINE_DATA(&state->spriteram16[offset]);
+}
+
+static WRITE32_HANDLER( deco32_buffer_spriteram_w )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	memcpy(state->spriteram16_buffered, state->spriteram16, 0x1000);
+}	
+
 static ADDRESS_MAP_START( fghthist_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
@@ -707,9 +727,8 @@ static ADDRESS_MAP_START( fghthist_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(deco32_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(deco32_palette_dma_w)
 	//
-	AM_RANGE(0x178000, 0x178fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x179000, 0x179fff) AM_RAM AM_BASE_GENERIC(spriteram2) // ?
-	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram32_w)
+	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
+	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram_w)
 
 	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
@@ -740,8 +759,8 @@ static ADDRESS_MAP_START( fghthsta_memmap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(deco32_palette_dma_w)
 	AM_RANGE(0x16c010, 0x16c013) AM_READNOP
 
-	AM_RANGE(0x178000, 0x179fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram32_w)
+	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
+	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram_w)
 	AM_RANGE(0x17c020, 0x17c023) AM_READNOP
 
 	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
@@ -1710,6 +1729,7 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
+
 static MACHINE_CONFIG_START( fghthist, deco32_state )
 
 	/* basic machine hardware */
@@ -1722,8 +1742,6 @@ static MACHINE_CONFIG_START( fghthist, deco32_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1734,6 +1752,9 @@ static MACHINE_CONFIG_START( fghthist, deco32_state )
 
 	MCFG_GFXDECODE(fghthist)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
 
 	MCFG_VIDEO_START(fghthist)
 
@@ -1767,7 +1788,7 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
+	//MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1778,6 +1799,9 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 
 	MCFG_GFXDECODE(fghthist)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
 
 	MCFG_VIDEO_START(fghthist)
 
@@ -3082,10 +3106,10 @@ GAME( 1991, captavenuu, captaven, captaven, captaven, captaven, ROT0, "Data East
 GAME( 1991, captavenua, captaven, captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (US Rev 1.4)", 0 )
 GAME( 1991, captavenj,  captaven, captaven, captaven, captaven, ROT0, "Data East Corporation", "Captain America and The Avengers (Japan Rev 0.2)", 0 )
 GAME( 1993, dragngun,   0,        dragngun, dragngun, dragngun, ROT0, "Data East Corporation", "Dragon Gun (US)", GAME_IMPERFECT_GRAPHICS  )
-GAME( 1993, fghthist,   0,        fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (World ver 43-07)", 0 )
-GAME( 1993, fghthistu,  fghthist, fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-03)", 0 )
-GAME( 1993, fghthista,  fghthist, fghthsta, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, alternate hardware )", 0 )
-GAME( 1993, fghthistj,  fghthist, fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (Japan ver 42-03)", 0 )
+GAME( 1993, fghthist,   0,        fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (World ver 43-07)", GAME_UNEMULATED_PROTECTION )
+GAME( 1993, fghthistu,  fghthist, fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-03)", GAME_UNEMULATED_PROTECTION )
+GAME( 1993, fghthista,  fghthist, fghthsta, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (US ver 42-05, alternate hardware)", GAME_UNEMULATED_PROTECTION )
+GAME( 1993, fghthistj,  fghthist, fghthist, fghthist, fghthist, ROT0, "Data East Corporation", "Fighter's History (Japan ver 42-03)", GAME_UNEMULATED_PROTECTION )
 GAME( 1994, lockload,   0,        lockload, lockload, lockload, ROT0, "Data East Corporation", "Locked 'n Loaded (World)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1994, lockloadu,  lockload, lockload, lockload, lockload, ROT0, "Data East Corporation", "Locked 'n Loaded (US)", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1994, tattass,    0,        tattass,  tattass,  tattass,  ROT0, "Data East Pinball",     "Tattoo Assassins (US prototype)", GAME_IMPERFECT_GRAPHICS )

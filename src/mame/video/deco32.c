@@ -1,85 +1,8 @@
 #include "emu.h"
 #include "includes/deco32.h"
+#include "video/decospr.h"
 
 
-/******************************************************************************
-
- This sprite_priority_bitmap handling is the same as in deco16ic.c
-
-******************************************************************************/
-
-
-static void deco16_clear_sprite_priority_bitmap(deco32_state *state)
-{
-	if (state->sprite_priority_bitmap)
-		bitmap_fill(state->sprite_priority_bitmap,NULL,0);
-}
-
-/* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */
-static void deco16_pdrawgfx(
-		bitmap_t *dest,const rectangle *clip,const gfx_element *gfx,
-		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha)
-{
-	deco32_state *state = gfx->machine->driver_data<deco32_state>();
-	int ox,oy,cx,cy;
-	int x_index,y_index,x,y;
-	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
-	const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-
-	/* check bounds */
-	ox = sx;
-	oy = sy;
-
-	if (sx>319 || sy>247 || sx<-15 || sy<-7)
-		return;
-
-	if (sy<0) sy=0;
-	if (sx<0) sx=0;
-	if (sx>319) cx=319;
-	else cx=ox+16;
-
-	cy=(sy-oy);
-
-	if (flipy) y_index=15-cy; else y_index=cy;
-
-	for( y=0; y<16-cy; y++ )
-	{
-		const UINT8 *source = code_base + (y_index * gfx->line_modulo);
-		UINT32 *destb = BITMAP_ADDR32(dest, sy, 0);
-		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
-		UINT8 *spri = BITMAP_ADDR8(state->sprite_priority_bitmap, sy, 0);
-
-		if (sy >= 0 && sy < 248)
-		{
-			if (flipx) { source+=15-(sx-ox); x_index=-1; } else { x_index=1; source+=(sx-ox); }
-
-			for (x=sx; x<cx; x++)
-			{
-				int c = *source;
-				if( c != transparent_color && x >= 0 && x < 320 )
-				{
-					if (pri_mask>pri[x] && sprite_mask>spri[x]) {
-						if (alpha != 0xff)
-							destb[x] = alpha_blend_r32(destb[x], pal[c], alpha);
-						else
-							destb[x] = pal[c];
-						if (write_pri)
-							pri[x] |= pri_mask;
-					}
-					spri[x]|=sprite_mask;
-				}
-				source+=x_index;
-			}
-		}
-
-		sy++;
-		if (sy>247)
-			return;
-		if (flipy) y_index--; else y_index++;
-	}
-}
 
 /******************************************************************************/
 
@@ -362,67 +285,6 @@ static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, co
 						sx + x_mult * (w-x),sy + y_mult * (h-y) - 512,
 						machine->priority_bitmap,prival,0);
 			}
-		}
-	}
-}
-
-static void fghthist_draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank, int mask, int colourmask)
-{
-	int offs;
-
-	for (offs = 0x400 - 4; offs >= 0; offs -=4)
-	{
-		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult,pri=0;
-		int alpha = 0xff;
-
-		sprite = spritedata[offs+1] & 0xffff;
-
-		y = spritedata[offs];
-		flash=y&0x1000;
-		if (flash && (machine->primary_screen->frame_number() & 1)) continue;
-
-		x = spritedata[offs+2];
-		colour = (x >>9) & colourmask;
-
-		if ((y&0x8000))
-			pri=1;
-		else
-			pri=4;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		mult=+16;
-
-		if (fx) fx=0; else fx=1;
-		if (fy) fy=0; else fy=1;
-
-		while (multi >= 0)
-		{
-			deco16_pdrawgfx(
-					bitmap,cliprect,machine->gfx[gfxbank],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					0,pri,1<<gfxbank, 1, alpha);
-
-			multi--;
 		}
 	}
 }
@@ -1071,10 +933,10 @@ VIDEO_START( fghthist )
 	state->pf1a_tilemap =0;
 	state->dirty_palette = auto_alloc_array(machine, UINT8, 4096);
 
-	/* Allow sprite bitmap */
 	int width = machine->primary_screen->width();
 	int height = machine->primary_screen->height();
-	state->sprite_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
+	state->temp_bitmap_sprites  = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+	machine->device<decospr_device>("spritegen")->set_sprite_bitmap(state->temp_bitmap_sprites);
 
 	tilemap_set_transparent_pen(state->pf1_tilemap,0);
 	tilemap_set_transparent_pen(state->pf2_tilemap,0);
@@ -1426,9 +1288,56 @@ SCREEN_UPDATE( dragngun )
 	return 0;
 }
 
+// inefficient, we should be able to mix in a single pass by comparing the existing priority bitmap from the tilemaps
+// mixing is also still wrong for some levels (it was before this rewrite of the code also)
+void fghthist_mix_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, bool hipriority)
+{
+	deco32_state *state = machine->driver_data<deco32_state>();
+
+	int y, x;
+	const pen_t *paldata = machine->pens;
+
+	UINT16* srcline;
+	UINT32* dstline;
+
+	for (y=cliprect->min_y;y<=cliprect->max_y;y++)
+	{
+		srcline= BITMAP_ADDR16(state->temp_bitmap_sprites, y, 0);
+		dstline= BITMAP_ADDR32(bitmap, y, 0);
+	
+		for (x=cliprect->min_x;x<=cliprect->max_x;x++)
+		{
+			UINT16 pix = srcline[x];
+
+			if (pix&0xf)
+			{
+				if (hipriority)
+				{
+					if (!(pix&0x800))
+						dstline[x] = paldata[(pix&0x1ff) + 1024];
+				}
+				else
+				{
+					if ((pix&0x800))
+						dstline[x] = paldata[(pix&0x1ff) + 1024];
+				}
+			
+			}
+		}
+	}
+	
+}
+
 SCREEN_UPDATE( fghthist )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
+
+	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
+	bitmap_fill(state->temp_bitmap_sprites, cliprect, 0);
+	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x000]); // Palette index not confirmed
+
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffered, 0x800, true); 
+
 	/* Dirty tilemaps if any globals change */
 	if (state->pf1_flip!=((state->pf12_control[6]>>0)&0x3))
 		tilemap_mark_all_tiles_dirty(state->pf1_tilemap);
@@ -1463,21 +1372,24 @@ SCREEN_UPDATE( fghthist )
 	deco32_setup_scroll(state->pf4_tilemap, 512,(state->pf34_control[5]>>8)&0xff,(state->pf34_control[6]>>8)&0xff,state->pf34_control[4],state->pf34_control[3],state->pf4_rowscroll,state->pf4_rowscroll+0x200);
 
 	/* Draw screen */
-	deco16_clear_sprite_priority_bitmap(state);
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x000]); // Palette index not confirmed
-	tilemap_draw(bitmap,cliprect,state->pf4_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->pf4_tilemap,0,1);
+
+
 	if(state->pri&1)
 	{
-		tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,0);
-		tilemap_draw(bitmap,cliprect,state->pf3_tilemap,0,2);
+		tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,2);
+		fghthist_mix_sprites(screen->machine, bitmap, cliprect, false); // lower pri sprites from bitmap
+		tilemap_draw(bitmap,cliprect,state->pf3_tilemap,0,4);
 	}
 	else
 	{
-		tilemap_draw(bitmap,cliprect,state->pf3_tilemap,0,0);
-		tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,2);
+		tilemap_draw(bitmap,cliprect,state->pf3_tilemap,0,2);
+		fghthist_mix_sprites(screen->machine, bitmap, cliprect, false); // lower pri sprites from bitmap
+		tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,4);
 	}
-	fghthist_draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u32,3,0, 0xf);
+
+	fghthist_mix_sprites(screen->machine, bitmap, cliprect, true); // hig pri sprites from bitmap
+
 	tilemap_draw(bitmap,cliprect,state->pf1_tilemap,0,0);
 	return 0;
 }

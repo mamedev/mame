@@ -5,6 +5,7 @@
    some games have different visible areas, but are confirmed as the same sprite chip.
 
    games with alpha aren't supported here yet, in most cases they need better mixing anyway, probably rendering to screen buffers and manual mixing.
+   see m_sprite_bitmap...
 
    used by:
    
@@ -80,6 +81,7 @@ void decospr_device::device_start()
 {
 //	sprite_kludge_x = sprite_kludge_y = 0;
 //	printf("decospr_device::device_start()\n");
+	m_sprite_bitmap = 0;
 }
 
 void decospr_device::device_reset()
@@ -95,6 +97,11 @@ void decospr_device::decospr_sprite_kludge(int x, int y)
 }
 */
 
+void decospr_device::set_sprite_bitmap(bitmap_t* bitmap)
+{
+	m_sprite_bitmap = bitmap;
+}
+
 void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
 {
 	m_pricallback = callback;
@@ -105,14 +112,15 @@ void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
 
 offs +0
 -------- --------
- fFbSssy yyyyyyyy
+efFbSssy yyyyyyyy
 
 s = size (multipart)
-S = size (x?) (does any other game use this?)
+S = size (x?) (double wings)
 f = flipy
 b = flash
 F = flipx
 y = ypos
+e = extra priority bit (or at least externally detectable by mixer circuits)
 
 offs +1
 -------- --------
@@ -133,6 +141,10 @@ x = xpos
 
 void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
 {
+
+	if (m_sprite_bitmap && m_pricallback)
+		fatalerror("m_sprite_bitmap && m_pricallback is invalid");
+
 	int offs, end, incr;
 
 	int flipscreen = flip_screen_get(machine);
@@ -157,7 +169,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	while (offs!=end)
 	{
 		int x, y, sprite, colour, multi, mult2, fx, fy, inc, flash, mult, xsize, pri;
-
+		
 		sprite = spriteram[offs + 1];
 
 		y = spriteram[offs];
@@ -167,8 +179,17 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		{
 
 			x = spriteram[offs + 2];
-			colour = (x >> 9) & 0x1f;
+			
+			if (!m_sprite_bitmap)
+				colour = (x >> 9) & 0x1f;
+			else
+			{
+				colour = (x >> 9) & 0x7f;
+				if (y&0x8000) colour |= 0x80; // fghthist uses this to mark priority
+				//colour *= 0x10; // for raw drawing
+			}
 
+	
 			if (m_pricallback)
 				pri = m_pricallback(x);
 			else
@@ -230,39 +251,65 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 				while (multi >= 0)
 				{
-					if (m_pricallback) 
-						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-							sprite - multi * inc,
-							colour,
-							fx,fy,
-							x,y + mult * multi,
-							machine->priority_bitmap,pri,0);
+					if(!m_sprite_bitmap)
+					{
+
+						if (m_pricallback) 
+							pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+								sprite - multi * inc,
+								colour,
+								fx,fy,
+								x,y + mult * multi,
+								machine->priority_bitmap,pri,0);
+						else
+							drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+								sprite - multi * inc,
+								colour,
+								fx,fy,
+								x,y + mult * multi,
+								0);
+					
+						// double wing uses this flag
+						if (xsize)
+						{
+							if (m_pricallback) 
+								pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+										(sprite - multi * inc)-mult2,
+										colour,
+										fx,fy,
+										x-16,y + mult * multi,
+										machine->priority_bitmap,pri,0);
+							else
+								drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+										(sprite - multi * inc)-mult2,
+										colour,
+										fx,fy,
+										x-16,y + mult * multi,
+										0);
+						}
+					}
 					else
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+					{
+						// if we have a sprite bitmap draw raw data to it for manual mixing
+						drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
 							sprite - multi * inc,
-							colour,
+							colour*0x10,
 							fx,fy,
 							x,y + mult * multi,
 							0);
-				
-					// double wing uses this flag
-					if (xsize)
-					{
-						if (m_pricallback) 
-							pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-									(sprite - multi * inc)-mult2,
-									colour,
-									fx,fy,
-									x-16,y + mult * multi,
-									machine->priority_bitmap,pri,0);
-						else
-							drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-									(sprite - multi * inc)-mult2,
-									colour,
-									fx,fy,
-									x-16,y + mult * multi,
-									0);
+						if (xsize)
+						{	
+							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
+								(sprite - multi * inc)-mult2,
+								colour*0x10,
+								fx,fy,
+								x-16,y + mult * multi,
+								0);
+						}
 					}
+
+
+
 
 					multi--;
 				}
