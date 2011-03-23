@@ -23,13 +23,13 @@
 
     I/O Ports:
 
-    00-01       R/W AY8910 #0 (Port A = Input Port #0)
-    80-81       R/W AY8910 #1 (Port A = Input Port #1)
+    00-01       R/W AY8912 #0 (Port A = Input Port #0)
+    80-81       R/W AY8912 #1 (Port A = Input Port #1)
 
 
     TODO:
 
-    - Verify Z80 and AY8910 clock speeds
+    - Verify actual Z80 and AY8912 clock speeds from PCB (XTAL confirmed)
 
 ***************************************************************************/
 
@@ -199,7 +199,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const ay8910_interface ay8910_interface_1 =
+static const ay8910_interface ay8912_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -209,7 +209,7 @@ static const ay8910_interface ay8910_interface_1 =
 	DEVCB_NULL
 };
 
-static const ay8910_interface ay8910_interface_2 =
+static const ay8910_interface ay8912_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -229,7 +229,7 @@ static const ay8910_interface ay8910_interface_2 =
 static MACHINE_CONFIG_START( ambush, ambush_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)		/* XTAL confirmed, divisor guessed */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -251,13 +251,13 @@ static MACHINE_CONFIG_START( ambush, ambush_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_interface_1)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8912, XTAL_18_432MHz/6/2)	/* XTAL confirmed, divisor guessed */
+	MCFG_SOUND_CONFIG(ay8912_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_CONFIG(ay8910_interface_2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8912, XTAL_18_432MHz/6/2)	/* XTAL confirmed, divisor guessed */
+	MCFG_SOUND_CONFIG(ay8912_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 
