@@ -665,14 +665,35 @@ static WRITE32_HANDLER( nslasher_prot_w )
 
 /**********************************************************************************/
 
+static READ32_HANDLER( deco32_spriteram_r )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	return state->spriteram16[offset] ^ 0xffff0000;
+}
+
+static WRITE32_HANDLER( deco32_spriteram_w )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
+	COMBINE_DATA(&state->spriteram16[offset]);
+}
+
+static WRITE32_HANDLER( deco32_buffer_spriteram_w )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	memcpy(state->spriteram16_buffered, state->spriteram16, 0x1000);
+}	
+
 static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100007) AM_READ(deco32_71_r)
-	AM_RANGE(0x100000, 0x100003) AM_WRITE(buffer_spriteram32_w)
+	AM_RANGE(0x100000, 0x100003) AM_WRITE(deco32_buffer_spriteram_w)
 	AM_RANGE(0x108000, 0x108003) AM_WRITENOP /* ? */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprites */
+	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
 	AM_RANGE(0x120000, 0x127fff) AM_RAM AM_BASE_MEMBER(deco32_state, ram) /* Main RAM */
+	
 	AM_RANGE(0x128000, 0x128fff) AM_READ(captaven_prot_r)
 	AM_RANGE(0x1280c8, 0x1280cb) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE(deco32_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
@@ -694,25 +715,7 @@ static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
 ADDRESS_MAP_END
 
-static READ32_HANDLER( deco32_spriteram_r )
-{
-	deco32_state *state = space->machine->driver_data<deco32_state>();
-	return state->spriteram16[offset] ^ 0xffff0000;
-}
 
-static WRITE32_HANDLER( deco32_spriteram_w )
-{
-	deco32_state *state = space->machine->driver_data<deco32_state>();
-	data &= 0x0000ffff;
-	mem_mask &= 0x0000ffff;
-	COMBINE_DATA(&state->spriteram16[offset]);
-}
-
-static WRITE32_HANDLER( deco32_buffer_spriteram_w )
-{
-	deco32_state *state = space->machine->driver_data<deco32_state>();
-	memcpy(state->spriteram16_buffered, state->spriteram16, 0x1000);
-}	
 
 static ADDRESS_MAP_START( fghthist_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w)
@@ -1682,6 +1685,27 @@ static INTERRUPT_GEN( tattass_snd_interrupt )
 	cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
+
+UINT16 captaven_pri_callback(UINT16 x)
+{
+	if ((x&0x60)==0x00)
+	{
+		return 0; // above everything
+	}
+	else if ((x&0x60)==0x20)
+	{
+		return 0xfff0; // above the 2nd playfield
+	}
+	else if ((x&0x60)==0x40)
+	{
+		return 0xfffc; // above the 1st playfield
+	}
+	else
+	{
+		return 0xfffe; // under everything
+	}
+}
+
 static MACHINE_CONFIG_START( captaven, deco32_state )
 
 	/* basic machine hardware */
@@ -1696,9 +1720,6 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 
 	MCFG_TIMER_ADD("int_timer", interrupt_gen)
 
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -1709,6 +1730,11 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 
 	MCFG_GFXDECODE(captaven)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+	decospr_device_config::set_pri_callback(device, captaven_pri_callback);
+
 
 	MCFG_VIDEO_START(captaven)
 
@@ -1929,7 +1955,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( tattass, deco32_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
+	MCFG_CPU_ADD("maincpu", ARM, 28000000/*/4*/) /* Unconfirmed - the divider makes it far too slow, due to inaccurate core timings? */
 	MCFG_CPU_PROGRAM_MAP(tattass_map)
 	MCFG_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 

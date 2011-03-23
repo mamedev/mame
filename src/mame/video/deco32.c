@@ -183,111 +183,7 @@ WRITE32_HANDLER( deco32_palette_dma_w )
 
 /******************************************************************************/
 
-static void captaven_draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank)
-{
-	int offs;
 
-	/*
-        Word 0:
-            0x8000: Y flip
-            0x4000: X flip
-            0x2000: Flash (Sprite toggles on/off every frame)
-            0x1fff: Y value
-        Word 1:
-            0xffff: X value
-        Word 2:
-            0xf000: Block height
-            0x0f00: Block width
-            0x0080: Unused?
-            0x0040: Priority
-            0x001f: Colour
-        Word 3:
-            0xffff: Sprite value
-    */
-
-	for (offs = 0x400-4;offs >=0;offs -= 4)
-	{
-		int sx,sy,sprite,colour,fx,fy,x_mult,y_mult,w,h,x,y,prival;
-
-		sy = spritedata[offs+0];
-		sprite = spritedata[offs+3] & 0xffff;
-
-		if (sy==0x00000108 && !sprite)
-			continue; //fix!!!!!
-
-		if ((spritedata[offs+2]&0x60)==0x00)
-		{
-			prival = 0; // above everything
-		}
-		else if ((spritedata[offs+2]&0x60)==0x20)
-		{
-			prival = 0xfff0; // above the 2nd playfield
-		}
-		else if ((spritedata[offs+2]&0x60)==0x40)
-		{
-			prival = 0xfffc; // above the 1st playfield
-		}
-		else
-		{
-			// never used?
-			prival = 0xfffe; // under everything
-		}
-
-		sx = spritedata[offs+1];
-
-		if ((sy&0x2000) && (machine->primary_screen->frame_number() & 1)) continue;
-
-		colour = (spritedata[offs+2] >>0) & 0x1f;
-
-		h = (spritedata[offs+2]&0xf000)>>12;
-		w = (spritedata[offs+2]&0x0f00)>> 8;
-		fx = !(spritedata[offs+0]&0x4000);
-		fy = !(spritedata[offs+0]&0x8000);
-
-		if (!flip_screen_get(machine)) {
-			sx = sx & 0x01ff;
-			sy = sy & 0x01ff;
-			if (sx>0x180) sx=-(0x200 - sx);
-			if (sy>0x180) sy=-(0x200 - sy);
-
-			if (fx) { x_mult=-16; sx+=16*w; } else { x_mult=16; sx-=16; }
-			if (fy) { y_mult=-16; sy+=16*h; } else { y_mult=16; sy-=16; }
-		} else {
-			if (fx) fx=0; else fx=1;
-			if (fy) fy=0; else fy=1;
-
-			sx = sx & 0x01ff;
-			sy = sy & 0x01ff;
-			if (sx&0x100) sx=-(0x100 - (sx&0xff));
-			if (sy&0x100) sy=-(0x100 - (sy&0xff));
-			sx = 304 - sx;
-			sy = 240 - sy;
-			if (sx >= 432) sx -= 512;
-			if (sy >= 384) sy -= 512;
-			if (fx) { x_mult=-16; sx+=16; } else { x_mult=16; sx-=16*w; }
-			if (fy) { y_mult=-16; sy+=16; } else { y_mult=16; sy-=16*h; }
-		}
-
-		for (x=0; x<w; x++) {
-			for (y=0; y<h; y++) {
-				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[gfxbank],
-						sprite + y + h * x,
-						colour,
-						fx,fy,
-						sx + x_mult * (w-x),sy + y_mult * (h-y),
-						machine->priority_bitmap,prival,0);
-
-				// wrap-around y
-				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[gfxbank],
-						sprite + y + h * x,
-						colour,
-						fx,fy,
-						sx + x_mult * (w-x),sy + y_mult * (h-y) - 512,
-						machine->priority_bitmap,prival,0);
-			}
-		}
-	}
-}
 
 /*
     This renders sprites to a 16 bit bitmap, for later mixing.
@@ -1023,7 +919,7 @@ VIDEO_START( nslasher )
 
 SCREEN_EOF( captaven )
 {
-	memcpy(machine->generic.buffered_spriteram.u32,machine->generic.spriteram.u32,machine->generic.spriteram_size);
+
 }
 
 SCREEN_EOF( dragngun )
@@ -1194,7 +1090,8 @@ SCREEN_UPDATE( captaven )
 	else
 		tilemap_draw(bitmap,cliprect,state->pf1a_tilemap,0,4);
 
-	captaven_draw_sprites(screen->machine,bitmap,cliprect,screen->machine->generic.buffered_spriteram.u32,3);
+	screen->machine->device<decospr_device>("spritegen")->set_alt_format(true);
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffered, 0x400); 
 
 	return 0;
 }

@@ -39,6 +39,7 @@ public:
 /*----------- defined in video/cninja.c -----------*/
 
 VIDEO_START( stoneage );
+VIDEO_START( mutantf );
 
 SCREEN_UPDATE( cninja );
 SCREEN_UPDATE( cninjabl );

@@ -21,91 +21,18 @@
    sshangha.c (could probably use pdrawgfx, not m_sprite_bitmap)
    cbuster.c (could probably use pdrawgfx, not m_sprite_bitmap)
    mirage.c (could probably use pdrawgfx, not m_sprite_bitmap)
+   cninja.c
 
    partially converted:
-   cninja.c (mutantf uses alpha etc.)
    deco32.c - video mixing
 
    difficult to convert:
-   rohga.c - alpha effects, extra rom banking on the sprites etc. causes problems
+   rohga.c - complex video mixing, 6bpp gfx..
    lemmings.c - priority stuff (plus sprites seem somewhat different anyway??)
-   dassault.c - video mixing
-   boogwing.c - video mixing
+   dassault.c - complex video mixing
+   boogwing.c - complex video mixing
+
 */
-
-
-#include "emu.h"
-#include "decospr.h"
-
-
-decospr_device_config::decospr_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "decospr_device", tag, owner, clock)
-{
-	m_gfxregion = 0;
-	m_pricallback = NULL;
-}
-
-device_config *decospr_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(decospr_device_config(mconfig, tag, owner, clock));
-}
-
-device_t *decospr_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(&machine, decospr_device(machine, *this));
-}
-
-void decospr_device_config::set_gfx_region(device_config *device, int gfxregion)
-{
-	decospr_device_config *dev = downcast<decospr_device_config *>(device);
-	dev->m_gfxregion = gfxregion;
-//	printf("decospr_device_config::set_gfx_region()\n");
-}
-
-void decospr_device_config::set_pri_callback(device_config *device, decospr_priority_callback_func callback)
-{
-	decospr_device_config *dev = downcast<decospr_device_config *>(device);
-	dev->m_pricallback = callback;
-//	printf("decospr_device_config::set_pri_callback()\n");
-}
-
-decospr_device::decospr_device(running_machine &_machine, const decospr_device_config &config)
-	: device_t(_machine, config),
-	  m_config(config),
-  	  m_gfxregion(m_config.m_gfxregion),
-	  m_pricallback(m_config.m_pricallback)
-{
-}
-
-void decospr_device::device_start()
-{
-//	sprite_kludge_x = sprite_kludge_y = 0;
-//	printf("decospr_device::device_start()\n");
-	m_sprite_bitmap = 0;
-}
-
-void decospr_device::device_reset()
-{
-	//printf("decospr_device::device_reset()\n");
-}
-
-/*
-void decospr_device::decospr_sprite_kludge(int x, int y)
-{
-	sprite_kludge_x = x;
-	sprite_kludge_y = y;
-}
-*/
-
-void decospr_device::alloc_sprite_bitmap(running_machine* machine)
-{
-	m_sprite_bitmap =  auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
-}
-
-void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
-{
-	m_pricallback = callback;
-}
 
 
 /*
@@ -178,9 +105,85 @@ t = sprite tile
 todo: the priotity callback for using pdrawgfx should really pack those 8 bits, and pass them instead of currently just
 passing offs+2 which lacks the extra priority bit
 
-todo: add support for alternate format + basic blend mixing
+todo: basic blend mixing
 
 */
+
+#include "emu.h"
+#include "decospr.h"
+
+
+decospr_device_config::decospr_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "decospr_device", tag, owner, clock)
+{
+	m_gfxregion = 0;
+	m_pricallback = NULL;
+}
+
+device_config *decospr_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(decospr_device_config(mconfig, tag, owner, clock));
+}
+
+device_t *decospr_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, decospr_device(machine, *this));
+}
+
+void decospr_device_config::set_gfx_region(device_config *device, int gfxregion)
+{
+	decospr_device_config *dev = downcast<decospr_device_config *>(device);
+	dev->m_gfxregion = gfxregion;
+//	printf("decospr_device_config::set_gfx_region()\n");
+}
+
+void decospr_device_config::set_pri_callback(device_config *device, decospr_priority_callback_func callback)
+{
+	decospr_device_config *dev = downcast<decospr_device_config *>(device);
+	dev->m_pricallback = callback;
+//	printf("decospr_device_config::set_pri_callback()\n");
+}
+
+decospr_device::decospr_device(running_machine &_machine, const decospr_device_config &config)
+	: device_t(_machine, config),
+	  m_config(config),
+  	  m_gfxregion(m_config.m_gfxregion),
+	  m_pricallback(m_config.m_pricallback)
+{
+}
+
+void decospr_device::device_start()
+{
+//	sprite_kludge_x = sprite_kludge_y = 0;
+//	printf("decospr_device::device_start()\n");
+	m_sprite_bitmap = 0;
+	m_alt_format = 0;
+}
+
+void decospr_device::device_reset()
+{
+	//printf("decospr_device::device_reset()\n");
+}
+
+/*
+void decospr_device::decospr_sprite_kludge(int x, int y)
+{
+	sprite_kludge_x = x;
+	sprite_kludge_y = y;
+}
+*/
+
+void decospr_device::alloc_sprite_bitmap(running_machine* machine)
+{
+	m_sprite_bitmap =  auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
+}
+
+void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
+{
+	m_pricallback = callback;
+}
+
+
 
 
 void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
@@ -216,150 +219,268 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 	while (offs!=end)
 	{
-		int x, y, sprite, colour, multi, mult2, fx, fy, inc, flash, mult, xsize, pri;
+		int x, y, sprite, colour, multi, mult2, fx, fy, inc, flash, mult, h, w, pri;
 		
-		sprite = spriteram[offs + 1];
-
-		y = spriteram[offs];
-		flash = y & 0x1000;
-		xsize = y & 0x0800;
-		if (!(flash && (machine->primary_screen->frame_number() & 1)))
+		if (!m_alt_format)
 		{
 
-			x = spriteram[offs + 2];
-			
-			if (!m_sprite_bitmap)
-				colour = (x >> 9) & 0x1f;
-			else
-			{
-				colour = (x >> 9) & 0x7f;
-				if (y&0x8000) colour |= 0x80; // fghthist uses this to mark priority
-				//colour *= 0x10; // for raw drawing
-			}
+			sprite = spriteram[offs + 1];
+			y = spriteram[offs];
+			flash = y & 0x1000;
+			w = y & 0x0800;
 
-	
+
+			if (!(flash && (machine->primary_screen->frame_number() & 1)))
+			{
+
+				x = spriteram[offs + 2];
+				
+				if (!m_sprite_bitmap)
+					colour = (x >> 9) & 0x1f;
+				else
+				{
+					colour = (x >> 9) & 0x7f;
+					if (y&0x8000) colour |= 0x80; // fghthist uses this to mark priority
+				}
+
+		
+				if (m_pricallback)
+					pri = m_pricallback(x);
+				else
+					pri = 0;
+
+				fx = y & 0x2000;
+				fy = y & 0x4000;
+				multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
+
+				if (cliprect->max_x>256)
+				{
+					x = x & 0x01ff;
+					y = y & 0x01ff;
+					if (x >= 320) x -= 512;
+					if (y >= 256) y -= 512;
+					y = 240 - y;
+					x = 304 - x;
+				}
+				else
+				{
+
+					x = x & 0x01ff;
+					y = y & 0x01ff;
+					if (x >= 256) x -= 512;
+					if (y >= 256) y -= 512;
+					y = 240 - y;
+					x = 240 - x;
+				}
+
+				//if (x <= 320)
+				{
+
+					sprite &= ~multi;
+					if (fy)
+						inc = -1;
+					else
+					{
+						sprite += multi;
+						inc = 1;
+					}
+
+					if (flipscreen)
+					{
+						y = 240 - y;
+
+						if (cliprect->max_x>256)
+							x = 304 - x;
+						else
+							x = 240 - x;
+
+						if (fx) fx = 0; else fx = 1;
+						if (fy) fy = 0; else fy = 1;
+						mult = 16;
+					}
+					else
+						mult = -16;
+
+					mult2 = multi + 1;
+
+					while (multi >= 0)
+					{
+						if(!m_sprite_bitmap)
+						{
+
+							if (m_pricallback) 
+								pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+									sprite - multi * inc,
+									colour,
+									fx,fy,
+									x,y + mult * multi,
+									machine->priority_bitmap,pri,0);
+							else
+								drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+									sprite - multi * inc,
+									colour,
+									fx,fy,
+									x,y + mult * multi,
+									0);
+						
+							// double wing uses this flag
+							if (w)
+							{
+								if (m_pricallback) 
+									pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+											(sprite - multi * inc)-mult2,
+											colour,
+											fx,fy,
+											x-16,y + mult * multi,
+											machine->priority_bitmap,pri,0);
+								else
+									drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+											(sprite - multi * inc)-mult2,
+											colour,
+											fx,fy,
+											x-16,y + mult * multi,
+											0);
+							}
+						}
+						else
+						{
+							// if we have a sprite bitmap draw raw data to it for manual mixing
+							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
+								sprite - multi * inc,
+								colour*0x10,
+								fx,fy,
+								x,y + mult * multi,
+								0);
+							if (w)
+							{	
+								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
+									(sprite - multi * inc)-mult2,
+									colour*0x10,
+									fx,fy,
+									x-16,y + mult * multi,
+									0);
+							}
+						}
+
+
+
+
+						multi--;
+					}
+				}
+			}
+		}
+		else // m_alt_format
+		{
+			y = spriteram[offs+0];
+			sprite = spriteram[offs+3] & 0xffff;
+
+
 			if (m_pricallback)
-				pri = m_pricallback(x);
+				pri = m_pricallback(spriteram[offs+2]&0x00ff);
 			else
 				pri = 0;
 
-			fx = y & 0x2000;
-			fy = y & 0x4000;
-			multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
+			x = spriteram[offs+1];
 
-			if (cliprect->max_x>256)
+			if (!((y&0x2000) && (machine->primary_screen->frame_number() & 1)));
 			{
-				x = x & 0x01ff;
-				y = y & 0x01ff;
-				if (x >= 320) x -= 512;
-				if (y >= 256) y -= 512;
-				y = 240 - y;
-				x = 304 - x;
-			}
-			else
-			{
-
-				x = x & 0x01ff;
-				y = y & 0x01ff;
-				if (x >= 256) x -= 512;
-				if (y >= 256) y -= 512;
-				y = 240 - y;
-				x = 240 - x;
-			}
-
-			//if (x <= 320)
-			{
-
-				sprite &= ~multi;
-				if (fy)
-					inc = -1;
+				if (!m_sprite_bitmap)
+					colour = (spriteram[offs+2] >>0) & 0x1f;
 				else
-				{
-					sprite += multi;
-					inc = 1;
-				}
+					colour = (spriteram[offs+2] >>0) & 0xff; // store all bits for manual mixing
 
-				if (flipscreen)
-				{
+
+				h = (spriteram[offs+2]&0xf000)>>12;
+				w = (spriteram[offs+2]&0x0f00)>> 8;
+				fx = !(spriteram[offs+0]&0x4000);
+				fy = !(spriteram[offs+0]&0x8000);
+
+				if (!flipscreen) {
+					x = x & 0x01ff;
+					y = y & 0x01ff;
+					if (x>0x180) x=-(0x200 - x);
+					if (y>0x180) y=-(0x200 - y);
+
+					if (fx) { mult=-16; x+=16*w; } else { mult=16; x-=16; }
+					if (fy) { mult2=-16; y+=16*h; } else { mult2=16; y-=16; }
+				} else {
+					if (fx) fx=0; else fx=1;
+					if (fy) fy=0; else fy=1;
+
+					x = x & 0x01ff;
+					y = y & 0x01ff;
+					if (x&0x100) x=-(0x100 - (x&0xff));
+					if (y&0x100) y=-(0x100 - (y&0xff));
+					x = 304 - x;
 					y = 240 - y;
-
-					if (cliprect->max_x>256)
-						x = 304 - x;
-					else
-						x = 240 - x;
-
-					if (fx) fx = 0; else fx = 1;
-					if (fy) fy = 0; else fy = 1;
-					mult = 16;
+					if (x >= 432) x -= 512;
+					if (y >= 384) y -= 512;
+					if (fx) { mult=-16; x+=16; } else { mult=16; x-=16*w; }
+					if (fy) { mult2=-16; y+=16; } else { mult2=16; y-=16*h; }
 				}
-				else
-					mult = -16;
 
-				mult2 = multi + 1;
-
-				while (multi >= 0)
+				for (int xx=0; xx<w; xx++)
 				{
-					if(!m_sprite_bitmap)
+					for (int yy=0; yy<h; yy++)
 					{
-
-						if (m_pricallback) 
-							pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-								sprite - multi * inc,
-								colour,
-								fx,fy,
-								x,y + mult * multi,
-								machine->priority_bitmap,pri,0);
-						else
-							drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-								sprite - multi * inc,
-								colour,
-								fx,fy,
-								x,y + mult * multi,
-								0);
-					
-						// double wing uses this flag
-						if (xsize)
+				
+						if(!m_sprite_bitmap)
 						{
 							if (m_pricallback) 
+							{
 								pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-										(sprite - multi * inc)-mult2,
+										sprite + yy + h * xx,
 										colour,
 										fx,fy,
-										x-16,y + mult * multi,
+										x + mult * (w-xx),y + mult2 * (h-yy),
 										machine->priority_bitmap,pri,0);
-							else
-								drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-										(sprite - multi * inc)-mult2,
+
+								// wrap-around y
+								pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+										sprite + yy + h * xx,
 										colour,
 										fx,fy,
-										x-16,y + mult * multi,
+										x + mult * (w-xx),y + mult2 * (h-yy) - 512,
+										machine->priority_bitmap,pri,0);
+							}
+							else
+							{
+
+								drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+										sprite + yy + h * xx,
+										colour,
+										fx,fy,
+										x + mult * (w-xx),y + mult2 * (h-yy),
 										0);
+
+								// wrap-around y
+								drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+										sprite + yy + h * xx,
+										colour,
+										fx,fy,
+										x + mult * (w-xx),y + mult2 * (h-yy) - 512,
+										0);
+							}
 						}
-					}
-					else
-					{
-						// if we have a sprite bitmap draw raw data to it for manual mixing
-						drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
-							sprite - multi * inc,
-							colour*0x10,
-							fx,fy,
-							x,y + mult * multi,
-							0);
-						if (xsize)
-						{	
+						else
+						{
 							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
-								(sprite - multi * inc)-mult2,
-								colour*0x10,
-								fx,fy,
-								x-16,y + mult * multi,
-								0);
+									sprite + yy + h * xx,
+									colour*0x10,
+									fx,fy,
+									x + mult * (w-xx),y + mult2 * (h-yy),
+									0);
+
+							// wrap-around y
+							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
+									sprite + yy + h * xx,
+									colour*0x10,
+									fx,fy,
+									x + mult * (w-xx),y + mult2 * (h-yy) - 512,
+									0);
 						}
 					}
-
-
-
-
-					multi--;
 				}
 			}
 		}
@@ -370,7 +491,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 
 // inefficient, we should be able to mix in a single pass by comparing the existing priority bitmap from the tilemaps
-void decospr_device::inefficient_copy_sprite_bitmap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 pri, UINT16 priority_mask, UINT16 colbase, UINT16 palmask)
+void decospr_device::inefficient_copy_sprite_bitmap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 pri, UINT16 priority_mask, UINT16 colbase, UINT16 palmask, UINT8 alpha)
 {
 	if (!m_sprite_bitmap)
 		fatalerror("decospr_device::inefficient_copy_sprite_bitmap with no m_sprite_bitmap");
@@ -386,16 +507,36 @@ void decospr_device::inefficient_copy_sprite_bitmap(running_machine* machine, bi
 		srcline= BITMAP_ADDR16(m_sprite_bitmap, y, 0);
 		dstline= BITMAP_ADDR32(bitmap, y, 0);
 	
-		for (x=cliprect->min_x;x<=cliprect->max_x;x++)
+		if (alpha==0xff)
 		{
-			UINT16 pix = srcline[x];
-
-			if (pix&0xf)
+			for (x=cliprect->min_x;x<=cliprect->max_x;x++)
 			{
-				if ((pix & priority_mask) ==pri )
+				UINT16 pix = srcline[x];
+
+				if (pix&0xf)
 				{
-					dstline[x] = paldata[(pix&palmask) + colbase];
-				}			
+					if ((pix & priority_mask) ==pri )
+					{
+						dstline[x] = paldata[(pix&palmask) + colbase];
+					}			
+				}
+			}
+		}
+		else
+		{
+			for (x=cliprect->min_x;x<=cliprect->max_x;x++)
+			{
+				UINT16 pix = srcline[x];
+
+				if (pix&0xf)
+				{
+					if ((pix & priority_mask) ==pri )
+					{
+						UINT32 pal1 = paldata[(pix&palmask) + colbase];
+						UINT32 pal2 = dstline[x];
+						dstline[x] = alpha_blend_r32(pal2, pal1, alpha);
+					}			
+				}
 			}
 		}
 	}

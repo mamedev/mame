@@ -713,8 +713,8 @@ static GFXDECODE_START( mutantf )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 64 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0, 64 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,          0, 64 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      256, 128 )	/* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,     1024+768, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,      0, 128 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,     0, 16 )	/* Sprites 16x16 */
 GFXDECODE_END
 
 /**********************************************************************************/
@@ -1131,10 +1131,18 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(mutantf)
 
+	MCFG_VIDEO_START(mutantf)
+
 	MCFG_GFXDECODE(mutantf)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", mutantf_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+
+	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 4);
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
