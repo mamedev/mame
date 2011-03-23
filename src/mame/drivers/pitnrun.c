@@ -156,17 +156,17 @@ static INPUT_PORTS_START( pitnrun )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
@@ -175,17 +175,17 @@ static INPUT_PORTS_START( pitnrun )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x20, 0x00, "Gasoline Count" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "DSW:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "DSW:5" )
+	PORT_DIPNAME( 0x20, 0x00, "Gasoline Count" )	PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x00, "10 Up or 10 Down" )
 	PORT_DIPSETTING(    0x20, "20 Up or 20 Down" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )	PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, "No Hit (Cheat)")
+	PORT_DIPNAME( 0x80, 0x00, "No Hit (Cheat)")		PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )		// also enables bootup test
 INPUT_PORTS_END
 
 
@@ -230,16 +230,16 @@ static GFXDECODE_START( pitnrun )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)		 /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
 	MCFG_CPU_VBLANK_INT("screen", pitnrun_nmi_source)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)		 /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)			/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
 	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)		 /* verified on pcb */
+	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)		/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_mcu_map)
 
 	MCFG_MACHINE_RESET(pitnrun)
@@ -263,11 +263,11 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)		 /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)		 /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)	/* verified on pcb */
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -343,6 +343,6 @@ ROM_START( pitnruna )
 	ROM_LOAD( "clr.3",  0x0040, 0x0020, CRC(25e70e5e) SHA1(fdb9c69e9568a725dd0e3ac25835270fb4f49280) )
 ROM_END
 
-GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run (set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run (set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run - F-1 Race (set 2)", GAME_IMPERFECT_SOUND )
 
