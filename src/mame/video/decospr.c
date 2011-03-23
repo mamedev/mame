@@ -5,7 +5,7 @@
    some games have different visible areas, but are confirmed as the same sprite chip.
 
    games with alpha aren't supported here yet, in most cases they need better mixing anyway, probably rendering to screen buffers and manual mixing.
-   see m_sprite_bitmap...
+   see m_sprite_bitmap... (note, if using that you must also use BITMAP_FORMAT_RGB32 in the machine config)
 
    used by:
    
@@ -18,19 +18,19 @@
    pktgaldx.c
    backfire.c
    darkseal.c
+   sshangha.c (could probably use pdrawgfx, not m_sprite_bitmap)
+   cbuster.c (could probably use pdrawgfx, not m_sprite_bitmap)
+   mirage.c (could probably use pdrawgfx, not m_sprite_bitmap)
 
    partially converted:
    cninja.c (mutantf uses alpha etc.)
+   deco32.c - video mixing
 
    difficult to convert:
    rohga.c - alpha effects, extra rom banking on the sprites etc. causes problems
-   lemmings.c - priority stuff
+   lemmings.c - priority stuff (plus sprites seem somewhat different anyway??)
    dassault.c - video mixing
-   deco32.c - video mixing
-   cbuster.c - needs updating to use proper priority (pdrawgfx), not multipass
-   mirage.c - needs updating to use proper priority (pdrawgfx), not multipass
-
-   many more
+   boogwing.c - video mixing
 */
 
 
@@ -97,9 +97,9 @@ void decospr_device::decospr_sprite_kludge(int x, int y)
 }
 */
 
-void decospr_device::set_sprite_bitmap(bitmap_t* bitmap)
+void decospr_device::alloc_sprite_bitmap(running_machine* machine)
 {
-	m_sprite_bitmap = bitmap;
+	m_sprite_bitmap =  auto_bitmap_alloc(machine, machine->primary_screen->width(), machine->primary_screen->height(), BITMAP_FORMAT_INDEXED16);
 }
 
 void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
@@ -110,15 +110,17 @@ void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
 
 /*
 
+STANDARD FORMAT
+
 offs +0
 -------- --------
 efFbSssy yyyyyyyy
 
-s = size (multipart)
-S = size (x?) (double wings)
+s = size (height)
+S = size (width) (double wings)
 f = flipy
-b = flash
 F = flipx
+b = flash/blink
 y = ypos
 e = extra priority bit (or at least externally detectable by mixer circuits)
 
@@ -136,6 +138,48 @@ c = colour palette
 p = priority
 x = xpos
 
+offs +3
+-------- -------- (unused)
+
+in reality all the colour / priority (and extra priority) bits are externally detectable and can be used for
+priority and mixing, the sprite palette in twocrude for example isn't in a single block (there is a gap for the tilemaps)
+but the mixing circuits take care of this
+
+ALTERNATE FORMAT (used by Mutant Fighter, Captain America)
+
+offs +0
+-------- --------
+fFbyyyyy yyyyyyyy
+
+f = flipy
+F = flipx
+b = flash/blink
+y = ypos
+
+offs +1
+-------- --------
+xxxxxxxx xxxxxxxx
+
+x = xpos
+
+offs +2
+-------- --------
+ssssSSSS pppccccc
+
+s = size (height)
+S = size (width) (double wings)
+
+offs +3
+-------- --------
+tttttttt tttttttt
+
+t = sprite tile
+
+todo: the priotity callback for using pdrawgfx should really pack those 8 bits, and pass them instead of currently just
+passing offs+2 which lacks the extra priority bit
+
+todo: add support for alternate format + basic blend mixing
+
 */
 
 
@@ -144,6 +188,10 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 	if (m_sprite_bitmap && m_pricallback)
 		fatalerror("m_sprite_bitmap && m_pricallback is invalid");
+
+	if (m_sprite_bitmap)
+		bitmap_fill(m_sprite_bitmap, cliprect, 0);
+
 
 	int offs, end, incr;
 
@@ -317,5 +365,38 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 		}
 
 		offs+=incr;
+	}
+}
+
+
+// inefficient, we should be able to mix in a single pass by comparing the existing priority bitmap from the tilemaps
+void decospr_device::inefficient_copy_sprite_bitmap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 pri, UINT16 priority_mask, UINT16 colbase, UINT16 palmask)
+{
+	if (!m_sprite_bitmap)
+		fatalerror("decospr_device::inefficient_copy_sprite_bitmap with no m_sprite_bitmap");
+
+	int y, x;
+	const pen_t *paldata = machine->pens;
+
+	UINT16* srcline;
+	UINT32* dstline;
+
+	for (y=cliprect->min_y;y<=cliprect->max_y;y++)
+	{
+		srcline= BITMAP_ADDR16(m_sprite_bitmap, y, 0);
+		dstline= BITMAP_ADDR32(bitmap, y, 0);
+	
+		for (x=cliprect->min_x;x<=cliprect->max_x;x++)
+		{
+			UINT16 pix = srcline[x];
+
+			if (pix&0xf)
+			{
+				if ((pix & priority_mask) ==pri )
+				{
+					dstline[x] = paldata[(pix&palmask) + colbase];
+				}			
+			}
+		}
 	}
 }

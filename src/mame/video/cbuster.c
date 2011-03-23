@@ -7,8 +7,11 @@
 #include "emu.h"
 #include "includes/cbuster.h"
 #include "video/deco16ic.h"
+#include "video/decospr.h"
 
 /******************************************************************************/
+
+/* maybe the game should just use generic palette handling, and have a darker palette by design... */
 
 static void update_24bitcol( running_machine *machine, int offset )
 {
@@ -36,82 +39,13 @@ WRITE16_HANDLER( twocrude_palette_24bit_b_w )
 
 /******************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
-{
-	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
-	int offs;
-
-	for (offs = 0; offs < 0x400; offs += 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-
-		sprite = buffered_spriteram[offs + 1] & 0x7fff;
-		if (!sprite)
-			continue;
-
-		y = buffered_spriteram[offs];
-		x = buffered_spriteram[offs + 2];
-
-		if ((y & 0x8000) && pri == 1)
-			continue;
-		if (!(y & 0x8000) && pri == 0)
-			continue;
-
-		colour = (x >> 9) & 0xf;
-		if (x & 0x2000)
-			colour += 64;
-
-		flash = y & 0x1000;
-		if (flash && (machine->primary_screen->frame_number() & 1))
-			continue;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 256) x -= 512;
-		if (y >= 256) y -= 512;
-		x = 240 - x;
-		y = 240 - y;
-
-		if (x > 256)
-			continue; /* Speedup */
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_get(machine))
-		{
-			y = 240 - y;
-			x = 240 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else mult = -16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,0);
-
-			multi--;
-		}
-	}
-}
 
 /******************************************************************************/
+
+VIDEO_START( twocrude )
+{
+	machine->device<decospr_device>("spritegen")->alloc_sprite_bitmap(machine);
+}
 
 SCREEN_UPDATE( twocrude )
 {
@@ -120,12 +54,16 @@ SCREEN_UPDATE( twocrude )
 
 	flip_screen_set(screen->machine, !BIT(flip, 7));
 
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffer, 0x400); 
+
+
 	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 	deco16ic_pf34_update(state->deco16ic, state->pf3_rowscroll, state->pf4_rowscroll);
 
 	/* Draw playfields & sprites */
 	deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0900, 0x100, 0x0ff);
+	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0900, 0x0900, 0x500, 0x0ff);
 
 	if (state->pri)
 	{
@@ -138,7 +76,8 @@ SCREEN_UPDATE( twocrude )
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
 
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0000, 0x0900, 0x100, 0x0ff);
+	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0100, 0x0900, 0x500, 0x0ff);
 	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

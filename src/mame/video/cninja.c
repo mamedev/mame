@@ -122,79 +122,6 @@ static void cninjabl_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 }
 
 
-static void robocop2_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
-{
-	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
-	int offs;
-
-	for (offs = 0x400 - 4; offs >=0 ; offs -= 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult, pri = 0;
-		sprite = buffered_spriteram[offs + 1];
-		if (!sprite)
-			continue;
-
-		x = buffered_spriteram[offs + 2];
-
-		/* Sprite/playfield priority */
-		switch (x & 0xc000)
-		{
-		case 0x0000: pri = 0; break;
-		case 0x4000: pri = 0xf0; break;
-		case 0x8000: pri = 0xf0 | 0xcc; break;
-		case 0xc000: pri = 0xf0 | 0xcc; break; /* Perhaps 0xf0|0xcc|0xaa (Sprite under bottom layer) */
-		}
-
-		y = buffered_spriteram[offs];
-		flash = y & 0x1000;
-		if (flash && (machine->primary_screen->frame_number() & 1))
-			continue;
-		colour = (x >> 9) & 0x1f;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-		x = 304 - x;
-		y = 240 - y;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_get(machine))
-		{
-			y = 240 - y;
-			x = 304 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else
-			mult = -16;
-
-		while (multi >= 0)
-		{
-			pdrawgfx_transpen(bitmap,cliprect,machine->gfx[3],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,
-					machine->priority_bitmap,pri,0);
-
-			multi--;
-		}
-	}
-}
 
 static void mutantf_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT16 *spriteptr, int gfxbank )
 {
@@ -422,7 +349,7 @@ SCREEN_UPDATE( robocop2 )
 			break;
 	}
 
-	robocop2_draw_sprites(screen->machine, bitmap, cliprect);
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0x400);
 	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	return 0;
 }

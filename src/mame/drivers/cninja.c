@@ -842,6 +842,7 @@ static MACHINE_RESET( cninja )
 	state->irq_mask = 0;
 }
 
+
 UINT16 cninja_pri_callback(UINT16 x)
 {
 	/* Sprite/playfield priority */
@@ -1082,6 +1083,9 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", robocop2_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

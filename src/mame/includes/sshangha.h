@@ -19,6 +19,11 @@ public:
 	int video_control;
 	int last_pf1_bank;
 	int last_pf2_bank;
+
+	UINT16* sprite_paletteram;
+	UINT16* sprite_paletteram2;
+	UINT16* tile_paletteram1;
+	UINT16* tile_paletteram2;
 };
 
 

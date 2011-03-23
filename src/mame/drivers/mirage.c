@@ -38,6 +38,7 @@ MR_01-.3A    [a0b758aa]
 #include "includes/decoprot.h"
 #include "video/deco16ic.h"
 #include "sound/okim6295.h"
+#include "video/decospr.h"
 
 class mirage_state : public driver_device
 {
@@ -66,78 +67,9 @@ public:
 	required_device<okim6295_device> oki_bgm;
 };
 
-
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
+static VIDEO_START( mirage )
 {
-	//mirage_state *state = machine->driver_data<mirage_state>();
-	UINT16 *spriteram = machine->generic.buffered_spriteram.u16;//state->spriteram;
-	int offs;
-
-	for (offs = 0; offs < 0x400; offs += 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-
-		sprite = spriteram[offs + 1];
-		if (!sprite)
-			continue;
-
-		y = spriteram[offs];
-		flash = y & 0x1000;
-
-		if (flash && (machine->primary_screen->frame_number() & 1))
-			continue;
-
-		if (pri != ((y & 0x8000) >> 15))
-			continue;
-
-		x = spriteram[offs + 2];
-		colour = (x >> 9) & 0x1f;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-		y = 240 - y;
-		x = 304 - x;
-
-		if (x > 320)
-			continue;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_get(machine))
-		{
-			y =240 - y;
-			x =304 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else mult = -16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[2],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,0);
-
-			multi--;
-		}
-	}
+	machine->device<decospr_device>("spritegen")->alloc_sprite_bitmap(machine);
 }
 
 static SCREEN_UPDATE( mirage )
@@ -146,14 +78,17 @@ static SCREEN_UPDATE( mirage )
 	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
+
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0x400); 
+
 	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 256); /* not verified */
 
 	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
 	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
 
 	return 0;
 }
@@ -396,16 +331,20 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(mirage)
 	MCFG_SCREEN_EOF(mirage)
 
+	MCFG_VIDEO_START(mirage)
+
 	MCFG_GFXDECODE(mirage)
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_DECO16IC_ADD("deco_custom", mirage_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 2);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

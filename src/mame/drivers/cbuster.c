@@ -24,7 +24,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-
+#include "video/decospr.h"
 
 static WRITE16_HANDLER( twocrude_control_w )
 {
@@ -33,7 +33,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 	switch (offset << 1)
 	{
 	case 0: /* DMA flag */
-		buffer_spriteram16_w(space, 0, 0, 0xffff);
+		memcpy(state->spriteram16_buffer, state->spriteram16, 0x800);
 		return;
 
 	case 6: /* IRQ ack */
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( twocrude_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf3_rowscroll)
 	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf4_rowscroll)
 
-	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_BASE_MEMBER(cbuster_state, spriteram16)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
 	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
 	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
@@ -326,21 +326,22 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_MACHINE_START(cbuster)
 	MCFG_MACHINE_RESET(cbuster)
 
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(twocrude)
+	MCFG_VIDEO_START(twocrude)
 
 	MCFG_GFXDECODE(cbuster)
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", twocrude_deco16ic_intf)
+	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

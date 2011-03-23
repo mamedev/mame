@@ -18,6 +18,11 @@
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
 
+  ToDo:
+
+  Palette handling is somewhat hacked, see paletteram16_xbgr_word_be_sprites_w
+
+  ----
 
 Stephh's notes (based on the games M68000 code and some tests) :
 
@@ -38,17 +43,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
   - The "Use Mahjong Tiles" Dip Switch only has an effect when playing
     "Shanghai Advanced".
 
-1) 'sshangha'
-
-  - There are writes to 0x100000-0x10000f (code from 0x000964 to 0x000a8c),
-    but their effect is unknown.
-
-2) 'sshanghb'
-
-  - There are writes to 0x101000-0x10100f (code from 0x000964 to 0x000a8c),
-    but their effect is unknown. Note that the code is the SAME as the one
-    in 'sshangha' (only the 0x10?00? addresses are different).
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -57,6 +51,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "includes/sshangha.h"
+#include "video/decospr.h"
 
 #define SSHANGHA_HACK	0
 
@@ -130,6 +125,56 @@ static MACHINE_RESET( sshangha )
 
 /******************************************************************************/
 
+/*-------------------------------------------------
+    set_color_8888 - set a 8-8-8 RGB color using
+    the 32-bit data provided and the specified
+    shift values
+-------------------------------------------------*/
+
+
+
+
+INLINE void set_color_888(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
+{
+	palette_set_color_rgb(machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
+}
+
+
+WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites2_w )
+{
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	COMBINE_DATA(&state->sprite_paletteram2[offset]);
+	set_color_888(space->machine, (offset/2)+0x100, 0, 8, 16, state->sprite_paletteram2[(offset) | 1] | (state->sprite_paletteram2[(offset) & ~1] << 16) );
+}
+
+WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
+{
+	// hack??? we have to call this otherwise the sprite colours for some selected tiles are wrong (most noticable on the 2nd level of quest mode)
+	// however if we simply mirror the memory both ways the how to play screen ends up with bad colours
+	// we use the 2nd copy of palette ram for low priority tiles only..
+	// is this related to the bootleg only, or does the original have this issue too?
+	// maybe related to sprite DMA on the original, or the apparent lack of a 2nd sprite controller on the bootleg.
+	paletteram16_xbgr_word_be_sprites2_w(space,offset,data,mem_mask);
+	
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	COMBINE_DATA(&state->sprite_paletteram[offset]);
+	set_color_888(space->machine, (offset/2)+0x000, 0, 8, 16, state->sprite_paletteram[(offset) | 1] | (state->sprite_paletteram[(offset) & ~1] << 16) );
+}
+
+WRITE16_HANDLER( paletteram16_xbgr_word_be_tilelow_w )
+{
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	COMBINE_DATA(&state->tile_paletteram1[offset]);
+	set_color_888(space->machine, (offset/2)+0x200, 0, 8, 16, state->tile_paletteram1[(offset) | 1] | (state->tile_paletteram1[(offset) & ~1] << 16) );
+}
+
+WRITE16_HANDLER( paletteram16_xbgr_word_be_tilehigh_w )
+{
+	sshangha_state *state = space->machine->driver_data<sshangha_state>();
+	COMBINE_DATA(&state->tile_paletteram2[offset]);
+	set_color_888(space->machine, (offset/2)+0x300, 0, 8, 16, state->tile_paletteram2[(offset) | 1] | (state->tile_paletteram2[(offset) & ~1] << 16) );
+}
+
 static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE_MEMBER(sshangha_state, sound_shared_ram)
@@ -150,8 +195,13 @@ static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
 	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
-	AM_RANGE(0x380000, 0x383fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM	/* Sprite ram buffer on bootleg only?? */
+
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE_MEMBER(sshangha_state, sprite_paletteram)
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE_MEMBER(sshangha_state, tile_paletteram2)
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE_MEMBER(sshangha_state, sprite_paletteram2)
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE_MEMBER(sshangha_state, tile_paletteram1)
+	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
+
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
 	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE_MEMBER(sshangha_state, prot_data)
 ADDRESS_MAP_END
@@ -171,14 +221,15 @@ static ADDRESS_MAP_START( sshanghb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
 
-	AM_RANGE(0x340000, 0x340fff) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x350000, 0x350001) AM_READ(deco_71_r)
-	AM_RANGE(0x350000, 0x350007) AM_WRITENOP
-	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_BASE_GENERIC(spriteram2)
-	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
-	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
-	AM_RANGE(0x380000, 0x383fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM	/* Sprite ram buffer on bootleg only?? */
+	AM_RANGE(0x340000, 0x340fff) AM_RAM // original spriteram
+
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE_MEMBER(sshangha_state, sprite_paletteram)
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE_MEMBER(sshangha_state, tile_paletteram2)
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE_MEMBER(sshangha_state, sprite_paletteram2)
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE_MEMBER(sshangha_state, tile_paletteram1)
+	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
+
+	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM AM_BASE_GENERIC(spriteram) // bootleg spriteram
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
 	AM_RANGE(0xff4000, 0xff47ff) AM_RAM
 ADDRESS_MAP_END
@@ -323,9 +374,9 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( sshangha )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  256, 64 ) /* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  256, 64 ) /* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 32 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0x200, 64 ) /* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,  0x200, 64 ) /* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,    0, 64 ) /* Sprites 16x16 */
 GFXDECODE_END
 
 /******************************************************************************/
@@ -359,19 +410,23 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 
 	MCFG_MACHINE_RESET(sshangha)	/* init machine */
 
-	/* video hardware */
-	/*MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)*/
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(sshangha)
 
 	MCFG_GFXDECODE(sshangha)
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_LENGTH(0x4000)
+
+	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 2);
+
+	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 2);
+
 
 	MCFG_VIDEO_START(sshangha)
 

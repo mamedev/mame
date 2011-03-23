@@ -61,7 +61,6 @@ public:
 	int has_ace_ram;
 	int last_pf3_bank;
 
-	bitmap_t* temp_bitmap_sprites;
 	UINT16 spriteram16[0x1000];
 	UINT16 spriteram16_buffered[0x1000];
 

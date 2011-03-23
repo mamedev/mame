@@ -25,7 +25,9 @@ public:
 	void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram, int sizewords, bool invert_flip = false );
 	void set_pri_callback(decospr_priority_callback_func callback);
 	void set_gfxregion(int region) { m_gfxregion = region; };
-	void set_sprite_bitmap(bitmap_t* bitmap);
+	void alloc_sprite_bitmap(running_machine* machine);
+	void inefficient_copy_sprite_bitmap(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 pri, UINT16 priority_mask, UINT16 colbase, UINT16 palmask);
+	bitmap_t* get_sprite_temp_bitmap(void) { return m_sprite_bitmap; };
 
 protected:
 	virtual void device_start();

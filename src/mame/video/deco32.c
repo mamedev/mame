@@ -933,10 +933,7 @@ VIDEO_START( fghthist )
 	state->pf1a_tilemap =0;
 	state->dirty_palette = auto_alloc_array(machine, UINT8, 4096);
 
-	int width = machine->primary_screen->width();
-	int height = machine->primary_screen->height();
-	state->temp_bitmap_sprites  = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
-	machine->device<decospr_device>("spritegen")->set_sprite_bitmap(state->temp_bitmap_sprites);
+	machine->device<decospr_device>("spritegen")->alloc_sprite_bitmap(machine);
 
 	tilemap_set_transparent_pen(state->pf1_tilemap,0);
 	tilemap_set_transparent_pen(state->pf2_tilemap,0);
@@ -1288,52 +1285,12 @@ SCREEN_UPDATE( dragngun )
 	return 0;
 }
 
-// inefficient, we should be able to mix in a single pass by comparing the existing priority bitmap from the tilemaps
-// mixing is also still wrong for some levels (it was before this rewrite of the code also)
-void fghthist_mix_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, bool hipriority)
-{
-	deco32_state *state = machine->driver_data<deco32_state>();
-
-	int y, x;
-	const pen_t *paldata = machine->pens;
-
-	UINT16* srcline;
-	UINT32* dstline;
-
-	for (y=cliprect->min_y;y<=cliprect->max_y;y++)
-	{
-		srcline= BITMAP_ADDR16(state->temp_bitmap_sprites, y, 0);
-		dstline= BITMAP_ADDR32(bitmap, y, 0);
-	
-		for (x=cliprect->min_x;x<=cliprect->max_x;x++)
-		{
-			UINT16 pix = srcline[x];
-
-			if (pix&0xf)
-			{
-				if (hipriority)
-				{
-					if (!(pix&0x800))
-						dstline[x] = paldata[(pix&0x1ff) + 1024];
-				}
-				else
-				{
-					if ((pix&0x800))
-						dstline[x] = paldata[(pix&0x1ff) + 1024];
-				}
-			
-			}
-		}
-	}
-	
-}
 
 SCREEN_UPDATE( fghthist )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(state->temp_bitmap_sprites, cliprect, 0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x000]); // Palette index not confirmed
 
 	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffered, 0x800, true); 
@@ -1378,17 +1335,17 @@ SCREEN_UPDATE( fghthist )
 	if(state->pri&1)
 	{
 		tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,2);
-		fghthist_mix_sprites(screen->machine, bitmap, cliprect, false); // lower pri sprites from bitmap
+		screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		tilemap_draw(bitmap,cliprect,state->pf3_tilemap,0,4);
 	}
 	else
 	{
 		tilemap_draw(bitmap,cliprect,state->pf3_tilemap,0,2);
-		fghthist_mix_sprites(screen->machine, bitmap, cliprect, false); // lower pri sprites from bitmap
+		screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,4);
 	}
 
-	fghthist_mix_sprites(screen->machine, bitmap, cliprect, true); // hig pri sprites from bitmap
+	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
 
 	tilemap_draw(bitmap,cliprect,state->pf1_tilemap,0,0);
 	return 0;

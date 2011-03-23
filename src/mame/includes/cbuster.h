@@ -16,6 +16,8 @@ public:
 	UINT16 *  pf3_rowscroll;
 	UINT16 *  pf4_rowscroll;
 	UINT16 *  ram;
+	UINT16 *  spriteram16;
+	UINT16    spriteram16_buffer[0x400];
 
 	/* misc */
 	UINT16    prot;
@@ -34,4 +36,5 @@ public:
 WRITE16_HANDLER( twocrude_palette_24bit_rg_w );
 WRITE16_HANDLER( twocrude_palette_24bit_b_w );
 
+VIDEO_START( twocrude );
 SCREEN_UPDATE( twocrude );
