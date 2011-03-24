@@ -73,14 +73,18 @@ static TILEMAP_MAPPER( tx_tilemap_scan )
 static TILE_GET_INFO( tx_get_tile_info )
 {
 	skykid_state *state = machine->driver_data<skykid_state>();
+	int code = state->textram[tile_index];
+	int attr = state->textram[tile_index + 0x400];
+	tileinfo->category = code >> 4 & 0xf;
+
 	/* the hardware has two character sets, one normal and one flipped. When
        screen is flipped, character flip is done by selecting the 2nd character set.
        We reproduce this here, but since the tilemap system automatically flips
        characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO(
 			0,
-			state->textram[tile_index] | (flip_screen_get(machine) ? 0x100 : 0),
-			state->textram[tile_index + 0x400] & 0x3f,
+			code | (flip_screen_get(machine) ? 0x100 : 0),
+			attr & 0x3f,
 			flip_screen_get(machine) ? (TILE_FLIPY | TILE_FLIPX) : 0);
 }
 
@@ -117,8 +121,6 @@ VIDEO_START( skykid )
 	state_save_register_global(machine, state->priority);
 	state_save_register_global(machine, state->scroll_x);
 	state_save_register_global(machine, state->scroll_y);
-	//FIXME: flip_screen
-	//state_save_register_global(machine, flip_screen_x_get(machine));
 }
 
 
@@ -250,14 +252,27 @@ SCREEN_UPDATE( skykid )
 		tilemap_set_scrolly(state->bg_tilemap, 0, state->scroll_y + 25);
 	}
 
-	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
-	if ((state->priority & 0xf0) != 0x50)
-		draw_sprites(screen->machine, bitmap,cliprect);
+	if (state->priority & 0x04)
+	{
+		// textlayer priority enabled?
+		int cat, pri = state->priority >> 4;
 
-	tilemap_draw(bitmap,cliprect,state->tx_tilemap,0,0);
+		// draw low priority tiles
+		tilemap_draw(bitmap, cliprect, state->tx_tilemap, pri, 0);
 
-	if ((state->priority & 0xf0) == 0x50)
-		draw_sprites(screen->machine, bitmap,cliprect);
+		draw_sprites(screen->machine, bitmap, cliprect);
+
+		// draw the other tiles
+		for (cat = 0; cat < 0xf; cat++)
+			if (cat != pri) tilemap_draw(bitmap, cliprect, state->tx_tilemap, cat, 0);
+	}
+	else
+	{
+		draw_sprites(screen->machine, bitmap, cliprect);
+		tilemap_draw(bitmap, cliprect, state->tx_tilemap, TILEMAP_DRAW_ALL_CATEGORIES, 0);
+	}
+
 	return 0;
 }
