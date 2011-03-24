@@ -26,7 +26,8 @@ struct _deco16ic_interface
 	const char         *screen;
 	int                pf12_only;
 	int                split;
-	int                full_width;
+	int                full_width12;
+	int				   full_width34;
 
 	int                trans_mask1, trans_mask2, trans_mask3, trans_mask4;
 	int                col_base1, col_base2, col_base3, col_base4;
@@ -117,6 +118,9 @@ void deco16ic_pdrawgfx(
 /* used by robocop2 */
 void deco16ic_set_tilemap_colour_mask(device_t *device, int tmap, int mask);
 void deco16ic_pf34_set_gfxbank(device_t *device, int small, int big);
+
+/* used by captaven */
+void deco16ic_set_pf3_8bpp_mode(device_t *device, int mode);
 
 /* used by stoneage */
 void deco16ic_set_scrolldx(device_t *device, int tmap, int size, int dx, int dx_if_flipped);

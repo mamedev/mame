@@ -311,7 +311,7 @@ static int boogwing_bank_callback2( const int bank )
 static const deco16ic_interface boogwing_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1,
+	0, 0, 1, 1,
 	0x0f, 0x1f, 0x0f, 0x0f, /* trans masks (pf2 has 5bpp graphics) */
 	0, 0, 0, 16, /* color base (pf2 is non default) */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */

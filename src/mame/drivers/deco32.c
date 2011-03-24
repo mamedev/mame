@@ -253,7 +253,7 @@ static int fghthist_bank_callback( int bank )
 static const deco16ic_interface fghthist_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1,
+	0, 0, 1, 1,
 	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
 	0x00, 0x10, 0x20, 0x30, /* color base */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
@@ -728,6 +728,19 @@ static WRITE32_HANDLER( deco32_buffer_spriteram2_w )
 	memcpy(state->spriteram16_2_buffered, state->spriteram16_2, 0x1000);
 }	
 
+
+
+
+static READ32_HANDLER( deco32_pf1_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( deco32_pf2_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf2_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( deco32_pf3_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf3_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( deco32_pf4_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf4_rowscroll[offset] ^ 0xffff0000; }
+static WRITE32_HANDLER( deco32_pf1_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf2_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf3_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf3_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf4_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf4_rowscroll[offset]); }
+
+
 static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
@@ -746,28 +759,19 @@ static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x178000, 0x178003) AM_WRITE(deco32_pri_w)
 
-	AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE_MEMBER(deco32_state, pf12_control)
-	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
-	AM_RANGE(0x192000, 0x193fff) AM_WRITE(deco32_pf1_data_w) /* Mirror address - bug in program code */
-	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
-	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
+	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x192000, 0x193fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w) /* Mirror address - bug in program code */
+	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_READWRITE(deco32_pf1_rowscroll_r, deco32_pf1_rowscroll_w)
+	AM_RANGE(0x1a4000, 0x1a5fff) AM_READWRITE(deco32_pf2_rowscroll_r, deco32_pf2_rowscroll_w)
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
-	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf34_control_dword_r, deco16ic_pf34_control_dword_w)
+	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_dword_r, deco16ic_pf3_data_dword_w)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_dword_r, deco16ic_pf4_data_dword_w) // unused
+	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(deco32_pf3_rowscroll_r, deco32_pf3_rowscroll_w)
+	AM_RANGE(0x1e4000, 0x1e5fff) AM_READWRITE(deco32_pf4_rowscroll_r, deco32_pf4_rowscroll_w) // unused
 ADDRESS_MAP_END
-
-
-
-static READ32_HANDLER( deco32_pf1_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( deco32_pf2_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf2_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( deco32_pf3_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf3_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( deco32_pf4_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf4_rowscroll[offset] ^ 0xffff0000; }
-static WRITE32_HANDLER( deco32_pf1_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
-static WRITE32_HANDLER( deco32_pf2_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
-static WRITE32_HANDLER( deco32_pf3_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf3_rowscroll[offset]); }
-static WRITE32_HANDLER( deco32_pf4_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf4_rowscroll[offset]); }
 
 
 static ADDRESS_MAP_START( fghthist_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1640,9 +1644,9 @@ static const gfx_layout spritelayout5 =
 };
 
 static GFXDECODE_START( captaven )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        512, 32 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        512, 32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,      1024,  4 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 128 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,          0, 128 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        0, 32 )	/* Sprites 16x16 */
 GFXDECODE_END
 
@@ -1760,6 +1764,29 @@ UINT16 captaven_pri_callback(UINT16 x)
 	}
 }
 
+static int captaven_bank_callback( int bank )
+{
+	bank = bank >> 4;
+	bank = (bank & 2) >> 1;
+
+	return bank * 0x4000;
+}
+
+// pf4 not used (pf3 is in 8bpp mode)
+static const deco16ic_interface captaven_deco16ic_intf =
+{
+	"screen",
+	0, 0, 1, 0, // pf12only, split, fullwidth12 / fullwidth34
+	0x0f, 0x0f, 0xff, 0x00,	/* trans masks (default values) */
+	0x20, 0x20, 0x10, 0x00, /* color base */
+	0x0f, 0x0f, 0x0f, 0x00,	/* color masks (default values) */
+	0,
+	0,
+	captaven_bank_callback,
+	NULL,
+};
+
+
 static MACHINE_CONFIG_START( captaven, deco32_state )
 
 	/* basic machine hardware */
@@ -1784,6 +1811,8 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 
 	MCFG_GFXDECODE(captaven)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_DECO16IC_ADD("deco_custom", captaven_deco16ic_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);

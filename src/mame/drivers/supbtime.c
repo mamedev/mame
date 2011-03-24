@@ -323,7 +323,7 @@ static const ym2151_interface ym2151_config =
 static const deco16ic_interface supbtime_deco16ic_intf =
 {
 	"screen",
-	1, 0, 1,
+	1, 0, 1, 1,
 	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
 	0, 16, 0, 16, /* color base (default values) */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */

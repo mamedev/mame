@@ -283,7 +283,7 @@ static int twocrude_bank_callback( const int bank )
 static const deco16ic_interface twocrude_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1,
+	0, 0, 1, 1,
 	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
 	0x00, 0x20, 0x30, 0x40, /* color base (default values) */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */

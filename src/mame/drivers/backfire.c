@@ -414,7 +414,7 @@ static int backfire_bank_callback( int bank )
 static const deco16ic_interface backfire_deco16ic_intf =
 {
 	"lscreen",
-	0, 0, 1,
+	0, 0, 1, 1,
 	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
 	0x00, 0x40, 0x10, 0x50, /* color base */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */

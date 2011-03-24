@@ -777,7 +777,7 @@ static int mutantf_2_bank_callback( const int bank )
 static const deco16ic_interface cninja_deco16ic_intf =
 {
 	"screen",
-	0, 1, 1,
+	0, 1, 1, 1,
 	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
 	0, 16, 0, 48, /* color base */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
@@ -790,7 +790,7 @@ static const deco16ic_interface cninja_deco16ic_intf =
 static const deco16ic_interface edrandy_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1,
+	0, 0, 1, 1,
 	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
 	0, 16, 0, 48, /* color base  */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
@@ -803,7 +803,7 @@ static const deco16ic_interface edrandy_deco16ic_intf =
 static const deco16ic_interface robocop2_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1,
+	0, 0, 1, 1,
 	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
 	0, 16, 0, 48, /* color base */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
@@ -816,7 +816,7 @@ static const deco16ic_interface robocop2_deco16ic_intf =
 static const deco16ic_interface mutantf_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1,
+	0, 0, 1, 1,
 	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
 	0, 0x30, 0x20, 0x40, /* color base */
 	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
