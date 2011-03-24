@@ -553,15 +553,15 @@ SCREEN_UPDATE( superpac )
 	/* Redraw the high priority characters */
 	tilemap_draw(bitmap,cliprect,state->bg_tilemap,1,0);
 
-	/* some sprites still have priority over that (ghost eyes in Pac 'n Pal) */
+	/* sprite color 0/1 still has priority over that (ghost eyes in Pac 'n Pal) */
 	for (y = 0;y < sprite_bitmap->height;y++)
 	{
 		for (x = 0;x < sprite_bitmap->width;x++)
 		{
-			// bg colortable contents and sprite color bitmask suggests that priority is determined by pen 2 equality comparison between sprite colortable and bg colortable
-			int spr_pen = *BITMAP_ADDR16(sprite_bitmap, y, x);
-			if (spr_pen != 15 && spr_pen & 2 && colortable_palette_get_color(screen->machine->colortable,colortable_entry_get_value(screen->machine->colortable, spr_pen & 0x1fe)) == colortable_palette_get_color(screen->machine->colortable,colortable_entry_get_value(screen->machine->colortable, spr_pen & 0x0fe)))
-				*BITMAP_ADDR16(bitmap, y, x) = spr_pen;
+			int spr_entry = *BITMAP_ADDR16(sprite_bitmap, y, x);
+			int spr_pen = colortable_entry_get_value(screen->machine->colortable, spr_entry);
+			if (spr_pen == 0 || spr_pen == 1)
+				*BITMAP_ADDR16(bitmap, y, x) = spr_entry;
 		}
 	}
 	return 0;
