@@ -25,10 +25,10 @@ public:
 	UINT32 *pf4_data;
 	UINT32 *pf12_control;
 	UINT32 *pf34_control;
-	UINT32 *pf1_rowscroll;
-	UINT32 *pf2_rowscroll;
-	UINT32 *pf3_rowscroll;
-	UINT32 *pf4_rowscroll;
+	UINT32 *pf1_rowscroll32;
+	UINT32 *pf2_rowscroll32;
+	UINT32 *pf3_rowscroll32;
+	UINT32 *pf4_rowscroll32;
 	UINT32 *dragngun_sprite_layout_0_ram;
 	UINT32 *dragngun_sprite_layout_1_ram;
 	UINT32 *dragngun_sprite_lookup_0_ram;
@@ -63,7 +63,11 @@ public:
 	UINT16 spriteram16_buffered[0x1000];
 	UINT16 spriteram16_2[0x1000];
 	UINT16 spriteram16_2_buffered[0x1000];
-
+	UINT16    pf1_rowscroll[0x0800/2];
+	UINT16    pf2_rowscroll[0x0800/2];
+	UINT16    pf3_rowscroll[0x0800/2];
+	UINT16    pf4_rowscroll[0x0800/2];
+	device_t *deco16ic;
 };
 
 

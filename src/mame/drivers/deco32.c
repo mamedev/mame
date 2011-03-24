@@ -237,8 +237,31 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/bsmt2000.h"
 #include "video/decospr.h"
+#include "video/deco16ic.h"
 
 /**********************************************************************************/
+
+
+static int fghthist_bank_callback( int bank )
+{
+	bank = bank >> 4;
+	bank = (bank & 1) | ((bank & 4) >> 1) | ((bank & 2) << 1);
+
+	return bank * 0x1000;
+}
+
+static const deco16ic_interface fghthist_deco16ic_intf =
+{
+	"screen",
+	0, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0x00, 0x10, 0x20, 0x30, /* color base */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	fghthist_bank_callback,
+	fghthist_bank_callback,
+	fghthist_bank_callback,
+	fghthist_bank_callback
+};
 
 
 static WRITE32_HANDLER( deco32_pf12_control_w )
@@ -727,18 +750,28 @@ static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
 	AM_RANGE(0x192000, 0x193fff) AM_WRITE(deco32_pf1_data_w) /* Mirror address - bug in program code */
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll)
-	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll)
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
+	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
-	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
+	AM_RANGE(0x1e0000, 0x1e1fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
 ADDRESS_MAP_END
 
 
 
+static READ32_HANDLER( deco32_pf1_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf1_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( deco32_pf2_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf2_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( deco32_pf3_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf3_rowscroll[offset] ^ 0xffff0000; }
+static READ32_HANDLER( deco32_pf4_rowscroll_r ) { deco32_state *state = space->machine->driver_data<deco32_state>(); return state->pf4_rowscroll[offset] ^ 0xffff0000; }
+static WRITE32_HANDLER( deco32_pf1_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf1_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf2_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf2_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf3_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf3_rowscroll[offset]); }
+static WRITE32_HANDLER( deco32_pf4_rowscroll_w ) { deco32_state *state = space->machine->driver_data<deco32_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->pf4_rowscroll[offset]); }
+
+
 static ADDRESS_MAP_START( fghthist_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w)
+//	AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w) // wtf??
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(deco32_state, ram)
 	AM_RANGE(0x120020, 0x12002f) AM_READ(fghthist_control_r)
@@ -753,17 +786,17 @@ static ADDRESS_MAP_START( fghthist_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
 	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram_w)
 
-	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
-	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x192000, 0x192fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll)
-	AM_RANGE(0x194000, 0x194fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE_MEMBER(deco32_state, pf12_control)
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x192000, 0x192fff) AM_READWRITE(deco32_pf1_rowscroll_r, deco32_pf1_rowscroll_w)
+	AM_RANGE(0x194000, 0x194fff) AM_READWRITE(deco32_pf2_rowscroll_r, deco32_pf2_rowscroll_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
 
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE_MEMBER(deco32_state, pf4_data)
-	AM_RANGE(0x1d2000, 0x1d2fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
-	AM_RANGE(0x1d4000, 0x1d4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
+	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_dword_r, deco16ic_pf3_data_dword_w)
+	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_dword_r, deco16ic_pf4_data_dword_w)
+	AM_RANGE(0x1d2000, 0x1d2fff) AM_READWRITE(deco32_pf3_rowscroll_r, deco32_pf3_rowscroll_w)
+	AM_RANGE(0x1d4000, 0x1d4fff) AM_READWRITE(deco32_pf4_rowscroll_r, deco32_pf4_rowscroll_w)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf34_control_dword_r, deco16ic_pf34_control_dword_w)
 
 	AM_RANGE(0x16c000, 0x16c01f) AM_READNOP
 	AM_RANGE(0x17c000, 0x17c03f) AM_READNOP
@@ -786,17 +819,17 @@ static ADDRESS_MAP_START( fghthsta_memmap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram_w)
 	AM_RANGE(0x17c020, 0x17c023) AM_READNOP
 
-	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
-	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x192000, 0x192fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll)
-	AM_RANGE(0x194000, 0x194fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE_MEMBER(deco32_state, pf12_control)
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x192000, 0x192fff) AM_READWRITE(deco32_pf1_rowscroll_r, deco32_pf1_rowscroll_w)
+	AM_RANGE(0x194000, 0x194fff) AM_READWRITE(deco32_pf2_rowscroll_r, deco32_pf2_rowscroll_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
 
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE_MEMBER(deco32_state, pf4_data)
-	AM_RANGE(0x1d2000, 0x1d2fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
-	AM_RANGE(0x1d4000, 0x1d4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
+	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_dword_r, deco16ic_pf3_data_dword_w)
+	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_dword_r, deco16ic_pf4_data_dword_w)
+	AM_RANGE(0x1d2000, 0x1d2fff) AM_READWRITE(deco32_pf3_rowscroll_r, deco32_pf3_rowscroll_w)
+	AM_RANGE(0x1d4000, 0x1d4fff) AM_READWRITE(deco32_pf4_rowscroll_r, deco32_pf4_rowscroll_w)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf34_control_dword_r, deco16ic_pf34_control_dword_w)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
@@ -817,15 +850,15 @@ static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE_MEMBER(deco32_state, pf12_control)
 	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll)
+	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
+	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 
 //  AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE_MEMBER(deco32_state, pf34_control)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE_MEMBER(deco32_state, pf4_data)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
-	AM_RANGE(0x1e4000, 0x1e4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll)
+	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
+	AM_RANGE(0x1e4000, 0x1e4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
 
 	AM_RANGE(0x204800, 0x204fff) AM_RAM // ace? 0x10 byte increments only  // 13f ff stuff
 
@@ -870,15 +903,15 @@ static ADDRESS_MAP_START( lockload_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE_MEMBER(deco32_state, pf12_control)
 	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll)
+	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
+	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 
 //  AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE_MEMBER(deco32_state, pf34_control)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE_MEMBER(deco32_state, pf4_data)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
-	AM_RANGE(0x1e4000, 0x1e4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll)
+	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
+	AM_RANGE(0x1e4000, 0x1e4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
 
 	AM_RANGE(0x204800, 0x204fff) AM_RAM				//0x10 byte increments only
 	AM_RANGE(0x208000, 0x208fff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_layout_0_ram)
@@ -932,14 +965,14 @@ static ADDRESS_MAP_START( tattass_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x192000, 0x193fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll)
-	AM_RANGE(0x194000, 0x195fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll)
+	AM_RANGE(0x192000, 0x193fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
+	AM_RANGE(0x194000, 0x195fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE_MEMBER(deco32_state, pf12_control)
 
 	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
 	AM_RANGE(0x1c4000, 0x1c5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE_MEMBER(deco32_state, pf4_data)
-	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll)
+	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
 	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_BASE(&deco32_prot_ram)
@@ -973,14 +1006,14 @@ static ADDRESS_MAP_START( nslasher_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
 	AM_RANGE(0x184000, 0x185fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x192000, 0x193fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll)
-	AM_RANGE(0x194000, 0x195fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll)
+	AM_RANGE(0x192000, 0x193fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
+	AM_RANGE(0x194000, 0x195fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 	AM_RANGE(0x1a0000, 0x1a001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE_MEMBER(deco32_state, pf12_control)
 
 	AM_RANGE(0x1c2000, 0x1c3fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
 	AM_RANGE(0x1c4000, 0x1c5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE_MEMBER(deco32_state, pf4_data)
-	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll)
+	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
 	AM_RANGE(0x1e0000, 0x1e001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_BASE(&deco32_prot_ram)
@@ -1614,9 +1647,9 @@ static GFXDECODE_START( captaven )
 GFXDECODE_END
 
 static GFXDECODE_START( fghthist )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0,  16 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        256,  16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        512,  32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0,  128 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0,  128 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,          0,  128 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,     1024, 128 )	/* Sprites 16x16 */
 GFXDECODE_END
 
@@ -1800,6 +1833,8 @@ static MACHINE_CONFIG_START( fghthist, deco32_state )
 	MCFG_GFXDECODE(fghthist)
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_DECO16IC_ADD("deco_custom", fghthist_deco16ic_intf)
+
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
 
@@ -1834,9 +1869,6 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	/* video hardware */
-	//MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -1846,6 +1878,8 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 
 	MCFG_GFXDECODE(fghthist)
 	MCFG_PALETTE_LENGTH(2048)
+
+	MCFG_DECO16IC_ADD("deco_custom", fghthist_deco16ic_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
