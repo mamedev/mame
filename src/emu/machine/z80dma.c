@@ -111,8 +111,6 @@ const int TM_SEARCH_TRANSFER	= 0x03;
 #define PORTB_ADDRESS			((PORTB_ADDRESS_H<<8) | PORTB_ADDRESS_L)
 #define BLOCKLEN				((BLOCKLEN_H<<8) | BLOCKLEN_L)
 
-#define PORTA_STEP				(((WR1 >> 4) & 0x03)*2-1)
-#define PORTB_STEP				(((WR2 >> 4) & 0x03)*2-1)
 #define PORTA_INC				(WR1 & 0x10)
 #define PORTB_INC				(WR2 & 0x10)
 #define PORTA_FIXED				(((WR1 >> 4) & 0x02) == 0x02)
@@ -443,7 +441,7 @@ void z80dma_device::do_read()
 					m_latch = devcb_call_read8(&m_in_iorq_func, m_addressA);
 
 				if (LOG) logerror("Z80DMA '%s' A src: %04x %s -> data: %02x\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o", m_latch);
-				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? PORTA_STEP : -PORTA_STEP;
+				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
 			}
 			else
 			{
@@ -453,7 +451,7 @@ void z80dma_device::do_read()
 					m_latch = devcb_call_read8(&m_in_iorq_func, m_addressB);
 
 				if (LOG) logerror("Z80DMA '%s' B src: %04x %s -> data: %02x\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o", m_latch);
-				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? PORTB_STEP : -PORTB_STEP;
+				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 			}
 			break;
 		case TM_SEARCH_TRANSFER:
@@ -490,7 +488,7 @@ int z80dma_device::do_write()
 					devcb_call_write8(&m_out_iorq_func, m_addressB, m_latch);
 
 				if (LOG) logerror("Z80DMA '%s' B dst: %04x %s\n", tag(), m_addressB, PORTB_MEMORY ? "mem" : "i/o");
-				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? PORTB_STEP : -PORTB_STEP;
+				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
 			}
 			else
 			{
@@ -500,7 +498,7 @@ int z80dma_device::do_write()
 					devcb_call_write8(&m_out_iorq_func, m_addressA, m_latch);
 
 				if (LOG) logerror("Z80DMA '%s' A dst: %04x %s\n", tag(), m_addressA, PORTA_MEMORY ? "mem" : "i/o");
-				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? PORTA_STEP : -PORTA_STEP;
+				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
 			}
 			m_count--;
 			done = (m_count == 0xFFFF);
