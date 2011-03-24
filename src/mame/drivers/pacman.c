@@ -1039,6 +1039,10 @@ static ADDRESS_MAP_START( dremshpr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")		/* DSW2 */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
+
+	/* vanvan: probably a leftover from development: the Sanritsu version writes
+	   the color lookup table here, while the Karateko version writes garbage. */
+	AM_RANGE(0xb800, 0xb87f) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -1067,35 +1071,6 @@ static ADDRESS_MAP_START( epos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")		/* DSW2 */
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( vanvan_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE(&pacman_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE(&pacman_colorram)
-	AM_RANGE(0x4800, 0x4fef) AM_MIRROR(0xa000) AM_RAM
-	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(vanvan_bgcolor_w)
-	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
-	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5004, 0x5004) AM_MIRROR(0xaf38) AM_WRITENOP
-	AM_RANGE(0x5005, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP /* always written together with 5001 */
-	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITENOP
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_BASE_GENERIC(spriteram2)
-	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP /* ??? toggled before reading 5000 */
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf3f) AM_READ_PORT("IN0")		/* IN0 */
-	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ_PORT("IN1")		/* IN1 */
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW1")		/* DSW1 */
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")		/* DSW2 */
-	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x3000) AM_ROM
-	/* probably a leftover from development: the Sanritsu version */
-	/* writes the color lookup table here, while the Karateko version */
-	/* writes garbage. */
-	AM_RANGE(0xb800, 0xb87f) AM_WRITENOP
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650games_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
@@ -3195,7 +3170,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( piranha, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(piranha_portmap)
 MACHINE_CONFIG_END
@@ -3204,7 +3178,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nmouse, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(nmouse_portmap)
 MACHINE_CONFIG_END
@@ -3213,7 +3186,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mspacman, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mspacman_map)
 MACHINE_CONFIG_END
@@ -3222,17 +3194,14 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( woodpek, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(woodpek_map)
-
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( alibaba, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alibaba_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -3242,7 +3211,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( dremshpr, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
 	MCFG_CPU_IO_MAP(dremshpr_portmap)
@@ -3257,7 +3225,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( theglobp, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(theglobp_portmap)
@@ -3270,7 +3237,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( acitya, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(acitya_portmap)
@@ -3283,9 +3249,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( vanvan, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(vanvan_map)
+	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
 	MCFG_CPU_IO_MAP(vanvan_portmap)
 	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
@@ -3304,7 +3269,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( bigbucks, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bigbucks_map)
 	MCFG_CPU_IO_MAP(bigbucks_portmap)
@@ -3318,7 +3282,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_DEVICE_REMOVE("maincpu")
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
 	MCFG_CPU_PROGRAM_MAP(s2650games_map)
@@ -3343,7 +3306,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( drivfrcp, s2650games )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(drivfrcp_portmap)
 MACHINE_CONFIG_END
@@ -3352,7 +3314,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( 8bpm, s2650games )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(_8bpm_portmap)
 MACHINE_CONFIG_END
@@ -3361,7 +3322,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( porky, s2650games )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(porky_portmap)
 MACHINE_CONFIG_END
@@ -3370,7 +3330,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( rocktrv2, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rocktrv2_map)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -3383,7 +3342,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mschamp, pacman )
 
 	/* basic machine hardware */
-
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mschamp_map)
 	MCFG_CPU_IO_MAP(mschamp_portmap)
@@ -3396,7 +3354,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( crush4, mschamp )
 
 	/* basic machine hardware */
-
 	MCFG_GFXDECODE(crush4)
 MACHINE_CONFIG_END
 
