@@ -194,6 +194,7 @@ void decospr_device::set_pri_callback(decospr_priority_callback_func callback)
 
 void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
 {
+	//printf("cliprect %04x, %04x\n", cliprect->min_y, cliprect->max_y);
 
 	if (m_sprite_bitmap && m_pricallback)
 		fatalerror("m_sprite_bitmap && m_pricallback is invalid");
@@ -311,65 +312,70 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 					while (multi >= 0)
 					{
-						if(!m_sprite_bitmap)
+						int ypos;
+						ypos = y + mult * multi;
+						if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y)-16))
 						{
-
-							if (m_pricallback) 
-								pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-									sprite - multi * inc,
-									colour,
-									fx,fy,
-									x,y + mult * multi,
-									machine->priority_bitmap,pri,0);
-							else
-								drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-									sprite - multi * inc,
-									colour,
-									fx,fy,
-									x,y + mult * multi,
-									0);
-						
-							// double wing uses this flag
-							if (w)
-							{
-								if (m_pricallback) 
-									pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-											(sprite - multi * inc)-mult2,
+							if(!m_sprite_bitmap)
+							{								
+								if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y)-16))
+								{
+									if (m_pricallback) 
+										pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+											sprite - multi * inc,
 											colour,
 											fx,fy,
-											x-16,y + mult * multi,
+											x,ypos,
 											machine->priority_bitmap,pri,0);
-								else
-									drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-											(sprite - multi * inc)-mult2,
+									else
+										drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+											sprite - multi * inc,
 											colour,
 											fx,fy,
-											x-16,y + mult * multi,
+											x,ypos,
 											0);
+								}
+						
+								// double wing uses this flag
+								if (w)
+								{								
+									if (m_pricallback) 
+										pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+												(sprite - multi * inc)-mult2,
+												colour,
+												fx,fy,
+												x-16,ypos,
+												machine->priority_bitmap,pri,0);
+									else
+										drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+												(sprite - multi * inc)-mult2,
+												colour,
+												fx,fy,
+												x-16,ypos,
+												0);
+								}
 							}
-						}
-						else
-						{
-							// if we have a sprite bitmap draw raw data to it for manual mixing
-							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
-								sprite - multi * inc,
-								colour<<m_raw_shift,
-								fx,fy,
-								x,y + mult * multi,
-								0);
-							if (w)
+							else
 							{	
+								// if we have a sprite bitmap draw raw data to it for manual mixing
 								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
-									(sprite - multi * inc)-mult2,
+									sprite - multi * inc,
 									colour<<m_raw_shift,
 									fx,fy,
-									x-16,y + mult * multi,
+									x,ypos,
 									0);
+								if (w)
+								{	
+									drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
+										(sprite - multi * inc)-mult2,
+										colour<<m_raw_shift,
+										fx,fy,
+										x-16,ypos,
+										0);
+								}
+							
 							}
 						}
-
-
-
 
 						multi--;
 					}
@@ -425,6 +431,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 					if (fx) { mult=-16; x+=16; } else { mult=16; x-=16*w; }
 					if (fy) { mult2=-16; y+=16; } else { mult2=16; y-=16*h; }
 				}
+				int ypos;
 
 				for (int xx=0; xx<w; xx++)
 				{
@@ -435,56 +442,83 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 						{
 							if (m_pricallback) 
 							{
-								pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-										sprite + yy + h * xx,
-										colour,
-										fx,fy,
-										x + mult * (w-xx),y + mult2 * (h-yy),
-										machine->priority_bitmap,pri,0);
+								ypos = y + mult2 * (h-yy);
 
-								// wrap-around y
-								pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-										sprite + yy + h * xx,
-										colour,
-										fx,fy,
-										x + mult * (w-xx),y + mult2 * (h-yy) - 512,
-										machine->priority_bitmap,pri,0);
+								if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y)-16))
+								{
+									pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+											sprite + yy + h * xx,
+											colour,
+											fx,fy,
+											x + mult * (w-xx),ypos,
+											machine->priority_bitmap,pri,0);
+								}
+
+								ypos -= 512; // wrap-around y
+							
+								if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y-16)))
+								{
+									pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+											sprite + yy + h * xx,
+											colour,
+											fx,fy,
+											x + mult * (w-xx),ypos,
+											machine->priority_bitmap,pri,0);
+								}
+
 							}
 							else
 							{
+								ypos = y + mult2 * (h-yy);
 
-								drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-										sprite + yy + h * xx,
-										colour,
-										fx,fy,
-										x + mult * (w-xx),y + mult2 * (h-yy),
-										0);
-
-								// wrap-around y
-								drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-										sprite + yy + h * xx,
-										colour,
-										fx,fy,
-										x + mult * (w-xx),y + mult2 * (h-yy) - 512,
-										0);
+								if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y)-16))
+								{
+									drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+											sprite + yy + h * xx,
+											colour,
+											fx,fy,
+											x + mult * (w-xx),ypos,
+											0);
+								}
+								
+								ypos -= 512; // wrap-around y
+							
+								if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y-16)))
+								{
+									drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+											sprite + yy + h * xx,
+											colour,
+											fx,fy,
+											x + mult * (w-xx),ypos,
+											0);
+								}
 							}
 						}
 						else
 						{
-							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
-									sprite + yy + h * xx,
-									colour<<m_raw_shift,
-									fx,fy,
-									x + mult * (w-xx),y + mult2 * (h-yy),
-									0);
+							ypos = y + mult2 * (h-yy);
+							
+							if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y)-16))
+							{
+								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
+										sprite + yy + h * xx,
+										colour<<m_raw_shift,
+										fx,fy,
+										x + mult * (w-xx),ypos,
+										0);
+							}
 
-							// wrap-around y
-							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
-									sprite + yy + h * xx,
-									colour<<m_raw_shift,
-									fx,fy,
-									x + mult * (w-xx),y + mult2 * (h-yy) - 512,
-									0);
+							ypos -= 512; // wrap-around y
+							
+							if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y-16)))
+							{
+								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
+										sprite + yy + h * xx,
+										colour<<m_raw_shift,
+										fx,fy,
+										x + mult * (w-xx),ypos,
+										0);
+							}
 						}
 					}
 				}
