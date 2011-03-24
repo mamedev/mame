@@ -32,6 +32,10 @@
    dassault.c - complex video mixing
    boogwing.c - complex video mixing
 
+   notes:
+   does the chip natively support 5bpp (tattass / nslasher) in hw, or is it done with doubled up chips?
+   the information in deco16ic lists 3x sprite chips on those games, but there are only 2 spritelists.
+
 */
 
 
@@ -158,6 +162,8 @@ void decospr_device::device_start()
 //	printf("decospr_device::device_start()\n");
 	m_sprite_bitmap = 0;
 	m_alt_format = 0;
+	m_pixmask = 0xf;
+	m_raw_shift = 4; // set to 8 on tattass / nslashers for the custom mixing (because they have 5bpp sprites, and shifting by 4 isn't good enough)
 }
 
 void decospr_device::device_reset()
@@ -347,7 +353,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 							// if we have a sprite bitmap draw raw data to it for manual mixing
 							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
 								sprite - multi * inc,
-								colour*0x10,
+								colour<<m_raw_shift,
 								fx,fy,
 								x,y + mult * multi,
 								0);
@@ -355,7 +361,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 							{	
 								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
 									(sprite - multi * inc)-mult2,
-									colour*0x10,
+									colour<<m_raw_shift,
 									fx,fy,
 									x-16,y + mult * multi,
 									0);
@@ -467,7 +473,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 						{
 							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
 									sprite + yy + h * xx,
-									colour*0x10,
+									colour<<m_raw_shift,
 									fx,fy,
 									x + mult * (w-xx),y + mult2 * (h-yy),
 									0);
@@ -475,7 +481,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 							// wrap-around y
 							drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
 									sprite + yy + h * xx,
-									colour*0x10,
+									colour<<m_raw_shift,
 									fx,fy,
 									x + mult * (w-xx),y + mult2 * (h-yy) - 512,
 									0);
@@ -528,7 +534,7 @@ void decospr_device::inefficient_copy_sprite_bitmap(running_machine* machine, bi
 			{
 				UINT16 pix = srcline[x];
 
-				if (pix&0xf)
+				if (pix&m_pixmask)
 				{
 					if ((pix & priority_mask) ==pri )
 					{

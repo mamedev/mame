@@ -53,8 +53,6 @@ public:
 	int pf2_colourbank;
 	int pf4_colourbank;
 	int pri;
-	bitmap_t *sprite0_mix_bitmap;
-	bitmap_t *sprite1_mix_bitmap;
 	bitmap_t *tilemap_alpha_bitmap;
 	UINT32 dragngun_sprite_ctrl;
 	int ace_ram_dirty;
@@ -63,6 +61,8 @@ public:
 
 	UINT16 spriteram16[0x1000];
 	UINT16 spriteram16_buffered[0x1000];
+	UINT16 spriteram16_2[0x1000];
+	UINT16 spriteram16_2_buffered[0x1000];
 
 };
 

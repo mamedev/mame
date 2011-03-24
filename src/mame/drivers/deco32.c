@@ -685,6 +685,26 @@ static WRITE32_HANDLER( deco32_buffer_spriteram_w )
 	memcpy(state->spriteram16_buffered, state->spriteram16, 0x1000);
 }	
 
+static READ32_HANDLER( deco32_spriteram2_r )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	return state->spriteram16_2[offset] ^ 0xffff0000;
+}
+
+static WRITE32_HANDLER( deco32_spriteram2_w )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	data &= 0x0000ffff;
+	mem_mask &= 0x0000ffff;
+	COMBINE_DATA(&state->spriteram16_2[offset]);
+}
+
+static WRITE32_HANDLER( deco32_buffer_spriteram2_w )
+{
+	deco32_state *state = space->machine->driver_data<deco32_state>();
+	memcpy(state->spriteram16_2_buffered, state->spriteram16_2, 0x1000);
+}	
+
 static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
@@ -900,14 +920,14 @@ static ADDRESS_MAP_START( tattass_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
 	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(deco32_palette_dma_w)
 
-	AM_RANGE(0x170000, 0x171fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
 	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
-	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram32_w)
+	AM_RANGE(0x174010, 0x174013) AM_WRITE(deco32_buffer_spriteram_w)
 	AM_RANGE(0x174018, 0x17401b) AM_WRITENOP /* Sprite 'CPU' (unused) */
-	AM_RANGE(0x178000, 0x179fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
 
+	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(deco32_spriteram2_r, deco32_spriteram2_w)
 	AM_RANGE(0x17c000, 0x17c003) AM_WRITENOP /* Sprite DMA mode (2) */
-	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram32_2_w)
+	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram2_w)
 	AM_RANGE(0x17c018, 0x17c01b) AM_WRITENOP /* Sprite 'CPU' (unused) */
 
 	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
@@ -941,13 +961,14 @@ static ADDRESS_MAP_START( nslasher_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
 	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(deco32_palette_dma_w)
 
-	AM_RANGE(0x170000, 0x171fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
 	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
-	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram32_w)
+	AM_RANGE(0x174010, 0x174013) AM_WRITE(deco32_buffer_spriteram_w)
 	AM_RANGE(0x174018, 0x17401b) AM_WRITENOP /* Sprite 'CPU' (unused) */
-	AM_RANGE(0x178000, 0x179fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
+
+	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(deco32_spriteram2_r, deco32_spriteram2_w)
 	AM_RANGE(0x17c000, 0x17c003) AM_WRITENOP /* Sprite DMA mode (2) */
-	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(buffer_spriteram32_2_w)
+	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram2_w)
 	AM_RANGE(0x17c018, 0x17c01b) AM_WRITENOP /* Sprite 'CPU' (unused) */
 
 	AM_RANGE(0x182000, 0x183fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
@@ -1545,7 +1566,7 @@ static const gfx_layout tilelayout2 =
 	64*8
 };
 
-static const gfx_layout spritelayout2 =
+static const gfx_layout spritelayout_5bpp_alt =
 {
 	16,16,
 	RGN_FRAC(1,5),
@@ -1608,11 +1629,11 @@ static GFXDECODE_START( dragngun )
 GFXDECODE_END
 
 static GFXDECODE_START( tattass )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 32 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        512, 32 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout2,    1536, 16 )	/* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,     1024+256, 32 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,            0, 32 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,            0, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,            512, 32 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_5bpp_alt, 1536, 16 )	/* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,          1024+256, 32 )	/* Sprites 16x16 */
 GFXDECODE_END
 
 static GFXDECODE_START( nslasher )
@@ -1965,15 +1986,20 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 
 	MCFG_EEPROM_ADD("eeprom", eeprom_interface_tattass)
 
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(42*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	
 	MCFG_SCREEN_UPDATE(nslasher)
+
+	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+
+	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 4);
+	
 
 	MCFG_GFXDECODE(tattass)
 	MCFG_PALETTE_LENGTH(2048)
@@ -2004,15 +2030,18 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MCFG_SCREEN_SIZE(42*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(nslasher)
+
+	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 3);
+
+	MCFG_DEVICE_ADD("spritegen2", decospr_, 0)
+	decospr_device_config::set_gfx_region(device, 4);
 
 	MCFG_GFXDECODE(nslasher)
 	MCFG_PALETTE_LENGTH(2048)

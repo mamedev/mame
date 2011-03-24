@@ -184,120 +184,6 @@ WRITE32_HANDLER( deco32_palette_dma_w )
 /******************************************************************************/
 
 
-
-/*
-    This renders sprites to a 16 bit bitmap, for later mixing.
-    Bottom 8 bits per pixel is palettised sprite data, top 8 is
-    colour/alpha/priority.
-*/
-static void deco32_draw_sprite(bitmap_t *dest,const rectangle *clip,const gfx_element *gfx,
-		UINT32 code,UINT32 priority,int flipx,int flipy,int sx,int sy)
-{
-	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-	int ox,oy,cx,cy;
-	int x_index,y_index,x,y;
-
-	/* check bounds */
-	ox = sx;
-	oy = sy;
-
-	if (sx>319 || sy>247 || sx<-15 || sy<-7)
-		return;
-
-	if (sy<0) sy=0;
-	if (sx<0) sx=0;
-	if (sx>319) cx=319;
-	else cx=ox+16;
-
-	cy=(sy-oy);
-
-	if (flipy) y_index=15-cy; else y_index=cy;
-
-	for( y=0; y<16-cy; y++ )
-	{
-		const UINT8 *source = code_base + y_index * gfx->line_modulo;
-		UINT16 *destb = BITMAP_ADDR16(dest, sy, 0);
-
-		if (flipx) { source+=15-(sx-ox); x_index=-1; } else { x_index=1; source+=(sx-ox); }
-
-		for (x=sx; x<cx; x++)
-		{
-			int c = *source;
-			if( c )
-				destb[x] = c | priority;
-
-			source+=x_index;
-		}
-
-		sy++;
-		if (sy>247)
-			return;
-		if (flipy) y_index--; else y_index++;
-	}
-}
-
-// Merge with Tattass & Fghthist sprite routines later
-static void nslasher_draw_sprites(running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT32 *spritedata, int gfxbank)
-{
-	int offs;
-
-	// Draw sprites back to front saving priority & alpha data per pixel for later mixing
-	for (offs = 0; offs<0x400; offs+=4)
-	{
-		int x,y,sprite,colour,multi,fx,fy,inc,flash,mult; /*,pri=0,spri=0;*/
-		//int trans;
-
-		sprite = spritedata[offs+1] & 0xffff;
-
-		y = spritedata[offs];
-		flash=y&0x1000;
-		if (flash && (machine->primary_screen->frame_number() & 1)) continue;
-
-		//trans=TRANSPARENCY_PEN;
-		x = spritedata[offs+2];
-
-		// Prepare colour, priority and alpha info
-		colour = (x>>9) & 0x7f;
-		if (y&0x8000)
-			colour|=0x80;
-		colour<<=8;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x0600) >> 9)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 320) x -= 512;
-		if (y >= 256) y -= 512;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		mult=+16;
-
-		if (fx) fx=0; else fx=1;
-		if (fy) fy=0; else fy=1;
-
-		while (multi >= 0)
-		{
-			deco32_draw_sprite(bitmap,cliprect,machine->gfx[gfxbank],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi);
-
-			multi--;
-		}
-	}
-}
-
 INLINE void dragngun_drawgfxzoom(
 		bitmap_t *dest_bmp,const rectangle *clip,const gfx_element *gfx,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
@@ -900,9 +786,10 @@ VIDEO_START( nslasher )
 
 	width = machine->primary_screen->width();
 	height = machine->primary_screen->height();
-	state->sprite0_mix_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
-	state->sprite1_mix_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
 	state->tilemap_alpha_bitmap=auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16 );
+
+	machine->device<decospr_device>("spritegen1")->alloc_sprite_bitmap(machine);
+	machine->device<decospr_device>("spritegen2")->alloc_sprite_bitmap(machine);
 
 	tilemap_set_transparent_pen(state->pf1_tilemap,0);
 	tilemap_set_transparent_pen(state->pf2_tilemap,0);
@@ -1265,12 +1152,15 @@ static void mixDualAlphaSprites(bitmap_t *bitmap, const rectangle *cliprect, con
 	const pen_t *pal1 = &pens[gfx1->color_base];
 	const pen_t *pal2 = &pens[machine->gfx[(state->pri&1) ? 1 : 2]->color_base];
 	int x,y;
+	bitmap_t* sprite0_mix_bitmap = machine->device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
+	bitmap_t* sprite1_mix_bitmap = machine->device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
 
+	
 	/* Mix sprites into main bitmap, based on priority & alpha */
 	for (y=8; y<248; y++) {
 		UINT8* tilemapPri=BITMAP_ADDR8(machine->priority_bitmap, y, 0);
-		UINT16* sprite0=BITMAP_ADDR16(state->sprite0_mix_bitmap, y, 0);
-		UINT16* sprite1=BITMAP_ADDR16(state->sprite1_mix_bitmap, y, 0);
+		UINT16* sprite0=BITMAP_ADDR16(sprite0_mix_bitmap, y, 0);
+		UINT16* sprite1=BITMAP_ADDR16(sprite1_mix_bitmap, y, 0);
 		UINT32* destLine=BITMAP_ADDR32(bitmap, y, 0);
 		UINT16* alphaTilemap=BITMAP_ADDR16(state->tilemap_alpha_bitmap, y, 0);
 
@@ -1430,16 +1320,19 @@ SCREEN_UPDATE( nslasher )
 	if (state->ace_ram_dirty)
 		updateAceRam(screen->machine);
 
-	bitmap_fill(state->sprite0_mix_bitmap,cliprect,0);
-	bitmap_fill(state->sprite1_mix_bitmap,cliprect,0);
+
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	if ((state->pf34_control[5]&0x8000)==0)
 		bitmap_fill(bitmap,cliprect,screen->machine->pens[0x200]);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
-	nslasher_draw_sprites(screen->machine,state->sprite0_mix_bitmap,cliprect,screen->machine->generic.buffered_spriteram.u32,3);
-	nslasher_draw_sprites(screen->machine,state->sprite1_mix_bitmap,cliprect,screen->machine->generic.buffered_spriteram2.u32,4);
+	screen->machine->device<decospr_device>("spritegen1")->set_pix_raw_shift(8);
+	screen->machine->device<decospr_device>("spritegen2")->set_pix_raw_shift(8);
 
+	screen->machine->device<decospr_device>("spritegen1")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffered, 0x800, true); 
+	screen->machine->device<decospr_device>("spritegen2")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_2_buffered, 0x800, true); 
+
+	
 	/* Render alpha-blended tilemap to seperate buffer for proper mixing */
 	bitmap_fill(state->tilemap_alpha_bitmap,cliprect,0);
 
