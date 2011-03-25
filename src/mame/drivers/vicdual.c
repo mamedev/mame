@@ -66,24 +66,25 @@
 
 #define COIN_PORT_TAG		"COIN"
 
-static UINT32 coin_status;
-
 
 static TIMER_CALLBACK( clear_coin_status )
 {
-	coin_status = 0;
+	vicdual_state *state = machine->driver_data<vicdual_state>();
+	state->coin_status = 0;
 }
 
 
-static void assert_coin_status(void)
+static void assert_coin_status(running_machine *machine)
 {
-	coin_status = 1;
+	vicdual_state *state = machine->driver_data<vicdual_state>();
+	state->coin_status = 1;
 }
 
 
 static CUSTOM_INPUT( vicdual_read_coin_status )
 {
-	return coin_status;
+	vicdual_state *state = field->port->machine->driver_data<vicdual_state>();
+	return state->coin_status;
 }
 
 
@@ -189,35 +190,21 @@ int vicdual_is_cabinet_color(running_machine *machine)
  *
  *************************************/
 
-static UINT8 *vicdual_videoram;
-static UINT8 *vicdual_characterram;
-
 
 static WRITE8_HANDLER( vicdual_videoram_w )
 {
+	vicdual_state *state = space->machine->driver_data<vicdual_state>();
 	space->machine->primary_screen->update_now();
-	vicdual_videoram[offset] = data;
-}
-
-
-UINT8 vicdual_videoram_r(offs_t offset)
-{
-	return vicdual_videoram[offset];
+	state->videoram[offset] = data;
 }
 
 
 static WRITE8_HANDLER( vicdual_characterram_w )
 {
+	vicdual_state *state = space->machine->driver_data<vicdual_state>();
 	space->machine->primary_screen->update_now();
-	vicdual_characterram[offset] = data;
+	state->characterram[offset] = data;
 }
-
-
-UINT8 vicdual_characterram_r(offs_t offset)
-{
-	return vicdual_characterram[offset];
-}
-
 
 
 /*************************************
@@ -226,7 +213,7 @@ UINT8 vicdual_characterram_r(offs_t offset)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( vicdual_root, driver_device )
+static MACHINE_CONFIG_START( vicdual_root, vicdual_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
@@ -259,16 +246,16 @@ static READ8_HANDLER( depthch_io_r )
 
 static WRITE8_HANDLER( depthch_io_w )
 {
-	if (offset & 0x01)  assert_coin_status();
+	if (offset & 0x01)  assert_coin_status(space->machine);
 	if (offset & 0x04)  depthch_audio_w(space, 0, data);
 }
 
 
 static ADDRESS_MAP_START( depthch_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 
@@ -341,7 +328,7 @@ static READ8_HANDLER( safari_io_r )
 
 static WRITE8_HANDLER( safari_io_w )
 {
-	if (offset & 0x01)  assert_coin_status();
+	if (offset & 0x01)  assert_coin_status(space->machine);
 	if (offset & 0x02) { /* safari_audio_w(0, data) */ }
 }
 
@@ -350,9 +337,9 @@ static ADDRESS_MAP_START( safari_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
     AM_RANGE(0x4000, 0x7fff) AM_NOP	/* unused */
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 
@@ -425,16 +412,16 @@ static READ8_HANDLER( frogs_io_r )
 
 static WRITE8_HANDLER( frogs_io_w )
 {
-	if (offset & 0x01)  assert_coin_status();
+	if (offset & 0x01)  assert_coin_status(space->machine);
 	if (offset & 0x02)  frogs_audio_w(space, 0, data);
 }
 
 
 static ADDRESS_MAP_START( frogs_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 
@@ -545,7 +532,7 @@ static READ8_HANDLER( sspaceat_io_r )
 
 static WRITE8_HANDLER( headon_io_w )
 {
-	if (offset & 0x01)  assert_coin_status();
+	if (offset & 0x01)  assert_coin_status(space->machine);
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
 	if (offset & 0x04) { /* vicdual_palette_bank_w(0, data)  */ }	 /* not written to */
 }
@@ -554,9 +541,9 @@ static WRITE8_HANDLER( headon_io_w )
 static ADDRESS_MAP_START( headon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 
@@ -746,7 +733,7 @@ static READ8_HANDLER( headon2_io_r )
 
 static WRITE8_HANDLER( headon2_io_w )
 {
-	if (offset & 0x01)  assert_coin_status();
+	if (offset & 0x01)  assert_coin_status(space->machine);
 	if (offset & 0x02)  headon_audio_w(space, 0, data);
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
     if (offset & 0x08) { /* schematics show this as going into a shifer circuit, but never written to */ }
@@ -757,7 +744,7 @@ static WRITE8_HANDLER( headon2_io_w )
 
 static WRITE8_HANDLER( digger_io_w )
 {
-	if (offset & 0x01)  assert_coin_status();
+	if (offset & 0x01)  assert_coin_status(space->machine);
 	if (offset & 0x02) { /* digger_audio_1_w(0, data) */ }
 	if (offset & 0x04)
 	{
@@ -774,9 +761,9 @@ static WRITE8_HANDLER( digger_io_w )
 static ADDRESS_MAP_START( headon2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
  /* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 
@@ -962,7 +949,7 @@ static WRITE8_HANDLER( invho2_io_w )
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
 	if (offset & 0x02)  invinco_audio_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -971,7 +958,7 @@ static WRITE8_HANDLER( invds_io_w )
 {
 	if (offset & 0x01)  invinco_audio_w(space, 0, data);
 	if (offset & 0x02) { /* deepscan_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -980,7 +967,7 @@ static WRITE8_HANDLER( sspacaho_io_w )
 {
 	if (offset & 0x01)  invho2_audio_w(space, 0, data);
 	if (offset & 0x02) { /* sspaceatt_audio_w(space, 0, data) */ }
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -989,7 +976,7 @@ static WRITE8_HANDLER( tranqgun_io_w )
 {
 	if (offset & 0x01) { /* tranqgun_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 }
 
 
@@ -997,7 +984,7 @@ static WRITE8_HANDLER( spacetrk_io_w )
 {
 	if (offset & 0x01) { /* spacetrk_audio_w(space, 0, data) */ }
 	if (offset & 0x02) { /* spacetrk_audio_w(space, 0, data) */ }
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1006,7 +993,7 @@ static WRITE8_HANDLER( carnival_io_w )
 {
 	if (offset & 0x01)  carnival_audio_1_w(space, 0, data);
 	if (offset & 0x02)  carnival_audio_2_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1015,7 +1002,7 @@ static WRITE8_HANDLER( brdrline_io_w )
 {
 	if (offset & 0x01) { /* brdrline_audio_w(space, 0, data) */ }
 	if (offset & 0x02)  vicdual_palette_bank_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 }
 
 
@@ -1023,7 +1010,7 @@ static WRITE8_HANDLER( pulsar_io_w )
 {
 	if (offset & 0x01)  pulsar_audio_1_w(space, 0, data);
 	if (offset & 0x02)  pulsar_audio_2_w(space, 0, data);
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -1038,7 +1025,7 @@ static WRITE8_HANDLER( heiankyo_io_w )
 		/* heiankyo_audio_2_w(0, data & 0x3f); */
 	}
 
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 }
 
 
@@ -1046,16 +1033,16 @@ static WRITE8_HANDLER( alphaho_io_w )
 {
 	if (offset & 0x01) { /* headon_audio_w(0, data) */ }
 	if (offset & 0x02) { /* alphaf_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
 
 static ADDRESS_MAP_START( vicdual_dualgame_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 
@@ -2056,23 +2043,23 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static UINT8 samurai_protection_data;
-
 
 static WRITE8_HANDLER( samurai_protection_w )
 {
-	samurai_protection_data = data;
+	vicdual_state *state = space->machine->driver_data<vicdual_state>();
+	state->samurai_protection_data = data;
 }
 
 
 static CUSTOM_INPUT( samurai_protection_r )
 {
+	vicdual_state *state = field->port->machine->driver_data<vicdual_state>();
 	int offset = (FPTR)param;
 	UINT32 answer = 0;
 
-	if (samurai_protection_data == 0xab)
+	if (state->samurai_protection_data == 0xab)
 		answer = 0x02;
-	else if (samurai_protection_data == 0x1d)
+	else if (state->samurai_protection_data == 0x1d)
 		answer = 0x0c;
 
 	return (answer >> offset) & 0x01;
@@ -2082,7 +2069,7 @@ static CUSTOM_INPUT( samurai_protection_r )
 static WRITE8_HANDLER( samurai_io_w )
 {
 	if (offset & 0x02) { /* samurai_audio_w(0, data) */ }
-	if (offset & 0x08)  assert_coin_status();
+	if (offset & 0x08)  assert_coin_status(space->machine);
 	if (offset & 0x40)  vicdual_palette_bank_w(space, 0, data);
 }
 
@@ -2090,9 +2077,9 @@ static WRITE8_HANDLER( samurai_io_w )
 /* dual game hardware */
 static ADDRESS_MAP_START( samurai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM AM_WRITE(samurai_protection_w)
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 
@@ -2195,7 +2182,7 @@ static READ8_HANDLER( nsub_io_r )
 
 static WRITE8_HANDLER( nsub_io_w )
 {
-	if (offset & 0x01)  assert_coin_status();
+	if (offset & 0x01)  assert_coin_status(space->machine);
 	if (offset & 0x02) { /* nsub_audio_w(0, data) */ }
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -2204,9 +2191,9 @@ static WRITE8_HANDLER( nsub_io_w )
 static ADDRESS_MAP_START( nsub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 
@@ -2291,7 +2278,7 @@ static READ8_HANDLER( invinco_io_r )
 
 static WRITE8_HANDLER( invinco_io_w )
 {
-	if (offset & 0x01)  assert_coin_status();
+	if (offset & 0x01)  assert_coin_status(space->machine);
 	if (offset & 0x02)  invinco_audio_w(space, 0, data);
 	if (offset & 0x04)  vicdual_palette_bank_w(space, 0, data);
 }
@@ -2300,9 +2287,9 @@ static WRITE8_HANDLER( invinco_io_w )
 static ADDRESS_MAP_START( invinco_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE(&vicdual_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE(&vicdual_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, characterram)
 ADDRESS_MAP_END
 
 

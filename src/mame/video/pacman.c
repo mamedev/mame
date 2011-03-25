@@ -20,19 +20,6 @@
 #include "includes/pacman.h"
 #include "video/resnet.h"
 
-UINT8 *pacman_videoram;
-UINT8 *pacman_colorram;
-static tilemap_t *bg_tilemap;
-static UINT8 charbank;
-static UINT8 spritebank;
-static UINT8 palettebank;
-static UINT8 colortablebank;
-static UINT8 flipscreen;
-static UINT8 bgpriority;
-
-static int xoffsethack;
-UINT8 *s2650games_spriteram;
-UINT8 *s2650games_tileram;
 
 static const rectangle spritevisiblearea =
 {
@@ -154,8 +141,9 @@ static TILEMAP_MAPPER( pacman_scan_rows )
 
 static TILE_GET_INFO( pacman_get_tile_info )
 {
-	int code = pacman_videoram[tile_index] | (charbank << 8);
-	int attr = (pacman_colorram[tile_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
+	pacman_state *state = machine->driver_data<pacman_state>();
+	int code = state->videoram[tile_index] | (state->charbank << 8);
+	int attr = (state->colorram[tile_index] & 0x1f) | (state->colortablebank << 5) | (state->palettebank << 6 );
 
 	SET_TILE_INFO(0,code,attr,0);
 }
@@ -168,61 +156,67 @@ static TILE_GET_INFO( pacman_get_tile_info )
 
 static void init_save_state(running_machine *machine)
 {
-	state_save_register_global(machine, charbank);
-	state_save_register_global(machine, spritebank);
-	state_save_register_global(machine, palettebank);
-	state_save_register_global(machine, colortablebank);
-	state_save_register_global(machine, flipscreen);
-	state_save_register_global(machine, bgpriority);
+	pacman_state *state = machine->driver_data<pacman_state>();
+	state_save_register_global(machine, state->charbank);
+	state_save_register_global(machine, state->spritebank);
+	state_save_register_global(machine, state->palettebank);
+	state_save_register_global(machine, state->colortablebank);
+	state_save_register_global(machine, state->flipscreen);
+	state_save_register_global(machine, state->bgpriority);
 }
 
 
 VIDEO_START( pacman )
 {
+	pacman_state *state = machine->driver_data<pacman_state>();
 	init_save_state(machine);
 
-	charbank = 0;
-	spritebank = 0;
-	palettebank = 0;
-	colortablebank = 0;
-	flipscreen = 0;
-	bgpriority = 0;
+	state->charbank = 0;
+	state->spritebank = 0;
+	state->palettebank = 0;
+	state->colortablebank = 0;
+	state->flipscreen = 0;
+	state->bgpriority = 0;
 
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
-	xoffsethack = 1;
+	state->xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( machine, pacman_get_tile_info, pacman_scan_rows,  8, 8, 36, 28 );
+	state->bg_tilemap = tilemap_create( machine, pacman_get_tile_info, pacman_scan_rows,  8, 8, 36, 28 );
 
-	tilemap_set_scrolldx( bg_tilemap, 0, 384 - 288 );
-	tilemap_set_scrolldy( bg_tilemap, 0, 264 - 224 );
+	tilemap_set_scrolldx( state->bg_tilemap, 0, 384 - 288 );
+	tilemap_set_scrolldy( state->bg_tilemap, 0, 264 - 224 );
 }
 
 WRITE8_HANDLER( pacman_videoram_w )
 {
-	pacman_videoram[offset] = data;
-	tilemap_mark_tile_dirty( bg_tilemap, offset );
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty( state->bg_tilemap, offset );
 }
 
 WRITE8_HANDLER( pacman_colorram_w )
 {
-	pacman_colorram[offset] = data;
-	tilemap_mark_tile_dirty( bg_tilemap, offset );
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty( state->bg_tilemap, offset );
 }
 
 WRITE8_HANDLER( pacman_flipscreen_w )
 {
-	flipscreen = data & 1;
-	tilemap_set_flip( bg_tilemap, flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	state->flipscreen = data & 1;
+	tilemap_set_flip( state->bg_tilemap, state->flipscreen * ( TILEMAP_FLIPX + TILEMAP_FLIPY ) );
 }
 
 
 SCREEN_UPDATE( pacman )
 {
-	if (bgpriority != 0)
+	pacman_state *state = screen->machine->driver_data<pacman_state>();
+	if (state->bgpriority != 0)
 		bitmap_fill(bitmap,cliprect,0);
 	else
-		tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
+		tilemap_draw(bitmap,cliprect,state->bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
 
 	if( screen->machine->generic.spriteram_size )
 	{
@@ -242,10 +236,10 @@ SCREEN_UPDATE( pacman )
 
 			sx = 272 - spriteram_2[offs + 1];
 			sy = spriteram_2[offs] - 31;
-			color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
+			color = ( spriteram[offs + 1] & 0x1f ) | (state->colortablebank << 5) | (state->palettebank << 6 );
 
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine->gfx[1],
-					( spriteram[offs] >> 2 ) | (spritebank << 6),
+					( spriteram[offs] >> 2 ) | (state->spritebank << 6),
 					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx,sy,
@@ -253,7 +247,7 @@ SCREEN_UPDATE( pacman )
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine->gfx[1],
-					( spriteram[offs] >> 2 ) | (spritebank << 6),
+					( spriteram[offs] >> 2 ) | (state->spritebank << 6),
 					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
 					sx - 256,sy,
@@ -268,27 +262,27 @@ SCREEN_UPDATE( pacman )
 
 			sx = 272 - spriteram_2[offs + 1];
 			sy = spriteram_2[offs] - 31;
-			color = ( spriteram[offs + 1] & 0x1f ) | (colortablebank << 5) | (palettebank << 6 );
+			color = ( spriteram[offs + 1] & 0x1f ) | (state->colortablebank << 5) | (state->palettebank << 6 );
 
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine->gfx[1],
-					( spriteram[offs] >> 2 ) | (spritebank << 6),
+					( spriteram[offs] >> 2 ) | (state->spritebank << 6),
 					color,
 					spriteram[offs] & 1,spriteram[offs] & 2,
-					sx,sy + xoffsethack,
+					sx,sy + state->xoffsethack,
 					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 
 			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
 			drawgfx_transmask(bitmap,&spriteclip,screen->machine->gfx[1],
-					( spriteram[offs] >> 2 ) | (spritebank << 6),
+					( spriteram[offs] >> 2 ) | (state->spritebank << 6),
 					color,
 					spriteram[offs] & 2,spriteram[offs] & 1,
-					sx - 256,sy + xoffsethack,
+					sx - 256,sy + state->xoffsethack,
 					colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 		}
 	}
 
-	if (bgpriority != 0)
-		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	if (state->bgpriority != 0)
+		tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 	return 0;
 }
 
@@ -301,48 +295,52 @@ SCREEN_UPDATE( pacman )
 
 VIDEO_START( pengo )
 {
+	pacman_state *state = machine->driver_data<pacman_state>();
 	init_save_state(machine);
 
-	charbank = 0;
-	spritebank = 0;
-	palettebank = 0;
-	colortablebank = 0;
-	flipscreen = 0;
-	bgpriority = 0;
+	state->charbank = 0;
+	state->spritebank = 0;
+	state->palettebank = 0;
+	state->colortablebank = 0;
+	state->flipscreen = 0;
+	state->bgpriority = 0;
 
-	xoffsethack = 0;
+	state->xoffsethack = 0;
 
-	bg_tilemap = tilemap_create( machine, pacman_get_tile_info, pacman_scan_rows,  8, 8, 36, 28 );
+	state->bg_tilemap = tilemap_create( machine, pacman_get_tile_info, pacman_scan_rows,  8, 8, 36, 28 );
 
-	tilemap_set_scrolldx( bg_tilemap, 0, 384 - 288 );
-	tilemap_set_scrolldy( bg_tilemap, 0, 264 - 224 );
+	tilemap_set_scrolldx( state->bg_tilemap, 0, 384 - 288 );
+	tilemap_set_scrolldy( state->bg_tilemap, 0, 264 - 224 );
 }
 
 WRITE8_HANDLER( pengo_palettebank_w )
 {
-	if (palettebank != data)
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	if (state->palettebank != data)
 	{
-		palettebank = data;
-		tilemap_mark_all_tiles_dirty( bg_tilemap );
+		state->palettebank = data;
+		tilemap_mark_all_tiles_dirty( state->bg_tilemap );
 	}
 }
 
 WRITE8_HANDLER( pengo_colortablebank_w )
 {
-	if (colortablebank != data)
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	if (state->colortablebank != data)
 	{
-		colortablebank = data;
-		tilemap_mark_all_tiles_dirty( bg_tilemap );
+		state->colortablebank = data;
+		tilemap_mark_all_tiles_dirty( state->bg_tilemap );
 	}
 }
 
 WRITE8_HANDLER( pengo_gfxbank_w )
 {
-	if (charbank != (data & 1))
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	if (state->charbank != (data & 1))
 	{
-		spritebank = data & 1;
-		charbank = data & 1;
-		tilemap_mark_all_tiles_dirty( bg_tilemap );
+		state->spritebank = data & 1;
+		state->charbank = data & 1;
+		tilemap_mark_all_tiles_dirty( state->bg_tilemap );
 	}
 }
 
@@ -355,41 +353,44 @@ S2650 Games
 
 static TILE_GET_INFO( s2650_get_tile_info )
 {
+	pacman_state *state = machine->driver_data<pacman_state>();
 	int colbank, code, attr;
 
-	colbank = s2650games_tileram[tile_index & 0x1f] & 0x3;
+	colbank = state->s2650games_tileram[tile_index & 0x1f] & 0x3;
 
-	code = pacman_videoram[tile_index] + (colbank << 8);
-	attr = pacman_colorram[tile_index & 0x1f];
+	code = state->videoram[tile_index] + (colbank << 8);
+	attr = state->colorram[tile_index & 0x1f];
 
 	SET_TILE_INFO(0,code,attr & 0x1f,0);
 }
 
 VIDEO_START( s2650games )
 {
+	pacman_state *state = machine->driver_data<pacman_state>();
 	init_save_state(machine);
 
-	charbank = 0;
-	spritebank = 0;
-	palettebank = 0;
-	colortablebank = 0;
-	flipscreen = 0;
-	bgpriority = 0;
+	state->charbank = 0;
+	state->spritebank = 0;
+	state->palettebank = 0;
+	state->colortablebank = 0;
+	state->flipscreen = 0;
+	state->bgpriority = 0;
 
-	xoffsethack = 1;
+	state->xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( machine, s2650_get_tile_info,tilemap_scan_rows,8,8,32,32 );
+	state->bg_tilemap = tilemap_create( machine, s2650_get_tile_info,tilemap_scan_rows,8,8,32,32 );
 
-	tilemap_set_scroll_cols(bg_tilemap, 32);
+	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 }
 
 SCREEN_UPDATE( s2650games )
 {
+	pacman_state *state = screen->machine->driver_data<pacman_state>();
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	UINT8 *spriteram_2 = screen->machine->generic.spriteram2.u8;
 	int offs;
 
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	tilemap_draw(bitmap,cliprect,state->bg_tilemap,0,0);
 
 	for (offs = screen->machine->generic.spriteram_size - 2;offs > 2*2;offs -= 2)
 	{
@@ -403,7 +404,7 @@ SCREEN_UPDATE( s2650games )
 
 		/* TODO: ?? */
 		drawgfx_transmask(bitmap,cliprect,screen->machine->gfx[1],
-				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3) << 6),
+				(spriteram[offs] >> 2) | ((state->s2650games_spriteram[offs] & 3) << 6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
 				sx,sy,
@@ -423,10 +424,10 @@ SCREEN_UPDATE( s2650games )
 
 		/* TODO: ?? */
 		drawgfx_transmask(bitmap,cliprect,screen->machine->gfx[1],
-				(spriteram[offs] >> 2) | ((s2650games_spriteram[offs] & 3)<<6),
+				(spriteram[offs] >> 2) | ((state->s2650games_spriteram[offs] & 3)<<6),
 				color,
 				spriteram[offs] & 1,spriteram[offs] & 2,
-				sx,sy + xoffsethack,
+				sx,sy + state->xoffsethack,
 				colortable_get_transpen_mask(screen->machine->colortable, screen->machine->gfx[1], color & 0x3f, 0));
 	}
 	return 0;
@@ -434,27 +435,31 @@ SCREEN_UPDATE( s2650games )
 
 WRITE8_HANDLER( s2650games_videoram_w )
 {
-	pacman_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap,offset);
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap,offset);
 }
 
 WRITE8_HANDLER( s2650games_colorram_w )
 {
+	pacman_state *state = space->machine->driver_data<pacman_state>();
 	int i;
-	pacman_colorram[offset & 0x1f] = data;
+	state->colorram[offset & 0x1f] = data;
 	for (i = offset; i < 0x0400; i += 32)
-		tilemap_mark_tile_dirty(bg_tilemap, i);
+		tilemap_mark_tile_dirty(state->bg_tilemap, i);
 }
 
 WRITE8_HANDLER( s2650games_scroll_w )
 {
-	tilemap_set_scrolly(bg_tilemap, offset, data);
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	tilemap_set_scrolly(state->bg_tilemap, offset, data);
 }
 
 WRITE8_HANDLER( s2650games_tilesbank_w )
 {
-	s2650games_tileram[offset] = data;
-	tilemap_mark_all_tiles_dirty(bg_tilemap);
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	state->s2650games_tileram[offset] = data;
+	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 }
 
 
@@ -494,6 +499,7 @@ static TILEMAP_MAPPER( jrpacman_scan_rows )
 
 static TILE_GET_INFO( jrpacman_get_tile_info )
 {
+	pacman_state *state = machine->driver_data<pacman_state>();
 	int color_index, code, attr;
 	if( tile_index < 1792 )
 	{
@@ -504,32 +510,33 @@ static TILE_GET_INFO( jrpacman_get_tile_info )
 		color_index = tile_index + 0x80;
 	}
 
-	code = pacman_videoram[tile_index] | (charbank << 8);
-	attr = (pacman_videoram[color_index] & 0x1f) | (colortablebank << 5) | (palettebank << 6 );
+	code = state->videoram[tile_index] | (state->charbank << 8);
+	attr = (state->videoram[color_index] & 0x1f) | (state->colortablebank << 5) | (state->palettebank << 6 );
 
 	SET_TILE_INFO(0,code,attr,0);
 }
 
-static void jrpacman_mark_tile_dirty( int offset )
+static void jrpacman_mark_tile_dirty( running_machine *machine, int offset )
 {
+	pacman_state *state = machine->driver_data<pacman_state>();
 	if( offset < 0x20 )
 	{
 		/* line color - mark whole line as dirty */
 		int i;
 		for( i = 2 * 0x20; i < 56 * 0x20; i += 0x20 )
 		{
-			tilemap_mark_tile_dirty( bg_tilemap, offset + i );
+			tilemap_mark_tile_dirty( state->bg_tilemap, offset + i );
 		}
 	}
 	else if (offset < 1792)
 	{
 		/* tiles for playfield */
-		tilemap_mark_tile_dirty( bg_tilemap, offset );
+		tilemap_mark_tile_dirty( state->bg_tilemap, offset );
 	}
 	else
 	{
 		/* tiles & colors for top and bottom two rows */
-		tilemap_mark_tile_dirty( bg_tilemap, offset & ~0x80 );
+		tilemap_mark_tile_dirty( state->bg_tilemap, offset & ~0x80 );
 	}
 }
 
@@ -540,53 +547,59 @@ static void jrpacman_mark_tile_dirty( int offset )
 ***************************************************************************/
 VIDEO_START( jrpacman )
 {
+	pacman_state *state = machine->driver_data<pacman_state>();
 	init_save_state(machine);
 
-	charbank = 0;
-	spritebank = 0;
-	palettebank = 0;
-	colortablebank = 0;
-	flipscreen = 0;
-	bgpriority = 0;
+	state->charbank = 0;
+	state->spritebank = 0;
+	state->palettebank = 0;
+	state->colortablebank = 0;
+	state->flipscreen = 0;
+	state->bgpriority = 0;
 
-	xoffsethack = 1;
+	state->xoffsethack = 1;
 
-	bg_tilemap = tilemap_create( machine, jrpacman_get_tile_info,jrpacman_scan_rows,8,8,36,54 );
+	state->bg_tilemap = tilemap_create( machine, jrpacman_get_tile_info,jrpacman_scan_rows,8,8,36,54 );
 
-	tilemap_set_transparent_pen( bg_tilemap, 0 );
-	tilemap_set_scroll_cols( bg_tilemap, 36 );
+	tilemap_set_transparent_pen( state->bg_tilemap, 0 );
+	tilemap_set_scroll_cols( state->bg_tilemap, 36 );
 }
 
 WRITE8_HANDLER( jrpacman_videoram_w )
 {
-	pacman_videoram[offset] = data;
-	jrpacman_mark_tile_dirty(offset);
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	state->videoram[offset] = data;
+	jrpacman_mark_tile_dirty(space->machine, offset);
 }
 
 WRITE8_HANDLER( jrpacman_charbank_w )
 {
-	if (charbank != (data & 1))
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	if (state->charbank != (data & 1))
 	{
-		charbank = data & 1;
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		state->charbank = data & 1;
+		tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 	}
 }
 
 WRITE8_HANDLER( jrpacman_spritebank_w )
 {
-	spritebank = (data & 1);
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	state->spritebank = (data & 1);
 }
 
 WRITE8_HANDLER( jrpacman_scroll_w )
 {
+	pacman_state *state = space->machine->driver_data<pacman_state>();
 	int i;
 	for( i = 2; i < 34; i++ )
 	{
-		tilemap_set_scrolly( bg_tilemap, i, data );
+		tilemap_set_scrolly( state->bg_tilemap, i, data );
 	}
 }
 
 WRITE8_HANDLER( jrpacman_bgpriority_w )
 {
-	bgpriority = (data & 1);
+	pacman_state *state = space->machine->driver_data<pacman_state>();
+	state->bgpriority = (data & 1);
 }

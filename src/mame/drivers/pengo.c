@@ -68,11 +68,11 @@
 #include "sound/namco.h"
 
 
-class pengo_state : public driver_device
+class pengo_state : public pacman_state
 {
 public:
 	pengo_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: pacman_state(machine, config) { }
 
 	UINT8 *spriteram;
 	UINT8 *spriteram2;
@@ -111,8 +111,8 @@ public:
 
 static ADDRESS_MAP_START( pengo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE(&pacman_videoram) /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE(&pacman_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pengo_state, videoram) /* video and color RAM, scratchpad RAM, sprite codes */
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pengo_state, colorram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE_MEMBER(pengo_state, spriteram, spriteram_size)
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", pacman_sound_w)
@@ -134,7 +134,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jrpacmbl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE(&pacman_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE_MEMBER(pengo_state, videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE_MEMBER(pengo_state, spriteram, spriteram_size)
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", pacman_sound_w)

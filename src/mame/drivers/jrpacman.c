@@ -104,11 +104,11 @@
 #include "sound/namco.h"
 
 
-class jrpacman_state : public driver_device
+class jrpacman_state : public pacman_state
 {
 public:
 	jrpacman_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: pacman_state(machine, config) { }
 
 	UINT8 *spriteram;
 	UINT8 *spriteram2;
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( jrpacman_interrupt_vector_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE(&pacman_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE_MEMBER(jrpacman_state, videoram)
 	AM_RANGE(0x4800, 0x4fef) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_BASE_SIZE_MEMBER(jrpacman_state, spriteram, spriteram_size)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
@@ -228,12 +228,12 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	8,8,
-    RGN_FRAC(1,2),
-    2,
-    { 0, 4 },
-    { STEP4(8*8,1), STEP4(0*8,1) },
-    { STEP8(0*8,8) },
-    16*8
+	RGN_FRAC(1,2),
+	2,
+	{ 0, 4 },
+	{ STEP4(8*8,1), STEP4(0*8,1) },
+	{ STEP8(0*8,8) },
+	16*8
 };
 
 
