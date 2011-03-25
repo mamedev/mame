@@ -104,7 +104,7 @@ void deco16ic_tilemap_3_draw(device_t *device, bitmap_t *bitmap, const rectangle
 void deco16ic_tilemap_4_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
 
 /* used by boogwing, nitrobal */
-void deco16ic_tilemap_34_combine_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority);
+void deco16ic_tilemap_34_combine_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority, int is_tattoo = false);
 
 
 /* used by boogwing, dassault, nitrobal */

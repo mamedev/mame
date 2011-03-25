@@ -63,10 +63,12 @@ public:
 	UINT16 spriteram16_buffered[0x1000];
 	UINT16 spriteram16_2[0x1000];
 	UINT16 spriteram16_2_buffered[0x1000];
-	UINT16    pf1_rowscroll[0x0800/2];
-	UINT16    pf2_rowscroll[0x0800/2];
-	UINT16    pf3_rowscroll[0x0800/2];
-	UINT16    pf4_rowscroll[0x0800/2];
+	UINT16    pf1_rowscroll[0x1000];
+	UINT16    pf2_rowscroll[0x1000];
+	UINT16    pf3_rowscroll[0x1000];
+	UINT16    pf4_rowscroll[0x1000];
+
+	
 	device_t *deco16ic;
 };
 
