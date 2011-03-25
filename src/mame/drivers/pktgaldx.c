@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( pktgaldx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8_MODERN("oki2", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8_MODERN("oki2", okim6295_device, read, 0x00ff)
 
-	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
 	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE("oki2", pktgaldx_oki_bank_w)
 	AM_RANGE(0x167800, 0x167fff) AM_READWRITE(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_BASE(&deco16_prot_ram)
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
@@ -300,15 +300,16 @@ static int pktgaldx_bank_callback( const int bank )
 static const deco16ic_interface pktgaldx_deco16ic_intf =
 {
 	"screen",
-	1, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 16, 0, 16, /* color base (default values) */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, /* color base (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	NULL,
 	pktgaldx_bank_callback,
-	NULL,
-	NULL
+	0,1,
 };
+
+
 
 static MACHINE_START( pktgaldx )
 {

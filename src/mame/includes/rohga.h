@@ -15,6 +15,7 @@ public:
 		  maincpu(*this, "maincpu"),
 		  audiocpu(*this, "audiocpu"),
 		  deco16ic(*this, "deco_custom"),
+		  deco16ic34(*this, "deco_custom34"),
 		  oki1(*this, "oki1"),
 		  oki2(*this, "oki2") { }
 
@@ -29,6 +30,7 @@ public:
 	required_device<cpu_device> maincpu;
 	required_device<cpu_device> audiocpu;
 	required_device<deco16ic_device> deco16ic;
+	required_device<deco16ic_device> deco16ic34;
 	required_device<okim6295_device> oki1;
 	required_device<okim6295_device> oki2;
 };

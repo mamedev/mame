@@ -229,12 +229,12 @@ static ADDRESS_MAP_START( dassault_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, pf2_rowscroll)
-	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
 
-	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
-	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, pf4_rowscroll)
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, ram) /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2) /* Spriteram (2nd) */
@@ -541,15 +541,27 @@ static int dassault_bank_callback( const int bank )
 static const deco16ic_interface dassault_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 16, 0, 16, /* color base (default values) */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, /* color base (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	dassault_bank_callback,
 	dassault_bank_callback,
-	dassault_bank_callback,
-	dassault_bank_callback
+	0,1,
 };
+
+static const deco16ic_interface dassault_deco16ic34_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, /* color base (default values) */
+	0x0f, 0x0f,	/* color masks (default values) */
+	dassault_bank_callback,
+	dassault_bank_callback,
+	0,2,
+};
+
 
 static MACHINE_CONFIG_START( dassault, dassault_state )
 
@@ -582,6 +594,7 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 	MCFG_PALETTE_LENGTH(4096)
 
 	MCFG_DECO16IC_ADD("deco_custom", dassault_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom34", dassault_deco16ic34_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

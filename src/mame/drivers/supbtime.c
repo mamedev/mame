@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( supbtime_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(sound_w)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_r, deco16ic_pf12_control_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_r, deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll)
@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( chinatwn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_r, deco16ic_pf12_control_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_r, deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll) // unused
@@ -323,11 +323,12 @@ static const ym2151_interface ym2151_config =
 static const deco16ic_interface supbtime_deco16ic_intf =
 {
 	"screen",
-	1, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 16, 0, 16, /* color base (default values) */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
-	NULL, NULL, NULL, NULL
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, /* color base (default values) */
+	0x0f, 0x0f,	/* color masks (default values) */
+	NULL, NULL,
+	0,1
 };
 
 static MACHINE_START( supbtime )

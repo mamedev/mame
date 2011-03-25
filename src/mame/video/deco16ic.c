@@ -140,8 +140,8 @@ Rowscroll style:
 
     2010-02: Converted to be a device.
     TODO:
-      - properly support PCBs with two ICs (i.e. no pf3/pf4 because they actually belong to a 2nd chip)
-      - move here emulation of the sprite chips (currently replicated in each driver)?
+		- convert to c++ device
+		- splite tilemap emulation from other emulation
 
 ***************************************************************************/
 
@@ -149,7 +149,6 @@ Rowscroll style:
 #include "video/deco16ic.h"
 #include "ui.h"
 
-/* Note, each device should have 2 tilemaps, not 4.. games with 4 chips use 2 devices.. this should be fixed here! */
 
 typedef struct _deco16ic_state deco16ic_state;
 struct _deco16ic_state
@@ -157,35 +156,33 @@ struct _deco16ic_state
 	screen_device *screen;
 
 	UINT16 *pf1_data, *pf2_data;
-	UINT16 *pf3_data, *pf4_data;
-	UINT16 *pf12_control, *pf34_control;
+	UINT16 *pf12_control;
 	UINT16 *raster_display_list;
 	UINT8 *dirty_palette;
 
 	const UINT16 *pf1_rowscroll_ptr, *pf2_rowscroll_ptr;
-	const UINT16 *pf3_rowscroll_ptr, *pf4_rowscroll_ptr;
 
-	tilemap_t *pf1_tilemap_16x16, *pf2_tilemap_16x16, *pf3_tilemap_16x16, *pf4_tilemap_16x16 ;
+	tilemap_t *pf1_tilemap_16x16, *pf2_tilemap_16x16;
 	tilemap_t *pf1_tilemap_8x8, *pf2_tilemap_8x8;
 	bitmap_t *sprite_priority_bitmap;
 
-	deco16_bank_cb  bank_cb[4];
+	deco16_bank_cb  bank_cb[2];
 
 	UINT16 priority;
 
 	int raster_display_position;
 
-	int use_custom_pf1, use_custom_pf2, use_custom_pf3, use_custom_pf4;
+	int use_custom_pf1, use_custom_pf2;
 
-	int pf1_bank, pf2_bank, pf3_bank, pf4_bank;
-	int pf12_16x16_gfx_bank, pf34_16x16_gfx_bank, pf12_8x8_gfx_bank;
-	int pf1_colourmask, pf2_colourmask, pf3_colourmask, pf4_colourmask;
-	int pf1_colour_bank, pf2_colour_bank, pf3_colour_bank, pf4_colour_bank;
-	int pf1_trans_mask, pf2_trans_mask, pf3_trans_mask, pf4_trans_mask;
+	int pf1_bank, pf2_bank;
+	int pf12_16x16_gfx_bank, pf12_8x8_gfx_bank;
+	int pf1_colourmask, pf2_colourmask;
+	int pf1_colour_bank, pf2_colour_bank;
+	int pf1_trans_mask, pf2_trans_mask;
 
-	int pf12_last_small, pf12_last_big, pf34_last_big;
+	int pf12_last_small, pf12_last_big;
 
-	int pf3_8bpp_mode;
+	int pf1_8bpp_mode;
 };
 
 /*****************************************************************************
@@ -287,76 +284,6 @@ static TILEMAP_MAPPER( deco16_scan_rows )
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-static TILE_GET_INFO_DEVICE( get_pf4_tile_info )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	UINT16 tile = deco16ic->pf4_data[tile_index];
-	UINT8 colour = (tile >> 12) & 0xf;
-	UINT8 flags = 0;
-
-	if (tile & 0x8000)
-	{
-		if ((deco16ic->pf34_control[6] >> 8) & 0x01)
-		{
-			flags |= TILE_FLIPX;
-			colour &= 0x7;
-		}
-		if ((deco16ic->pf34_control[6] >> 8) & 0x02)
-		{
-			flags|=TILE_FLIPY;
-			colour &= 0x7;
-		}
-	}
-
-	SET_TILE_INFO_DEVICE(
-			deco16ic->pf34_16x16_gfx_bank,
-			(tile & 0xfff) | deco16ic->pf4_bank,
-			(colour & deco16ic->pf4_colourmask) + deco16ic->pf4_colour_bank,
-			flags);
-}
-
-static TILE_GET_INFO_DEVICE( get_pf3_tile_info )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	UINT16 tile = deco16ic->pf3_data[tile_index];
-	UINT8 colour = (tile >> 12) & 0xf;
-	UINT8 flags = 0;
-
-	if (tile & 0x8000)
-	{
-		if ((deco16ic->pf34_control[6] >> 0) & 0x01)
-		{
-			flags |= TILE_FLIPX;
-			colour &= 0x7;
-		}
-		if ((deco16ic->pf34_control[6] >> 0) & 0x02)
-		{
-			flags |= TILE_FLIPY;
-			colour &= 0x7;
-		}
-	}
-
-	if (deco16ic->pf3_8bpp_mode)
-	{
-		// Captain America operates this chip in 8bpp mode.
-		// In 8bpp mode you appear to only get 1 layer, not 2, but you also
-		// have an extra 2 tile bits, and 2 less colour bits.
-		SET_TILE_INFO_DEVICE(
-				deco16ic->pf34_16x16_gfx_bank,
-				(tile & 0x3fff) | deco16ic->pf3_bank,
-				((colour & deco16ic->pf3_colourmask) + deco16ic->pf3_colour_bank)>>2,
-				flags);
-	}
-	else
-	{
-		SET_TILE_INFO_DEVICE(
-				deco16ic->pf34_16x16_gfx_bank,
-				(tile & 0xfff) | deco16ic->pf3_bank,
-				((colour & deco16ic->pf3_colourmask) + deco16ic->pf3_colour_bank),
-				flags);
-	}
-}
-
 static TILE_GET_INFO_DEVICE( get_pf2_tile_info )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
@@ -406,11 +333,25 @@ static TILE_GET_INFO_DEVICE( get_pf1_tile_info )
 		}
 	}
 
-	SET_TILE_INFO_DEVICE(
-			deco16ic->pf12_16x16_gfx_bank,
-			(tile & 0xfff) | deco16ic->pf1_bank,
-			(colour & deco16ic->pf1_colourmask) + deco16ic->pf1_colour_bank,
-			flags);
+	if (deco16ic->pf1_8bpp_mode)
+	{
+		// Captain America operates this chip in 8bpp mode.
+		// In 8bpp mode you appear to only get 1 layer, not 2, but you also
+		// have an extra 2 tile bits, and 2 less colour bits.
+		SET_TILE_INFO_DEVICE(
+				deco16ic->pf12_16x16_gfx_bank,
+				(tile & 0x3fff) | deco16ic->pf1_bank,
+				((colour & deco16ic->pf1_colourmask) + deco16ic->pf1_colour_bank)>>2,
+				flags);
+	}
+	else
+	{	
+		SET_TILE_INFO_DEVICE(
+				deco16ic->pf12_16x16_gfx_bank,
+				(tile & 0xfff) | deco16ic->pf1_bank,
+				(colour & deco16ic->pf1_colourmask) + deco16ic->pf1_colour_bank,
+				flags);
+	}
 }
 
 static TILE_GET_INFO_DEVICE( get_pf2_tile_info_b )
@@ -523,7 +464,7 @@ static void custom_tilemap_draw(
 	width_mask = src_bitmap0->width - 1;
 	height_mask = src_bitmap0->height - 1;
 	src_y = scrolly + starty;
-
+	
 
 	for (y = starty; y < endy; y++)
 	{
@@ -547,7 +488,7 @@ static void custom_tilemap_draw(
 
 				if (src_bitmap1)
 				{
-					p |= (*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
+					p |= (*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;		
 				}
 
 				src_x = (src_x + 1) & width_mask;
@@ -586,7 +527,7 @@ static void custom_tilemap_draw(
 					{
 						UINT16 p2 = *BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x);
 						p = 0x200+( ((p&0x30)<<4) | (p&0x0f) | ((p2 & 0x0f)<<4));
-					}
+					}				
 				}
 				src_x = (src_x + 1) & width_mask;
 
@@ -608,10 +549,10 @@ static void custom_tilemap_draw(
 /******************************************************************************/
 
 /* captain america seems to have a similar 8bpp feature to robocop2, investigate merging */
-void deco16ic_set_pf3_8bpp_mode(device_t *device, int mode)
+void deco16ic_set_pf1_8bpp_mode(device_t *device, int mode)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
-	deco16ic->pf3_8bpp_mode = mode;
+	deco16ic->pf1_8bpp_mode = mode;
 }
 
 /* robocop 2 can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
@@ -623,25 +564,34 @@ void deco16ic_set_tilemap_colour_mask( device_t *device, int tmap, int mask )
 	{
 	case 0: deco16ic->pf1_colourmask = mask; break;
 	case 1: deco16ic->pf2_colourmask = mask; break;
-	case 2: deco16ic->pf3_colourmask = mask; break;
-	case 3: deco16ic->pf4_colourmask = mask; break;
 	}
 }
 
-void deco16ic_pf34_set_gfxbank( device_t *device, int small, int big )
+void deco16ic_pf12_set_gfxbank( device_t *device, int small, int big )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
-	if (deco16ic->pf34_last_big != big)
+	if (deco16ic->pf12_last_big != big)
 	{
-		if (deco16ic->pf3_tilemap_16x16)
-			tilemap_mark_all_tiles_dirty(deco16ic->pf3_tilemap_16x16);
-		if (deco16ic->pf4_tilemap_16x16)
-			tilemap_mark_all_tiles_dirty(deco16ic->pf4_tilemap_16x16);
+		if (deco16ic->pf1_tilemap_16x16)
+			tilemap_mark_all_tiles_dirty(deco16ic->pf1_tilemap_16x16);
+		if (deco16ic->pf2_tilemap_16x16)
+			tilemap_mark_all_tiles_dirty(deco16ic->pf2_tilemap_16x16);
 
-		deco16ic->pf34_last_big = big;
+		deco16ic->pf12_last_big = big;
 	}
-	deco16ic->pf34_16x16_gfx_bank = big;
+	deco16ic->pf12_16x16_gfx_bank = big;
+
+	if (deco16ic->pf12_last_small != small)
+	{
+		if (deco16ic->pf1_tilemap_8x8)
+			tilemap_mark_all_tiles_dirty(deco16ic->pf1_tilemap_8x8);
+		if (deco16ic->pf2_tilemap_8x8)
+			tilemap_mark_all_tiles_dirty(deco16ic->pf2_tilemap_8x8);
+
+		deco16ic->pf12_last_small = small;
+	}
+	deco16ic->pf12_8x8_gfx_bank = small;
 }
 
 /* stoneage has broken scroll registers */
@@ -662,14 +612,6 @@ void deco16ic_set_scrolldx( device_t *device, int tmap, int size, int dx, int dx
 			tilemap_set_scrolldx(deco16ic->pf2_tilemap_16x16, dx, dx_if_flipped);
 		else
 			tilemap_set_scrolldx(deco16ic->pf2_tilemap_8x8, dx, dx_if_flipped);
-		break;
-	case 2:
-		if (!size)
-			tilemap_set_scrolldx(deco16ic->pf3_tilemap_16x16, dx, dx_if_flipped);
-		break;
-	case 3:
-		if (!size)
-			tilemap_set_scrolldx(deco16ic->pf4_tilemap_16x16, dx, dx_if_flipped);
 		break;
 	}
 }
@@ -698,22 +640,6 @@ WRITE16_DEVICE_HANDLER( deco16ic_pf2_data_w )
 		tilemap_mark_tile_dirty(deco16ic->pf2_tilemap_16x16, offset);
 }
 
-WRITE16_DEVICE_HANDLER( deco16ic_pf3_data_w )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-
-	COMBINE_DATA(&deco16ic->pf3_data[offset]);
-	tilemap_mark_tile_dirty(deco16ic->pf3_tilemap_16x16, offset);
-}
-
-WRITE16_DEVICE_HANDLER( deco16ic_pf4_data_w )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-
-	COMBINE_DATA(&deco16ic->pf4_data[offset]);
-	tilemap_mark_tile_dirty(deco16ic->pf4_tilemap_16x16, offset);
-}
-
 READ16_DEVICE_HANDLER( deco16ic_pf1_data_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
@@ -726,66 +652,30 @@ READ16_DEVICE_HANDLER( deco16ic_pf2_data_r )
 	return deco16ic->pf2_data[offset];
 }
 
-READ16_DEVICE_HANDLER( deco16ic_pf3_data_r )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	return deco16ic->pf3_data[offset];
-}
 
-READ16_DEVICE_HANDLER( deco16ic_pf4_data_r )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	return deco16ic->pf4_data[offset];
-}
-
-
-WRITE16_DEVICE_HANDLER( deco16ic_pf12_control_w )
+WRITE16_DEVICE_HANDLER( deco16ic_pf_control_w )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	COMBINE_DATA(&deco16ic->pf12_control[offset]);
 	device->machine->primary_screen->update_partial(device->machine->primary_screen->vpos());
 }
 
-WRITE16_DEVICE_HANDLER( deco16ic_pf34_control_w )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	COMBINE_DATA(&deco16ic->pf34_control[offset]);
-	device->machine->primary_screen->update_partial(device->machine->primary_screen->vpos());
-}
-
-READ16_DEVICE_HANDLER( deco16ic_pf12_control_r )
+READ16_DEVICE_HANDLER( deco16ic_pf_control_r )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	return deco16ic->pf12_control[offset];
 }
 
-READ16_DEVICE_HANDLER( deco16ic_pf34_control_r )
+
+READ32_DEVICE_HANDLER ( deco16ic_pf_control_dword_r )
 {
-	deco16ic_state *deco16ic = get_safe_token(device);
-	return deco16ic->pf34_control[offset];
+	return deco16ic_pf_control_r(device, offset, 0xffff)^0xffff0000;
 }
 
-
-READ32_DEVICE_HANDLER ( deco16ic_pf12_control_dword_r )
+WRITE32_DEVICE_HANDLER( deco16ic_pf_control_dword_w )
 {
-	return deco16ic_pf12_control_r(device, offset, 0xffff)^0xffff0000;
+	deco16ic_pf_control_w(device, offset, data & 0xffff, mem_mask & 0xffff);
 }
-
-WRITE32_DEVICE_HANDLER( deco16ic_pf12_control_dword_w )
-{
-	deco16ic_pf12_control_w(device, offset, data & 0xffff, mem_mask & 0xffff);
-}
-
-READ32_DEVICE_HANDLER ( deco16ic_pf34_control_dword_r )
-{
-	return deco16ic_pf34_control_r(device, offset, 0xffff)^0xffff0000;
-}
-
-WRITE32_DEVICE_HANDLER( deco16ic_pf34_control_dword_w )
-{
-	deco16ic_pf34_control_w(device, offset, data & 0xffff, mem_mask & 0xffff);
-}
-
 
 READ32_DEVICE_HANDLER( deco16ic_pf1_data_dword_r )
 {
@@ -807,25 +697,6 @@ WRITE32_DEVICE_HANDLER( deco16ic_pf2_data_dword_w )
 	deco16ic_pf2_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
 }
 
-READ32_DEVICE_HANDLER( deco16ic_pf3_data_dword_r )
-{
-	return deco16ic_pf3_data_r(device, offset, 0xffff)^0xffff0000;
-}
-
-WRITE32_DEVICE_HANDLER( deco16ic_pf3_data_dword_w )
-{
-	deco16ic_pf3_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
-}
-
-READ32_DEVICE_HANDLER( deco16ic_pf4_data_dword_r )
-{
-	return deco16ic_pf4_data_r(device, offset, 0xffff)^0xffff0000;
-}
-
-WRITE32_DEVICE_HANDLER( deco16ic_pf4_data_dword_w )
-{
-	deco16ic_pf4_data_w(device, offset, data & 0xffff, mem_mask & 0xffff);
-}
 
 
 /*****************************************************************************************/
@@ -844,9 +715,6 @@ static int deco16_pf_update(
 	/* Toggle between 8x8 and 16x16 modes (and master enable bit) */
 	if (BIT(control1, 7))
 	{
-		if (!tilemap_8x8)
-			popmessage("Deco16: Playfield switched into 8x8 mode but no tilemap defined");
-
 		if (tilemap_8x8)
 			tilemap_set_enable(tilemap_8x8, BIT(control0, 7));
 
@@ -856,9 +724,6 @@ static int deco16_pf_update(
 	}
 	else
 	{
-		if (!tilemap_16x16)
-			popmessage("Deco16: Playfield switched into 16x16 mode but no tilemap defined");
-
 		if (tilemap_8x8)
 			tilemap_set_enable(tilemap_8x8, 0);
 
@@ -986,7 +851,7 @@ static int deco16_pf_update(
 	return use_custom;
 }
 
-void deco16ic_pf12_update( device_t *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
+void deco16ic_pf_update( device_t *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	int bank1, bank2;
@@ -1029,43 +894,6 @@ void deco16ic_pf12_update( device_t *device, const UINT16 *rowscroll_1_ptr, cons
 	}
 }
 
-void deco16ic_pf34_update( device_t *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	int bank1, bank2;
-
-	/* Update scrolling and tilemap enable */
-	deco16ic->pf3_rowscroll_ptr = rowscroll_1_ptr;
-	deco16ic->pf4_rowscroll_ptr = rowscroll_2_ptr;
-	deco16ic->use_custom_pf4 = deco16_pf_update(0, deco16ic->pf4_tilemap_16x16, rowscroll_2_ptr, deco16ic->pf34_control[3], deco16ic->pf34_control[4], deco16ic->pf34_control[5] >> 8, deco16ic->pf34_control[6] >> 8);
-	deco16ic->use_custom_pf3 = deco16_pf_update(0, deco16ic->pf3_tilemap_16x16, rowscroll_1_ptr, deco16ic->pf34_control[1], deco16ic->pf34_control[2], deco16ic->pf34_control[5] & 0xff, deco16ic->pf34_control[6] & 0xff);
-
-	/* Update banking and global flip state */
-	if (deco16ic->bank_cb[2])
-	{
-		bank1 = deco16ic->bank_cb[2](deco16ic->pf34_control[7] & 0xff);
-		if (bank1 != deco16ic->pf3_bank)
-		{
-			if (deco16ic->pf3_tilemap_16x16)
-				tilemap_mark_all_tiles_dirty(deco16ic->pf3_tilemap_16x16);
-
-			deco16ic->pf3_bank = bank1;
-		}
-	}
-
-	if (deco16ic->bank_cb[3])
-	{
-		bank2 = deco16ic->bank_cb[3](deco16ic->pf34_control[7] >> 8);
-		if (bank2 != deco16ic->pf4_bank)
-		{
-			if (deco16ic->pf4_tilemap_16x16)
-				tilemap_mark_all_tiles_dirty(deco16ic->pf4_tilemap_16x16);
-
-			deco16ic->pf4_bank = bank2;
-		}
-	}
-}
-
 /*****************************************************************************************/
 
 void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap)
@@ -1083,16 +911,6 @@ void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap)
 	}
 	else
 		sprintf(buf, "\n\n");
-
-	if (deco16ic->pf34_control)
-	{
-		sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", deco16ic->pf34_control[0], deco16ic->pf34_control[1], deco16ic->pf34_control[2], deco16ic->pf34_control[3]);
-		sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", deco16ic->pf34_control[4], deco16ic->pf34_control[5], deco16ic->pf34_control[6], deco16ic->pf34_control[7]);
-	}
-	else
-		sprintf(&buf[strlen(buf)], "\n\n");
-
-	sprintf(&buf[strlen(buf)],"%04X", deco16ic->priority);
 
 	ui_draw_text(&device->machine->render().ui_container(), buf, 60, 40);
 }
@@ -1213,33 +1031,14 @@ void deco16ic_tilemap_2_draw(device_t *device, bitmap_t *bitmap, const rectangle
 	}
 }
 
-void deco16ic_tilemap_3_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-
-	if (deco16ic->use_custom_pf3)
-		custom_tilemap_draw(device, bitmap, cliprect, 0, deco16ic->pf3_tilemap_16x16, 0, 0, deco16ic->pf3_rowscroll_ptr, deco16ic->pf34_control[1], deco16ic->pf34_control[2], deco16ic->pf34_control[5] & 0xff, deco16ic->pf34_control[6] & 0xff, 0, 0, deco16ic->pf3_trans_mask, flags, priority, 0);
-	else if (deco16ic->pf3_tilemap_16x16)
-		tilemap_draw(bitmap, cliprect, deco16ic->pf3_tilemap_16x16, flags, priority);
-}
-
-void deco16ic_tilemap_4_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-
-	if (deco16ic->use_custom_pf4)
-		custom_tilemap_draw(device, bitmap, cliprect, 0, deco16ic->pf4_tilemap_16x16, 0, 0, deco16ic->pf4_rowscroll_ptr, deco16ic->pf34_control[3], deco16ic->pf34_control[4], deco16ic->pf34_control[5] >> 8, deco16ic->pf34_control[6] >> 8, 0, 0, deco16ic->pf4_trans_mask, flags, priority, 0);
-	else if (deco16ic->pf4_tilemap_16x16)
-		tilemap_draw(bitmap, cliprect, deco16ic->pf4_tilemap_16x16, flags, priority);
-}
 
 /*****************************************************************************************/
 
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
-void deco16ic_tilemap_34_combine_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority, int is_tattoo)
+void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority, int is_tattoo)
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
-	custom_tilemap_draw(device, bitmap, cliprect, 0, deco16ic->pf3_tilemap_16x16, 0, deco16ic->pf4_tilemap_16x16, deco16ic->pf3_rowscroll_ptr, deco16ic->pf34_control[1], deco16ic->pf34_control[2], deco16ic->pf34_control[5] & 0xff, deco16ic->pf34_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);
+	custom_tilemap_draw(device, bitmap, cliprect, 0, deco16ic->pf1_tilemap_16x16, 0, deco16ic->pf2_tilemap_16x16, deco16ic->pf1_rowscroll_ptr, deco16ic->pf12_control[1], deco16ic->pf12_control[2], deco16ic->pf12_control[5] & 0xff, deco16ic->pf12_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);
 }
 
 
@@ -1261,26 +1060,23 @@ static DEVICE_START( deco16ic )
 
 	deco16ic->bank_cb[0] = intf->bank_cb0;
 	deco16ic->bank_cb[1] = intf->bank_cb1;
-	deco16ic->bank_cb[2] = intf->bank_cb2;
-	deco16ic->bank_cb[3] = intf->bank_cb3;
 
 	deco16ic->pf1_trans_mask = intf->trans_mask1;
 	deco16ic->pf2_trans_mask = intf->trans_mask2;
-	deco16ic->pf3_trans_mask = intf->trans_mask3;
-	deco16ic->pf4_trans_mask = intf->trans_mask4;
 
 	deco16ic->pf1_colour_bank = intf->col_base1;
 	deco16ic->pf2_colour_bank = intf->col_base2;
-	deco16ic->pf3_colour_bank = intf->col_base3;
-	deco16ic->pf4_colour_bank = intf->col_base4;
 
 	deco16ic->pf1_colourmask = intf->col_mask1;
 	deco16ic->pf2_colourmask = intf->col_mask2;
-	deco16ic->pf3_colourmask = intf->col_mask3;
-	deco16ic->pf4_colourmask = intf->col_mask4;
 
-	deco16ic->pf1_tilemap_16x16 =	tilemap_create_device(device, get_pf1_tile_info, deco16_scan_rows, 16, 16, 64, 32);
-	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, 64, 32);
+	deco16ic->pf1_tilemap_16x16 =	tilemap_create_device(device, get_pf1_tile_info, deco16_scan_rows, 16, 16, intf->full_width12 ? 64 : 32, 32);
+//	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, intf->full_width12 ? 64 : 32, 32);
+	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, 64 , 32);
+
+	deco16ic->pf12_8x8_gfx_bank = intf->_8x8_gfxregion;
+	deco16ic->pf12_16x16_gfx_bank = intf->_16x16_gfxregion;
+
 
 	if (intf->split)
 		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, intf->full_width12 ? 64 : 32, 32);
@@ -1288,17 +1084,6 @@ static DEVICE_START( deco16ic )
 		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, intf->full_width12 ? 64 : 32, 32);
 
 	deco16ic->pf2_tilemap_8x8 = tilemap_create_device(device, get_pf2_tile_info_b, tilemap_scan_rows, 8, 8, intf->full_width12 ? 64 : 32, 32);
-
-	if (!intf->pf12_only)
-	{
-		deco16ic->pf4_tilemap_16x16 =	tilemap_create_device(device, get_pf4_tile_info, deco16_scan_rows, 16, 16, intf->full_width34 ? 64 : 32, 32);
-		deco16ic->pf3_tilemap_16x16 =	tilemap_create_device(device, get_pf3_tile_info, deco16_scan_rows, 16, 16, intf->full_width34 ? 64 : 32, 32);
-	}
-	else
-	{
-		deco16ic->pf3_tilemap_16x16 = 0;
-		deco16ic->pf4_tilemap_16x16 = 0;
-	}
 
 	tilemap_set_transparent_pen(deco16ic->pf1_tilemap_8x8, 0);
 	tilemap_set_transparent_pen(deco16ic->pf2_tilemap_8x8, 0);
@@ -1308,73 +1093,53 @@ static DEVICE_START( deco16ic )
 	if (intf->split) /* Caveman Ninja only */
 		tilemap_set_transmask(deco16ic->pf2_tilemap_16x16, 0, 0x00ff, 0xff01);
 
-	if (!intf->pf12_only)
-	{
-		tilemap_set_transparent_pen(deco16ic->pf3_tilemap_16x16, 0);
-		tilemap_set_transparent_pen(deco16ic->pf4_tilemap_16x16, 0);
-	}
-
-	deco16ic->pf3_8bpp_mode = 0;
+	deco16ic->pf1_8bpp_mode = 0;
 
 	deco16ic->dirty_palette = auto_alloc_array_clear(device->machine, UINT8, 4096);
 	deco16ic->raster_display_list = auto_alloc_array_clear(device->machine, UINT16, 20 * 256 / 2);
 
 	deco16ic->pf1_data = auto_alloc_array_clear(device->machine, UINT16, 0x2000 / 2);
 	deco16ic->pf2_data = auto_alloc_array_clear(device->machine, UINT16, 0x2000 / 2);
-	deco16ic->pf3_data = auto_alloc_array_clear(device->machine, UINT16, 0x2000 / 2);
-	deco16ic->pf4_data = auto_alloc_array_clear(device->machine, UINT16, 0x2000 / 2);
 	deco16ic->pf12_control = auto_alloc_array_clear(device->machine, UINT16, 0x10 / 2);
-	deco16ic->pf34_control = auto_alloc_array_clear(device->machine, UINT16, 0x10 / 2);
+
 
 	device->save_item(NAME(deco16ic->priority));
 	device->save_item(NAME(deco16ic->raster_display_position));
 	device->save_item(NAME(deco16ic->use_custom_pf1));
 	device->save_item(NAME(deco16ic->use_custom_pf2));
-	device->save_item(NAME(deco16ic->use_custom_pf3));
-	device->save_item(NAME(deco16ic->use_custom_pf4));
 	device->save_item(NAME(deco16ic->pf1_bank));
 	device->save_item(NAME(deco16ic->pf2_bank));
-	device->save_item(NAME(deco16ic->pf3_bank));
-	device->save_item(NAME(deco16ic->pf4_bank));
 	device->save_item(NAME(deco16ic->pf12_8x8_gfx_bank));
 	device->save_item(NAME(deco16ic->pf12_16x16_gfx_bank));
-	device->save_item(NAME(deco16ic->pf34_16x16_gfx_bank));
 	device->save_item(NAME(deco16ic->pf12_last_small));
 	device->save_item(NAME(deco16ic->pf12_last_big));
-	device->save_item(NAME(deco16ic->pf34_last_big));
-	device->save_item(NAME(deco16ic->pf3_8bpp_mode));
+
+	device->save_item(NAME(deco16ic->pf1_8bpp_mode));
 
 	device->save_pointer(NAME(deco16ic->dirty_palette), 4096);
 	device->save_pointer(NAME(deco16ic->raster_display_list), 20 * 256 / 2);
 	device->save_pointer(NAME(deco16ic->pf1_data), 0x2000 / 2);
 	device->save_pointer(NAME(deco16ic->pf2_data), 0x2000 / 2);
-	device->save_pointer(NAME(deco16ic->pf3_data), 0x2000 / 2);
-	device->save_pointer(NAME(deco16ic->pf4_data), 0x2000 / 2);
 	device->save_pointer(NAME(deco16ic->pf12_control), 0x10 / 2);
-	device->save_pointer(NAME(deco16ic->pf34_control), 0x10 / 2);
+
 }
 
 static DEVICE_RESET( deco16ic )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 
-	deco16ic->pf1_bank = deco16ic->pf2_bank = deco16ic->pf3_bank = deco16ic->pf4_bank = 0;
+	deco16ic->pf1_bank = deco16ic->pf2_bank = 0;
 
-	deco16ic->pf12_8x8_gfx_bank = 0;
-	deco16ic->pf12_16x16_gfx_bank = 1;
-	deco16ic->pf34_16x16_gfx_bank = 2;
 
 	deco16ic->raster_display_position = 0;
 
-	deco16ic->pf12_last_small = deco16ic->pf12_last_big = deco16ic->pf34_last_big = -1;
+	deco16ic->pf12_last_small = deco16ic->pf12_last_big = -1;
 
 	deco16ic->priority = 0;
-	deco16ic->use_custom_pf1 = deco16ic->use_custom_pf2 = deco16ic->use_custom_pf3 = deco16ic->use_custom_pf4 = 0;
+	deco16ic->use_custom_pf1 = deco16ic->use_custom_pf2 = 0;
 
 	deco16ic->pf1_rowscroll_ptr = 0;
 	deco16ic->pf2_rowscroll_ptr = 0;
-	deco16ic->pf3_rowscroll_ptr = 0;
-	deco16ic->pf4_rowscroll_ptr = 0;
 }
 
 

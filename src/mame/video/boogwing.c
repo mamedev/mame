@@ -140,12 +140,12 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( boogwing )
 {
 	boogwing_state *state = screen->machine->driver_data<boogwing_state>();
-	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->deco16ic, 0, 0xffff);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf34_update(state->deco16ic, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco16ic34, state->pf3_rowscroll, state->pf4_rowscroll);
 
 	/* Draw playfields */
 	deco16ic_clear_sprite_priority_bitmap(state->deco16ic);
@@ -157,17 +157,17 @@ SCREEN_UPDATE( boogwing )
 	if ((priority & 0x7) == 0x5)
 	{
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		deco16ic_tilemap_34_combine_draw(state->deco16ic, bitmap, cliprect, 0, 32);
+		deco16ic_tilemap_12_combine_draw(state->deco16ic34, bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x1 || (priority & 0x7) == 0x2)
 	{
-		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 8);
-		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 32);
+		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 32);
 	}
 	else if ((priority & 0x7) == 0x3)
 	{
-		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 8);
 
 		// This mode uses playfield 3 to shadow sprites & playfield 2 (instead of
@@ -176,8 +176,8 @@ SCREEN_UPDATE( boogwing )
 	}
 	else
 	{
-		deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 8);
+		deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 8);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 32);
 	}
 

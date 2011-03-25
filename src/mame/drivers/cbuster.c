@@ -113,15 +113,15 @@ static ADDRESS_MAP_START( twocrude_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf1_rowscroll)
 	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf2_rowscroll)
 
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
-	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf3_rowscroll)
 	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE_MEMBER(cbuster_state, pf4_rowscroll)
 
 	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_BASE_MEMBER(cbuster_state, spriteram16)
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
-	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
-	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
+	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
+	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
 	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(twocrude_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(twocrude_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
@@ -283,14 +283,25 @@ static int twocrude_bank_callback( const int bank )
 static const deco16ic_interface twocrude_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0x00, 0x20, 0x30, 0x40, /* color base (default values) */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0x00, 0x20, /* color base (default values) */
+	0x0f, 0x0f,	/* color masks (default values) */
 	twocrude_bank_callback,
 	twocrude_bank_callback,
+	0,1,
+};
+
+static const deco16ic_interface twocrude_deco16ic34_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0x30, 0x40, /* color base (default values) */
+	0x0f, 0x0f,	/* color masks (default values) */
 	twocrude_bank_callback,
-	twocrude_bank_callback
+	twocrude_bank_callback,
+	0,2,
 };
 
 static MACHINE_START( cbuster )
@@ -300,6 +311,7 @@ static MACHINE_START( cbuster )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 	state->deco16ic = machine->device("deco_custom");
+	state->deco16ic34 = machine->device("deco_custom34");
 
 	state->save_item(NAME(state->prot));
 	state->save_item(NAME(state->pri));
@@ -340,6 +352,8 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", twocrude_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom34", twocrude_deco16ic34_intf)
+
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
 

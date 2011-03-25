@@ -15,6 +15,7 @@ public:
 		  maincpu(*this, "maincpu"),
 		  audiocpu(*this, "audiocpu"),
 		  deco16ic(*this, "deco_custom"),
+		  deco16ic34(*this, "deco_custom34"),
 		  raster_irq_timer(*this, "raster_timer"),
 		  oki2(*this, "oki2") { }
 
@@ -32,6 +33,7 @@ public:
 	required_device<cpu_device> maincpu;
 	required_device<cpu_device> audiocpu;
 	required_device<deco16ic_device> deco16ic;
+	required_device<deco16ic_device> deco16ic34;
 	optional_device<timer_device> raster_irq_timer;
 	optional_device<okim6295_device> oki2;
 };

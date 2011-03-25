@@ -23,6 +23,7 @@ public:
 	device_t *maincpu;
 	device_t *audiocpu;
 	device_t *deco16ic;
+	device_t *deco16ic34;
 };
 
 

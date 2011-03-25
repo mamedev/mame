@@ -52,12 +52,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100003) AM_WRITE(vaportra_priority_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(vaportra_sound_w)
 	AM_RANGE(0x100000, 0x10000f) AM_READ(vaportra_control_r)
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
-	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
 	AM_RANGE(0x280000, 0x281fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x282000, 0x283fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
 	AM_RANGE(0x300000, 0x3009ff) AM_RAM_WRITE(vaportra_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x304000, 0x3049ff) AM_RAM_WRITE(vaportra_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x308000, 0x308001) AM_NOP
@@ -193,6 +193,7 @@ static const gfx_layout tilelayout =
 static GFXDECODE_START( vaportra )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, charlayout,    0x000, 0x500 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout,    0x000, 0x500 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0x000000, charlayout,    0x000, 0x500 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0x000000, tilelayout,    0x000, 0x500 )	/* Tiles 16x16 */ // ok
 	GFXDECODE_ENTRY( "gfx3", 0x000000, tilelayout,    0x100, 16 )	/* Sprites 16x16 */
 GFXDECODE_END
@@ -219,16 +220,27 @@ static int vaportra_bank_callback( const int bank )
 static const deco16ic_interface vaportra_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0x00, 0x20, 0x30, 0x40, /* color base */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f, /* trans masks (default values) */
+	0x00, 0x20, /* color base */
+	0x0f, 0x0f, /* color masks (default values) */
 	vaportra_bank_callback,
 	vaportra_bank_callback,
-	vaportra_bank_callback,
-	vaportra_bank_callback
+	0,1
 };
 
+
+static const deco16ic_interface vaportra_deco16ic34_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0x30, 0x40, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
+	vaportra_bank_callback,
+	vaportra_bank_callback,
+	2,3
+};
 
 static MACHINE_START( vaportra )
 {
@@ -237,6 +249,7 @@ static MACHINE_START( vaportra )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 	state->deco16ic = machine->device("deco_custom");
+	state->deco16ic34 = machine->device("deco_custom34");
 
 	state->save_item(NAME(state->priority));
 }
@@ -277,6 +290,8 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 
 
 	MCFG_DECO16IC_ADD("deco_custom", vaportra_deco16ic_intf)
+
+	MCFG_DECO16IC_ADD("deco_custom34", vaportra_deco16ic34_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

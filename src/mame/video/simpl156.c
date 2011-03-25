@@ -31,7 +31,7 @@ SCREEN_UPDATE( simpl156 )
 
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
-	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 256);
 

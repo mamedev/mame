@@ -175,34 +175,34 @@ static void draw_sprites( running_machine* machine, bitmap_t *bitmap, const rect
 SCREEN_UPDATE( dassault )
 {
 	dassault_state *state = screen->machine->driver_data<dassault_state>();
-	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->deco16ic, 0, 0xffff);
 	UINT16 priority = deco16ic_priority_r(state->deco16ic, 0, 0xffff);
 
 	/* Update tilemaps */
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	deco16ic_pf12_update(state->deco16ic, 0, state->pf2_rowscroll);
-	deco16ic_pf34_update(state->deco16ic, 0, state->pf4_rowscroll);
+	deco16ic_pf_update(state->deco16ic, 0, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco16ic34, 0, state->pf4_rowscroll);
 
 	/* Draw playfields/update priority bitmap */
 	deco16ic_clear_sprite_priority_bitmap(state->deco16ic);
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[3072]);
-	deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	/* The middle playfields can be swapped priority-wise */
 	if ((priority & 3) == 0)
 	{
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
-		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 16);
+		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 16);
 	}
 	else if ((priority & 3) == 1)
 	{
-		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 64);
 	}
 	else if ((priority & 3) == 3)
 	{
-		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 16);
 	}
 	else

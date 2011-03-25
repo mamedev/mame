@@ -18,7 +18,7 @@
 
 static ADDRESS_MAP_START( dietgo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
 	AM_RANGE(0x210000, 0x211fff) AM_DEVWRITE("deco_custom", deco16ic_pf1_data_w)
 	AM_RANGE(0x212000, 0x213fff) AM_DEVWRITE("deco_custom", deco16ic_pf2_data_w)
 	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_BASE_MEMBER(dietgo_state, pf1_rowscroll)
@@ -180,14 +180,13 @@ static int dietgo_bank_callback(const int bank)
 static const deco16ic_interface dietgo_deco16ic_intf =
 {
 	"screen",
-	1, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 16, 0, 16, /* color base (default values) */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, /* color base (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	dietgo_bank_callback,
 	dietgo_bank_callback,
-	NULL,
-	NULL
+	0,1,
 };
 
 
@@ -227,7 +226,7 @@ static MACHINE_CONFIG_START( dietgo, dietgo_state )
 	MCFG_DECO16IC_ADD("deco_custom", dietgo_deco16ic_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
-
+	
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 

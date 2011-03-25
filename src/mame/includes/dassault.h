@@ -16,6 +16,7 @@ public:
 		  audiocpu(*this, "audiocpu"),
 		  subcpu(*this, "sub"),
 		  deco16ic(*this, "deco_custom"),
+		  deco16ic34(*this, "deco_custom34"),
 		  oki2(*this, "oki2") { }
 
 	/* memory pointers */
@@ -30,6 +31,7 @@ public:
 	required_device<cpu_device> audiocpu;
 	required_device<cpu_device> subcpu;
 	required_device<deco16ic_device> deco16ic;
+	required_device<deco16ic_device> deco16ic34;
 	required_device<okim6295_device> oki2;
 };
 

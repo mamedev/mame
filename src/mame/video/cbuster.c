@@ -50,29 +50,29 @@ VIDEO_START( twocrude )
 SCREEN_UPDATE( twocrude )
 {
 	cbuster_state *state = screen->machine->driver_data<cbuster_state>();
-	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, !BIT(flip, 7));
 
-	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffer, 0x400);
+	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffer, 0x400); 
 
 
-	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf34_update(state->deco16ic, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco16ic34, state->pf3_rowscroll, state->pf4_rowscroll);
 
 	/* Draw playfields & sprites */
-	deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0900, 0x100, 0x0ff);
 	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0900, 0x0900, 0x500, 0x0ff);
 
 	if (state->pri)
 	{
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
-		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
-		deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 0);
 		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	}
 

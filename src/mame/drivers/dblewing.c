@@ -90,10 +90,10 @@ UINT16 dblwings_pri_callback(UINT16 x)
 static SCREEN_UPDATE(dblewing)
 {
 	dblewing_state *state = screen->machine->driver_data<dblewing_state>();
-	UINT16 flip = deco16ic_pf12_control_r(state->deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->deco16ic, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	deco16ic_pf12_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 0); /* not Confirmed */
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
 	AM_RANGE(0x288000, 0x288001) AM_RAM
-	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE_MEMBER(dblewing_state, spriteram, spriteram_size)
 	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
@@ -543,14 +543,13 @@ static int dblewing_bank_callback( const int bank )
 static const deco16ic_interface dblewing_deco16ic_intf =
 {
 	"screen",
-	1, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 16, 0, 16, /* color base (default values) */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f, 	/* trans masks (default values) */
+	0, 16, /* color base (default values) */
+	0x0f, 0x0f, /* color masks (default values) */
 	dblewing_bank_callback,
 	dblewing_bank_callback,
-	NULL,
-	NULL
+	0,1,
 };
 
 static MACHINE_START( dblewing )

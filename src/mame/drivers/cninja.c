@@ -152,7 +152,7 @@ static READ16_HANDLER( robocop2_prot_r )
 static WRITE16_HANDLER( cninja_pf12_control_w )
 {
 	cninja_state *state = space->machine->driver_data<cninja_state>();
-	deco16ic_pf12_control_w(state->deco16ic, offset, data, mem_mask);
+	deco16ic_pf_control_w(state->deco16ic, offset, data, mem_mask);
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
@@ -160,7 +160,7 @@ static WRITE16_HANDLER( cninja_pf12_control_w )
 static WRITE16_HANDLER( cninja_pf34_control_w )
 {
 	cninja_state *state = space->machine->driver_data<cninja_state>();
-	deco16ic_pf34_control_w(state->deco16ic, offset, data, mem_mask);
+	deco16ic_pf_control_w(state->deco16ic34, offset, data, mem_mask);
 	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 }
 
@@ -175,8 +175,8 @@ static ADDRESS_MAP_START( cninja_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf2_rowscroll)
 
 	AM_RANGE(0x150000, 0x15000f) AM_WRITE(cninja_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf3_rowscroll)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf4_rowscroll)
 
@@ -209,8 +209,8 @@ static ADDRESS_MAP_START( cninjabl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf2_rowscroll)
 
 	AM_RANGE(0x150000, 0x15000f) AM_WRITE(cninja_pf34_control_w)	// not used / incorrect on this
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf3_rowscroll)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf4_rowscroll)
 
@@ -237,8 +237,8 @@ static ADDRESS_MAP_START( edrandy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf2_rowscroll)
 
 	AM_RANGE(0x150000, 0x15000f) AM_WRITE(cninja_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf3_rowscroll)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf4_rowscroll)
 
@@ -265,8 +265,8 @@ static ADDRESS_MAP_START( robocop2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x14e000, 0x14e7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf2_rowscroll)
 
 	AM_RANGE(0x150000, 0x15000f) AM_WRITE(cninja_pf34_control_w)
-	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
-	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x154000, 0x154fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x156000, 0x156fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x15c000, 0x15c7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf3_rowscroll)
 	AM_RANGE(0x15e000, 0x15e7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf4_rowscroll)
 
@@ -301,8 +301,8 @@ static ADDRESS_MAP_START( mutantf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x30a000, 0x30a7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf2_rowscroll)
 
 	AM_RANGE(0x310000, 0x31000f) AM_WRITE(cninja_pf34_control_w)
-	AM_RANGE(0x314000, 0x315fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
-	AM_RANGE(0x316000, 0x317fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x314000, 0x315fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x316000, 0x317fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x318000, 0x3187ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf3_rowscroll)
 	AM_RANGE(0x31a000, 0x31a7ff) AM_RAM AM_BASE_MEMBER(cninja_state, pf4_rowscroll)
 
@@ -777,54 +777,103 @@ static int mutantf_2_bank_callback( const int bank )
 static const deco16ic_interface cninja_deco16ic_intf =
 {
 	"screen",
-	0, 1, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 16, 0, 48, /* color base */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	1, 1,
+	0x0f, 0x0f, /* trans masks (default values) */
+	0, 16, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
 	NULL,
 	NULL,
-	cninja_bank_callback,
-	cninja_bank_callback
+	0, 1,
 };
+
+static const deco16ic_interface cninja_deco16ic34_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 48, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
+	cninja_bank_callback,
+	cninja_bank_callback,
+	0, 2,
+};
+
+
 
 static const deco16ic_interface edrandy_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 16, 0, 48, /* color base  */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f, /* trans masks (default values) */
+	0, 16, /* color base  */
+	0x0f, 0x0f, /* color masks (default values) */
 	NULL,
 	NULL,
-	cninja_bank_callback,
-	cninja_bank_callback
+	0,1,
 };
+
+static const deco16ic_interface edrandy_deco16ic34_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 48, /* color base  */
+	0x0f, 0x0f,	/* color masks (default values) */
+	cninja_bank_callback,
+	cninja_bank_callback,
+	0,2,
+};
+
 
 static const deco16ic_interface robocop2_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 16, 0, 48, /* color base */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, /* color base */
+	0x0f, 0x0f, /* color masks (default values) */
 	NULL,
 	robocop2_bank_callback,
-	robocop2_bank_callback,
-	robocop2_bank_callback
+	0,1,
 };
+
+static const deco16ic_interface robocop2_deco16ic34_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 48, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
+	robocop2_bank_callback,
+	robocop2_bank_callback,
+	0,2,
+};
+
 
 static const deco16ic_interface mutantf_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1, 1,
-	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
-	0, 0x30, 0x20, 0x40, /* color base */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0, 0x30, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
 	mutantf_1_bank_callback,
 	mutantf_2_bank_callback,
-	mutantf_1_bank_callback,
-	mutantf_1_bank_callback
+	0,1,
 };
+
+static const deco16ic_interface mutantf_deco16ic34_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0x20, 0x40, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
+	mutantf_1_bank_callback,
+	mutantf_1_bank_callback,
+	0,2,
+};
+
 
 static MACHINE_START( cninja )
 {
@@ -887,6 +936,8 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", cninja_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom34", cninja_deco16ic34_intf)
+
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
 	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
@@ -940,6 +991,8 @@ static MACHINE_CONFIG_START( stoneage, cninja_state )
 	MCFG_VIDEO_START(stoneage)
 
 	MCFG_DECO16IC_ADD("deco_custom", cninja_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom34", cninja_deco16ic34_intf)
+
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
 	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
@@ -989,6 +1042,7 @@ static MACHINE_CONFIG_START( cninjabl, cninja_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", cninja_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom32", cninja_deco16ic34_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1032,6 +1086,8 @@ static MACHINE_CONFIG_START( edrandy, cninja_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", edrandy_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom34", edrandy_deco16ic34_intf)
+
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
 	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
@@ -1083,6 +1139,8 @@ static MACHINE_CONFIG_START( robocop2, cninja_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", robocop2_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom34", robocop2_deco16ic34_intf)
+
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
 	decospr_device_config::set_pri_callback(device, cninja_pri_callback);
@@ -1137,6 +1195,8 @@ static MACHINE_CONFIG_START( mutantf, cninja_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_DECO16IC_ADD("deco_custom", mutantf_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom34", mutantf_deco16ic34_intf)
+
 	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
 

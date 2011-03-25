@@ -106,15 +106,15 @@ static ADDRESS_MAP_START( boogwing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE(deco16_104_prot_w) AM_BASE(&deco16_prot_ram)
 
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
 	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf1_rowscroll)
 	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf2_rowscroll)
 
-	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
-	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf3_data_w)
-	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf4_data_w)
+	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
+	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("deco_custom34", deco16ic_pf1_data_w)
+	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("deco_custom34", deco16ic_pf2_data_w)
 	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf3_rowscroll)
 	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf4_rowscroll)
 
@@ -311,14 +311,25 @@ static int boogwing_bank_callback2( const int bank )
 static const deco16ic_interface boogwing_deco16ic_intf =
 {
 	"screen",
-	0, 0, 1, 1,
-	0x0f, 0x1f, 0x0f, 0x0f, /* trans masks (pf2 has 5bpp graphics) */
-	0, 0, 0, 16, /* color base (pf2 is non default) */
-	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	0, 1,
+	0x0f, 0x1f, /* trans masks (pf2 has 5bpp graphics) */
+	0, 0,  /* color base (pf2 is non default) */
+	0x0f, 0x0f,	/* color masks (default values) */
 	NULL,
 	boogwing_bank_callback,
+	0, 1
+};
+
+static const deco16ic_interface boogwing_deco16ic34_intf =
+{
+	"screen",
+	0, 1, 
+	0x0f, 0x0f,
+	0, 16,
+	0x0f, 0x0f,
 	boogwing_bank_callback2,
-	boogwing_bank_callback2
+	boogwing_bank_callback2,
+	0, 2
 };
 
 
@@ -347,6 +358,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_GFXDECODE(boogwing)
 
 	MCFG_DECO16IC_ADD("deco_custom", boogwing_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom34", boogwing_deco16ic34_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
