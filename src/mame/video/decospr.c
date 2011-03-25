@@ -8,7 +8,7 @@
    see m_sprite_bitmap... (note, if using that you must also use BITMAP_FORMAT_RGB32 in the machine config)
 
    used by:
-   
+
    dblewing.c
    tumblep.c
    dietgo.c
@@ -138,28 +138,28 @@ void decospr_device_config::set_gfx_region(device_config *device, int gfxregion)
 {
 	decospr_device_config *dev = downcast<decospr_device_config *>(device);
 	dev->m_gfxregion = gfxregion;
-//	printf("decospr_device_config::set_gfx_region()\n");
+//  printf("decospr_device_config::set_gfx_region()\n");
 }
 
 void decospr_device_config::set_pri_callback(device_config *device, decospr_priority_callback_func callback)
 {
 	decospr_device_config *dev = downcast<decospr_device_config *>(device);
 	dev->m_pricallback = callback;
-//	printf("decospr_device_config::set_pri_callback()\n");
+//  printf("decospr_device_config::set_pri_callback()\n");
 }
 
 decospr_device::decospr_device(running_machine &_machine, const decospr_device_config &config)
 	: device_t(_machine, config),
 	  m_config(config),
-  	  m_gfxregion(m_config.m_gfxregion),
+	  m_gfxregion(m_config.m_gfxregion),
 	  m_pricallback(m_config.m_pricallback)
 {
 }
 
 void decospr_device::device_start()
 {
-//	sprite_kludge_x = sprite_kludge_y = 0;
-//	printf("decospr_device::device_start()\n");
+//  sprite_kludge_x = sprite_kludge_y = 0;
+//  printf("decospr_device::device_start()\n");
 	m_sprite_bitmap = 0;
 	m_alt_format = 0;
 	m_pixmask = 0xf;
@@ -174,8 +174,8 @@ void decospr_device::device_reset()
 /*
 void decospr_device::decospr_sprite_kludge(int x, int y)
 {
-	sprite_kludge_x = x;
-	sprite_kludge_y = y;
+    sprite_kludge_x = x;
+    sprite_kludge_y = y;
 }
 */
 
@@ -227,7 +227,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 	while (offs!=end)
 	{
 		int x, y, sprite, colour, multi, mult2, fx, fy, inc, flash, mult, h, w, pri;
-		
+
 		if (!m_alt_format)
 		{
 
@@ -241,7 +241,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 			{
 
 				x = spriteram[offs + 2];
-				
+
 				if (!m_sprite_bitmap)
 					colour = (x >> 9) & 0x1f;
 				else
@@ -250,7 +250,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 					if (y&0x8000) colour |= 0x80; // fghthist uses this to mark priority
 				}
 
-		
+
 				if (m_pricallback)
 					pri = m_pricallback(x);
 				else
@@ -317,10 +317,10 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 						if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y)-16))
 						{
 							if(!m_sprite_bitmap)
-							{								
+							{
 								if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y)-16))
 								{
-									if (m_pricallback) 
+									if (m_pricallback)
 										pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
 											sprite - multi * inc,
 											colour,
@@ -335,11 +335,11 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 											x,ypos,
 											0);
 								}
-						
+
 								// double wing uses this flag
 								if (w)
-								{								
-									if (m_pricallback) 
+								{
+									if (m_pricallback)
 										pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
 												(sprite - multi * inc)-mult2,
 												colour,
@@ -356,7 +356,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 								}
 							}
 							else
-							{	
+							{
 								// if we have a sprite bitmap draw raw data to it for manual mixing
 								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
 									sprite - multi * inc,
@@ -365,7 +365,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 									x,ypos,
 									0);
 								if (w)
-								{	
+								{
 									drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
 										(sprite - multi * inc)-mult2,
 										colour<<m_raw_shift,
@@ -373,7 +373,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 										x-16,ypos,
 										0);
 								}
-							
+
 							}
 						}
 
@@ -437,10 +437,10 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 				{
 					for (int yy=0; yy<h; yy++)
 					{
-				
+
 						if(!m_sprite_bitmap)
 						{
-							if (m_pricallback) 
+							if (m_pricallback)
 							{
 								ypos = y + mult2 * (h-yy);
 
@@ -455,7 +455,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 								}
 
 								ypos -= 512; // wrap-around y
-							
+
 								if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y-16)))
 								{
 									pdrawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
@@ -480,9 +480,9 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 											x + mult * (w-xx),ypos,
 											0);
 								}
-								
+
 								ypos -= 512; // wrap-around y
-							
+
 								if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y-16)))
 								{
 									drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
@@ -497,7 +497,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 						else
 						{
 							ypos = y + mult2 * (h-yy);
-							
+
 							if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y)-16))
 							{
 								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
@@ -509,7 +509,7 @@ void decospr_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 							}
 
 							ypos -= 512; // wrap-around y
-							
+
 							if ((ypos<=cliprect->max_y) && (ypos>=(cliprect->min_y-16)))
 							{
 								drawgfx_transpen_raw(m_sprite_bitmap,cliprect,machine->gfx[m_gfxregion],
@@ -546,7 +546,7 @@ void decospr_device::inefficient_copy_sprite_bitmap(running_machine* machine, bi
 	{
 		srcline= BITMAP_ADDR16(m_sprite_bitmap, y, 0);
 		dstline= BITMAP_ADDR32(bitmap, y, 0);
-	
+
 		if (alpha==0xff)
 		{
 			for (x=cliprect->min_x;x<=cliprect->max_x;x++)
@@ -558,7 +558,7 @@ void decospr_device::inefficient_copy_sprite_bitmap(running_machine* machine, bi
 					if ((pix & priority_mask) ==pri )
 					{
 						dstline[x] = paldata[(pix&palmask) + colbase];
-					}			
+					}
 				}
 			}
 		}
@@ -575,7 +575,7 @@ void decospr_device::inefficient_copy_sprite_bitmap(running_machine* machine, bi
 						UINT32 pal1 = paldata[(pix&palmask) + colbase];
 						UINT32 pal2 = dstline[x];
 						dstline[x] = alpha_blend_r32(pal2, pal1, alpha);
-					}			
+					}
 				}
 			}
 		}

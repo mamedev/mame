@@ -10241,6 +10241,7 @@ Other Sun games
 	DRIVER( atworld )	/* (c) 2007 Amcoe - Around The World */
 	DRIVER( atworldd1 )	/* (c) 2007 Amcoe */
 	DRIVER( amclink )	/* (c) 200? Amcoe - Amcoe Link Control Box? */
+	DRIVER( fbdeluxe )	/* (c) 200? Amcoe - Amcoe Link Control Box? */
 
 	DRIVER( act2000 )	/* (c) 1999 Amcoe - Action 2000 */
 	DRIVER( act2000v1 )	/* (c) 1999 Amcoe */

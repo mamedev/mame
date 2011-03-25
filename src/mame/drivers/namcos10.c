@@ -358,7 +358,7 @@ READ32_HANDLER( nand_data_r )
 {
 	UINT32 data = nand_read2( nand_address * 2 );
 
-/*	printf( "data<-%08x (%08x)\n", data, nand_address ); */
+/*  printf( "data<-%08x (%08x)\n", data, nand_address ); */
 	nand_address++;
 
 	return data;
@@ -379,7 +379,7 @@ UINT32 block[ 0x1ff ];
 WRITE32_HANDLER( nand_block_w )
 {
 	COMBINE_DATA( &block[ offset ] );
-/*	printf( "block %d %08x\n", offset, data ); */
+/*  printf( "block %d %08x\n", offset, data ); */
 }
 
 READ32_HANDLER( nand_block_r )

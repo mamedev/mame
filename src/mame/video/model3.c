@@ -1145,7 +1145,7 @@ static void draw_model(running_machine *machine, UINT32 addr)
 		float dot;
 		int intensity;
 		int polygon_transparency;
-		
+
 		//
 		// Header bits:
 		//
@@ -1167,7 +1167,7 @@ static void draw_model(running_machine *machine, UINT32 addr)
 		//
 		//    3:FFFFFF00 - polygon normal Z coordinate, 2.22
 		//    3:00000038 - texture width, in tiles
-		//	  3:00000007 - texture height, in tiles
+		//    3:00000007 - texture height, in tiles
 		//
 		//    4:FFFFFF00 - RGB lighting color
 		//    4:00000040 - texture page

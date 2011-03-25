@@ -80,7 +80,7 @@ bool path_iterator::next(astring &buffer, const char *name)
 		semi = m_current + strlen(m_current);
 	buffer.cpy(m_current, semi - m_current);
 	m_current = (*semi == 0) ? semi : semi + 1;
-	
+
 	// append the name if we have one
 	if (name != NULL)
 	{

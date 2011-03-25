@@ -931,9 +931,9 @@ ROM_END
 static DRIVER_INIT( bagman )
 {
 	bagman_state *state = machine->driver_data<bagman_state>();
-	
+
 	/* Unmap video enable register, not available on earlier hardware revision(s)
-	   Bagman is supposed to have glitches during screen transitions */
+       Bagman is supposed to have glitches during screen transitions */
 	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0);
 	*state->video_enable = 1;
 }

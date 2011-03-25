@@ -1081,7 +1081,7 @@ static void sdlinput_register_keyboards(running_machine *machine)
 		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 
 		// add the item to the device
-//		printf("Keynum %d => sdl key %d\n", keynum, OSD_SDL_INDEX(key_trans_table[keynum].sdl_key));
+//      printf("Keynum %d => sdl key %d\n", keynum, OSD_SDL_INDEX(key_trans_table[keynum].sdl_key));
 		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
 	}
 
@@ -1306,7 +1306,7 @@ void sdlinput_poll(running_machine *machine)
 		switch(event.type) {
 		case SDL_KEYDOWN:
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
-//			printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name, OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
+//          printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name, OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 			ui_input_push_char_event(machine, sdl_window_list->target, (unicode_char) event.key.keysym.unicode);
@@ -1611,8 +1611,8 @@ void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
 					#else
 					mameid_code = lookup_mame_code("ITEM_ID_SCRLOCK");
 					#endif
-				} 
-				else 
+				}
+				else
 				{
 					snprintf(fullmode, 63, "ITEM_ID_%s", uimode);
 					mameid_code = lookup_mame_code(fullmode);

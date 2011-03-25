@@ -258,7 +258,7 @@ static SCREEN_UPDATE(ssfindo)
 				}
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -380,12 +380,12 @@ static READ32_HANDLER(PS7500_IO_r)
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
 			if (ssfindo_speedup) ssfindo_speedup(space);
-			
+
 			if( state->iocr_hack)
 			{
 				return (input_port_read(space->machine, "PS7500") & 0x80) | 0x34 | (space->machine->rand()&3); //eeprom read ?
 			}
-			
+
 			return (input_port_read(space->machine, "PS7500") & 0x80) | 0x37;
 
 		case VIDCR:
@@ -468,8 +468,8 @@ static WRITE32_HANDLER(PS7500_IO_w)
 		case VIDINITA: //TODO: bit 30 (last bit) p.105
 					COMBINE_DATA(&state->PS7500_IO[offset]);
 		break;
-		
-		
+
+
 
 	}
 }
@@ -700,7 +700,7 @@ static INPUT_PORTS_START( tetfight )
 	PORT_DIPNAME( 0x80, 0x80, "DSW 7" )
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	
+
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Test Mode" )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
@@ -876,7 +876,7 @@ static DRIVER_INIT(tetfight)
 {
 	ssfindo_state *state = machine->driver_data<ssfindo_state>();
 	DRIVER_INIT_CALL(common);
-	state->flashType=0; 
+	state->flashType=0;
 	state->iocr_hack=1;
 }
 

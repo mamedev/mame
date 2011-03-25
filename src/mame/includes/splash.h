@@ -15,9 +15,9 @@ public:
 
 	int adpcm_data;
 	int ret;
-	
+
 	int vblank_irq, sound_irq;
-	
+
 	int msm_data1, msm_data2;
 	int msm_toggle1, msm_toggle2;
 	int msm_source;

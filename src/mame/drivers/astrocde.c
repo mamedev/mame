@@ -890,7 +890,7 @@ static INPUT_PORTS_START( spacezap )
 
 	PORT_START("FAKE")
 	/* Dedicated cabinets had a B/W monitor and color overlay,
-	   some (unofficial/repaired?) cabinets had a color monitor. */
+       some (unofficial/repaired?) cabinets had a color monitor. */
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED(spacezap_monitor, 0)
 	PORT_CONFSETTING(    0x00, "B/W" )
 	PORT_CONFSETTING(    0x01, "Color" )

@@ -5,44 +5,44 @@
         Platform: Aristocrat 540 Video ( MK 2.5 Video / MK IV )
         Driver by Palindrome & FraSher
 
-		***************** INITIALISATION *********************************************************************
+        ***************** INITIALISATION *********************************************************************
 
-		Method 1 :
-		* Key in with the Jackpot Key followed by the Audit Key
-		* Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
-		* A value (displayed below) will appear next to RF/AMT on the right of the screen
-		* Key out both the Jackpot and Audit Keys
+        Method 1 :
+        * Key in with the Jackpot Key followed by the Audit Key
+        * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+        * A value (displayed below) will appear next to RF/AMT on the right of the screen
+        * Key out both the Jackpot and Audit Keys
 
-		This method works with the following games:
-		3bagflnz 200
-		3bagflvt 200
-		autmoon  200
-		blkrhino 200
-		coralr2  200
-		eforesta 200
-		eforestb 200
-		ffortune 200
-		gldnpkr  400
-		goldenc  200
-		gtroppo  500
-		kgbird   200
-		kgbirda  200
-		phantomp 200
-		swtht2nz 200
-		wildone  200
-		wtigernz 200
+        This method works with the following games:
+        3bagflnz 200
+        3bagflvt 200
+        autmoon  200
+        blkrhino 200
+        coralr2  200
+        eforesta 200
+        eforestb 200
+        ffortune 200
+        gldnpkr  400
+        goldenc  200
+        gtroppo  500
+        kgbird   200
+        kgbirda  200
+        phantomp 200
+        swtht2nz 200
+        wildone  200
+        wtigernz 200
 
-		Method 2 :
-		* Key in with the Jackpot Key followed by the Audit Key
-		* Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
-		* This will enter the cashcade screen and increment $100 to the maximum
-		* Press PLAY 2 LINES [BET 2 is erroneously displayed on the screen] to increment the minimum cashcade value by $5
-			(optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment the $5 to start with above or the game won't initialise)
-		* A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible until you key out and back in again with the Audit Key)
-		* Key out both the Jackpot and Audit Keys
+        Method 2 :
+        * Key in with the Jackpot Key followed by the Audit Key
+        * Press PB4, PB5 and PB6 keys simultaneously (Z+X+C keys by default)
+        * This will enter the cashcade screen and increment $100 to the maximum
+        * Press PLAY 2 LINES [BET 2 is erroneously displayed on the screen] to increment the minimum cashcade value by $5
+            (optionally, you can decrement with the PLAY 1 LINE [BET 1] button, but you must first increment the $5 to start with above or the game won't initialise)
+        * A value (displayed below) will appear on the right as RF/AMT when you key in again (not visible until you key out and back in again with the Audit Key)
+        * Key out both the Jackpot and Audit Keys
 
-		This method works with the following games:
-		topgear  500
+        This method works with the following games:
+        topgear  500
 
         Technical Notes:
 
@@ -143,9 +143,9 @@
 
         9.When DIP SW7 is set to off/off, speed is dramatically reduced.
 
-		10. rewrite video emulation by using custom drawing code.
+        10. rewrite video emulation by using custom drawing code.
 
-		11. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
+        11. check what type of mc6845 this HW uses on real PCB, and hook it up properly.
 
         ***************** POKER GAMES ************************************************************************
 

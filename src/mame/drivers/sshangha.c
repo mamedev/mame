@@ -155,7 +155,7 @@ WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
 	// is this related to the bootleg only, or does the original have this issue too?
 	// maybe related to sprite DMA on the original, or the apparent lack of a 2nd sprite controller on the bootleg.
 	paletteram16_xbgr_word_be_sprites2_w(space,offset,data,mem_mask);
-	
+
 	sshangha_state *state = space->machine->driver_data<sshangha_state>();
 	COMBINE_DATA(&state->sprite_paletteram[offset]);
 	set_color_888(space->machine, (offset/2)+0x000, 0, 8, 16, state->sprite_paletteram[(offset) | 1] | (state->sprite_paletteram[(offset) & ~1] << 16) );

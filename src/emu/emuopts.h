@@ -54,7 +54,7 @@ enum
 {
 	// command-line options are HIGH priority
 	OPTION_PRIORITY_CMDLINE = OPTION_PRIORITY_HIGH,
-	
+
 	// INI-based options are NORMAL priority, in increasing order:
 	OPTION_PRIORITY_INI = OPTION_PRIORITY_NORMAL,
 	OPTION_PRIORITY_MAME_INI,
@@ -216,7 +216,7 @@ public:
 	const char *system_name() const { return value(OPTION_SYSTEMNAME); }
 	const game_driver *system() const;
 	void set_system_name(const char *name);
-	
+
 	// core configuration options
 	bool read_config() const { return bool_value(OPTION_READCONFIG); }
 	bool write_config() const { return bool_value(OPTION_WRITECONFIG); }
@@ -334,7 +334,7 @@ public:
 	bool skip_gameinfo() const { return bool_value(OPTION_SKIP_GAMEINFO); }
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
-	
+
 	// device-specific options
 	const char *device_option(device_image_interface &image);
 
@@ -344,7 +344,7 @@ private:
 	void remove_device_options();
 
 	// INI parsing helper
-	bool parse_one_ini(const char *basename, int priority, astring *error_string = NULL);	
+	bool parse_one_ini(const char *basename, int priority, astring *error_string = NULL);
 
 	static const options_entry s_option_entries[];
 };

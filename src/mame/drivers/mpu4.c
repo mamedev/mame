@@ -32,7 +32,7 @@ This board uses a ~1.72 Mhz 6809B CPU, and a number of PIA6821 chips for multipl
 To some extent, the hardware feels like a revision of the MPU3 design, integrating into the base unit features that were
 previously added through expansion ports. However, there is no backwards compatibility, and the entire memory map has been
 reworked.
- 
+
 Like MPU3, a 6840PTM is used for internal timing, and other miscellaneous control functions, including as a crude analogue sound device
 (a square wave from the PTM being used as the alarm sound generator). However, the main sound functionality is provided by
 dedicated hardware (an AY8913).
@@ -44,7 +44,7 @@ an anti-tampering device which helped to prevent the hacking of certain titles i
 Like MPU3, over the years developers have added more capabilities through the spare inputs and outputs provided. These provided
 support for more reels, lamps and LEDs through daughtercards.
 Several solutions were released depending on the manufacturer of the machine, all are emulated here.
- 
+
 In later revisions of the main board (MOD4 onwards), the AY8913 was removed entirely, as two official alternatives for sound had been produced.
 In one, a YM2413 is built into the gameboard, and in the other an OKI MSM6376 is interfaced with a PIA and PTM to allow sophisticated
 sampled sound.
@@ -212,13 +212,13 @@ IRQ line connected to CPU
 
 TODO: - Distinguish door switches using manual
       - Complete stubs for hoppers (needs slightly better 68681 emulation, and new 'hoppers' device emulation)
-	  - It seems that the MPU4 core program relies on some degree of persistence when switching strobes and handling
-	  writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs
-	  For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything*
+      - It seems that the MPU4 core program relies on some degree of persistence when switching strobes and handling
+      writes to the various hardware ports. This explains the occasional lamping/LED blackout and switching bugs
+      For now, we're ignoring any extra writes to strobes, as the alternative is to assign a timer to *everything*
       - Flo's move in Great Escape gives spin alarms - need a different opto setting for reverse spin reels?
       - Fix BwB characteriser, need to be able to calculate stabiliser bytes. Anyone fancy reading 6809 source?
-	  - Fix MSM6376 - We're triggering 'contact MAMEDEV' since we need all features of the chip,
-	  including dynamic sample rate adjustment and BEEP.
+      - Fix MSM6376 - We're triggering 'contact MAMEDEV' since we need all features of the chip,
+      including dynamic sample rate adjustment and BEEP.
 ***********************************************************************************************************/
 #include "emu.h"
 #include "machine/6821pia.h"
@@ -743,7 +743,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic3_porta_w )
 	LOG_IC3(("%s: IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", device->machine->describe_context(),data));
 
 	if(state->ic23_active)
-	{	
+	{
 		if (state->lamp_strobe != state->input_strobe)
 		{
 			// Because of the nature of the lamping circuit, there is an element of persistance
@@ -1119,15 +1119,15 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
 		if (mame_stricmp(device->machine->gamedrv->name, "m_gmball") == 0)
 	{
 		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
-		provide a truly fair hi-lo gamble for an AWP machine. Functionally, it consists of
-		a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
-		holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
-		hole it's currently in, to land in another. Landing in the same hole cause the machine to
-		refire the ball. The ball detection is done by the high	4 bytes of AUX1. 
-		Here we call the MAME RNG, clamping it to 16 values, with the unused
-		values effectively asking the machine to 'roll again'. We then trigger the switches corresponding to
-		the correct number. This appears to be the best way of making the game fair, short of simulating
-		the physics of a bouncing ball ;)*/
+        provide a truly fair hi-lo gamble for an AWP machine. Functionally, it consists of
+        a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
+        holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
+        hole it's currently in, to land in another. Landing in the same hole cause the machine to
+        refire the ball. The ball detection is done by the high 4 bytes of AUX1.
+        Here we call the MAME RNG, clamping it to 16 values, with the unused
+        values effectively asking the machine to 'roll again'. We then trigger the switches corresponding to
+        the correct number. This appears to be the best way of making the game fair, short of simulating
+        the physics of a bouncing ball ;)*/
 		if (data & 0x0f)
 		{
 			switch (device->machine->rand() & 0xf)
@@ -1200,7 +1200,7 @@ static WRITE8_DEVICE_HANDLER( pia_ic5_portb_w )
 	{
 		// led_write_latch(state, data & 0x07, pia_get_output_a(pia_ic4),state->input_strobe)
 	}
-	
+
 }
 static READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 {
@@ -2284,7 +2284,7 @@ incorrect behaviour manifesting in ridiculously large payouts.
 
 In fact, the software seems deliberately designed to mislead, but is (fortunately for
 us) prone to similar weaknesses that allow a per game solution.
- 
+
 */
 
 
@@ -2418,7 +2418,7 @@ static const mpu4_chr_table blsbys_data[72] = {
 
 // set percentage and other options. 2e 20 0f
 // PAL Codes
-// 0   1   2  3  4  5  6  7  8 
+// 0   1   2  3  4  5  6  7  8
 // 42  2E 20 0F 24 3C 36 27 09
    //      6  0  7  0  8  0  7  0  0  8
 //request 36 42 27 42 09 42 27 42 42 09
@@ -2593,7 +2593,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpu4_bwb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
- 
+
 	AM_RANGE(0x0800, 0x083F) AM_READWRITE(bwb_characteriser_r,bwb_characteriser_w)// Game selects a random value within this range
 
 	AM_RANGE(0x0850, 0x0850) AM_WRITE(bankswitch_w)	// write bank (rom page select)

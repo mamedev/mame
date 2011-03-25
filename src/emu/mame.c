@@ -163,7 +163,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 		}
 
 		// otherwise, perform validity checks before anything else
-		else 
+		else
 			validate_drivers(options, system);
 
 		firstgame = false;

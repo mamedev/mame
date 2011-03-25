@@ -96,7 +96,7 @@ public:
 	class entry
 	{
 		friend class core_options;
-		
+
 		// construction/destruction
 		entry(const options_entry &entry);
 
@@ -143,16 +143,16 @@ public:
 	core_options(const options_entry *entrylist1, const options_entry *entrylist2, const options_entry *entrylist3);
 	core_options(const core_options &src);
 	virtual ~core_options();
-	
+
 	// operators
 	core_options &operator=(const core_options &rhs);
 	bool operator==(const core_options &rhs);
 	bool operator!=(const core_options &rhs);
-	
+
 	// getters
 	entry *first() const { return m_entrylist; }
 	const char *command() const { return m_command; }
-	
+
 	// configuration
 	void add_entries(const options_entry *entrylist, bool override_existing = false);
 	void set_default_value(const char *name, const char *defvalue);
@@ -181,7 +181,7 @@ public:
 	bool set_value(const char *name, const char *value, int priority, astring &error_string);
 	bool set_value(const char *name, int value, int priority, astring &error_string);
 	bool set_value(const char *name, float value, int priority, astring &error_string);
-	
+
 	// misc
 	static const char *unadorned(int x = 0) { return s_option_unadorned[MIN(x, MAX_UNADORNED_OPTIONS)]; }
 
@@ -195,9 +195,9 @@ private:
 	// internal state
 	entry *					m_entrylist;			// head of list of entries
 	entry **				m_entrylist_tailptr;	// pointer to tail of entry list
-	tagmap_t<entry *> 		m_entrymap;				// map for fast lookup
+	tagmap_t<entry *>		m_entrymap;				// map for fast lookup
 	astring					m_command;				// command found
-	static const char *const s_option_unadorned[]; 	// array of unadorned option "names"
+	static const char *const s_option_unadorned[];	// array of unadorned option "names"
 };
 
 

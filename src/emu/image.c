@@ -156,7 +156,7 @@ static int write_config(emu_options &options, const char *filename, const game_d
 static void image_options_extract(running_machine *machine)
 {
 	/* only extract the device options if we've added them */
-//	if (machine->options().bool_value(OPTION_ADDED_DEVICE_OPTIONS)) 
+//  if (machine->options().bool_value(OPTION_ADDED_DEVICE_OPTIONS))
 	{
 		int index = 0;
 		device_image_interface *image = NULL;

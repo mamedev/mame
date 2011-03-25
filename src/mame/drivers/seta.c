@@ -1958,13 +1958,13 @@ static ADDRESS_MAP_START( zingzipbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(seta_state, workram)		// RAM (pointer for zombraid crosshair hack)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM (wrofaero only?)
-//	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
-//	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
+//  AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
+//  AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")                 // P2
 	AM_RANGE(0x400002, 0x400003) AM_READ(zingzipbl_unknown_r)		// P2
-//	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
+//  AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")              // Coins
 	AM_RANGE(0x500000, 0x500005) AM_RAM_WRITE(seta_vregs_w) AM_BASE_MEMBER(seta_state, vregs)	// (gundhara) Coin Lockout + Video Registers
 
-	//AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
+	//AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)              // DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram, paletteram_size)	// Palette
 	AM_RANGE(0x701000, 0x70ffff) AM_RAM								//
@@ -2649,17 +2649,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( thunderlbl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM								// ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM								// RAM
-//	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+//  AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)  // Sound
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ?
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ?
-//	AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)	// Protection (not in wits)
+//  AM_RANGE(0x400000, 0x40ffff) AM_WRITE(thunderl_protection_w)    // Protection (not in wits)
 	AM_RANGE(0x500000, 0x500001) AM_RAM_WRITE(seta_vregs_w) AM_BASE_MEMBER(seta_state, vregs)	// Coin Lockout
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram, paletteram_size)	// Palette
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("COINS")				// Coins
-//	AM_RANGE(0xb0000c, 0xb0000d) AM_READ(thunderl_protection_r	)	// Protection (not in wits)
+//  AM_RANGE(0xb0000c, 0xb0000d) AM_READ(thunderl_protection_r  )   // Protection (not in wits)
 	AM_RANGE(0xb00008, 0xb00009) AM_READ_PORT("P3")					// P3 (wits)
 	AM_RANGE(0xb0000a, 0xb0000b) AM_READ_PORT("P4")					// P4 (wits)
 /**/AM_RANGE(0xc00000, 0xc00001) AM_RAM								// ? 0x4000
@@ -6861,7 +6861,7 @@ static const gfx_layout layout_zzbl_6bpp =
 	{
 	 0*16,1*16,2*16,3*16,4*16,5*16,6*16,7*16,
 	 8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16
-	
+
 	},
 	16*16*2
 };
@@ -6870,8 +6870,8 @@ static const gfx_layout layout_zzbl_6bpp =
 
 static GFXDECODE_START( zingzipbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_zzbl,       16*32*0, 		32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_zzbl_6bpp, 16*32*2, 		32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_zzbl, 16*32*1, 		32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_zzbl_6bpp, 16*32*2,		32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_zzbl, 16*32*1,		32 ) // [2] Layer 2
 	GFXDECODE_ENTRY( "gfx2", 0, layout_zzbl_6bpp, 16*32*2+64*32*1, 32 ) // [3] Layer 1
 GFXDECODE_END
 
@@ -8434,7 +8434,7 @@ static MACHINE_CONFIG_DERIVED( zingzipbl, zingzip )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zingzipbl_map)
 	MCFG_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM) // irq3 isn't valid on the bootleg
-	
+
 	MCFG_DEVICE_REMOVE("x1snd")
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)

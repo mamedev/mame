@@ -3992,7 +3992,7 @@ INLINE void write_pixel(running_machine* machine, UINT8 pix, int pixeloffset )
 				segacd_dataram[offset] |= pix << shift;
 			}
 			break;
-		
+
 		case 0x02: // overwrite, only write non-zero data
 			if (pix)
 			{
@@ -4660,7 +4660,7 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 
 						dest[dstoffset+1] = data >>8;
 						dest[dstoffset+0] = data&0xff;
-					
+
 						segacd_mark_tiles_dirty(space->machine, dstoffset/2);
 					}
 					else
@@ -4684,7 +4684,7 @@ void CDC_Do_DMA(running_machine* machine, int rate)
 					dest[dstoffset+1] = data >>8;
 					dest[dstoffset+0] = data&0xff;
 				}
-				
+
 			}
 		}
 
@@ -5067,7 +5067,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 
 	if (ACCESSING_BITS_8_15)
 		scd_a12002_memory_mode_w_8_15(space, 0, data>>8);
-		
+
 	if (ACCESSING_BITS_0_7)
 		scd_a12002_memory_mode_w_0_7(space, 0, data&0xff);
 }
@@ -5150,7 +5150,7 @@ WRITE8_HANDLER( segacd_sub_memory_mode_w_0_7 )
 			}
 		}
 		else
-		{ // == 0x0 - currently in 2 meg mode		
+		{ // == 0x0 - currently in 2 meg mode
 			scd_mode_dmna_ret_flags &= 0xddff;
 		}
 	}
@@ -5163,7 +5163,7 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 
 	if (ACCESSING_BITS_8_15)
 		segacd_sub_memory_mode_w_8_15(space, 0, data>>8);
-		
+
 	if (ACCESSING_BITS_0_7)
 		segacd_sub_memory_mode_w_0_7(space, 0, data&0xff);
 }
@@ -5441,7 +5441,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 		}
 		else
 		{
-		//	printf("Unspported: segacd_main_dataram_part1_w (Cell rearranged RAM) in mode 1 (illega?)\n"); // is this legal??
+		//  printf("Unspported: segacd_main_dataram_part1_w (Cell rearranged RAM) in mode 1 (illega?)\n"); // is this legal??
 		}
 	}
 }
@@ -6005,8 +6005,8 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	memory_unmap_readwrite        (space, 0x020000,0x3fffff,0,0);
 
-//	memory_install_read_bank(space, 0x0020000, 0x003ffff, 0, 0, "scd_4m_prgbank");
-//	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
+//  memory_install_read_bank(space, 0x0020000, 0x003ffff, 0, 0, "scd_4m_prgbank");
+//  memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	memory_install_read16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_r );
 	memory_install_write16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_w );
 	segacd_wordram_mapped = 1;
@@ -6138,7 +6138,7 @@ static MACHINE_RESET( segacd )
 	// I'm not sure what the source of this timing problem is, it's not using IRQ3 or StopWatch at the
 	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
 	// too slow and has bad sound.  -- Investigate!
-	
+
 	_segacd_68k_cpu->set_clock_scale(1.5000f);
 
 }
@@ -6203,7 +6203,7 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 	}
 	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
-//		printf("Unspported: segacd_sub_dataram_part1_r in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
+//      printf("Unspported: segacd_sub_dataram_part1_r in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
 		UINT16 data;
 
 		if (scd_rammode&1)
@@ -6224,7 +6224,7 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 			return ((data & 0xf000) >> 4) | ((data & 0x0f00) >> 8);
 		}
 
-		
+
 	}
 
 	return 0x0000;
@@ -6248,13 +6248,13 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 		//if (mem_mask==0xffff)
-		//	printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x %04x\n", data, mem_mask);
+		//  printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x %04x\n", data, mem_mask);
 
 		data = (data & 0x000f) | (data & 0x0f00)>>4;
 		mem_mask = (mem_mask & 0x000f) | (mem_mask & 0x0f00)>>4;
 
-//		data = ((data & 0x00f0) >>4) | (data & 0xf000)>>8;
-//		mem_mask = ((mem_mask & 0x00f0)>>4) | ((mem_mask & 0xf000)>>8);
+//      data = ((data & 0x00f0) >>4) | (data & 0xf000)>>8;
+//      mem_mask = ((mem_mask & 0x00f0)>>4) | ((mem_mask & 0xf000)>>8);
 
 
 		if (!(offset&1))
@@ -6272,7 +6272,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 			segacd_1meg_mode_word_write(space->machine, offset/2+0x20000/2, data, mem_mask, 1);
 		}
 
-	//	printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x\n", data);
+	//  printf("Unspported: segacd_sub_dataram_part1_w in mode 1 (Word RAM Expander - 1 Byte Per Pixel) %04x\n", data);
 	}
 }
 
@@ -9337,7 +9337,7 @@ MACHINE_RESET( megadriv )
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
-	//	machine->device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
+	//  machine->device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
 
 		memset(megadrive_ram,0x00,0x10000);
 	}

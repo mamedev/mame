@@ -1238,7 +1238,7 @@ static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x083800, 0x087fff) AM_RAM				// SpriteRAM (unused)
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x120000, 0x120fff) AM_RAM				// Copy of SpriteRAM ?
-//	AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP		// ???
+//  AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP        // ???
 	AM_RANGE(0x180000, 0x182fff) AM_DEVREADWRITE("gp9001vdp0", pipibibi_bootleg_videoram16_r, pipibibi_bootleg_videoram16_w)	// TileRAM
 	AM_RANGE(0x188000, 0x18800f) AM_DEVWRITE("gp9001vdp0", pipibibi_bootleg_scroll_w)
 	AM_RANGE(0x190002, 0x190003) AM_READ(shared_ram_r)	// Z80 ready ?
@@ -1371,7 +1371,7 @@ static ADDRESS_MAP_START( shippumd_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
-//	AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP					// ???
+//  AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP                    // ???
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(shippumd_coin_word_w)	// Coin count/lock + oki bankswitch
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
@@ -1893,7 +1893,7 @@ static INPUT_PORTS_START( dogyuuna )
 	PORT_DIPSETTING(		0x00b0, "Taiwan" )
 	PORT_DIPSETTING(		0x00c0, "Taiwan (??????? license)" )
 	PORT_DIPSETTING(		0x00d0, "Southeast Asia (Charterfield license)" )
-//	PORT_DIPSETTING(		0x00e0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00e0, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
 INPUT_PORTS_END
 
@@ -1918,10 +1918,10 @@ static INPUT_PORTS_START( dogyuunt )
 	PORT_DIPSETTING(		0x0080, "Hong Kong (Honest Trading Co. license)" )
 	PORT_DIPSETTING(		0x0090, "Korea (JC Trading Corp license)" )
 	PORT_DIPSETTING(		0x00a0, "USA (Fabtek license)" )
-//	PORT_DIPSETTING(		0x00b0, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x00c0, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x00d0, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x00e0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00b0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00c0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00d0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00e0, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x00f0, "Japan (Taito Corp license)" )
 INPUT_PORTS_END
 
@@ -1971,15 +1971,15 @@ static INPUT_PORTS_START( kbash )
 	PORT_DIPSETTING(		0x0040, "Hong Kong" )
 	PORT_DIPSETTING(		0x0050, "Taiwan" )
 	PORT_DIPSETTING(		0x0060, "Southeast Asia" )	// Service Mode wrongly shows European coinage
-//	PORT_DIPSETTING(		0x0070, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x0080, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x0070, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x0080, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x0090, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x00a0, DEF_STR( Europe ) )	// European coinage
-//	PORT_DIPSETTING(		0x00b0, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x00c0, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x00d0, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x00e0, DEF_STR( Unused ) )	// Service Mode wrongly shows European coinage
-//	PORT_DIPSETTING(		0x00f0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00b0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00c0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00d0, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x00e0, DEF_STR( Unused ) ) // Service Mode wrongly shows European coinage
+//  PORT_DIPSETTING(        0x00f0, DEF_STR( Unused ) )
 INPUT_PORTS_END
 
 
@@ -1993,21 +1993,21 @@ static INPUT_PORTS_START( kbash2 )
 	PORT_MODIFY("JMPR")
 	PORT_DIPNAME( 0x000f,	0x0006, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0000, "Japan (Taito Corp license)" )
-//	PORT_DIPSETTING(		0x0001, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x0002, DEF_STR( Unused ) )	// European coinage
+//  PORT_DIPSETTING(        0x0001, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x0002, DEF_STR( Unused ) ) // European coinage
 	PORT_DIPSETTING(		0x0003, "Korea (Unite Trading license)" )
 	PORT_DIPSETTING(		0x0004, "Hong Kong" )
 	PORT_DIPSETTING(		0x0005, "Taiwan" )
 	PORT_DIPSETTING(		0x0006, "Southeast Asia (Charterfield license)" )	// Service Mode wrongly shows European coinage
-//	PORT_DIPSETTING(		0x0007, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x0007, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x0008, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(		0x0009, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x000a, DEF_STR( Unused ) )	// European coinage
+//  PORT_DIPSETTING(        0x0009, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x000a, DEF_STR( Unused ) ) // European coinage
 	PORT_DIPSETTING(		0x000b, "Korea" )
-//	PORT_DIPSETTING(		0x000c, "Hong Kong" )
-//	PORT_DIPSETTING(		0x000d, "Taiwan" )
+//  PORT_DIPSETTING(        0x000c, "Hong Kong" )
+//  PORT_DIPSETTING(        0x000d, "Taiwan" )
 	PORT_DIPSETTING(		0x000e, "Southeast Asia" )	// Service Mode wrongly shows European coinage
-//	PORT_DIPSETTING(		0x000f, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x000f, DEF_STR( Unused ) )
 	PORT_BIT( 0x00f0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -2058,10 +2058,10 @@ static INPUT_PORTS_START( truxton2 )
 	PORT_DIPSETTING(		0x0008, "Hong Kong (Honest Trading Co. license)" )
 	PORT_DIPSETTING(		0x0009, "Korea (JC Trading Corp license)" )
 	PORT_DIPSETTING(		0x000a, "USA (Fabtek license)" )
-//	PORT_DIPSETTING(		0x000b, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x000c, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x000d, DEF_STR( Unused ) )
-//	PORT_DIPSETTING(		0x000e, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x000b, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x000c, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x000d, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x000e, DEF_STR( Unused ) )
 	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
 INPUT_PORTS_END
 
@@ -2282,7 +2282,7 @@ static INPUT_PORTS_START( grindstm )
 	// Code in many places in game tests if region is >= 0xC. Effects on gameplay?
 	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
-//	PORT_DIPSETTING(		0x0080, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(        0x0080, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x00b0, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x00a0, "USA (American Sammy Corporation license)" )
 	PORT_DIPSETTING(		0x0070, "Southeast Asia" )
@@ -2296,7 +2296,7 @@ static INPUT_PORTS_START( grindstm )
 	PORT_DIPSETTING(		0x00d0, "USA; different?" )
 	PORT_DIPSETTING(		0x00c0, "USA (American Sammy Corporation license); different?" )
 	PORT_DIPSETTING(		0x00e0, "Korea; different?" )
-//	PORT_DIPSETTING(		0x00f0, "Korea; different?" )
+//  PORT_DIPSETTING(        0x00f0, "Korea; different?" )
 INPUT_PORTS_END
 
 
@@ -2307,21 +2307,21 @@ static INPUT_PORTS_START( grindstma )
 	// Code in many places in game tests if region is >= 0xC. Effects on gameplay?
 	PORT_DIPNAME( 0x00f0,	0x0090, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0090, DEF_STR( Europe ) )
-//	PORT_DIPSETTING(		0x0080, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(        0x0080, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x00b0, DEF_STR( USA ) )
 	PORT_DIPSETTING(		0x00a0, "USA (Atari Games Corp license)" )
 	PORT_DIPSETTING(		0x0070, "Southeast Asia" )
 	PORT_DIPSETTING(		0x0060, "Southeast Asia (Charterfield license)" )
 	PORT_DIPSETTING(		0x0050, "Taiwan" )
-//	PORT_DIPSETTING(		0x0040, "Taiwan" )
+//  PORT_DIPSETTING(        0x0040, "Taiwan" )
 	PORT_DIPSETTING(		0x0030, "Hong Kong" )
 	PORT_DIPSETTING(		0x0020, "Hong Kong (Charterfield license)" )
 	PORT_DIPSETTING(		0x0010, "Korea" )
 	PORT_DIPSETTING(		0x0000, "Korea (Unite Trading license)" )
 	PORT_DIPSETTING(		0x00c0, "Korea; different?" )
-//	PORT_DIPSETTING(		0x00d0, "Korea; different?" )
-//	PORT_DIPSETTING(		0x00e0, "Korea; different?" )
-//	PORT_DIPSETTING(		0x00f0, "Korea; different?" )
+//  PORT_DIPSETTING(        0x00d0, "Korea; different?" )
+//  PORT_DIPSETTING(        0x00e0, "Korea; different?" )
+//  PORT_DIPSETTING(        0x00f0, "Korea; different?" )
 INPUT_PORTS_END
 
 
@@ -2335,8 +2335,8 @@ static INPUT_PORTS_START( vfive )
 	// Runs twice near end of stage 1, once when each of the two boss tanks appears. Effect?
 	PORT_DIPNAME( 0x0070,	0x0000, "Copyright" )
 	PORT_DIPSETTING(		0x0000, "All Rights Reserved" )
-//	PORT_DIPSETTING(		0x0010, "All Rights Reserved" )
-//	PORT_DIPSETTING(		0x0020, "All Rights Reserved" )
+//  PORT_DIPSETTING(        0x0010, "All Rights Reserved" )
+//  PORT_DIPSETTING(        0x0020, "All Rights Reserved" )
 	PORT_DIPSETTING(		0x0030, "Licensed to Taito Corp" )
 	PORT_DIPNAME( 0x0080,	0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(		0x0000, DEF_STR( Off ) )
@@ -2470,7 +2470,7 @@ static INPUT_PORTS_START( snowbro2 )
 	PORT_DIPSETTING(		0x1000, "Hong Kong" )
 	PORT_DIPSETTING(		0x1400, "Taiwan" )
 	PORT_DIPSETTING(		0x1800, "Southeast Asia" )
-//	PORT_DIPSETTING(		0x1c00, DEF_STR( Unused ) )
+//  PORT_DIPSETTING(        0x1c00, DEF_STR( Unused ) )
 	PORT_BIT( 0xc3ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -2560,7 +2560,7 @@ static INPUT_PORTS_START( kingdmgp )
 	PORT_DIPNAME( 0x000e,	0x0004, DEF_STR( Region ) )
 	PORT_DIPSETTING(		0x0004, DEF_STR( Europe ) )
 	PORT_DIPSETTING(		0x0002, DEF_STR( USA ) )
-//	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )	// Corrupt title screen and text - use shippumd
+//  PORT_DIPSETTING(        0x0000, DEF_STR( Japan ) )  // Corrupt title screen and text - use shippumd
 	PORT_DIPSETTING(		0x0006, "Southeast Asia" )
 	PORT_DIPSETTING(		0x0008, "China" )
 	PORT_DIPSETTING(		0x000a, "Korea (Unite Trading license)" )

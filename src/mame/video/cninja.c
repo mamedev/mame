@@ -275,7 +275,7 @@ SCREEN_UPDATE( mutantf )
 	deco16ic_tilemap_4_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
 	deco16ic_tilemap_3_draw(state->deco16ic, bitmap, cliprect, 0, 0);
-	
+
 
 	if (priority & 1)
 	{

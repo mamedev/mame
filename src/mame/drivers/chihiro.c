@@ -1,5 +1,5 @@
 /*
- 
+
 Chihiro is an Xbox-based arcade system from SEGA.
 
 Games on this system include....
@@ -39,28 +39,28 @@ Games on this system include....
 * denotes these games are archived.
 If you can help with the undumped games or know of missing Chihiro games, please contact...
 http://guru.mameworld.info/  or  http://www.mamedev.org
-   
-A Chihiro system consists of several boards. 
-The system is in 2 separate metal boxes that fit together to form one box. 
+
+A Chihiro system consists of several boards.
+The system is in 2 separate metal boxes that fit together to form one box.
 In order from top to bottom they are....
  - Network board  \
  - Media board    /  Together in the top box
- 
+
  - Base board     \
  - Xbox board     /  Together in the bottom box
 
 The 2 boxes join together via the Base Board upper connector and Media Board lower connector.
 
 The Microsoft-manufactured XBox board is the lowest board. It's mostly the same as the V1 XBox retail
-board with the exception that it has 128MB of RAM and a NVidia MCPX X2 chip. The retail XBox board has a 
+board with the exception that it has 128MB of RAM and a NVidia MCPX X2 chip. The retail XBox board has a
 MCPX X3 chip. The board was probably released to Sega very early in development and the chip was updated
 in the mass-produced retail version.
 
-The Sega-manufactured base board is connected to the XBox board via a 40 pin 80-wire flat cable and a 16 
-pin 16-wire flat cable connects to the LPC header, plus a couple of thin multi-wire cables which join to the 
+The Sega-manufactured base board is connected to the XBox board via a 40 pin 80-wire flat cable and a 16
+pin 16-wire flat cable connects to the LPC header, plus a couple of thin multi-wire cables which join to the
 XBox game controller ports (USB1.1) and front panel connector.
-On the reverse side of that board are the power output connectors going to the XBox board and a 100 pin 
-connector where the media board plugs in. A CR2032 coin battery is also located there and next to it are 6 
+On the reverse side of that board are the power output connectors going to the XBox board and a 100 pin
+connector where the media board plugs in. A CR2032 coin battery is also located there and next to it are 6
 jumpers....
 JP3S 2-3 \
 JP4S 1-2 |
@@ -68,12 +68,12 @@ JP5S 1-2 |
 JP6S 2-3 | These are connected to the USB chip on the other side of this board
 JP7S 1-2 |
 JP8S 2-3 /
-A long connector on one edge connects to the filter board (power supply input etc) and on another edge are 
-connectors for VGA output, audio/video input (from a short cable coming from the A/V connector on the XBox board) 
+A long connector on one edge connects to the filter board (power supply input etc) and on another edge are
+connectors for VGA output, audio/video input (from a short cable coming from the A/V connector on the XBox board)
 and a 14 pin connector which is unused. The base board handles JVS and video output.
 
 The upper part contains a Sega-manufactured media board with a TSOP48 flash ROM containing an xbox .xbe loader
-(this is the Chihiro logo you see when you power the Chihiro) and there's a connector for a Sega network board. 
+(this is the Chihiro logo you see when you power the Chihiro) and there's a connector for a Sega network board.
 The network board is 100% the same as the one in the Triforce v3 with the same firmware also.
 
 The system requires one of the various Sega JVS I/O boards to operate.
@@ -89,12 +89,12 @@ Media Board   : One ST 29W160ET 2M x8-bit TSOP48 Flash ROM stamped 'FPR24042' at
 Base Board    : Two Microchip 24LC64 64k Serial EEPROMs at locations IC32 and IC10
                 One Microchip 24LC24 2k Serial EEPROM at location IC11
                 The chip at IC32 seems to be a backup of the base board firmware without region or serial.
-                The chip at IC11 has an unknown purpose. It contains some strings. The interesting thing is that it 
+                The chip at IC11 has an unknown purpose. It contains some strings. The interesting thing is that it
                 contains the string SBJE. If you go to the system info menu and press the service button 16 times in a row
                 a message will be displayed: GAME ID SBJE
                 The chip at IC10 contains the firmware of the Base Board, serial number and REGION of the whole system.
-                The region is located at offset 0x00001F10. 01 is JAPAN, 02 is USA, 03 is EXPORT. If you want to change 
-                the region of your Chihiro unit just change this byte. 
+                The region is located at offset 0x00001F10. 01 is JAPAN, 02 is USA, 03 is EXPORT. If you want to change
+                the region of your Chihiro unit just change this byte.
                 Alternatively, if you have a netboot PIC, plug that in and power up with it.
                  1) Enter the test menu (push the test button)
                  2) Go to the System Information menu.
@@ -103,7 +103,7 @@ Base Board    : Two Microchip 24LC64 64k Serial EEPROMs at locations IC32 and IC
                     power on again.
 Xbox Board    : One Macronix 29F040TC-90 512k x8-bit TSOP32 Flash ROM at location U7D1
 
-  
+
 Board Layouts
 =============
 
@@ -173,7 +173,7 @@ Sticker: 837-14280-92
 |      3771                                                   CN5|
 |-------------------------|       CN15         |-----------------|
                           |--------------------|
-Notes: 
+Notes:
       (* these parts on other side of the PCB)
       RV5C386A  - I2C Bus Serial Interface Real-Time Clock IC with Voltage Monitoring Function (SSOP10)
       24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8)
@@ -283,13 +283,13 @@ Notes:
       SW1/2 - test/service buttons
       DIN1  - 96-pin connector joining to Base Board
       DIPSW - 8-position DIP switch. On this game (Wangan Midnight Maximum Tune 2 Ver.B) DIPs 3, 4, 6, 7 & 8 are set ON. The others are OFF.
- 
+
 */
 
-/* 
- 
-Dump info: 
- 
+/*
+
+Dump info:
+
 Network Board Dump : Ver1305.bin
 Media Board dump   : FPR21042_M29W160ET.bin
 Base Board Dumps   : ic10_g24lc64.bin ic11_24lc024.bin pc20_g24lc64.bin

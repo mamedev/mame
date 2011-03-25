@@ -72,11 +72,11 @@
   1x AY-3-8910 @ 2 MHz? (need clk confirmation).
   1x empty socket (maybe an AY replacement?)
     wih the following pinouts:
-	(28 pins)
-	Vcc +5v @ Pin 19
-	GND @ pins 6 & 16
-	Analog Channels @ Pins 1 y 5
-	Clock @ pin 15
+    (28 pins)
+    Vcc +5v @ Pin 19
+    GND @ pins 6 & 16
+    Analog Channels @ Pins 1 y 5
+    Clock @ pin 15
 
   16x 8116 (16K x 1bit). DRAM Video (should be set as 32 KB).
   1x 6116 (NVRAM)
@@ -382,9 +382,9 @@ static READ8_HANDLER( blitter_status_r )
 /* code checks bit 6 and/or bit 7 */
 	//return space->machine->rand() & 0xc0;
 	/*
-		x--- ---- blitter busy
-		-x-- ---- vblank
-	*/
+        x--- ---- blitter busy
+        -x-- ---- vblank
+    */
 
 	return 0x80 | ((space->machine->primary_screen->vblank() & 1) << 6);
 }
@@ -518,7 +518,7 @@ static WRITE8_HANDLER( mux_port_w )
 	coin_counter_w(space->machine, 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
 	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
 
-//	logerror("muxsel: %02x \n", input_selector);
+//  logerror("muxsel: %02x \n", input_selector);
 }
 
 static WRITE8_HANDLER( wc_meters_w )
@@ -538,7 +538,7 @@ static WRITE8_HANDLER( wc_meters_w )
 	coin_counter_w(space->machine, 1, (data ^ 0xff) & 0x02);	/* Credits In (through Coin 3) */
 	coin_counter_w(space->machine, 2, (data ^ 0xff) & 0x04);	/* Credits Out */
 
-//	popmessage("meters: %02x", (data ^ 0xff));
+//  popmessage("meters: %02x", (data ^ 0xff));
 }
 
 static WRITE8_DEVICE_HANDLER(ay_port_a_out)
@@ -569,9 +569,9 @@ static WRITE8_DEVICE_HANDLER(ay_port_b_out)
 
   Writes: (begin) EF/D8 (00)
            71 (FF/00)
-		   DF (01)
+           DF (01)
            71 (FF/00)
-		   D8 (00....) --> snd_latch?
+           D8 (00....) --> snd_latch?
            EF: meters.
 
   Reads: E8/E9....EA/EB/EC/ED/EE
@@ -625,14 +625,14 @@ ADDRESS_MAP_END
 
   Reads:
          F8 ---> DIP switches bank 1.
-		 F9 ---> Controls for players A & B.
-		 FA ---> Credits for players A, B, C, D.
-		 FB ---> Single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters.
-		 FD ---> Controls for players C & D.
-		 FF ---> Unknown.
+         F9 ---> Controls for players A & B.
+         FA ---> Credits for players A, B, C, D.
+         FB ---> Single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters.
+         FD ---> Controls for players C & D.
+         FF ---> Unknown.
 
   Writes:
-		 FC ---> Meters.
+         FC ---> Meters.
          FE ---> Sound Latch (writes 01, 02 and 03 during attract)...
 */
 
@@ -1622,10 +1622,10 @@ ROM_END
 
   2x Z80 @ 2MHz.
   1x AY-3-8910 @ 2MHz.
-  
+
   18x22 pins Corona hardware.
   Multiplexed inputs.
-  
+
 ******************************/
 
 ROM_START(rcirulet)
@@ -1639,7 +1639,7 @@ ROM_START(rcirulet)
 
 	ROM_REGION( 0x0020, "proms", 0 )	/* color PROM */
 	ROM_LOAD( "rci_82s123_ic19_1b92.bin",	0x0000, 0x0020, CRC(051e5edc) SHA1(2305c056fa1fc21432189af12afb7d54c6569484) )
-	
+
 	ROM_REGION( 0x0020, "proms2", 0 )	/* unknown from video */
 	ROM_LOAD( "rci_82s123_ic04_1f95.bin",	0x0000, 0x0020, CRC(3a6684b3) SHA1(c9461565a78f1024c6bd4088e4555f1a8020013b) )
 ROM_END

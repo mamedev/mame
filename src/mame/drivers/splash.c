@@ -150,7 +150,7 @@ static void roldfrog_update_irq( running_machine *machine )
 {
 	splash_state * state = machine->driver_data<splash_state>();
 	int irq = (state->sound_irq ? 0x08 : 0) | ((state->vblank_irq) ? 0x18 : 0);
-	cpu_set_input_line_and_vector(machine->device("audiocpu"), 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); 
+	cpu_set_input_line_and_vector(machine->device("audiocpu"), 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
 }
 
 static WRITE8_HANDLER( roldfrog_vblank_ack_w )
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( roldfrog_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x37, 0x37) AM_WRITE(roldfrog_vblank_ack_w )
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_r)
-	
+
 	AM_RANGE(0x0, 0xff) AM_READ(roldfrog_unk_r)
 ADDRESS_MAP_END
 
@@ -454,12 +454,12 @@ static INPUT_PORTS_START( funystrp )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-	
+
 	PORT_START("SYSTEM")
 	PORT_DIPNAME( 0xffff, 0xffff, "Clear EEPROM" )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0xffff, DEF_STR( On ) )
-	
+
 INPUT_PORTS_END
 
 static const gfx_layout tilelayout8 =
@@ -654,7 +654,7 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 	MCFG_CPU_ADD("audiocpu", Z80,30000000/8)
 	MCFG_CPU_PROGRAM_MAP(funystrp_sound_map)
 	MCFG_CPU_IO_MAP(funystrp_sound_io_map)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -769,7 +769,7 @@ ROM_START( roldfroga )
 	ROM_LOAD( "roldfrog.001", 0x00000, 0x08000, CRC(ba9eb1c6) SHA1(649d1103f3188554eaa3fc87a1f52c53233932b2) )
 	ROM_CONTINUE(             0x10000, 0x10000 )
 	ROM_CONTINUE(             0x38000, 0x08000 )
-	
+
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "roldfrog.010",       0x00000, 0x20000, CRC(51fd0e1a) SHA1(940c4231b21d16c62cad47c22fe735b18662af4a) )
 	ROM_LOAD( "roldfrog.011",       0x20000, 0x20000, CRC(610bf6f3) SHA1(04a7efac2e83c6747d4bd480b1f3118eb44a1f76) )
@@ -1031,7 +1031,7 @@ static DRIVER_INIT( roldfrog )
 	splash_state *state = machine->driver_data<splash_state>();
 	UINT8 * ROM = (UINT8 *)machine->region("audiocpu")->base();
 	memory_configure_bank(machine, "sound_bank", 0, 16, &ROM[0x10000], 0x8000);
-	
+
 	state->bitmap_type = 1;
 	state->sprite_attr2_shift = 8;
 }
@@ -1075,7 +1075,7 @@ static DRIVER_INIT( funystrp )
 	state->sprite_attr2_shift = 0;
 
 	// initial protection checks, just after boot
-	
+
 	ROM[0x04770/2] = 0x4e71;
 	ROM[0x04772/2] = 0x4e71;
 
@@ -1083,24 +1083,24 @@ static DRIVER_INIT( funystrp )
 	// protection write -> read -> compare tests
 	// not all of them should always pass ( especially the ones that compares data read with ram variable )
 	// side effect of the above is broken (sometimes) sound
-	// there's stil problem with  (broken) gameplay = sometimes one (or more) dot is moved 
+	// there's stil problem with  (broken) gameplay = sometimes one (or more) dot is moved
 	// out of playfield (and placed on right part of screen ) and there's no way to complete the level
 	// game reads sprite coords directly from sprite ram and checks distance between player and each(!) dot or
 	// game object every frame
 	// most of the patched protection checks are very similar. when test fails, dot counter is altered.
 	// sometimes it's increased = level is impossible to complete, sometimes - cleared (and level ends
-	// immediately). 
-	
+	// immediately).
+
 	ROM[0x07b30/2] = 0x7001;
 	ROM[0x07ec6/2] = 0x7001;
-	ROM[0x07fbe/2] = 0x7001;	
+	ROM[0x07fbe/2] = 0x7001;
 	ROM[0x08060/2] = 0x7001;
 	ROM[0x08576/2] = 0x7001;
 	ROM[0x08948/2] = 0x7001;
 	ROM[0x09e16/2] = 0x7001;
 	ROM[0x0a994/2] = 0x7001;
 	ROM[0x0c648/2] = 0x7001;
-	ROM[0x0c852/2] = 0x7001;			
+	ROM[0x0c852/2] = 0x7001;
 	ROM[0x0dc22/2] = 0x7001;
 	ROM[0x0f780/2] = 0x7001;
 	ROM[0x0f882/2] = 0x7001;
@@ -1109,7 +1109,7 @@ static DRIVER_INIT( funystrp )
 	ROM[0x11f80/2] = 0x7001;
 
 	ROM = (UINT16 *)machine->region("audiocpu")->base();
-	
+
 	memory_configure_bank(machine, "sound_bank", 0, 16, &ROM[0x00000], 0x8000);
 
 }

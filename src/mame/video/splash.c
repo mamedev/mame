@@ -245,7 +245,7 @@ static void funystrp_draw_sprites(running_machine *machine, bitmap_t *bitmap,con
 		int number = (state->spriteram[i] & 0xff) + (attr & 0xf)*256;
 
 		if (attr2 & 0x80) sx += 256;
-		
+
 		drawgfx_transpen(bitmap,cliprect,gfx,number,
 			(attr2 & 0x7f),attr & 0x40,attr & 0x80,
 			sx-8,sy,0);

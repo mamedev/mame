@@ -1113,7 +1113,7 @@ ROM_START( hustlerb2 )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_LOAD( "b4.r2",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
-	ROM_LOAD( "b5",  	 0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // broken rom, assumed to be the same
+	ROM_LOAD( "b5", 	 0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) ) // broken rom, assumed to be the same
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "27s19.bin",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )

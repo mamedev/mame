@@ -22,7 +22,7 @@ public:
 	int ace_ram_dirty;
 	int has_ace_ram;
 	UINT32 *ace_ram;
-		
+
 	UINT8 *dirty_palette;
 
 	int pri;
@@ -42,7 +42,7 @@ public:
 	UINT32 *pf2_rowscroll32;
 	UINT32 *pf3_rowscroll32;
 	UINT32 *pf4_rowscroll32;
-	
+
 	device_t *deco16ic;
 };
 

@@ -101,7 +101,7 @@ core_options::entry::entry(const options_entry &entrylist)
 			m_maximum.cpysubstr(namestr, dash + 1, rparen - (dash + 1)).trimspace();
 			namestr.del(lparen, rparen + 1 - lparen);
 		}
-		
+
 		// then chop up any semicolon-separated names
 		int semi;
 		int nameindex = 0;
@@ -110,12 +110,12 @@ core_options::entry::entry(const options_entry &entrylist)
 			m_name[nameindex++].cpysubstr(namestr, 0, semi);
 			namestr.del(0, semi + 1);
 		}
-		
+
 		// finally add the last item
 		if (nameindex < ARRAY_LENGTH(m_name))
 			m_name[nameindex++] = namestr;
 	}
-	
+
 	// set the default value
 	if (entrylist.defvalue != NULL)
 		m_defdata = entrylist.defvalue;
@@ -271,7 +271,7 @@ bool core_options::operator!=(const core_options &rhs)
 
 
 //-------------------------------------------------
-//  add_entries - add entries to the current 
+//  add_entries - add entries to the current
 //  options sets
 //-------------------------------------------------
 
@@ -291,7 +291,7 @@ void core_options::add_entries(const options_entry *entrylist, bool override_exi
 				// if we're overriding existing entries, then remove the old one
 				if (override_existing)
 					remove_entry(*existing);
-				
+
 				// otherwise, just override the default and current values and throw out the new entry
 				else
 				{
@@ -301,7 +301,7 @@ void core_options::add_entries(const options_entry *entrylist, bool override_exi
 				}
 			}
 		}
-		
+
 		// add us to the list and maps
 		append_entry(*newentry);
 	}
@@ -309,7 +309,7 @@ void core_options::add_entries(const options_entry *entrylist, bool override_exi
 
 
 //-------------------------------------------------
-//  set_default_value - change the default value 
+//  set_default_value - change the default value
 //  of an option
 //-------------------------------------------------
 
@@ -319,14 +319,14 @@ void core_options::set_default_value(const char *name, const char *defvalue)
 	entry *curentry = m_entrymap.find(name);
 	if (curentry == NULL)
 		return;
-	
+
 	// update the data and default data
 	curentry->set_default_value(defvalue);
 }
 
 
 //-------------------------------------------------
-//  parse_command_line - parse a series of 
+//  parse_command_line - parse a series of
 //  command line arguments
 //-------------------------------------------------
 
@@ -352,7 +352,7 @@ bool core_options::parse_command_line(int argc, char **argv, int priority, astri
 			error_string.catprintf("Error: unknown option: %s\n", curarg);
 			return false;
 		}
-		
+
 		// process commands first
 		if (curentry->type() == OPTION_COMMAND)
 		{
@@ -388,7 +388,7 @@ bool core_options::parse_command_line(int argc, char **argv, int priority, astri
 
 
 //-------------------------------------------------
-//  parse_ini_file - parse a series of entries in 
+//  parse_ini_file - parse a series of entries in
 //  an INI file
 //-------------------------------------------------
 
@@ -453,7 +453,7 @@ bool core_options::parse_ini_file(core_file &inifile, int priority, int ignore_p
 
 
 //-------------------------------------------------
-//  revert - revert options at or below a certain 
+//  revert - revert options at or below a certain
 //  priority back to their defaults
 //-------------------------------------------------
 
@@ -519,7 +519,7 @@ const char *core_options::output_help(astring &buffer)
 {
 	// start empty
 	buffer.reset();
-	
+
 	// loop over all items
 	for (entry *curentry = m_entrylist; curentry != NULL; curentry = curentry->next())
 	{
@@ -570,7 +570,7 @@ bool core_options::set_value(const char *name, const char *value, int priority, 
 		error_string.catprintf("Attempted to set unknown option %s\n", name);
 		return false;
 	}
-	
+
 	// validate and set the item normally
 	return validate_and_set_data(*curentry, value, priority, error_string);
 }
@@ -600,14 +600,14 @@ void core_options::reset()
 	// remove all entries from the list
 	while (m_entrylist != NULL)
 		remove_entry(*m_entrylist);
-	
+
 	// reset the map
 	m_entrymap.reset();
 }
 
 
 //-------------------------------------------------
-//  append_entry - append an entry to our list 
+//  append_entry - append an entry to our list
 //  and index it in the map
 //-------------------------------------------------
 
@@ -623,7 +623,7 @@ void core_options::append_entry(core_options::entry &newentry)
 		if (newentry.m_name[name])
 		{
 			m_entrymap.add(newentry.m_name[name], &newentry);
-			
+
 			// for boolean options add a "no" variant as well
 			if (newentry.type() == OPTION_BOOLEAN)
 				m_entrymap.add(tempstr.cpy("no").cat(newentry.m_name[name]), &newentry);
@@ -632,7 +632,7 @@ void core_options::append_entry(core_options::entry &newentry)
 
 
 //-------------------------------------------------
-//  remove_entry - remove an entry from our list 
+//  remove_entry - remove an entry from our list
 //  and map
 //-------------------------------------------------
 
@@ -648,7 +648,7 @@ void core_options::remove_entry(core_options::entry &delentry)
 				preventry->m_next = delentry.m_next;
 			else
 				m_entrylist = delentry.m_next;
-			
+
 			// if we're the last item, update the next pointer
 			if (delentry.m_next == NULL)
 			{
@@ -675,7 +675,7 @@ void core_options::copyfrom(const core_options &src)
 {
 	// reset ourselves first
 	reset();
-	
+
 	// iterate through the src options and make our own
 	for (entry *curentry = src.m_entrylist; curentry != NULL; curentry = curentry->next())
 		append_entry(*new entry(*curentry));
@@ -693,14 +693,14 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 	// trim any whitespace
 	astring data(newdata);
 	data.trimspace();
-	
+
 	// trim quotes
 	if (data.chr(0, '"') == 0 && data.rchr(0, '"') == data.len() - 1)
 	{
 		data.del(0, 1);
 		data.del(data.len() - 1, 1);
 	}
-	
+
 	// validate the type of data and optionally the range
 	float fval;
 	int ival;
@@ -714,7 +714,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 				return false;
 			}
 			break;
-	
+
 		// integers must be integral
 		case OPTION_INTEGER:
 			if (sscanf(data, "%d", &ival) != 1)
@@ -728,7 +728,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 				return false;
 			}
 			break;
-	
+
 		// floating-point values must be numeric
 		case OPTION_FLOAT:
 			if (sscanf(data, "%f", &fval) != 1)
@@ -742,11 +742,11 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 				return false;
 			}
 			break;
-		
+
 		// strings can be anything
 		case OPTION_STRING:
 			break;
-	
+
 		// anything else is invalid
 		case OPTION_INVALID:
 		case OPTION_HEADER:
@@ -754,7 +754,7 @@ bool core_options::validate_and_set_data(core_options::entry &curentry, const ch
 			error_string.catprintf("Attempted to set invalid option %s\n", curentry.name());
 			return false;
 	}
-	
+
 	// set the data
 	curentry.set_value(data, priority);
 	return true;

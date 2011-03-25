@@ -1028,7 +1028,7 @@ static GFXDECODE_START( hrdtimes )
 GFXDECODE_END
 
 static GFXDECODE_START( bigtwinb )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 		 0x300, 16 )	/* colors 0x300-0x3ff */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,		 0x300, 16 )	/* colors 0x300-0x3ff */
 	GFXDECODE_ENTRY( "gfx1", 0, hrdtimes_tilelayout, 0x000, 16 )	/* colors 0x000-0x0ff */
 	GFXDECODE_ENTRY( "gfx1", 0, hrdtimes_charlayout, 0x200, 16 )	/* colors 0x200-0x2ff */
 GFXDECODE_END
@@ -1133,7 +1133,7 @@ static MACHINE_CONFIG_START( bigtwinb, playmark_state )
 
 	MCFG_GFXDECODE(bigtwinb)
 	MCFG_PALETTE_LENGTH(1024)
-	
+
 	MCFG_VIDEO_START(bigtwinb)
 
 	/* sound hardware */

@@ -645,7 +645,7 @@ SCREEN_UPDATE(skns)
 	}
 
 	bitmap_fill(sprite_bitmap, cliprect, 0x0000);
-	
+
 	if (suprnova_alt_enable_sprites)
 		state->spritegen->skns_draw_sprites(screen->machine, sprite_bitmap, cliprect, screen->machine->generic.spriteram.u32, screen->machine->generic.spriteram_size, screen->machine->region("gfx1")->base(), screen->machine->region ("gfx1")->bytes(), skns_spc_regs );
 

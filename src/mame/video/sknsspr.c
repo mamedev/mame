@@ -4,11 +4,11 @@
 
   - used by suprnova.c
             galpani3.c
-			jchan.c
+            jchan.c
 
   - ToDo:
     Get rid of sprite position kludges
-	Fix zooming precision/rounding (most noticable on jchan backgrounds)
+    Fix zooming precision/rounding (most noticable on jchan backgrounds)
 
 */
 

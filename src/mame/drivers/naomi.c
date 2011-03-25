@@ -53,7 +53,7 @@ PCB Layout
 837-13544-01
 171-7772F
 837-13707 (sticker)
-(C) SEGA 1999 
+(C) SEGA 1999
 |---------------------------------------------------|
 |    CN1                           CN3              |
 |PC910  62256   EPF8452AQC160-3                     |
@@ -335,13 +335,13 @@ Games known to use this PCB include....
 Game                                    on cart    IC11#   # of SOP44 IC13S#    IC1#          Notes
 ---------------------------------------------------------------------------------------------------------------------
 Giant Gram 2000                         840-0039C  23377   20 (64Mb)  present   317-0296-COM
-Kick '4' Cash                           840-0140C  24212   16 (64Mb)  present   317-0397-COM 
+Kick '4' Cash                           840-0140C  24212   16 (64Mb)  present   317-0397-COM
 Marvel Vs. Capcom 2 (Rev A)             841-0007C  23085A  14 (64Mb)  present   317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
 Power Smash 2 / Virtua Tennis 2 (Rev A) 840-0084C  22327A  18 (64Mb)  present   317-0320-COM
 Quiz Ah Megamisama                      840-0030C  23227   16 (64Mb)  present   317-0280-JPN
 Shootout Pool                           840-0098C  23844    4 (64mb)  present   317-0336-COM
 Shootout Pool - Shootout Pool Prize     840-0128C  24065    4 (64mb)  present   317-0367-COM
-Shootout Pool Medal                     ?          24148    4 (64Mb)  ?         ? 
+Shootout Pool Medal                     ?          24148    4 (64Mb)  ?         ?
 Virtua Fighter 4 Evolution              840-0106B  23934   20 (64Mb)  present   317-0339-COM
 
 
@@ -432,10 +432,10 @@ Notes:
       CN4   - 6 legs connector for ISP programming
 
    Games known to use this PCB include....
-                                   Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S  
+                                   Sticker    EPROM        FLASHROMs   XC3S50   PIC16C621A    XCF01S
 Game                               on cart    IC7#         # of SOP56  IC2#     IC3#          IC4#     Notes
 ----------------------------------------------------------------------------------------------------------------------------
-Dynamite Deka EX / Asian Dynamite  840-0175C  ?            ?           ?        ?             ? 
+Dynamite Deka EX / Asian Dynamite  840-0175C  ?            ?           ?        ?             ?
 Mamonoro                           841-0060C  not present  4 (512Mb)   present  317-5132-JPN  present  IC2# is labeled "VER.2"
 Touch De Zunou (Rev A)             840-0166C  not present  2 (512Mb)   present  317-0435-JPN  present  IC4# is marked "18"
 
@@ -7185,13 +7185,13 @@ ROM_END
 // 0041
 // 0042  NAOMI DIMM Firm Update for CF-BOX
 // 0042A NAOMI DIMM Firm Update for CF-BOX (Rev A)
-// 00??  Crackin' DJ Part 2 
-// 00??  Dragon Treasure 
-// 00??  Dragon Treasure II 
-// 00??  Dragon Treasure III 
-// 00??  Get Bass 2 
-// 00??  KyoryuKing 
-// 00??  World Club Champion Football Serie A 2001-2002 
+// 00??  Crackin' DJ Part 2
+// 00??  Dragon Treasure
+// 00??  Dragon Treasure II
+// 00??  Dragon Treasure III
+// 00??  Get Bass 2
+// 00??  KyoryuKing
+// 00??  World Club Champion Football Serie A 2001-2002
 
 /* GDL-xxxx ("licensed by Sega" GD-ROM games) */
 /* 0001  */ GAME( 2001, gundmgd,   naomigd,  naomigd, naomi,    naomi,    ROT0,   "Capcom",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

@@ -28,7 +28,7 @@ static void psychic5_change_palette(running_machine *machine, int color, int off
 	psychic5_state *state = machine->driver_data<psychic5_state>();
 	UINT8 lo = state->ps5_palette_ram[offset & ~1];
 	UINT8 hi = state->ps5_palette_ram[offset | 1];
-	jal_blend_set(color, hi & 0x0f);	
+	jal_blend_set(color, hi & 0x0f);
 	palette_set_color_rgb(machine, color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 

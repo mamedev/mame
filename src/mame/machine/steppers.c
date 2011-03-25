@@ -219,7 +219,7 @@ int stepper_update(int which, UINT8 pattern)
 		step[which].phase =	(step[which].step_pos % 8);
 		step[which].pattern = pattern;
 
-//		index = (step[which].old_pattern << 4) | pattern;
+//      index = (step[which].old_pattern << 4) | pattern;
 		switch ( step[which].type )
 		{
 			default:

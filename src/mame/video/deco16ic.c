@@ -523,7 +523,7 @@ static void custom_tilemap_draw(
 	width_mask = src_bitmap0->width - 1;
 	height_mask = src_bitmap0->height - 1;
 	src_y = scrolly + starty;
-	
+
 
 	for (y = starty; y < endy; y++)
 	{
@@ -547,7 +547,7 @@ static void custom_tilemap_draw(
 
 				if (src_bitmap1)
 				{
-					p |= (*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;		
+					p |= (*BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x) & combine_mask) << combine_shift;
 				}
 
 				src_x = (src_x + 1) & width_mask;
@@ -586,7 +586,7 @@ static void custom_tilemap_draw(
 					{
 						UINT16 p2 = *BITMAP_ADDR16(src_bitmap1, (src_y + column_offset) & height_mask, src_x);
 						p = 0x200+( ((p&0x30)<<4) | (p&0x0f) | ((p2 & 0x0f)<<4));
-					}				
+					}
 				}
 				src_x = (src_x + 1) & width_mask;
 

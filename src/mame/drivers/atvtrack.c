@@ -37,7 +37,7 @@ REF. 020419
  | TL074C   TL074C                                     385-1    |
  |     TDA1387   TDA1387                          14.31818MHz   |
  |                                                              |
- |--------------------------------------------------------------|   
+ |--------------------------------------------------------------|
 Notes:
       SH4       - Hitachi HD6417750S SH4 CPU (BGA)
       K4S643232 - Samsung K4S643232E-TC70 64M x 32-bit SDRAM (TSSOP86)
@@ -53,7 +53,7 @@ Notes:
       CN1       - Multi-pin connector for filter board (input power & controls connectors etc)
       DB9       - Video output connector (for twin monitors)
       SW3       - Push button switch
-	  
+
 */
 
 #include "emu.h"

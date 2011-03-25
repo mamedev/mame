@@ -1498,8 +1498,8 @@ const input_type_desc *input_type_list(running_machine *machine)
 
 
 /*-------------------------------------------------
-	input_port_exists - return whether an input
-	port exists
+    input_port_exists - return whether an input
+    port exists
 -------------------------------------------------*/
 
 bool input_port_exists(running_machine *machine, const char *tag)
@@ -1509,9 +1509,9 @@ bool input_port_exists(running_machine *machine, const char *tag)
 
 
 /*-------------------------------------------------
-	input_port_active - return a bitmask of which
-	bits of an input port are active (i.e. not
-	unused or unknown) 
+    input_port_active - return a bitmask of which
+    bits of an input port are active (i.e. not
+    unused or unknown)
 -------------------------------------------------*/
 
 input_port_value input_port_active(running_machine *machine, const char *tag)
@@ -1524,10 +1524,10 @@ input_port_value input_port_active(running_machine *machine, const char *tag)
 
 
 /*-------------------------------------------------
-	input_port_active_safe - return a bitmask of
-	which bits of an input port are active (i.e.
-	not unused or unknown), or a default value if
-	the port does not exist
+    input_port_active_safe - return a bitmask of
+    which bits of an input port are active (i.e.
+    not unused or unknown), or a default value if
+    the port does not exist
 -------------------------------------------------*/
 
 input_port_value input_port_active_safe(running_machine *machine, const char *tag, input_port_value defvalue)
@@ -2933,7 +2933,7 @@ static int frame_get_digital_field_state(const input_field_config *field, int mo
 
 /*-------------------------------------------------
     port_default_value - updates default value
-	of port settings according to device settings
+    of port settings according to device settings
 -------------------------------------------------*/
 
 static UINT32 port_default_value(const char *fulltag, UINT32 mask, UINT32 defval, device_config *owner)
@@ -3433,7 +3433,7 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
-				defval = port_default_value(fulltag,mask,defval,owner);	
+				defval = port_default_value(fulltag,mask,defval,owner);
 				curfield = field_config_alloc(curport, IPT_DIPSWITCH, defval, mask);
 				cursetting = NULL;
 				curfield->name = input_port_string_from_token(*ipt++);
@@ -3512,7 +3512,7 @@ static void port_config_detokenize(ioport_list &portlist, const input_port_token
 				TOKEN_GET_UINT64_UNPACK2(ipt, mask, 32, defval, 32);
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
-				defval = port_default_value(fulltag,mask,defval,owner);	
+				defval = port_default_value(fulltag,mask,defval,owner);
 				curfield = field_config_alloc(curport, IPT_CONFIG, defval, mask);
 				cursetting = NULL;
 				curfield->name = input_port_string_from_token(*ipt++);

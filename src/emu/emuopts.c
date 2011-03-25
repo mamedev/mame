@@ -264,7 +264,7 @@ void emu_options::remove_device_options()
 	{
 		// pre-fetch the next entry in case we delete this one
 		nextentry = curentry->next();
-		
+
 		// if this is a device option, nuke it
 		if ((curentry->flags() & OPTION_FLAG_DEVICE) != 0)
 			remove_entry(*curentry);
@@ -281,15 +281,15 @@ bool emu_options::parse_command_line(int argc, char *argv[], astring &error_stri
 {
 	// remember the original system name
 	astring old_system_name(system_name());
-	
+
 	// parse as normal
 	bool result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
-	
+
 	// if the system name changed, fix up the device options
 	if (old_system_name != system_name())
 	{
 		add_device_options();
-		
+
 		// if we failed the first time, try parsing again with the new options in place
 		if (!result)
 			result = core_options::parse_command_line(argc, argv, OPTION_PRIORITY_CMDLINE, error_string);
@@ -379,7 +379,7 @@ void emu_options::set_system_name(const char *name)
 {
 	// remember the original system name
 	astring old_system_name(system_name());
-	
+
 	// if the system name changed, fix up the device options
 	if (old_system_name != name)
 	{
@@ -395,7 +395,7 @@ void emu_options::set_system_name(const char *name)
 
 
 //-------------------------------------------------
-//  device_option - return the value of the 
+//  device_option - return the value of the
 //  device-specific option
 //-------------------------------------------------
 

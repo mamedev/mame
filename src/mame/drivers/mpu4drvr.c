@@ -2560,7 +2560,7 @@ incorrect behaviour manifesting in ridiculously large payouts.
 
 In fact, the software seems deliberately designed to mislead, but is (fortunately for
 us) prone to similar weaknesses that allow a per game solution.
- 
+
 */
 
 

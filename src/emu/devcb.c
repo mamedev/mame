@@ -343,7 +343,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 				resolved->target = device->owner();
 			else
 				resolved->target = device->siblingdevice(config->tag);
-		
+
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_write8: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 

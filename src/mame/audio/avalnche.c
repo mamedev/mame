@@ -131,5 +131,5 @@ DISCRETE_SOUND_END
 WRITE8_HANDLER( catch_audio_w )
 {
 	/* Different from avalnche, it plays a sound (offset 0/1/2) on data bit 0 rising edge.
-	There's no indication that the game silences sound, it's probably done automatically. */
+    There's no indication that the game silences sound, it's probably done automatically. */
 }
