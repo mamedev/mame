@@ -827,8 +827,8 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 
 	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
 
-	MCFG_deco16ic_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -873,8 +873,8 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 
 	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
 
-	MCFG_deco16ic_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -919,8 +919,8 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 
 	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
 
-	MCFG_deco16ic_ADD("tilegen1", nitrobal_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", nitrobal_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", nitrobal_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", nitrobal_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -967,8 +967,8 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 
 	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
 
-	MCFG_deco16ic_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

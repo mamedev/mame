@@ -496,8 +496,8 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	MCFG_VIDEO_START(backfire)
 
-	MCFG_deco16ic_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", backfire_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", backfire_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 4);

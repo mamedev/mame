@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( funkyjet, funkyjet_state )
 	MCFG_GFXDECODE(funkyjet)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_deco16ic_ADD("tilegen1", funkyjet_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen1", funkyjet_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 

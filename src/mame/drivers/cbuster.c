@@ -351,8 +351,8 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_GFXDECODE(cbuster)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_deco16ic_ADD("tilegen1", twocrude_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", twocrude_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", twocrude_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", twocrude_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);

@@ -54,7 +54,7 @@ public:
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;
 //  UINT16 *  spriteram;
-//  UINT16 *  paletteram;    // currently this uses generic palette handling (in deco_tilegen1.c)
+//  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
 //  size_t    spriteram_size;
 
 	/* misc */
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_GFXDECODE(mirage)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_deco16ic_ADD("tilegen1", mirage_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen1", mirage_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 

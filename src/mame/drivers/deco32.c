@@ -1827,8 +1827,8 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_GFXDECODE(captaven)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_deco16ic_ADD("tilegen1", captaven_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", captaven_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", captaven_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", captaven_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
@@ -1878,8 +1878,8 @@ static MACHINE_CONFIG_START( fghthist, deco32_state )
 	MCFG_GFXDECODE(fghthist)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_deco16ic_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
@@ -1925,8 +1925,8 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 	MCFG_GFXDECODE(fghthist)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_deco16ic_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
@@ -2039,8 +2039,8 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_SCREEN_UPDATE(dragngun)
 	MCFG_SCREEN_EOF(dragngun)
 
-	MCFG_deco16ic_ADD("tilegen1", dragngun_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", dragngun_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", dragngun_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", dragngun_deco16ic_tilegen2_intf)
 
 	MCFG_GFXDECODE(dragngun)
 	MCFG_PALETTE_LENGTH(2048)
@@ -2094,8 +2094,8 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_SCREEN_UPDATE(dragngun)
 	MCFG_SCREEN_EOF(dragngun)
 
-	MCFG_deco16ic_ADD("tilegen1", lockload_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", lockload_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", lockload_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", lockload_deco16ic_tilegen2_intf)
 
 	MCFG_GFXDECODE(dragngun)
 	MCFG_PALETTE_LENGTH(2048)
@@ -2177,8 +2177,8 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	
 	MCFG_SCREEN_UPDATE(nslasher)
 
-	MCFG_deco16ic_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
@@ -2223,8 +2223,8 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(nslasher)
 
-	MCFG_deco16ic_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
-	MCFG_deco16ic_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);

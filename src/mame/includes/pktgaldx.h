@@ -14,7 +14,7 @@ public:
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;
 	UINT16 *  spriteram;
-//  UINT16 *  paletteram;    // currently this uses generic palette handling (in deco_tilegen1.c)
+//  UINT16 *  paletteram;    // currently this uses generic palette handling (in decocomn.c)
 	size_t    spriteram_size;
 
 	UINT16*   pktgaldb_fgram;

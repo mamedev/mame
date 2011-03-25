@@ -8,8 +8,8 @@
 **************************************************************************/
 
 #pragma once
-#ifndef __deco16ic_H__
-#define __deco16ic_H__
+#ifndef __DECO16IC_H__
+#define __DECO16IC_H__
 
 #include "devcb.h"
 
@@ -35,15 +35,15 @@ struct _deco16ic_interface
 	int				   _8x8_gfxregion, _16x16_gfxregion;
 };
 
-DECLARE_LEGACY_DEVICE(deco16ic, deco16ic);
+DECLARE_LEGACY_DEVICE(DECO16IC, deco16ic);
 
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_deco16ic_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, deco16ic, 0) \
+#define MCFG_DECO16IC_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, DECO16IC, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
 /***************************************************************************

@@ -193,7 +193,7 @@ struct _deco16ic_state
 INLINE deco16ic_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
-	assert(device->type() == deco16ic);
+	assert(device->type() == DECO16IC);
 
 	return (deco16ic_state *)downcast<legacy_device_base *>(device)->token();
 }
@@ -201,7 +201,7 @@ INLINE deco16ic_state *get_safe_token( device_t *device )
 INLINE const deco16ic_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
-	assert((device->type() == deco16ic));
+	assert((device->type() == DECO16IC));
 	return (const deco16ic_interface *) device->baseconfig().static_config();
 }
 
@@ -993,4 +993,4 @@ DEVICE_GET_INFO( deco16ic )
 }
 
 
-DEFINE_LEGACY_DEVICE(deco16ic, deco16ic);
+DEFINE_LEGACY_DEVICE(DECO16IC, deco16ic);

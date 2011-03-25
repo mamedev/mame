@@ -289,9 +289,9 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	MCFG_PALETTE_LENGTH(1280)
 
 
-	MCFG_deco16ic_ADD("tilegen1", vaportra_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen1", vaportra_deco16ic_tilegen1_intf)
 
-	MCFG_deco16ic_ADD("tilegen2", vaportra_deco16ic_tilegen2_intf)
+	MCFG_DECO16IC_ADD("tilegen2", vaportra_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 
 	MCFG_VIDEO_START(wcvol95)
 
-	MCFG_deco16ic_ADD("tilegen1", deco156_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen1", deco156_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 	decospr_device_config::set_pri_callback(device, deco156_pri_callback);
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 
 	MCFG_VIDEO_START(wcvol95)
 
-	MCFG_deco16ic_ADD("tilegen1", deco156_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen1", deco156_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 	decospr_device_config::set_pri_callback(device, deco156_pri_callback);

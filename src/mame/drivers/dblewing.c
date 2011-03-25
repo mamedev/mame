@@ -654,7 +654,7 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_GFXDECODE(dblewing)
 
-	MCFG_deco16ic_ADD("tilegen1", dblewing_deco16ic_tilegen1_intf)
+	MCFG_DECO16IC_ADD("tilegen1", dblewing_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 	decospr_device_config::set_pri_callback(device, dblwings_pri_callback);
