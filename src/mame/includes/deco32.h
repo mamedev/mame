@@ -9,7 +9,6 @@ public:
 	timer_device *raster_irq_timer;
 	UINT8 nslasher_sound_irq;
 	int strobe;
-	int dragngun_lightgun_port;
 	int tattass_eprom_bit;
 	int lastClock;
 	char buffer[32];
@@ -19,45 +18,16 @@ public:
 	int byteAddr;
 	UINT8 bsmt_latch;
 	UINT8 bsmt_reset;
-	UINT32 *pf1_data;
-	UINT32 *pf2_data;
-	UINT32 *pf3_data;
-	UINT32 *pf4_data;
-	UINT32 *pf12_control;
-	UINT32 *pf34_control;
-	UINT32 *pf1_rowscroll32;
-	UINT32 *pf2_rowscroll32;
-	UINT32 *pf3_rowscroll32;
-	UINT32 *pf4_rowscroll32;
-	UINT32 *dragngun_sprite_layout_0_ram;
-	UINT32 *dragngun_sprite_layout_1_ram;
-	UINT32 *dragngun_sprite_lookup_0_ram;
-	UINT32 *dragngun_sprite_lookup_1_ram;
-	UINT32 *ace_ram;
-	UINT16 *raster_display_list;
-	int raster_display_position;
-	UINT8 *dirty_palette;
-	tilemap_t *pf1_tilemap;
-	tilemap_t *pf1a_tilemap;
-	tilemap_t *pf2_tilemap;
-	tilemap_t *pf3_tilemap;
-	tilemap_t *pf4_tilemap;
-	int pf1_bank;
-	int pf2_bank;
-	int pf3_bank;
-	int pf4_bank;
-	int pf1_flip;
-	int pf2_flip;
-	int pf3_flip;
-	int pf4_flip;
-	int pf2_colourbank;
-	int pf4_colourbank;
-	int pri;
-	bitmap_t *tilemap_alpha_bitmap;
-	UINT32 dragngun_sprite_ctrl;
+
 	int ace_ram_dirty;
 	int has_ace_ram;
-	int last_pf3_bank;
+	UINT32 *ace_ram;
+		
+	UINT8 *dirty_palette;
+
+	int pri;
+	bitmap_t *tilemap_alpha_bitmap;
+
 
 	UINT16 spriteram16[0x1000];
 	UINT16 spriteram16_buffered[0x1000];
@@ -67,10 +37,29 @@ public:
 	UINT16    pf2_rowscroll[0x1000];
 	UINT16    pf3_rowscroll[0x1000];
 	UINT16    pf4_rowscroll[0x1000];
-
+	// we use the pointers below to store a 32-bit copy..
+	UINT32 *pf1_rowscroll32;
+	UINT32 *pf2_rowscroll32;
+	UINT32 *pf3_rowscroll32;
+	UINT32 *pf4_rowscroll32;
 	
 	device_t *deco16ic;
 };
+
+class dragngun_state : public deco32_state
+{
+public:
+	dragngun_state(running_machine &machine, const driver_device_config_base &config)
+		: deco32_state(machine, config) { }
+
+	UINT32 *dragngun_sprite_layout_0_ram;
+	UINT32 *dragngun_sprite_layout_1_ram;
+	UINT32 *dragngun_sprite_lookup_0_ram;
+	UINT32 *dragngun_sprite_lookup_1_ram;
+	UINT32 dragngun_sprite_ctrl;
+	int dragngun_lightgun_port;
+};
+
 
 
 /*----------- defined in video/deco32.c -----------*/

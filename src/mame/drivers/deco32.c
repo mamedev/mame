@@ -446,7 +446,7 @@ static READ32_HANDLER( dragngun_prot_r )
 
 static READ32_HANDLER( dragngun_lightgun_r )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	dragngun_state *state = space->machine->driver_data<dragngun_state>();
 	/* Ports 0-3 are read, but seem unused */
 	switch (state->dragngun_lightgun_port) {
 	case 4: return input_port_read(space->machine, "LIGHT0_X");
@@ -461,7 +461,7 @@ static READ32_HANDLER( dragngun_lightgun_r )
 
 static WRITE32_HANDLER( dragngun_lightgun_w )
 {
-	deco32_state *state = space->machine->driver_data<deco32_state>();
+	dragngun_state *state = space->machine->driver_data<dragngun_state>();
 //  logerror("Lightgun port %d\n",state->dragngun_lightgun_port);
 	state->dragngun_lightgun_port=offset;
 }
@@ -846,27 +846,25 @@ static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x138000, 0x138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
 	AM_RANGE(0x138008, 0x13800b) AM_WRITE(deco32_palette_dma_w)
 
-//  AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE_MEMBER(deco32_state, pf12_control)
-	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE_MEMBER(deco32_state, pf12_control)
-	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
-	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
+	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
+	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 
-//  AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
-	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE_MEMBER(deco32_state, pf34_control)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE_MEMBER(deco32_state, pf4_data)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
-	AM_RANGE(0x1e4000, 0x1e4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf34_control_dword_r, deco16ic_pf34_control_dword_w)
+	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_dword_r, deco16ic_pf3_data_dword_w)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_dword_r, deco16ic_pf4_data_dword_w) // unused
+	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
+	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32) // unused
 
 	AM_RANGE(0x204800, 0x204fff) AM_RAM // ace? 0x10 byte increments only  // 13f ff stuff
 
 
-	AM_RANGE(0x208000, 0x208fff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_layout_0_ram)
-	AM_RANGE(0x20c000, 0x20cfff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_layout_1_ram)
-	AM_RANGE(0x210000, 0x217fff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_lookup_0_ram)
-	AM_RANGE(0x218000, 0x21ffff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_lookup_1_ram)
+	AM_RANGE(0x208000, 0x208fff) AM_RAM AM_BASE_MEMBER(dragngun_state, dragngun_sprite_layout_0_ram)
+	AM_RANGE(0x20c000, 0x20cfff) AM_RAM AM_BASE_MEMBER(dragngun_state, dragngun_sprite_layout_1_ram)
+	AM_RANGE(0x210000, 0x217fff) AM_RAM AM_BASE_MEMBER(dragngun_state, dragngun_sprite_lookup_0_ram)
+	AM_RANGE(0x218000, 0x21ffff) AM_RAM AM_BASE_MEMBER(dragngun_state, dragngun_sprite_lookup_1_ram)
 	AM_RANGE(0x220000, 0x221fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Main spriteram */
 
 	AM_RANGE(0x228000, 0x2283ff) AM_RAM //0x10 byte increments only
@@ -899,25 +897,23 @@ static ADDRESS_MAP_START( lockload_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x170000, 0x170007) AM_READ(lockload_gun_mirror_r) /* Not on Dragongun */
 	AM_RANGE(0x178008, 0x17800f) AM_WRITENOP /* Gun read ACK's */
 
-//  AM_RANGE(0x180000, 0x18001f) AM_RAM_WRITE(deco32_pf12_control_w) AM_BASE_MEMBER(deco32_state, pf12_control)
-	AM_RANGE(0x180000, 0x18001f) AM_RAM AM_BASE_MEMBER(deco32_state, pf12_control)
-	AM_RANGE(0x190000, 0x191fff) AM_RAM_WRITE(deco32_pf1_data_w) AM_BASE_MEMBER(deco32_state, pf1_data)
-	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_data_w) AM_BASE_MEMBER(deco32_state, pf2_data)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
+	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf12_control_dword_r, deco16ic_pf12_control_dword_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
+	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 
-//  AM_RANGE(0x1c0000, 0x1c001f) AM_RAM_WRITE(deco32_pf34_control_w) AM_BASE_MEMBER(deco32_state, pf34_control)
-	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM AM_BASE_MEMBER(deco32_state, pf34_control)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_RAM_WRITE(deco32_pf3_data_w) AM_BASE_MEMBER(deco32_state, pf3_data)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_data_w) AM_BASE_MEMBER(deco32_state, pf4_data)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
-	AM_RANGE(0x1e4000, 0x1e4fff) AM_RAM AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf34_control_dword_r, deco16ic_pf34_control_dword_w)
+	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_dword_r, deco16ic_pf3_data_dword_w)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_dword_r, deco16ic_pf4_data_dword_w) // unused
+	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
+	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32) // unused
 
 	AM_RANGE(0x204800, 0x204fff) AM_RAM				//0x10 byte increments only
-	AM_RANGE(0x208000, 0x208fff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_layout_0_ram)
-	AM_RANGE(0x20c000, 0x20cfff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_layout_1_ram)
-	AM_RANGE(0x210000, 0x217fff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_lookup_0_ram)
-	AM_RANGE(0x218000, 0x21ffff) AM_RAM AM_BASE_MEMBER(deco32_state, dragngun_sprite_lookup_1_ram)
+	AM_RANGE(0x208000, 0x208fff) AM_RAM AM_BASE_MEMBER(dragngun_state, dragngun_sprite_layout_0_ram)
+	AM_RANGE(0x20c000, 0x20cfff) AM_RAM AM_BASE_MEMBER(dragngun_state, dragngun_sprite_layout_1_ram)
+	AM_RANGE(0x210000, 0x217fff) AM_RAM AM_BASE_MEMBER(dragngun_state, dragngun_sprite_lookup_0_ram)
+	AM_RANGE(0x218000, 0x21ffff) AM_RAM AM_BASE_MEMBER(dragngun_state, dragngun_sprite_lookup_1_ram)
 	AM_RANGE(0x220000, 0x221fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Main spriteram */
 
 	AM_RANGE(0x228000, 0x2283ff) AM_RAM				//0x10 byte increments only
@@ -1586,7 +1582,7 @@ static const gfx_layout tilelayout =
 	64*8
 };
 
-static const gfx_layout tilelayout2 =
+static const gfx_layout tilelayout_8bpp =
 {
 	16,16,
 	RGN_FRAC(1,4),
@@ -1642,7 +1638,7 @@ static const gfx_layout spritelayout5 =
 static GFXDECODE_START( captaven )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,          0, 128 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,          0, 128 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout2,          0, 128 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_8bpp,          0, 128 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,        0, 32 )	/* Sprites 16x16 */
 GFXDECODE_END
 
@@ -1654,9 +1650,9 @@ static GFXDECODE_START( fghthist )
 GFXDECODE_END
 
 static GFXDECODE_START( dragngun )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        512, 16 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        768, 16 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout2,      1024,  4 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 16 )	/* Characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout_8bpp,      0,  4 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout4,       0, 32 )	/* Sprites 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, spritelayout5,       0, 32 )	/* Sprites 16x16 */
 GFXDECODE_END
@@ -1928,7 +1924,48 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dragngun, deco32_state )
+
+static int dragngun_bank_callback( int bank )
+{
+	bank = bank >> 4;
+	return bank * 0x1000;
+}
+
+
+static int dragngun_bank2_callback( int bank )
+{
+	bank = bank >> 5;
+	return bank * 0x1000;
+}
+
+
+static const deco16ic_interface dragngun_deco16ic_intf =
+{
+	"screen",
+	0, 0, 1, 1, // dragon gun definitely needs pf3/4 full width, bgs in 2nd attract demo.
+	0x0f, 0x0f, 0xff, 0xff,	/* trans masks (default values) */
+	0x20, 0x30, 0x04, 0x04, /* color base */
+	0x0f, 0x0f, 0x03, 0x03,	/* color masks (default values) */
+	dragngun_bank_callback,
+	dragngun_bank_callback,
+	dragngun_bank2_callback,
+	NULL
+};
+
+static const deco16ic_interface lockload_deco16ic_intf =
+{
+	"screen",
+	0, 0, 1, 0, // lockload definitely wants pf34 half width..
+	0x0f, 0x0f, 0xff, 0xff,	/* trans masks (default values) */
+	0x20, 0x30, 0x04, 0x04, /* color base */
+	0x0f, 0x0f, 0x03, 0x03,	/* color masks (default values) */
+	dragngun_bank_callback,
+	dragngun_bank_callback,
+	dragngun_bank2_callback,
+	NULL
+};
+
+static MACHINE_CONFIG_START( dragngun, dragngun_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1953,6 +1990,8 @@ static MACHINE_CONFIG_START( dragngun, deco32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(dragngun)
 	MCFG_SCREEN_EOF(dragngun)
+
+	MCFG_DECO16IC_ADD("deco_custom", dragngun_deco16ic_intf)
 
 	MCFG_GFXDECODE(dragngun)
 	MCFG_PALETTE_LENGTH(2048)
@@ -1980,7 +2019,7 @@ static MACHINE_CONFIG_START( dragngun, deco32_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lockload, deco32_state )
+static MACHINE_CONFIG_START( lockload, dragngun_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -2005,6 +2044,8 @@ static MACHINE_CONFIG_START( lockload, deco32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(dragngun)
 	MCFG_SCREEN_EOF(dragngun)
+
+	MCFG_DECO16IC_ADD("deco_custom", lockload_deco16ic_intf)
 
 	MCFG_GFXDECODE(dragngun)
 	MCFG_PALETTE_LENGTH(2048)
