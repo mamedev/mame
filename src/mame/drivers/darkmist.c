@@ -37,17 +37,6 @@ static WRITE8_HANDLER(darkmist_hw_w)
 	memory_set_bankptr(space->machine, "bank1",&space->machine->region("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
 }
 
-static READ8_HANDLER(t5182shared_r)
-{
-	return t5182_sharedram[offset];
-}
-
-static WRITE8_HANDLER(t5182shared_w)
-{
-	t5182_sharedram[offset] = data;
-}
-
-
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -61,7 +50,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc808, 0xc808) AM_READ_PORT("UNK")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd400, 0xd41f) AM_RAM AM_BASE_MEMBER(darkmist_state, scroll)
-	AM_RANGE(0xd600, 0xd67f) AM_READWRITE(t5182shared_r, t5182shared_w)
+	AM_RANGE(0xd600, 0xd67f) AM_READWRITE(t5182_sharedram_r, t5182_sharedram_w)
 	AM_RANGE(0xd680, 0xd680) AM_WRITE(t5182_sound_irq_w)
 	AM_RANGE(0xd681, 0xd681) AM_READ(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0xd682, 0xd682) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)

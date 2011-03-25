@@ -436,7 +436,7 @@ public:
 
 extern const char *const amiga_custom_names[0x100];
 
-extern void amiga_chip_ram_w8(amiga_state *state, offs_t offset, UINT8 data);
+void amiga_chip_ram_w8(amiga_state *state, offs_t offset, UINT8 data);
 
 void amiga_machine_config(running_machine *machine, const amiga_machine_interface *intf);
 

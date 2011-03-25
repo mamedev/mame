@@ -812,7 +812,7 @@ DRIVER_INIT( pceboard )
 	memory_install_write8_handler(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, eboard_rom_switch_w );
 
 	/* ppu_latch callback */
-	ppu_latch = mapper9_latch;
+	ppu2c0x_set_latch(machine->device("ppu"), mapper9_latch);
 
 	/* nvram at $6000-$6fff */
 	memory_install_ram(cputag_get_address_space(machine, "cart", ADDRESS_SPACE_PROGRAM), 0x6000, 0x6fff, 0, 0, NULL );

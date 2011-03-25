@@ -169,9 +169,7 @@ WRITE16_HANDLER( vertigo_wsot_w )
 
 static TIMER_CALLBACK( sound_command_w )
 {
-	exidy440_sound_command = param;
-	exidy440_sound_command_ack = 0;
-	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+	exidy440_sound_command(machine, param);
 
 	/* It is important that the sound cpu ACKs the sound command
        quickly. Otherwise the main CPU gives up with sound. Boosting
@@ -190,7 +188,7 @@ WRITE16_HANDLER( vertigo_audio_w )
 
 READ16_HANDLER( vertigo_sio_r )
 {
-	return exidy440_sound_command_ack ? 0xfc : 0xfd;
+	return exidy440_sound_command_ack() ? 0xfc : 0xfd;
 }
 
 

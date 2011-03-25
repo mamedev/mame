@@ -273,9 +273,6 @@ static void reset_common(running_machine *machine)
 	state->bg_status = 0x01;
 	state->flipscreen = 0;
 	state->palette_intensity = 0;
-
-	if (jal_blend_table != NULL)
-		memset(jal_blend_table, 0, 0xc00);
 }
 
 VIDEO_START( argus )
@@ -292,7 +289,7 @@ VIDEO_START( argus )
 	/* dummy RAM for back ground */
 	state->dummy_bg0ram = auto_alloc_array(machine, UINT8, 0x800);
 
-	jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
+	jal_blend_init(machine, 1);
 }
 
 VIDEO_RESET( argus )
@@ -317,7 +314,7 @@ VIDEO_START( valtric )
 
 	state->mosaicbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
-	jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
+	jal_blend_init(machine, 1);
 }
 
 VIDEO_RESET( valtric )
@@ -346,8 +343,7 @@ VIDEO_START( butasan )
 	state->butasan_txram      = &state->butasan_pagedram[1][0x000];
 	state->butasan_txbackram  = &state->butasan_pagedram[1][0x800];
 
-	jal_blend_table = auto_alloc_array(machine, UINT8, 0xc00);
-	//jal_blend_table = NULL;
+	jal_blend_init(machine, 1);
 }
 
 VIDEO_RESET( butasan )
@@ -396,7 +392,7 @@ static void argus_change_palette(running_machine *machine, int color, int lo_off
 	argus_state *state = machine->driver_data<argus_state>();
 	UINT8 lo = state->paletteram[lo_offs];
 	UINT8 hi = state->paletteram[hi_offs];
-	if (jal_blend_table != NULL) jal_blend_table[color] = hi & 0x0f;
+	jal_blend_set(color, hi & 0x0f);
 	palette_set_color_rgb(machine, color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 

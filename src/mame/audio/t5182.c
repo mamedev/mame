@@ -149,9 +149,6 @@ rom.
 #include "sound/2151intf.h"
 
 
-UINT8 *t5182_sharedram;
-
-
 enum
 {
 	VECTOR_INIT,
@@ -162,7 +159,18 @@ enum
 	CPU_CLEAR
 };
 
+static UINT8 *t5182_sharedram;
 static int irqstate;
+
+READ8_HANDLER(t5182_sharedram_r)
+{
+	return t5182_sharedram[offset];
+}
+
+WRITE8_HANDLER(t5182_sharedram_w)
+{
+	t5182_sharedram[offset] = data;
+}
 
 static TIMER_CALLBACK( setirq_callback )
 {

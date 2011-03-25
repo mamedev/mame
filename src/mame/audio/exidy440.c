@@ -71,11 +71,9 @@ typedef struct sound_cache_entry
 
 
 
-/* globals */
-UINT8 exidy440_sound_command;
-UINT8 exidy440_sound_command_ack;
-
 /* local allocated storage */
+static UINT8 sound_command;
+static UINT8 sound_command_ack;
 static UINT8 *sound_banks;
 static UINT8 *m6844_data;
 static UINT8 *sound_volume;
@@ -136,10 +134,10 @@ static DEVICE_START( exidy440_sound )
 	int i, length;
 
 	/* reset the system */
-	exidy440_sound_command = 0;
-	exidy440_sound_command_ack = 1;
-	state_save_register_global(machine, exidy440_sound_command);
-	state_save_register_global(machine, exidy440_sound_command_ack);
+	sound_command = 0;
+	sound_command_ack = 1;
+	state_save_register_global(machine, sound_command);
+	state_save_register_global(machine, sound_command_ack);
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -339,9 +337,23 @@ static READ8_HANDLER( sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
 	cputag_set_input_line(space->machine, "audiocpu", 1, CLEAR_LINE);
-	exidy440_sound_command_ack = 1;
+	sound_command_ack = 1;
 
-	return exidy440_sound_command;
+	return sound_command;
+}
+
+
+void exidy440_sound_command(running_machine *machine, UINT8 param)
+{
+	sound_command = param;
+	sound_command_ack = 0;
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_IRQ1, ASSERT_LINE);
+}
+
+
+UINT8 exidy440_sound_command_ack(void)
+{
+	return sound_command_ack;
 }
 
 

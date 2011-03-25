@@ -113,7 +113,7 @@ static int adder2_screen_page_reg;		  // access/display select
 static int adder2_c101;
 static int adder2_rx;
 static int adder_vbl_triggered;			  // flag <>0, VBL IRQ triggered
-int adder2_acia_triggered;		  // flag <>0, ACIA receive IRQ
+static int adder2_acia_triggered;		  // flag <>0, ACIA receive IRQ
 
 static UINT8 adder_ram[0xE80];				// normal RAM
 static UINT8 adder_screen_ram[2][0x1180];	// paged  display RAM
@@ -121,11 +121,11 @@ static UINT8 adder_screen_ram[2][0x1180];	// paged  display RAM
 static tilemap_t *tilemap0;  // tilemap screen0
 static tilemap_t *tilemap1;  // timemap screen1
 
-UINT8 adder2_data_from_sc2;
-UINT8 adder2_data_to_sc2;
+static UINT8 adder2_data_from_sc2;
+static UINT8 adder2_data_to_sc2;
 
-UINT8 adder2_data;
-UINT8 adder2_sc2data;
+static UINT8 adder2_data;
+static UINT8 adder2_sc2data;
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -412,6 +412,32 @@ static READ8_HANDLER( adder2_irq_r )
 
 	if ( adder_vbl_triggered )  status |= 0x02;
 	if ( adder2_acia_triggered ) status |= 0x08;
+
+	return status;
+}
+
+void adder2_send(int data)
+{
+	adder2_data_from_sc2 = 1;		// set flag, data from scorpion2 board available
+	adder2_sc2data       = data;	// store data
+
+	adder2_acia_triggered = 1;		// set flag, acia IRQ triggered
+}
+
+int adder2_receive(void)
+{
+	UINT8 data = adder2_data;
+	adder2_data_to_sc2 = 0;	  // clr flag, data from adder available
+
+	return data;
+}
+
+int adder2_status()
+{
+	int status = 0;
+
+	if ( adder2_data_to_sc2  ) status |= 0x01; // receive  buffer full
+	if ( !adder2_data_from_sc2) status |= 0x02; // transmit buffer empty
 
 	return status;
 }

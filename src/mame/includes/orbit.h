@@ -52,4 +52,4 @@ DISCRETE_SOUND_EXTERN( orbit );
 VIDEO_START( orbit );
 SCREEN_UPDATE( orbit );
 
-extern WRITE8_HANDLER( orbit_playfield_w );
+WRITE8_HANDLER( orbit_playfield_w );

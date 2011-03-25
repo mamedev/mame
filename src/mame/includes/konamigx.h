@@ -98,7 +98,7 @@ WRITE32_HANDLER( konamigx_t1_psacmap_w );
 WRITE32_HANDLER( konamigx_t4_psacmap_w );
 
 extern int konamigx_current_frame;
-extern WRITE32_HANDLER( konamigx_type3_psac2_bank_w );
+WRITE32_HANDLER( konamigx_type3_psac2_bank_w );
 extern UINT32* konamigx_type3_psac2_bank;
 
 

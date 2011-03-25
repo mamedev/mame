@@ -231,23 +231,23 @@ typedef struct
 } scc68070_regs_t;
 
 // Member functions
-extern TIMER_CALLBACK( scc68070_timer0_callback );
-extern TIMER_CALLBACK( scc68070_rx_callback );
-extern TIMER_CALLBACK( scc68070_tx_callback );
-extern READ16_HANDLER( scc68070_periphs_r );
-extern WRITE16_HANDLER( scc68070_periphs_w );
-//extern READ16_HANDLER( uart_loopback_enable );
+TIMER_CALLBACK( scc68070_timer0_callback );
+TIMER_CALLBACK( scc68070_rx_callback );
+TIMER_CALLBACK( scc68070_tx_callback );
+READ16_HANDLER( scc68070_periphs_r );
+WRITE16_HANDLER( scc68070_periphs_w );
+//READ16_HANDLER( uart_loopback_enable );
 
-extern void scc68070_init(running_machine *machine, scc68070_regs_t *scc68070);
-extern void scc68070_uart_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
-extern void scc68070_uart_tx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
-extern void scc68070_register_globals(running_machine *machine, scc68070_regs_t *scc68070);
+void scc68070_init(running_machine *machine, scc68070_regs_t *scc68070);
+void scc68070_uart_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
+void scc68070_uart_tx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
+void scc68070_register_globals(running_machine *machine, scc68070_regs_t *scc68070);
 
 // UART Access for Quizard
-extern void scc68070_set_quizard_mcu_value(running_machine *machine, UINT16 value);
-extern void scc68070_set_quizard_mcu_ack(running_machine *machine, UINT8 ack);
-extern void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
+void scc68070_set_quizard_mcu_value(running_machine *machine, UINT16 value);
+void scc68070_set_quizard_mcu_ack(running_machine *machine, UINT8 ack);
+void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
 
-extern INTERRUPT_GEN( scc68070_mcu_frame );
+INTERRUPT_GEN( scc68070_mcu_frame );
 
 #endif // _MACHINE_CDI070_H_

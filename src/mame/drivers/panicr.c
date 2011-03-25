@@ -175,7 +175,7 @@ static TILE_GET_INFO( get_txttile_info )
 static READ8_HANDLER(t5182shared_r)
 {
 	if ((offset & 1) == 0)
-		return t5182_sharedram[offset/2];
+		return t5182_sharedram_r(space, offset/2);
 	else
 		return 0;
 }
@@ -183,7 +183,7 @@ static READ8_HANDLER(t5182shared_r)
 static WRITE8_HANDLER(t5182shared_w)
 {
 	if ((offset & 1) == 0)
-		t5182_sharedram[offset/2] = data;
+		t5182_sharedram_w(space, offset/2, data);
 }
 
 

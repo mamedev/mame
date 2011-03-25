@@ -23,7 +23,7 @@ public:
 
 DISCRETE_SOUND_EXTERN( skyraid );
 
-extern WRITE8_DEVICE_HANDLER( skyraid_sound_w );
+WRITE8_DEVICE_HANDLER( skyraid_sound_w );
 
 
 /*----------- defined in video/skyraid.c -----------*/

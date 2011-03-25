@@ -183,11 +183,11 @@ struct _mcd212_ab_t
 };
 
 // Member functions
-extern READ16_HANDLER( mcd212_r );
-extern WRITE16_HANDLER( mcd212_w );
-extern TIMER_CALLBACK( mcd212_perform_scan );
-extern VIDEO_START( cdimono1 );
-extern SCREEN_UPDATE( cdimono1 );
-extern SCREEN_UPDATE( cdimono1_lcd );
+READ16_HANDLER( mcd212_r );
+WRITE16_HANDLER( mcd212_w );
+TIMER_CALLBACK( mcd212_perform_scan );
+VIDEO_START( cdimono1 );
+SCREEN_UPDATE( cdimono1 );
+SCREEN_UPDATE( cdimono1_lcd );
 
 #endif // _VIDEO_MCD212_H_

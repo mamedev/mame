@@ -378,7 +378,7 @@ joshi Vollyball set.
 
 ****************************************************************************/
 
-int josvolly_nmi_enable;
+static int josvolly_nmi_enable;
 
 typedef struct josvolly_8741_struct {
 	UINT8 cmd;
@@ -534,6 +534,11 @@ WRITE8_HANDLER( josvolly_8741_0_w ){ josvolly_8741_w(space,0,offset,data); }
 READ8_HANDLER( josvolly_8741_0_r ) { return josvolly_8741_r(space,0,offset); }
 WRITE8_HANDLER( josvolly_8741_1_w ) { josvolly_8741_w(space,1,offset,data); }
 READ8_HANDLER( josvolly_8741_1_r ) { return josvolly_8741_r(space,1,offset); }
+
+WRITE8_HANDLER( josvolly_nmi_enable_w )
+{
+	josvolly_nmi_enable = 1;
+}
 
 static struct
 {

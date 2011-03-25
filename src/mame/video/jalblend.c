@@ -16,7 +16,31 @@
 
 
 /* each palette entry contains a fourth 'alpha' value */
-UINT8 *jal_blend_table;
+static UINT8 *jal_blend_table;
+
+
+static void jal_blend_reset(running_machine &machine)
+{
+	memset(jal_blend_table, 0, 0xc00);
+}
+
+void jal_blend_init(running_machine *machine, int enable)
+{
+	if (enable)
+	{
+		jal_blend_table = auto_alloc_array_clear(machine, UINT8, 0xc00);
+		machine->add_notifier(MACHINE_NOTIFY_RESET, jal_blend_reset);
+	}
+	else
+	{
+		jal_blend_table = NULL;
+	}
+}
+
+void jal_blend_set(int color, UINT8 val)
+{
+	if (jal_blend_table) jal_blend_table[color] = val;
+}
 
 /*
  * 'Alpha' Format

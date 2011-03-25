@@ -108,6 +108,7 @@ struct _ppu2c0x_state
 	int                         scanlines_per_frame;	/* number of scanlines per frame */
 	rgb_t                       palette[64*4];		/* palette for this chip */
 	int                         security_value;		/* 2C05 protection */
+	void (*latch)( device_t *device, offs_t offset );
 };
 
 
@@ -121,7 +122,6 @@ static TIMER_CALLBACK( scanline_callback );
 static TIMER_CALLBACK( hblank_callback );
 static TIMER_CALLBACK( nmi_callback );
 
-void (*ppu_latch)( device_t *device, offs_t offset );
 
 /* palette handlers */
 static WRITE8_HANDLER( ppu2c0x_palette_write );
@@ -327,6 +327,12 @@ static const gfx_layout ppu_charlayout =
  *
  *************************************/
 
+void ppu2c0x_set_latch( device_t *device, void (*latch)(device_t *device, offs_t offset))
+{
+	ppu2c0x_state *ppu2c0x = get_token(device);
+	ppu2c0x->latch = latch;
+}
+
 static TIMER_CALLBACK( hblank_callback )
 {
 	device_t *device = (device_t *)ptr;
@@ -436,9 +442,9 @@ static void draw_background( device_t *device, UINT8 *line_priority )
 		page2 = ppu2c0x->space->read_byte(index1);
 
 		// 27/12/2002
-		if (ppu_latch)
+		if (ppu2c0x->latch)
 		{
-			(*ppu_latch)(device, (tile_page << 10) | (page2 << 4));
+			(*ppu2c0x->latch)(device, (tile_page << 10) | (page2 << 4));
 		}
 
 		if (start_x < VISIBLE_SCREEN_WIDTH)
@@ -577,8 +583,8 @@ static void draw_sprites( device_t *device, UINT8 *line_priority )
 			}
 		}
 
-		if (ppu_latch)
-			(*ppu_latch)(device, (sprite_page << 10) | ((tile & 0xff) << 4));
+		if (ppu2c0x->latch)
+			(*ppu2c0x->latch)(device, (sprite_page << 10) | ((tile & 0xff) << 4));
 
 		/* compute the character's line to draw */
 		sprite_line = scanline - sprite_ypos;
@@ -991,8 +997,8 @@ READ8_DEVICE_HANDLER( ppu2c0x_r )
 			break;
 
 		case PPU_DATA: /* 7 */
-			if (ppu_latch)
-				(*ppu_latch)(device, ppu2c0x->videomem_addr & 0x3fff);
+			if (ppu2c0x->latch)
+				(*ppu2c0x->latch)(device, ppu2c0x->videomem_addr & 0x3fff);
 
 			if (ppu2c0x->videomem_addr >= 0x3f00)
 			{
@@ -1142,8 +1148,8 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
 			{
 				int tempAddr = ppu2c0x->videomem_addr & 0x3fff;
 
-				if (ppu_latch)
-					(*ppu_latch)(device, tempAddr);
+				if (ppu2c0x->latch)
+					(*ppu2c0x->latch)(device, tempAddr);
 
 				/* if there's a callback, call it now */
 				if (ppu2c0x->vidaccess_callback_proc)

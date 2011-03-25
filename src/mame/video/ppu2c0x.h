@@ -120,8 +120,7 @@ void ppu2c0x_set_vidaccess_callback( device_t *device, ppu2c0x_vidaccess_cb cb )
 void ppu2c0x_set_scanlines_per_frame( device_t *device, int scanlines ) ATTR_NONNULL(1);
 
 //27/12/2002 (HACK!)
-extern void (*ppu_latch)( device_t *device, offs_t offset );
-
+void ppu2c0x_set_latch( device_t *device, void (*ppu_latch_t)( device_t *device, offs_t offset ));
 WRITE8_DEVICE_HANDLER( ppu2c0x_w );
 READ8_DEVICE_HANDLER( ppu2c0x_r );
 

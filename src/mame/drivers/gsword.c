@@ -250,17 +250,6 @@ static MACHINE_RESET( josvolly )
 	josvolly_8741_reset();
 }
 
-#if 0
-static INTERRUPT_GEN( josvolly_snd_interrupt )
-{
-	if(josvolly_nmi_enable)
-	{
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-		josvolly_nmi_enable = 0;
-	}
-}
-#endif
-
 static INTERRUPT_GEN( gsword_snd_interrupt )
 {
 	gsword_state *state = device->machine->driver_data<gsword_state>();
@@ -304,11 +293,6 @@ static WRITE8_DEVICE_HANDLER( gsword_nmi_set_w )
 	/* bit1= nmi disable , for ram check */
 	logerror("NMI controll %02x\n",data);
 #endif
-}
-
-static WRITE8_HANDLER( josvolly_nmi_enable_w )
-{
-	josvolly_nmi_enable = 1;
 }
 
 static WRITE8_DEVICE_HANDLER( gsword_AY8910_control_port_0_w )

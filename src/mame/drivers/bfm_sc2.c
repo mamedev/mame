@@ -257,42 +257,6 @@ static void e2ram_reset(running_machine *machine);
       0  1  1  0  0  0
 
 */
-///////////////////////////////////////////////////////////////////////////
-
-static void send_to_adder(running_machine *machine, int data)
-{
-	adder2_data_from_sc2 = 1;
-	adder2_sc2data       = data;
-
-	adder2_acia_triggered = 1;
-	cputag_set_input_line(machine, "adder2", M6809_IRQ_LINE, HOLD_LINE );
-
-	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-static int receive_from_adder(void)
-{
-	int data = adder2_data;
-	adder2_data_to_sc2 = 0;
-
-	LOG_SERIAL(("radder:  %02X(%c)\n",data, data ));
-
-	return data;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-static int get_scorpion2_uart_status(running_machine *machine)
-{
-	int status = 0;
-
-	if ( adder2_data_to_sc2  ) status |= 0x01;	// receive  buffer full
-	if ( !adder2_data_from_sc2) status |= 0x02; // transmit buffer empty
-
-	return status;
-}
 
 ///////////////////////////////////////////////////////////////////////////
 // called if board is reset ///////////////////////////////////////////////
@@ -1062,7 +1026,10 @@ static WRITE8_HANDLER( uart2data_w )
 
 static WRITE8_HANDLER( vid_uart_tx_w )
 {
-	send_to_adder(space->machine, data);
+	adder2_send(data);
+	cputag_set_input_line(space->machine, "adder2", M6809_IRQ_LINE, HOLD_LINE );
+
+	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1075,14 +1042,18 @@ static WRITE8_HANDLER( vid_uart_ctrl_w )
 
 static READ8_HANDLER( vid_uart_rx_r )
 {
-	return receive_from_adder();
+	int data = adder2_receive();
+
+	LOG_SERIAL(("radder:  %02X(%c)\n",data, data ));
+
+	return data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
 static READ8_HANDLER( vid_uart_ctrl_r )
 {
-	return get_scorpion2_uart_status(space->machine);
+	return adder2_status();
 }
 
 ///////////////////////////////////////////////////////////////////////////

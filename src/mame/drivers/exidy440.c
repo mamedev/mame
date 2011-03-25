@@ -346,7 +346,7 @@ static READ8_HANDLER( exidy440_input_port_3_r )
 static READ8_HANDLER( sound_command_ack_r )
 {
 	/* sound command acknowledgements come on bit 3 here */
-	return exidy440_sound_command_ack ? 0xf7 : 0xff;
+	return exidy440_sound_command_ack() ? 0xf7 : 0xff;
 }
 
 
@@ -359,11 +359,7 @@ static READ8_HANDLER( sound_command_ack_r )
 
 static TIMER_CALLBACK( delayed_sound_command_w )
 {
-	exidy440_sound_command = param;
-	exidy440_sound_command_ack = 0;
-
-	/* cause an FIRQ on the sound CPU */
-	cputag_set_input_line(machine, "audiocpu", 1, ASSERT_LINE);
+	exidy440_sound_command(machine, param);
 }
 
 

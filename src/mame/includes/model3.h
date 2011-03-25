@@ -108,12 +108,12 @@ void model3_set_irq_line(running_machine *machine, UINT8 bit, int state);
 
 /*----------- defined in machine/model3.c -----------*/
 
-extern void model3_machine_init(running_machine *machine, int step);
-extern int model3_tap_read(running_machine *machine);
-extern void model3_tap_write(running_machine *machine, int tck, int tms, int tdi, int trst);
-extern void model3_tap_reset(running_machine *machine);
-extern READ32_HANDLER(rtc72421_r);
-extern WRITE32_HANDLER(rtc72421_w);
+void model3_machine_init(running_machine *machine, int step);
+int model3_tap_read(running_machine *machine);
+void model3_tap_write(running_machine *machine, int tck, int tms, int tdi, int trst);
+void model3_tap_reset(running_machine *machine);
+READ32_HANDLER(rtc72421_r);
+WRITE32_HANDLER(rtc72421_w);
 
 
 /*----------- defined in video/model3.c -----------*/
