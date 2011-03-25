@@ -68,7 +68,7 @@ public:
 	/* devices */
 	device_t *maincpu;
 	device_t *audiocpu;
-	device_t *deco16ic;
+	device_t *deco_tilegen1;
 };
 
 UINT16 dblwings_pri_callback(UINT16 x)
@@ -90,16 +90,16 @@ UINT16 dblwings_pri_callback(UINT16 x)
 static SCREEN_UPDATE(dblewing)
 {
 	dblewing_state *state = screen->machine->driver_data<dblewing_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 0); /* not Confirmed */
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
-	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
-	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 4);
+	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
+	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 4);
 	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 0x400);
 	return 0;
 }
@@ -301,8 +301,8 @@ static WRITE16_HANDLER( dblewing_prot_w )
 static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM AM_BASE_MEMBER(dblewing_state, pf1_rowscroll)
 	AM_RANGE(0x106000, 0x106fff) AM_RAM AM_BASE_MEMBER(dblewing_state, pf2_rowscroll)
 
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
 	AM_RANGE(0x288000, 0x288001) AM_RAM
-	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
+	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_BASE_SIZE_MEMBER(dblewing_state, spriteram, spriteram_size)
 	AM_RANGE(0x320000, 0x3207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
@@ -540,7 +540,7 @@ static int dblewing_bank_callback( const int bank )
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-static const deco16ic_interface dblewing_deco16ic_intf =
+static const deco16ic_interface dblewing_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -558,7 +558,7 @@ static MACHINE_START( dblewing )
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
-	state->deco16ic = machine->device("deco_custom");
+	state->deco_tilegen1 = machine->device("tilegen1");
 
 	state->save_item(NAME(state->_008_data));
 	state->save_item(NAME(state->_104_data));
@@ -654,7 +654,7 @@ static MACHINE_CONFIG_START( dblewing, dblewing_state )
 	MCFG_PALETTE_LENGTH(4096)
 	MCFG_GFXDECODE(dblewing)
 
-	MCFG_DECO16IC_ADD("deco_custom", dblewing_deco16ic_intf)
+	MCFG_deco16ic_ADD("tilegen1", dblewing_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 	decospr_device_config::set_pri_callback(device, dblwings_pri_callback);

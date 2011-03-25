@@ -250,7 +250,7 @@ static int fghthist_bank_callback( int bank )
 	return bank * 0x1000;
 }
 
-static const deco16ic_interface fghthist_deco16ic_intf =
+static const deco16ic_interface fghthist_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -262,7 +262,7 @@ static const deco16ic_interface fghthist_deco16ic_intf =
 	0,1
 };
 
-static const deco16ic_interface fghthist_deco16ic34_intf =
+static const deco16ic_interface fghthist_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1,
@@ -767,16 +767,16 @@ static ADDRESS_MAP_START( captaven_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x178000, 0x178003) AM_WRITE(deco32_pri_w)
 
-	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x192000, 0x193fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w) /* Mirror address - bug in program code */
-	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x192000, 0x193fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w) /* Mirror address - bug in program code */
+	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
 	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("deco_custom34", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w) // unused
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w) // unused
 	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
 	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32) // unused
 ADDRESS_MAP_END
@@ -798,17 +798,17 @@ static ADDRESS_MAP_START( fghthist_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
 	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram_w)
 
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x192000, 0x193fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("deco_custom34", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
 	AM_RANGE(0x16c000, 0x16c01f) AM_READNOP
 	AM_RANGE(0x17c000, 0x17c03f) AM_READNOP
@@ -831,17 +831,17 @@ static ADDRESS_MAP_START( fghthsta_memmap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram_w)
 	AM_RANGE(0x17c020, 0x17c023) AM_READNOP
 
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x192000, 0x193fff)  AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
 	AM_RANGE(0x194000, 0x195fff)  AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1d2000, 0x1d3fff)  AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
 	AM_RANGE(0x1d4000, 0x1d5fff)  AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("deco_custom34", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(deco16_146_fghthist_prot_r, deco16_146_fghthist_prot_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
@@ -858,15 +858,15 @@ static ADDRESS_MAP_START( dragngun_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x138000, 0x138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
 	AM_RANGE(0x138008, 0x13800b) AM_WRITE(deco32_palette_dma_w)
 
-	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
 	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("deco_custom34", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w) // unused
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w) // unused
 	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
 	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32) // unused
 
@@ -909,15 +909,15 @@ static ADDRESS_MAP_START( lockload_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x170000, 0x170007) AM_READ(lockload_gun_mirror_r) /* Not on Dragongun */
 	AM_RANGE(0x178008, 0x17800f) AM_WRITENOP /* Gun read ACK's */
 
-	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
 	AM_RANGE(0x1a4000, 0x1a5fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
 
-	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("deco_custom34", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w) // unused
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x1d4000, 0x1d5fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w) // unused
 	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
 	AM_RANGE(0x1e4000, 0x1e5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32) // unused
 
@@ -971,17 +971,17 @@ static ADDRESS_MAP_START( tattass_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram2_w)
 	AM_RANGE(0x17c018, 0x17c01b) AM_WRITENOP /* Sprite 'CPU' (unused) */
 
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x192000, 0x193fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("deco_custom34", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
@@ -1012,17 +1012,17 @@ static ADDRESS_MAP_START( nslasher_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x17c010, 0x17c013) AM_WRITE(deco32_buffer_spriteram2_w)
 	AM_RANGE(0x17c018, 0x17c01b) AM_WRITENOP /* Sprite 'CPU' (unused) */
 
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x184000, 0x185fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x192000, 0x193fff) AM_RAM_WRITE(deco32_pf1_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf1_rowscroll32)
 	AM_RANGE(0x194000, 0x195fff) AM_RAM_WRITE(deco32_pf2_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf2_rowscroll32)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
-	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x1c2000, 0x1c3fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x1c4000, 0x1c5fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1d2000, 0x1d3fff) AM_RAM_WRITE(deco32_pf3_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf3_rowscroll32)
 	AM_RANGE(0x1d4000, 0x1d5fff) AM_RAM_WRITE(deco32_pf4_rowscroll_w) AM_BASE_MEMBER(deco32_state, pf4_rowscroll32)
-	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("deco_custom34", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x1e0000, 0x1e001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(nslasher_prot_r, nslasher_prot_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
@@ -1777,7 +1777,7 @@ static int captaven_bank_callback( int bank )
 }
 
 // pf4 not used (pf3 is in 8bpp mode)
-static const deco16ic_interface captaven_deco16ic_intf =
+static const deco16ic_interface captaven_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1, // pf12only, split, fullwidth12 / fullwidth34
@@ -1789,7 +1789,7 @@ static const deco16ic_interface captaven_deco16ic_intf =
 	0,1
 };
 
-static const deco16ic_interface captaven_deco16ic34_intf =
+static const deco16ic_interface captaven_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 0, // pf12only, split, fullwidth12 / fullwidth34
@@ -1827,8 +1827,8 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_GFXDECODE(captaven)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_DECO16IC_ADD("deco_custom", captaven_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", captaven_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen1", captaven_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", captaven_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
@@ -1878,8 +1878,8 @@ static MACHINE_CONFIG_START( fghthist, deco32_state )
 	MCFG_GFXDECODE(fghthist)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_DECO16IC_ADD("deco_custom", fghthist_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", fghthist_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
@@ -1925,8 +1925,8 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state )
 	MCFG_GFXDECODE(fghthist)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_DECO16IC_ADD("deco_custom", fghthist_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", fghthist_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen1", fghthist_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", fghthist_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
@@ -1965,7 +1965,7 @@ static int dragngun_bank2_callback( int bank )
 }
 
 
-static const deco16ic_interface dragngun_deco16ic_intf =
+static const deco16ic_interface dragngun_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1, // dragon gun definitely needs pf3/4 full width, bgs in 2nd attract demo.
@@ -1977,7 +1977,7 @@ static const deco16ic_interface dragngun_deco16ic_intf =
 	0,1,
 };
 
-static const deco16ic_interface dragngun_deco16ic34_intf =
+static const deco16ic_interface dragngun_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1, // dragon gun definitely needs pf3/4 full width, bgs in 2nd attract demo.
@@ -1989,7 +1989,7 @@ static const deco16ic_interface dragngun_deco16ic34_intf =
 	0,2,
 };
 
-static const deco16ic_interface lockload_deco16ic_intf =
+static const deco16ic_interface lockload_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1, // lockload definitely wants pf34 half width..
@@ -2001,7 +2001,7 @@ static const deco16ic_interface lockload_deco16ic_intf =
 	0,1,
 };
 
-static const deco16ic_interface lockload_deco16ic34_intf =
+static const deco16ic_interface lockload_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 0, // lockload definitely wants pf34 half width..
@@ -2039,8 +2039,8 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_SCREEN_UPDATE(dragngun)
 	MCFG_SCREEN_EOF(dragngun)
 
-	MCFG_DECO16IC_ADD("deco_custom", dragngun_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", dragngun_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen1", dragngun_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", dragngun_deco16ic_tilegen2_intf)
 
 	MCFG_GFXDECODE(dragngun)
 	MCFG_PALETTE_LENGTH(2048)
@@ -2094,8 +2094,8 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_SCREEN_UPDATE(dragngun)
 	MCFG_SCREEN_EOF(dragngun)
 
-	MCFG_DECO16IC_ADD("deco_custom", lockload_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", lockload_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen1", lockload_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", lockload_deco16ic_tilegen2_intf)
 
 	MCFG_GFXDECODE(dragngun)
 	MCFG_PALETTE_LENGTH(2048)
@@ -2130,7 +2130,7 @@ static int tattass_bank_callback( int bank )
 	return bank * 0x1000;
 }
 
-static const deco16ic_interface tattass_deco16ic_intf =
+static const deco16ic_interface tattass_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -2142,7 +2142,7 @@ static const deco16ic_interface tattass_deco16ic_intf =
 	0,1,
 };
 
-static const deco16ic_interface tattass_deco16ic34_intf =
+static const deco16ic_interface tattass_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1,
@@ -2177,8 +2177,8 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	
 	MCFG_SCREEN_UPDATE(nslasher)
 
-	MCFG_DECO16IC_ADD("deco_custom", tattass_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", tattass_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);
@@ -2223,8 +2223,8 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE(nslasher)
 
-	MCFG_DECO16IC_ADD("deco_custom", tattass_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", tattass_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen1", tattass_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", tattass_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 3);

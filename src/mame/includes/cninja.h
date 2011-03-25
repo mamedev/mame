@@ -6,6 +6,7 @@
 
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
+#include "video/decocomn.h"
 
 class cninja_state : public driver_device
 {
@@ -14,8 +15,9 @@ public:
 		: driver_device(machine, config),
 		  maincpu(*this, "maincpu"),
 		  audiocpu(*this, "audiocpu"),
-		  deco16ic(*this, "deco_custom"),
-		  deco16ic34(*this, "deco_custom34"),
+		  decocomn(*this, "deco_common"),
+		  deco_tilegen1(*this, "tilegen1"),
+		  deco_tilegen2(*this, "tilegen2"),
 		  raster_irq_timer(*this, "raster_timer"),
 		  oki2(*this, "oki2") { }
 
@@ -32,8 +34,9 @@ public:
 	/* devices */
 	required_device<cpu_device> maincpu;
 	required_device<cpu_device> audiocpu;
-	required_device<deco16ic_device> deco16ic;
-	required_device<deco16ic_device> deco16ic34;
+	required_device<decocomn_device> decocomn;
+	required_device<deco16ic_device> deco_tilegen1;
+	required_device<deco16ic_device> deco_tilegen2;
 	optional_device<timer_device> raster_irq_timer;
 	optional_device<okim6295_device> oki2;
 };

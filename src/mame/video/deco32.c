@@ -599,33 +599,33 @@ SCREEN_EOF( dragngun )
 SCREEN_UPDATE( captaven )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
-	state->deco16ic = screen->machine->device("deco_custom");
-	state->deco16ic34 = screen->machine->device("deco_custom34");
+	state->deco_tilegen1 = screen->machine->device("tilegen1");
+	state->deco_tilegen2 = screen->machine->device("tilegen2");
 
 	tilemap_set_flip_all(screen->machine,flip_screen_get(screen->machine) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x000]); // Palette index not confirmed
 
-	deco16ic_set_pf1_8bpp_mode(state->deco16ic34, 1);
+	deco16ic_set_pf1_8bpp_mode(state->deco_tilegen2, 1);
 
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf_update(state->deco16ic34, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
 
 	// pf4 not used (because pf3 is in 8bpp mode)
 
 	if ((state->pri&1)==0)
 	{
-		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 1);
-		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 1);
+		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
 	}
 	else
 	{
-		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 1);
-		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 1);
+		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 2);
 	}
 
-	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 4);
+	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 4);
 
 	screen->machine->device<decospr_device>("spritegen")->set_alt_format(true);
 	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffered, 0x400); 
@@ -636,19 +636,19 @@ SCREEN_UPDATE( captaven )
 SCREEN_UPDATE( dragngun )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
-	state->deco16ic = screen->machine->device("deco_custom");
-	state->deco16ic34 = screen->machine->device("deco_custom34");
+	state->deco_tilegen1 = screen->machine->device("tilegen1");
+	state->deco_tilegen2 = screen->machine->device("tilegen2");
 
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf_update(state->deco16ic34, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
 
-	//deco16ic_set_pf3_8bpp_mode(state->deco16ic, 1); // despite being 8bpp this doesn't require the same shifting as captaven, why not?
+	//deco16ic_set_pf3_8bpp_mode(state->deco_tilegen1, 1); // despite being 8bpp this doesn't require the same shifting as captaven, why not?
 
-	deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, 0, 0); // it uses pf3 in 8bpp mode instead, like captaven
-	deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 0);
-	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 0); // it uses pf3 in 8bpp mode instead, like captaven
+	deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 
 	// zooming sprite draw is very slow, and sprites are buffered.. however, one of the levels attempts to use
 	// partial updates for every line, which causes things to be very slow... the sprites appear to support
@@ -669,7 +669,7 @@ SCREEN_UPDATE( dragngun )
 		clip.max_y = 247;
 
 		dragngun_draw_sprites(screen->machine,bitmap,&clip,screen->machine->generic.buffered_spriteram.u32);
-		deco16ic_tilemap_1_draw(state->deco16ic, bitmap, &clip, 0, 0);
+		deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, &clip, 0, 0);
 
 	}
 
@@ -680,36 +680,36 @@ SCREEN_UPDATE( dragngun )
 SCREEN_UPDATE( fghthist )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
-	state->deco16ic = screen->machine->device("deco_custom");
-	state->deco16ic34 = screen->machine->device("deco_custom34");
+	state->deco_tilegen1 = screen->machine->device("tilegen1");
+	state->deco_tilegen2 = screen->machine->device("tilegen2");
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x000]); // Palette index not confirmed
 
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf_update(state->deco16ic34, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
 
 	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram16_buffered, 0x800, true); 
 
 	/* Draw screen */
-	deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, 0, 1);
+	deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 1);
 
 	if(state->pri&1)
 	{
-		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
 		screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
-		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 4);
+		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
-		deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 2);
+		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 2);
 		screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
-		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 4);
+		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 4);
 	}
 
 	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
 
-	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -858,11 +858,11 @@ SCREEN_UPDATE( nslasher )
 {
 	deco32_state *state = screen->machine->driver_data<deco32_state>();
 	int alphaTilemap=0;
-	state->deco16ic = screen->machine->device("deco_custom");
-	state->deco16ic34 = screen->machine->device("deco_custom34");
+	state->deco_tilegen1 = screen->machine->device("tilegen1");
+	state->deco_tilegen2 = screen->machine->device("tilegen2");
 
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf_update(state->deco16ic34, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
 
 	/* This is not a conclusive test for deciding if tilemap needs alpha blending */
 	if (state->ace_ram[0x17]!=0x0 && state->pri)
@@ -889,32 +889,32 @@ SCREEN_UPDATE( nslasher )
 	/* Draw playfields & sprites */
 	if (state->pri&2)
 	{
-		deco16ic_tilemap_12_combine_draw(state->deco16ic34, bitmap, cliprect, 0, 1, 1);
-		deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 4);
+		deco16ic_tilemap_12_combine_draw(state->deco_tilegen2, bitmap, cliprect, 0, 1, 1);
+		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
-		deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, 0, 1);
+		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 1);
 		if (state->pri&1)
 		{
-			deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				deco16ic_tilemap_1_draw(state->deco16ic34, state->tilemap_alpha_bitmap, cliprect, 0, 4);
+				deco16ic_tilemap_1_draw(state->deco_tilegen2, state->tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
-				deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 4);
+				deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 4);
 		}
 		else
 		{
-			deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 2);
 			if (alphaTilemap)
-				deco16ic_tilemap_2_draw(state->deco16ic, state->tilemap_alpha_bitmap, cliprect, 0, 4);
+				deco16ic_tilemap_2_draw(state->deco_tilegen1, state->tilemap_alpha_bitmap, cliprect, 0, 4);
 			else
-				deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 4);
+				deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 4);
 		}
 	}
 
 	mixDualAlphaSprites(bitmap, cliprect, screen->machine->gfx[3], screen->machine->gfx[4], alphaTilemap);
 
-	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -26,8 +26,8 @@ public:
 	/* devices */
 	device_t *maincpu;
 	device_t *audiocpu;
-	device_t *deco16ic;
-	device_t *deco16ic34;
+	device_t *deco_tilegen1;
+	device_t *deco_tilegen2;
 };
 
 

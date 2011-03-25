@@ -46,7 +46,7 @@ public:
 	mirage_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  maincpu(*this, "maincpu"),
-		  deco16ic(*this, "deco_custom"),
+		  deco_tilegen1(*this, "tilegen1"),
 		  oki_sfx(*this, "oki_sfx"),
 		  oki_bgm(*this, "oki_bgm") { }
 
@@ -54,7 +54,7 @@ public:
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;
 //  UINT16 *  spriteram;
-//  UINT16 *  paletteram;    // currently this uses generic palette handling (in deco16ic.c)
+//  UINT16 *  paletteram;    // currently this uses generic palette handling (in deco_tilegen1.c)
 //  size_t    spriteram_size;
 
 	/* misc */
@@ -62,7 +62,7 @@ public:
 
 	/* devices */
 	required_device<m68000_device> maincpu;
-	required_device<deco16ic_device> deco16ic;
+	required_device<deco16ic_device> deco_tilegen1;
 	required_device<okim6295_device> oki_sfx;
 	required_device<okim6295_device> oki_bgm;
 };
@@ -75,19 +75,19 @@ static VIDEO_START( mirage )
 static SCREEN_UPDATE( mirage )
 {
 	mirage_state *state = screen->machine->driver_data<mirage_state>();
-	UINT16 flip = deco16ic_pf_control_r(state->deco16ic, 0, 0xffff);
+	UINT16 flip = deco16ic_pf_control_r(state->deco_tilegen1, 0, 0xffff);
 
 	flip_screen_set(screen->machine, BIT(flip, 7));
 
 	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0x400); 
 
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 256); /* not verified */
 
-	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
-	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	screen->machine->device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(screen->machine, bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
 
 	return 0;
@@ -138,8 +138,8 @@ static WRITE16_HANDLER( okim0_rombank_w )
 static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	/* tilemaps */
-	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w) // 0x100000 - 0x101fff tested
-	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w) // 0x102000 - 0x102fff tested
+	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w) // 0x100000 - 0x101fff tested
+	AM_RANGE(0x102000, 0x103fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w) // 0x102000 - 0x102fff tested
 	/* linescroll */
 	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf1_rowscroll)
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf2_rowscroll)
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x140006, 0x140007) AM_READ(random_readers)
 //  AM_RANGE(0x150006, 0x150007) AM_READNOP
 	AM_RANGE(0x160000, 0x160001) AM_WRITENOP
-	AM_RANGE(0x168000, 0x16800f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
+	AM_RANGE(0x168000, 0x16800f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x16a000, 0x16a001) AM_WRITENOP
 	AM_RANGE(0x16c000, 0x16c001) AM_WRITE(okim1_rombank_w)
 	AM_RANGE(0x16c002, 0x16c003) AM_WRITE(okim0_rombank_w)
@@ -287,7 +287,7 @@ static int mirage_bank_callback( const int bank )
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-static const deco16ic_interface mirage_deco16ic_intf =
+static const deco16ic_interface mirage_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -341,7 +341,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_GFXDECODE(mirage)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_DECO16IC_ADD("deco_custom", mirage_deco16ic_intf)
+	MCFG_deco16ic_ADD("tilegen1", mirage_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 

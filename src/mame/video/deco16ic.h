@@ -2,13 +2,14 @@
 
     deco16ic.h
 
-    Implementation of various Data East custom 16bit video ICs
+    Implementation of Data East tilemap ICs
+	Data East IC 55 / 56 / 74 / 141
 
 **************************************************************************/
 
 #pragma once
-#ifndef __DECO16IC_H__
-#define __DECO16IC_H__
+#ifndef __deco16ic_H__
+#define __deco16ic_H__
 
 #include "devcb.h"
 
@@ -34,15 +35,15 @@ struct _deco16ic_interface
 	int				   _8x8_gfxregion, _16x16_gfxregion;
 };
 
-DECLARE_LEGACY_DEVICE(DECO16IC, deco16ic);
+DECLARE_LEGACY_DEVICE(deco16ic, deco16ic);
 
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_DECO16IC_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, DECO16IC, 0) \
+#define MCFG_deco16ic_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, deco16ic, 0) \
 	MCFG_DEVICE_CONFIG(_interface)
 
 /***************************************************************************
@@ -55,12 +56,9 @@ WRITE16_DEVICE_HANDLER( deco16ic_pf2_data_w );
 READ16_DEVICE_HANDLER( deco16ic_pf1_data_r );
 READ16_DEVICE_HANDLER( deco16ic_pf2_data_r );
 
-
 WRITE16_DEVICE_HANDLER( deco16ic_pf_control_w );
 
-
 READ16_DEVICE_HANDLER( deco16ic_pf_control_r );
-
 
 WRITE32_DEVICE_HANDLER( deco16ic_pf1_data_dword_w );
 WRITE32_DEVICE_HANDLER( deco16ic_pf2_data_dword_w );
@@ -72,15 +70,6 @@ WRITE32_DEVICE_HANDLER( deco16ic_pf_control_dword_w );
 
 READ32_DEVICE_HANDLER( deco16ic_pf_control_dword_r );
 
-WRITE16_DEVICE_HANDLER( deco16ic_nonbuffered_palette_w );
-WRITE16_DEVICE_HANDLER( deco16ic_buffered_palette_w );
-WRITE16_DEVICE_HANDLER( deco16ic_palette_dma_w );
-
-WRITE16_DEVICE_HANDLER( deco16ic_priority_w );
-READ16_DEVICE_HANDLER( deco16ic_priority_r );
-
-READ16_DEVICE_HANDLER( deco16ic_71_r );
-
 void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap);
 
 void deco16ic_pf_update(device_t *device, const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr);
@@ -90,14 +79,6 @@ void deco16ic_tilemap_2_draw(device_t *device, bitmap_t *bitmap, const rectangle
 
 /* used by boogwing, nitrobal */
 void deco16ic_tilemap_12_combine_draw(device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority, int is_tattoo = false);
-
-/* used by boogwing, dassault, nitrobal */
-void deco16ic_clear_sprite_priority_bitmap(device_t *device);
-void deco16ic_pdrawgfx(
-		device_t *device,
-		bitmap_t *dest,const rectangle *clip,const gfx_element *gfx,
-		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		int transparent_color,UINT32 pri_mask,UINT32 sprite_mask,UINT8 write_pri,UINT8 alpha);
 
 /* used by robocop2 */
 void deco16ic_set_tilemap_colour_mask(device_t *device, int tmap, int mask);

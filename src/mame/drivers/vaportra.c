@@ -52,12 +52,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100003) AM_WRITE(vaportra_priority_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(vaportra_sound_w)
 	AM_RANGE(0x100000, 0x10000f) AM_READ(vaportra_control_r)
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
-	AM_RANGE(0x280000, 0x281fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x282000, 0x283fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
+	AM_RANGE(0x280000, 0x281fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x282000, 0x283fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x300000, 0x3009ff) AM_RAM_WRITE(vaportra_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x304000, 0x3049ff) AM_RAM_WRITE(vaportra_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x308000, 0x308001) AM_NOP
@@ -217,7 +217,7 @@ static int vaportra_bank_callback( const int bank )
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-static const deco16ic_interface vaportra_deco16ic_intf =
+static const deco16ic_interface vaportra_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -230,7 +230,7 @@ static const deco16ic_interface vaportra_deco16ic_intf =
 };
 
 
-static const deco16ic_interface vaportra_deco16ic34_intf =
+static const deco16ic_interface vaportra_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1,
@@ -248,8 +248,8 @@ static MACHINE_START( vaportra )
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
-	state->deco16ic = machine->device("deco_custom");
-	state->deco16ic34 = machine->device("deco_custom34");
+	state->deco_tilegen1 = machine->device("tilegen1");
+	state->deco_tilegen2 = machine->device("tilegen2");
 
 	state->save_item(NAME(state->priority));
 }
@@ -289,9 +289,9 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	MCFG_PALETTE_LENGTH(1280)
 
 
-	MCFG_DECO16IC_ADD("deco_custom", vaportra_deco16ic_intf)
+	MCFG_deco16ic_ADD("tilegen1", vaportra_deco16ic_tilegen1_intf)
 
-	MCFG_DECO16IC_ADD("deco_custom34", vaportra_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen2", vaportra_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

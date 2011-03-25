@@ -31,12 +31,12 @@ SCREEN_UPDATE( simpl156 )
 
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
 
 	bitmap_fill(bitmap, cliprect, 256);
 
-	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
-	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 4);
+	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
+	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 4);
 
 	//FIXME: flip_screen_x should not be written!
 	flip_screen_set_no_update(screen->machine, 1);

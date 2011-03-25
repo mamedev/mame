@@ -87,13 +87,13 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-
+#include "video/decocomn.h"
 
 static ADDRESS_MAP_START( boogwing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
+	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE("deco_common", decocomn_priority_w)
 	AM_RANGE(0x220002, 0x22000f) AM_NOP
 
 	AM_RANGE(0x240000, 0x240001) AM_WRITE(buffer_spriteram16_w)
@@ -106,22 +106,22 @@ static ADDRESS_MAP_START( boogwing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE(deco16_104_prot_w) AM_BASE(&deco16_prot_ram)
 
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
-	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf1_rowscroll)
 	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf2_rowscroll)
 
-	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
-	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("deco_custom34", deco16ic_pf1_data_w)
-	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("deco_custom34", deco16ic_pf2_data_w)
+	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
+	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_pf1_data_w)
+	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_pf2_data_w)
 	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf3_rowscroll)
 	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_BASE_MEMBER(boogwing_state, pf4_rowscroll)
 
 	AM_RANGE(0x280000, 0x28000f) AM_NOP // ?
 	AM_RANGE(0x282000, 0x282001) AM_NOP // Palette setup?
-	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w)
-	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE("deco_common", decocomn_palette_dma_w)
+	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x3c0000, 0x3c004f) AM_RAM // ?
 ADDRESS_MAP_END
@@ -308,7 +308,12 @@ static int boogwing_bank_callback2( const int bank )
 	return offset;
 }
 
-static const deco16ic_interface boogwing_deco16ic_intf =
+static const decocomn_interface boogwing_decocomn_intf =
+{
+	"screen",
+};
+
+static const deco16ic_interface boogwing_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -320,7 +325,7 @@ static const deco16ic_interface boogwing_deco16ic_intf =
 	0, 1
 };
 
-static const deco16ic_interface boogwing_deco16ic34_intf =
+static const deco16ic_interface boogwing_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1, 
@@ -357,8 +362,10 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_PALETTE_LENGTH(2048)
 	MCFG_GFXDECODE(boogwing)
 
-	MCFG_DECO16IC_ADD("deco_custom", boogwing_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", boogwing_deco16ic34_intf)
+	MCFG_DECOCOMN_ADD("deco_common", boogwing_decocomn_intf)
+
+	MCFG_deco16ic_ADD("tilegen1", boogwing_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", boogwing_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

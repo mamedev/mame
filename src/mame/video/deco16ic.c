@@ -1,5 +1,12 @@
 /********************************************************************************
 
+	 deco16ic.c
+
+    Implementation of Data East tilemap ICs
+	Data East IC 55 / 56 / 74 / 141
+
+	original work by Bryan McPhail, various updates David Haywood
+
     Data East video emulation & information by Bryan McPhail, mish@tendril.co.uk (c) 2000-2005 Bryan McPhail
     Please send me any additions to the table below.
 
@@ -141,7 +148,8 @@ Rowscroll style:
     2010-02: Converted to be a device.
     TODO:
 		- convert to c++ device
-		- splite tilemap emulation from other emulation
+		- should the decryption functions for the tilemap chips be here too?
+
 
 ***************************************************************************/
 
@@ -157,20 +165,13 @@ struct _deco16ic_state
 
 	UINT16 *pf1_data, *pf2_data;
 	UINT16 *pf12_control;
-	UINT16 *raster_display_list;
-	UINT8 *dirty_palette;
 
 	const UINT16 *pf1_rowscroll_ptr, *pf2_rowscroll_ptr;
 
 	tilemap_t *pf1_tilemap_16x16, *pf2_tilemap_16x16;
 	tilemap_t *pf1_tilemap_8x8, *pf2_tilemap_8x8;
-	bitmap_t *sprite_priority_bitmap;
 
 	deco16_bank_cb  bank_cb[2];
-
-	UINT16 priority;
-
-	int raster_display_position;
 
 	int use_custom_pf1, use_custom_pf2;
 
@@ -192,7 +193,7 @@ struct _deco16ic_state
 INLINE deco16ic_state *get_safe_token( device_t *device )
 {
 	assert(device != NULL);
-	assert(device->type() == DECO16IC);
+	assert(device->type() == deco16ic);
 
 	return (deco16ic_state *)downcast<legacy_device_base *>(device)->token();
 }
@@ -200,81 +201,9 @@ INLINE deco16ic_state *get_safe_token( device_t *device )
 INLINE const deco16ic_interface *get_interface( device_t *device )
 {
 	assert(device != NULL);
-	assert((device->type() == DECO16IC));
+	assert((device->type() == deco16ic));
 	return (const deco16ic_interface *) device->baseconfig().static_config();
 }
-
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
-
-/* Later games have double buffered paletteram - the real palette ram is
-only updated on a DMA call */
-
-WRITE16_DEVICE_HANDLER( deco16ic_nonbuffered_palette_w )
-{
-	int r,g,b;
-
-	COMBINE_DATA(&device->machine->generic.paletteram.u16[offset]);
-	if (offset&1) offset--;
-
-	b = (device->machine->generic.paletteram.u16[offset] >> 0) & 0xff;
-	g = (device->machine->generic.paletteram.u16[offset + 1] >> 8) & 0xff;
-	r = (device->machine->generic.paletteram.u16[offset + 1] >> 0) & 0xff;
-
-	palette_set_color(device->machine, offset / 2, MAKE_RGB(r,g,b));
-}
-
-WRITE16_DEVICE_HANDLER( deco16ic_buffered_palette_w )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-
-	COMBINE_DATA(&device->machine->generic.paletteram.u16[offset]);
-
-	deco16ic->dirty_palette[offset / 2] = 1;
-}
-
-WRITE16_DEVICE_HANDLER( deco16ic_palette_dma_w )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	const int m = device->machine->total_colors();
-	int r, g, b, i;
-
-	for (i = 0; i < m; i++)
-	{
-		if (deco16ic->dirty_palette[i])
-		{
-			deco16ic->dirty_palette[i] = 0;
-
-			b = (device->machine->generic.paletteram.u16[i * 2] >> 0) & 0xff;
-			g = (device->machine->generic.paletteram.u16[i * 2 + 1] >> 8) & 0xff;
-			r = (device->machine->generic.paletteram.u16[i * 2 + 1] >> 0) & 0xff;
-
-			palette_set_color(device->machine, i, MAKE_RGB(r,g,b));
-		}
-	}
-}
-
-/*****************************************************************************************/
-
-/* */
-READ16_DEVICE_HANDLER( deco16ic_71_r )
-{
-	return 0xffff;
-}
-
-WRITE16_DEVICE_HANDLER( deco16ic_priority_w )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	deco16ic->priority = data;
-}
-
-READ16_DEVICE_HANDLER( deco16ic_priority_r )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	return deco16ic->priority;
-}
-
 
 /*****************************************************************************************/
 
@@ -917,86 +846,6 @@ void deco16ic_print_debug_info(device_t *device, bitmap_t *bitmap)
 
 /*****************************************************************************************/
 
-void deco16ic_clear_sprite_priority_bitmap( device_t *device )
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-
-	if (deco16ic->sprite_priority_bitmap)
-		bitmap_fill(deco16ic->sprite_priority_bitmap, NULL, 0);
-}
-
-/* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */
-void deco16ic_pdrawgfx(
-		device_t *device,
-		bitmap_t *dest, const rectangle *clip, const gfx_element *gfx,
-		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
-		int transparent_color, UINT32 pri_mask, UINT32 sprite_mask, UINT8 write_pri, UINT8 alpha)
-{
-	deco16ic_state *deco16ic = get_safe_token(device);
-	int ox, oy, cx, cy;
-	int x_index, y_index, x, y;
-	bitmap_t *priority_bitmap = gfx->machine->priority_bitmap;
-	const pen_t *pal = &gfx->machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-	const UINT8 *code_base = gfx_element_get_data(gfx, code % gfx->total_elements);
-
-	/* check bounds */
-	ox = sx;
-	oy = sy;
-
-	if (sx > 319 || sy > 247 || sx < -15 || sy < -7)
-		return;
-
-	if (sy < 0) sy = 0;
-	if (sx < 0) sx = 0;
-
-	if (sx > 319) cx = 319;
-	else cx = ox + 16;
-
-	cy = (sy - oy);
-
-	if (flipy) y_index = 15 - cy; else y_index = cy;
-
-	for (y = 0; y < 16 - cy; y++)
-	{
-		const UINT8 *source = code_base + (y_index * gfx->line_modulo);
-		UINT32 *destb = BITMAP_ADDR32(dest, sy, 0);
-		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, sy, 0);
-		UINT8 *spri = BITMAP_ADDR8(deco16ic->sprite_priority_bitmap, sy, 0);
-
-		if (sy >= 0 && sy < 248)
-		{
-			if (flipx) { source += 15 - (sx - ox); x_index = -1; }
-			else       { source += (sx - ox); x_index = 1; }
-
-			for (x = sx; x < cx; x++)
-			{
-				int c = *source;
-				if (c != transparent_color && x >= 0 && x < 320)
-				{
-					if (pri_mask>pri[x] && sprite_mask>spri[x])
-					{
-						if (alpha != 0xff)
-							destb[x] = alpha_blend_r32(destb[x], pal[c], alpha);
-						else
-							destb[x] = pal[c];
-						if (write_pri)
-							pri[x] |= pri_mask;
-					}
-					spri[x] |= sprite_mask;
-				}
-				source += x_index;
-			}
-		}
-
-		sy++;
-		if (sy > 247)
-			return;
-		if (flipy) y_index--; else y_index++;
-	}
-}
-
-/*****************************************************************************************/
-
 void deco16ic_tilemap_1_draw( device_t *device, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
@@ -1050,13 +899,6 @@ static DEVICE_START( deco16ic )
 {
 	deco16ic_state *deco16ic = get_safe_token(device);
 	const deco16ic_interface *intf = get_interface(device);
-	int width, height;
-
-	deco16ic->screen = device->machine->device<screen_device>(intf->screen);
-	width = deco16ic->screen->width();
-	height = deco16ic->screen->height();
-
-	deco16ic->sprite_priority_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED8);
 
 	deco16ic->bank_cb[0] = intf->bank_cb0;
 	deco16ic->bank_cb[1] = intf->bank_cb1;
@@ -1072,7 +914,7 @@ static DEVICE_START( deco16ic )
 
 	deco16ic->pf1_tilemap_16x16 =	tilemap_create_device(device, get_pf1_tile_info, deco16_scan_rows, 16, 16, intf->full_width12 ? 64 : 32, 32);
 //	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, intf->full_width12 ? 64 : 32, 32);
-	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, 64 , 32);
+	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, 64 , 32); // nitroball
 
 	deco16ic->pf12_8x8_gfx_bank = intf->_8x8_gfxregion;
 	deco16ic->pf12_16x16_gfx_bank = intf->_16x16_gfxregion;
@@ -1095,16 +937,11 @@ static DEVICE_START( deco16ic )
 
 	deco16ic->pf1_8bpp_mode = 0;
 
-	deco16ic->dirty_palette = auto_alloc_array_clear(device->machine, UINT8, 4096);
-	deco16ic->raster_display_list = auto_alloc_array_clear(device->machine, UINT16, 20 * 256 / 2);
-
 	deco16ic->pf1_data = auto_alloc_array_clear(device->machine, UINT16, 0x2000 / 2);
 	deco16ic->pf2_data = auto_alloc_array_clear(device->machine, UINT16, 0x2000 / 2);
 	deco16ic->pf12_control = auto_alloc_array_clear(device->machine, UINT16, 0x10 / 2);
 
 
-	device->save_item(NAME(deco16ic->priority));
-	device->save_item(NAME(deco16ic->raster_display_position));
 	device->save_item(NAME(deco16ic->use_custom_pf1));
 	device->save_item(NAME(deco16ic->use_custom_pf2));
 	device->save_item(NAME(deco16ic->pf1_bank));
@@ -1116,8 +953,6 @@ static DEVICE_START( deco16ic )
 
 	device->save_item(NAME(deco16ic->pf1_8bpp_mode));
 
-	device->save_pointer(NAME(deco16ic->dirty_palette), 4096);
-	device->save_pointer(NAME(deco16ic->raster_display_list), 20 * 256 / 2);
 	device->save_pointer(NAME(deco16ic->pf1_data), 0x2000 / 2);
 	device->save_pointer(NAME(deco16ic->pf2_data), 0x2000 / 2);
 	device->save_pointer(NAME(deco16ic->pf12_control), 0x10 / 2);
@@ -1129,15 +964,8 @@ static DEVICE_RESET( deco16ic )
 	deco16ic_state *deco16ic = get_safe_token(device);
 
 	deco16ic->pf1_bank = deco16ic->pf2_bank = 0;
-
-
-	deco16ic->raster_display_position = 0;
-
 	deco16ic->pf12_last_small = deco16ic->pf12_last_big = -1;
-
-	deco16ic->priority = 0;
 	deco16ic->use_custom_pf1 = deco16ic->use_custom_pf2 = 0;
-
 	deco16ic->pf1_rowscroll_ptr = 0;
 	deco16ic->pf2_rowscroll_ptr = 0;
 }
@@ -1165,4 +993,4 @@ DEVICE_GET_INFO( deco16ic )
 }
 
 
-DEFINE_LEGACY_DEVICE(DECO16IC, deco16ic);
+DEFINE_LEGACY_DEVICE(deco16ic, deco16ic);

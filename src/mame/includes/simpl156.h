@@ -14,7 +14,7 @@ public:
 	simpl156_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  maincpu(*this, "maincpu"),
-		  deco16ic(*this, "deco_custom"),
+		  deco_tilegen1(*this, "tilegen1"),
 		  eeprom(*this, "eeprom"),
 		  okimusic(*this, "okimusic") { }
 
@@ -28,7 +28,7 @@ public:
 
 	/* devices */
 	required_device<cpu_device> maincpu;
-	required_device<deco16ic_device> deco16ic;
+	required_device<deco16ic_device> deco_tilegen1;
 	required_device<eeprom_device> eeprom;
 	required_device<okim6295_device> okimusic;
 };

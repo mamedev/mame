@@ -40,8 +40,8 @@ public:
 
 	/* devices */
 	device_t *maincpu;
-	device_t *deco16ic;
-	device_t *deco16ic34;
+	device_t *deco_tilegen1;
+	device_t *deco_tilegen2;
 
 	device_t *lscreen;
 	device_t *rscreen;
@@ -91,8 +91,8 @@ static SCREEN_UPDATE( backfire )
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
-	deco16ic_pf_update(state->deco16ic34, state->pf3_rowscroll, state->pf4_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen2, state->pf3_rowscroll, state->pf4_rowscroll);
 
 	if (screen == state->lscreen)
 	{
@@ -102,14 +102,14 @@ static SCREEN_UPDATE( backfire )
 
 		if (state->left_priority[0] == 0)
 		{
-			deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 1);
-			deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 1);
+			deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
 			screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_1, 0x800);
 		}
 		else if (state->left_priority[0] == 2)
 		{
-			deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 2);
-			deco16ic_tilemap_1_draw(state->deco16ic34, bitmap, cliprect, 0, 4);
+			deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 4);
 			screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_1, 0x800);
 		}
 		else
@@ -122,14 +122,14 @@ static SCREEN_UPDATE( backfire )
 
 		if (state->right_priority[0] == 0)
 		{
-			deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, 0, 1);
-			deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 1);
+			deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
 			screen->machine->device<decospr_device>("spritegen2")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_2, 0x800);
 		}
 		else if (state->right_priority[0] == 2)
 		{
-			deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, 0, 2);
-			deco16ic_tilemap_2_draw(state->deco16ic34, bitmap, cliprect, 0, 4);
+			deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 2);
+			deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 4);
 			screen->machine->device<decospr_device>("spritegen2")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram_2, 0x800);
 		}
 		else
@@ -250,14 +250,14 @@ static WRITE32_HANDLER( backfire_spriteram2_w )
 
 static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
 	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
-	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE("deco_custom34", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x150000, 0x150fff) AM_READWRITE(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
 	AM_RANGE(0x154000, 0x154fff) AM_READWRITE(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
 	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
@@ -414,7 +414,7 @@ static int backfire_bank_callback( int bank )
 	return bank * 0x1000;
 }
 
-static const deco16ic_interface backfire_deco16ic_intf =
+static const deco16ic_interface backfire_deco16ic_tilegen1_intf =
 {
 	"lscreen",
 	0, 1,
@@ -426,7 +426,7 @@ static const deco16ic_interface backfire_deco16ic_intf =
 	0,1
 };
 
-static const deco16ic_interface backfire_deco16ic34_intf =
+static const deco16ic_interface backfire_deco16ic_tilegen2_intf =
 {
 	"lscreen",
 	0, 1,
@@ -443,8 +443,8 @@ static MACHINE_START( backfire )
 	backfire_state *state = machine->driver_data<backfire_state>();
 
 	state->maincpu = machine->device("maincpu");
-	state->deco16ic = machine->device("deco_custom");
-	state->deco16ic34 = machine->device("deco_custom34");
+	state->deco_tilegen1 = machine->device("tilegen1");
+	state->deco_tilegen2 = machine->device("tilegen2");
 	state->lscreen = machine->device("lscreen");
 	state->rscreen = machine->device("rscreen");
 	state->eeprom = machine->device("eeprom");
@@ -496,8 +496,8 @@ static MACHINE_CONFIG_START( backfire, backfire_state )
 
 	MCFG_VIDEO_START(backfire)
 
-	MCFG_DECO16IC_ADD("deco_custom", backfire_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", backfire_deco16ic34_intf)
+	MCFG_deco16ic_ADD("tilegen1", backfire_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", backfire_deco16ic_tilegen2_intf)
 
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 4);

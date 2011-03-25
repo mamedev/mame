@@ -6,6 +6,7 @@
 
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
+#include "video/decocomn.h"
 
 class dassault_state : public driver_device
 {
@@ -15,8 +16,9 @@ public:
 		  maincpu(*this, "maincpu"),
 		  audiocpu(*this, "audiocpu"),
 		  subcpu(*this, "sub"),
-		  deco16ic(*this, "deco_custom"),
-		  deco16ic34(*this, "deco_custom34"),
+		  decocomn(*this, "deco_common"),
+		  deco_tilegen1(*this, "tilegen1"),
+		  deco_tilegen2(*this, "tilegen2"),
 		  oki2(*this, "oki2") { }
 
 	/* memory pointers */
@@ -30,8 +32,9 @@ public:
 	required_device<cpu_device> maincpu;
 	required_device<cpu_device> audiocpu;
 	required_device<cpu_device> subcpu;
-	required_device<deco16ic_device> deco16ic;
-	required_device<deco16ic_device> deco16ic34;
+	required_device<decocomn_device> decocomn;
+	required_device<deco16ic_device> deco_tilegen1;
+	required_device<deco16ic_device> deco_tilegen2;
 	required_device<okim6295_device> oki2;
 };
 

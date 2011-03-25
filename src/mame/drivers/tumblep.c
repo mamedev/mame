@@ -119,9 +119,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepop_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE_MEMBER(tumblep_state, spriteram, spriteram_size)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
-	AM_RANGE(0x320000, 0x320fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x322000, 0x322fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x320000, 0x320fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x322000, 0x322fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, pf1_rowscroll) // unused
 	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, pf2_rowscroll) // unused
 ADDRESS_MAP_END
@@ -285,7 +285,7 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
-static const deco16ic_interface tumblep_deco16ic_intf =
+static const deco16ic_interface tumblep_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -302,7 +302,7 @@ static MACHINE_START( tumblep )
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
-	state->deco16ic = machine->device("deco_custom");
+	state->deco_tilegen1 = machine->device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( tumblep, tumblep_state )
@@ -329,7 +329,7 @@ static MACHINE_CONFIG_START( tumblep, tumblep_state )
 	MCFG_GFXDECODE(tumblep)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_DECO16IC_ADD("deco_custom", tumblep_deco16ic_intf)
+	MCFG_deco16ic_ADD("tilegen1", tumblep_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 

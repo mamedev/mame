@@ -69,9 +69,9 @@ static ADDRESS_MAP_START( supbtime_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(sound_w)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_r, deco16ic_pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll)
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf2_rowscroll)
 ADDRESS_MAP_END
@@ -84,9 +84,9 @@ static ADDRESS_MAP_START( chinatwn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_r, deco16ic_pf_control_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf1_rowscroll) // unused
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, pf2_rowscroll) // unused
 ADDRESS_MAP_END
@@ -320,7 +320,7 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
-static const deco16ic_interface supbtime_deco16ic_intf =
+static const deco16ic_interface supbtime_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -337,7 +337,7 @@ static MACHINE_START( supbtime )
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
-	state->deco16ic = machine->device("deco_custom");
+	state->deco_tilegen1 = machine->device("tilegen1");
 }
 
 static MACHINE_CONFIG_START( supbtime, supbtime_state )
@@ -366,7 +366,7 @@ static MACHINE_CONFIG_START( supbtime, supbtime_state )
 	MCFG_GFXDECODE(supbtime)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_DECO16IC_ADD("deco_custom", supbtime_deco16ic_intf)
+	MCFG_deco16ic_ADD("tilegen1", supbtime_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 
@@ -409,7 +409,7 @@ static MACHINE_CONFIG_START( chinatwn, supbtime_state )
 	MCFG_GFXDECODE(supbtime)
 	MCFG_PALETTE_LENGTH(1024)
 
-	MCFG_DECO16IC_ADD("deco_custom", supbtime_deco16ic_intf)
+	MCFG_deco16ic_ADD("tilegen1", supbtime_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 

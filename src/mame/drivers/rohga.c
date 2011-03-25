@@ -112,7 +112,7 @@
 #include "includes/rohga.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
+#include "video/decocomn.h"
 
 static READ16_HANDLER( rohga_irq_ack_r )
 {
@@ -136,8 +136,8 @@ static WRITE16_HANDLER( wizdfire_irq_ack_w )
 static ADDRESS_MAP_START( rohga_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
-	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
 
 	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w)  AM_BASE(&deco16_prot_ram) /* Protection device */
 
@@ -145,15 +145,15 @@ static ADDRESS_MAP_START( rohga_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
 	AM_RANGE(0x310000, 0x310009) AM_WRITENOP /* Palette control? */
-	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
+	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE("deco_common", decocomn_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
-	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
+	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE("deco_common", decocomn_priority_w)
 	AM_RANGE(0x321100, 0x321101) AM_READ(rohga_irq_ack_r) /* Irq ack?  Value not used */
 
-	AM_RANGE(0x3c0000, 0x3c1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x3c4000, 0x3c4fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x3c6000, 0x3c6fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x3c0000, 0x3c1fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x3c4000, 0x3c4fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x3c6000, 0x3c6fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 
 	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
 	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
@@ -161,26 +161,26 @@ static ADDRESS_MAP_START( rohga_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
 
 	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wizdfire_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x202fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x208000, 0x208fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x20a000, 0x20afff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x202fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x208000, 0x208fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x20a000, 0x20afff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 
 	AM_RANGE(0x20b000, 0x20b3ff) AM_WRITEONLY /* ? Always 0 written */
 	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
 	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
 
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
-	AM_RANGE(0x310000, 0x31000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x310000, 0x31000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
 
-	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE("deco_custom", deco16ic_priority_w) /* Priority */
+	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE("deco_common", decocomn_priority_w) /* Priority */
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
 	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
@@ -189,8 +189,8 @@ static ADDRESS_MAP_START( wizdfire_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(buffer_spriteram16_2_w) /* Triggers DMA for spriteram */
 
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w)
+	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_palette_dma_w)
 
 	AM_RANGE(0xfe4000, 0xfe47ff) AM_READWRITE(deco16_104_prot_r,deco16_104_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
@@ -199,20 +199,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nitrobal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x2027ff) AM_MIRROR(0x800) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x208000, 0x2087ff) AM_MIRROR(0x800) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x20a000, 0x20a7ff) AM_MIRROR(0x800) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x2027ff) AM_MIRROR(0x800) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x208000, 0x2087ff) AM_MIRROR(0x800) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x20a000, 0x20a7ff) AM_MIRROR(0x800) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 
 	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
 	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
 	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
 	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
 
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
-	AM_RANGE(0x310000, 0x31000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x310000, 0x31000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
 
-	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("DSW3") AM_DEVWRITE("deco_custom", deco16ic_priority_w) /* Priority */
+	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("DSW3") AM_DEVWRITE("deco_common", decocomn_priority_w) /* Priority */
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
 	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
@@ -221,8 +221,8 @@ static ADDRESS_MAP_START( nitrobal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(buffer_spriteram16_2_w) /* Triggers DMA for spriteram */
 
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w)
+	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_common", decocomn_palette_dma_w)
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
 	AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
@@ -231,30 +231,30 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( schmeisr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", deco16ic_pf_control_w)
-	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("deco_custom34", deco16ic_pf_control_w)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
 	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSW3")  AM_WRITE(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
 	AM_RANGE(0x310002, 0x310003) AM_READ_PORT("IN1")
 	AM_RANGE(0x310000, 0x310009) AM_WRITENOP /* Palette control? */
-	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
+	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE("deco_common", decocomn_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
-	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
+	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE("deco_common", decocomn_priority_w)
 	AM_RANGE(0x321100, 0x321101) AM_WRITE(wizdfire_irq_ack_w)  /* Irq ack?  Value not used */
 
-	AM_RANGE(0x3c0000, 0x3c1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x3c4000, 0x3c4fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x3c6000, 0x3c6fff) AM_DEVREADWRITE("deco_custom34", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x3c0000, 0x3c1fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x3c4000, 0x3c4fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x3c6000, 0x3c6fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
 	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
 	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
 	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
 
 	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff7fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
@@ -741,12 +741,17 @@ static const ym2151_interface ym2151_config =
 
 /**********************************************************************************/
 
+static const decocomn_interface rohga_decocomn_intf =
+{
+	"screen",
+};
+
 static int rohga_bank_callback( const int bank )
 {
 	return ((bank >> 4) & 0x3) << 12;
 }
 
-static const deco16ic_interface rohga_deco16ic_intf =
+static const deco16ic_interface rohga_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -758,7 +763,7 @@ static const deco16ic_interface rohga_deco16ic_intf =
 	0, 1,
 };
 
-static const deco16ic_interface rohga_deco16ic34_intf =
+static const deco16ic_interface rohga_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 1,
@@ -770,7 +775,7 @@ static const deco16ic_interface rohga_deco16ic34_intf =
 	0, 2,
 };
 
-static const deco16ic_interface nitrobal_deco16ic_intf =
+static const deco16ic_interface nitrobal_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 0,
@@ -782,7 +787,7 @@ static const deco16ic_interface nitrobal_deco16ic_intf =
 	0, 1,
 };
 
-static const deco16ic_interface nitrobal_deco16ic34_intf =
+static const deco16ic_interface nitrobal_deco16ic_tilegen2_intf =
 {
 	"screen",
 	0, 0,
@@ -820,8 +825,10 @@ static MACHINE_CONFIG_START( rohga, rohga_state )
 
 	MCFG_VIDEO_START(rohga)
 
-	MCFG_DECO16IC_ADD("deco_custom", rohga_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", rohga_deco16ic34_intf)
+	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
+
+	MCFG_deco16ic_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -864,8 +871,10 @@ static MACHINE_CONFIG_START( wizdfire, rohga_state )
 	MCFG_GFXDECODE(wizdfire)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_DECO16IC_ADD("deco_custom", rohga_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", rohga_deco16ic34_intf)
+	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
+
+	MCFG_deco16ic_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -908,8 +917,10 @@ static MACHINE_CONFIG_START( nitrobal, rohga_state )
 	MCFG_GFXDECODE(wizdfire)
 	MCFG_PALETTE_LENGTH(2048)
 
-	MCFG_DECO16IC_ADD("deco_custom", nitrobal_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", nitrobal_deco16ic34_intf)
+	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
+
+	MCFG_deco16ic_ADD("tilegen1", nitrobal_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", nitrobal_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -954,8 +965,10 @@ static MACHINE_CONFIG_START( schmeisr, rohga_state )
 
 	MCFG_VIDEO_START(rohga)
 
-	MCFG_DECO16IC_ADD("deco_custom", rohga_deco16ic_intf)
-	MCFG_DECO16IC_ADD("deco_custom34", rohga_deco16ic34_intf)
+	MCFG_DECOCOMN_ADD("deco_common", rohga_decocomn_intf)
+
+	MCFG_deco16ic_ADD("tilegen1", rohga_deco16ic_tilegen1_intf)
+	MCFG_deco16ic_ADD("tilegen2", rohga_deco16ic_tilegen2_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

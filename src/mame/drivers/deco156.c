@@ -29,12 +29,12 @@ public:
 	deco156_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  maincpu(*this, "maincpu"),
-		  deco16ic(*this, "deco_custom"),
+		  deco_tilegen1(*this, "tilegen1"),
 		  oki2(*this, "oki2") { }
 
 	/* devices */
 	required_device<arm_device> maincpu;
-	required_device<deco16ic_device> deco16ic;
+	required_device<deco16ic_device> deco_tilegen1;
 	optional_device<okim6295_device> oki2;
 
 	/* memory */
@@ -66,11 +66,11 @@ static SCREEN_UPDATE( wcvol95 )
 	bitmap_fill(screen->machine->priority_bitmap, NULL, 0);
 	bitmap_fill(bitmap, NULL, 0);
 
-	deco16ic_pf_update(state->deco16ic, state->pf1_rowscroll, state->pf2_rowscroll);
+	deco16ic_pf_update(state->deco_tilegen1, state->pf1_rowscroll, state->pf2_rowscroll);
 
-	deco16ic_tilemap_2_draw(state->deco16ic, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	screen->machine->device<decospr_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 0x800);
-	deco16ic_tilemap_1_draw(state->deco16ic, bitmap, cliprect, 0, 0);
+	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
@@ -130,9 +130,9 @@ static ADDRESS_MAP_START( hvysmsh_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x12000c, 0x12000f) AM_DEVWRITE("oki1", hvysmsh_oki_0_bank_w)
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x160000, 0x160003) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(deco156_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
@@ -142,9 +142,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wcvol95_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("deco_custom", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
 	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
 	AM_RANGE(0x130000, 0x137fff) AM_RAM
@@ -312,7 +312,7 @@ static int deco156_bank_callback(const int bank)
 	return ((bank >> 4) & 0x7) * 0x1000;
 }
 
-static const deco16ic_interface deco156_deco16ic_intf =
+static const deco16ic_interface deco156_deco16ic_tilegen1_intf =
 {
 	"screen",
 	0, 1,
@@ -360,7 +360,7 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 
 	MCFG_VIDEO_START(wcvol95)
 
-	MCFG_DECO16IC_ADD("deco_custom", deco156_deco16ic_intf)
+	MCFG_deco16ic_ADD("tilegen1", deco156_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 	decospr_device_config::set_pri_callback(device, deco156_pri_callback);
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 
 	MCFG_VIDEO_START(wcvol95)
 
-	MCFG_DECO16IC_ADD("deco_custom", deco156_deco16ic_intf)
+	MCFG_deco16ic_ADD("tilegen1", deco156_deco16ic_tilegen1_intf)
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
 	decospr_device_config::set_pri_callback(device, deco156_pri_callback);

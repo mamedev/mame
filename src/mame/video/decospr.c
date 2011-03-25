@@ -34,7 +34,7 @@
 
    notes:
    does the chip natively support 5bpp (tattass / nslasher) in hw, or is it done with doubled up chips?
-   the information in deco16ic lists 3x sprite chips on those games, but there are only 2 spritelists.
+   the information in deco_tilegen1 lists 3x sprite chips on those games, but there are only 2 spritelists.
 
 */
 
