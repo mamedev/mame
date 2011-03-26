@@ -1969,7 +1969,7 @@ static INPUT_PORTS_START( hal21 )
 
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DSW1:1" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )          /* Dual Controls, simultaneous play */
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )         /* Alternative play */
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:3")
