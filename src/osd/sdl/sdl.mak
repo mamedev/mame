@@ -364,7 +364,8 @@ else
 
 # FIXME: remove the directfb ref. later. This is just there for now to work around an issue with SDL1.3.
 INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
-INCPATH += `$(SDL_INSTALL_ROOT)/bin/sdl-config --cflags  | sed 's:/SDL::'`
+INCPATH += `$(SDL_INSTALL_ROOT)/bin/sdl-config --cflags  | sed -e 's:/SDL::' -e 's:\(-D[^ ]*\)::g'`
+CCOMFLAGS += `$(SDL_INSTALL_ROOT)/bin/sdl-config --cflags  | sed -e 's:/SDL::' -e 's:\(-I[^ ]*\)::g'`
 LIBS += -lm `$(SDL_INSTALL_ROOT)/bin/sdl-config --libs`
 endif
 
