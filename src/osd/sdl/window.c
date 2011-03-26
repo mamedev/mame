@@ -606,13 +606,13 @@ static void sdlwindow_update_cursor_state(running_machine *machine, sdl_window_i
 		{
 			SDL_ShowCursor(SDL_ENABLE);
 			if (SDL_GetWindowGrab(window->sdl_window ))
-				SDL_SetWindowGrab(window->sdl_window, 0);
+				SDL_SetWindowGrab(window->sdl_window, SDL_FALSE);
 		}
 		else
 		{
 			SDL_ShowCursor(SDL_DISABLE);
 			if (!SDL_GetWindowGrab(window->sdl_window))
-				SDL_SetWindowGrab(window->sdl_window, 1);
+				SDL_SetWindowGrab(window->sdl_window, SDL_TRUE);
 		}
 		SDL_SetCursor(NULL); // Force an update in case the underlying driver has changed visibility
 	}
@@ -818,7 +818,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		minimum_height -= 4;
 	}
 
-	num = SDL_GetNumDisplayModes();
+	num = SDL_GetNumDisplayModes(window->monitor->handle);
 
 	if (num == 0)
 	{
@@ -830,7 +830,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 		for (i = 0; i < num; ++i)
 		{
 			SDL_DisplayMode mode;
-			SDL_GetDisplayMode(i, &mode);
+			SDL_GetDisplayMode(window->monitor->handle, i, &mode);
 
 			// compute initial score based on difference between target and current
 			size_score = 1.0f / (1.0f + fabsf((INT32)mode.w - target_width) + fabsf((INT32)mode.h - target_height));

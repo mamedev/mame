@@ -642,7 +642,7 @@ static void devmap_init(running_machine *machine, device_map_t *devmap, const ch
 		if (dev_name && *dev_name && strcmp(dev_name,SDLOPTVAL_AUTO))
 		{
 			devmap->map[dev].name = remove_spaces(machine, dev_name);
-			mame_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, joy_map.map[dev].name);
+			mame_printf_verbose("%s: Logical id %d: %s\n", label, dev + 1, devmap->map[dev].name);
 			devmap->initialized = 1;
 		}
 	}
@@ -1002,7 +1002,7 @@ static kt_table * sdlinput_read_keymap(running_machine *machine)
 //  sdlinput_register_keyboards
 //============================================================
 
-#if (!SDL13_POST_HG4464 && SDL_VERSION_ATLEAST(1,3,0))
+#if ((1 ||!SDL13_POST_HG4464) && SDL_VERSION_ATLEAST(1,3,0))
 static void sdlinput_register_keyboards(running_machine *machine)
 {
 	int physical_keyboard;
@@ -1015,8 +1015,9 @@ static void sdlinput_register_keyboards(running_machine *machine)
 
 	for (physical_keyboard = 0; physical_keyboard < SDL_GetNumKeyboards(); physical_keyboard++)
 	{
-		char defname[90];
-		snprintf(defname, sizeof(defname)-1, "Keyboard #%d", physical_keyboard + 1);
+		//char defname[90];
+		//snprintf(defname, sizeof(defname)-1, "Keyboard #%d", physical_keyboard + 1);
+		char *defname = remove_spaces(machine, SDL_GetKeyboardName(SDL_GetKeyboard(physical_keyboard) ));
 
 		devmap_register(&keyboard_map, physical_keyboard, defname);
 	}
@@ -1081,7 +1082,7 @@ static void sdlinput_register_keyboards(running_machine *machine)
 		snprintf(defname, sizeof(defname)-1, "%s", key_trans_table[keynum].ui_name);
 
 		// add the item to the device
-//      printf("Keynum %d => sdl key %d\n", keynum, OSD_SDL_INDEX(key_trans_table[keynum].sdl_key));
+//		printf("Keynum %d => sdl key %d\n", keynum, OSD_SDL_INDEX(key_trans_table[keynum].sdl_key));
 		input_device_item_add(devinfo->device, defname, &devinfo->keyboard.state[OSD_SDL_INDEX(key_trans_table[keynum].sdl_key)], itemid, generic_button_get_state);
 	}
 
@@ -1306,7 +1307,7 @@ void sdlinput_poll(running_machine *machine)
 		switch(event.type) {
 		case SDL_KEYDOWN:
 			devinfo = generic_device_find_index( keyboard_list, keyboard_map.logical[event.key.which]);
-//          printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name, OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
+			//printf("Key down %d %d %s => %d %s (scrlock keycode is %d)\n", event.key.which, event.key.keysym.scancode, devinfo->name, OSD_SDL_INDEX_KEYSYM(&event.key.keysym), sdl_key_trans_table[event.key.keysym.scancode].mame_key_name, KEYCODE_SCRLOCK);
 			devinfo->keyboard.state[OSD_SDL_INDEX_KEYSYM(&event.key.keysym)] = 0x80;
 #if (!SDL_VERSION_ATLEAST(1,3,0))
 			ui_input_push_char_event(machine, sdl_window_list->target, (unicode_char) event.key.keysym.unicode);

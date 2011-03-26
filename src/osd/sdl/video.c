@@ -166,8 +166,7 @@ void sdlvideo_monitor_refresh(sdl_monitor_info *monitor)
 	#if (SDL_VERSION_ATLEAST(1,3,0))
 	SDL_DisplayMode dmode;
 
-	SDL_SelectVideoDisplay(monitor->handle);
-	SDL_GetDesktopDisplayMode(&dmode);
+	SDL_GetDesktopDisplayMode(monitor->handle, &dmode);
 	monitor->monitor_width = dmode.w;
 	monitor->monitor_height = dmode.h;
 	monitor->center_width = dmode.w;
@@ -448,10 +447,9 @@ static void init_monitors(void)
 
 	#if (SDL_VERSION_ATLEAST(1,3,0))
 	{
-		int i, temp;
+		int i;
 
 		mame_printf_verbose("Enter init_monitors\n");
-		temp = SDL_GetCurrentVideoDisplay();
 
 		for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
 		{
@@ -463,8 +461,7 @@ static void init_monitors(void)
 
 			snprintf(monitor->monitor_device, sizeof(monitor->monitor_device)-1, "%s%d", SDLOPTION_SCREEN,i);
 
-			SDL_SelectVideoDisplay(i);
-			SDL_GetDesktopDisplayMode(&dmode);
+			SDL_GetDesktopDisplayMode(i, &dmode);
 			monitor->monitor_width = dmode.w;
 			monitor->monitor_height = dmode.h;
 			monitor->center_width = dmode.w;
@@ -482,7 +479,6 @@ static void init_monitors(void)
 			*tailptr = monitor;
 			tailptr = &monitor->next;
 		}
-		SDL_SelectVideoDisplay(temp);
 	}
 	mame_printf_verbose("Leave init_monitors\n");
 	#elif defined(SDLMAME_WIN32)

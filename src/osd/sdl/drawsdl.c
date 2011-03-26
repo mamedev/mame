@@ -263,7 +263,7 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 	UINT32 fmt;
 
 	// Determine preferred pixelformat and set up yuv if necessary
-	SDL_GetCurrentDisplayMode(&mode);
+	SDL_GetCurrentDisplayMode(window->monitor->handle, &mode);
 
 	if (sdl->yuv_bitmap)
 	{
@@ -414,12 +414,10 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 			SDL_WINDOW_BORDERLESS | SDL_WINDOW_INPUT_FOCUS | SDL_WINDOW_MOUSE_FOCUS
 			| SDL_WINDOW_INPUT_GRABBED : SDL_WINDOW_RESIZABLE);
 
-	SDL_SelectVideoDisplay(window->monitor->handle);
-
 	if (window->fullscreen && video_config.switchres)
 	{
 		SDL_DisplayMode mode;
-		SDL_GetCurrentDisplayMode(&mode);
+		SDL_GetCurrentDisplayMode(window->monitor->handle, &mode);
 		mode.w = width;
 		mode.h = height;
 		if (window->refresh)
@@ -433,13 +431,13 @@ static int drawsdl_window_create(sdl_window_info *window, int width, int height)
 			width, height, sdl->extra_flags);
 	SDL_ShowWindow(window->sdl_window);
 
-	SDL_SetWindowFullscreen(window->sdl_window, window->fullscreen);
+	SDL_SetWindowFullscreen(window->sdl_window, (SDL_bool) window->fullscreen);
 	SDL_GetWindowSize(window->sdl_window, &window->width, &window->height);
 	SDL_RaiseWindow(window->sdl_window);
 
 	/* FIXME: Bug in SDL 1.3 */
 	if (window->fullscreen)
-		SDL_SetWindowGrab(window->sdl_window, 1);
+		SDL_SetWindowGrab(window->sdl_window, SDL_TRUE);
 
 	// create a texture
 
