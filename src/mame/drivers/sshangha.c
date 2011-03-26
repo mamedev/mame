@@ -52,6 +52,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/okim6295.h"
 #include "includes/sshangha.h"
 #include "video/decospr.h"
+#include "video/deco16ic.h"
 
 #define SSHANGHA_HACK	0
 
@@ -113,26 +114,10 @@ static READ16_HANDLER( deco_71_r )
 
 static MACHINE_RESET( sshangha )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	/* Such thing is needed as there is no code to turn the screen
-       to normal orientation when the game is reset.
-       I'm using the value that forces the screen to be in normal
-         orientation when entering the "test mode"
-         (check the game code from 0x0006b8 to 0x0006f0).
-       I can't tell however if this is accurate or not. */
-	sshangha_control_0_w(space, 0, 0x10, 0x00ff);
+
 }
 
 /******************************************************************************/
-
-/*-------------------------------------------------
-    set_color_8888 - set a 8-8-8 RGB color using
-    the 32-bit data provided and the specified
-    shift values
--------------------------------------------------*/
-
-
-
 
 INLINE void set_color_888(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
@@ -179,12 +164,12 @@ static ADDRESS_MAP_START( sshangha_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE_MEMBER(sshangha_state, sound_shared_ram)
 
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE_MEMBER(sshangha_state, pf1_data)
-	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE_MEMBER(sshangha_state, pf2_data)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(sshangha_state, pf1_rowscroll)
 	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(sshangha_state, pf2_rowscroll)
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(sshangha_control_0_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
@@ -211,12 +196,12 @@ static ADDRESS_MAP_START( sshanghb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
 	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE_MEMBER(sshangha_state, sound_shared_ram) /* the bootleg writes here */
 
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(sshangha_pf1_data_w) AM_BASE_MEMBER(sshangha_state, pf1_data)
-	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(sshangha_pf2_data_w) AM_BASE_MEMBER(sshangha_state, pf2_data)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(sshangha_state, pf1_rowscroll)
 	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(sshangha_state, pf2_rowscroll)
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_WRITE(sshangha_control_0_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
@@ -396,6 +381,25 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
+static int sshangha_bank_callback( int bank )
+{
+	bank = bank >> 4;
+	return bank * 0x1000;
+}
+
+static const deco16ic_interface sshangha_deco16ic_tilegen1_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0x10, 0x00, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
+	sshangha_bank_callback,
+	sshangha_bank_callback,
+	0,1
+};
+
+
 static MACHINE_CONFIG_START( sshangha, sshangha_state )
 
 	/* basic machine hardware */
@@ -420,6 +424,8 @@ static MACHINE_CONFIG_START( sshangha, sshangha_state )
 
 	MCFG_GFXDECODE(sshangha)
 	MCFG_PALETTE_LENGTH(0x4000)
+
+	MCFG_DECO16IC_ADD("tilegen1", sshangha_deco16ic_tilegen1_intf)
 
 	MCFG_DEVICE_ADD("spritegen1", decospr_, 0)
 	decospr_device_config::set_gfx_region(device, 2);
