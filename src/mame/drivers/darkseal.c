@@ -21,6 +21,7 @@
 #include "sound/okim6295.h"
 #include "includes/darkseal.h"
 #include "video/decospr.h"
+#include "video/deco16ic.h"
 
 /******************************************************************************/
 
@@ -65,14 +66,18 @@ static ADDRESS_MAP_START( darkseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(darkseal_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE(darkseal_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(darkseal_control_r, darkseal_control_w)
-	AM_RANGE(0x200000, 0x200fff) AM_WRITE(darkseal_pf3b_data_w) /* 2nd half of pf3, only used on last level */
-	AM_RANGE(0x202000, 0x203fff) AM_WRITE(darkseal_pf3_data_w) AM_BASE_MEMBER(darkseal_state, pf3_data)
-	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_BASE_MEMBER(darkseal_state, pf12_row)
-	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_BASE_MEMBER(darkseal_state, pf34_row)
-	AM_RANGE(0x240000, 0x24000f) AM_WRITE(darkseal_control_0_w)
-	AM_RANGE(0x260000, 0x261fff) AM_WRITE(darkseal_pf2_data_w) AM_BASE_MEMBER(darkseal_state, pf2_data)
-	AM_RANGE(0x262000, 0x263fff) AM_WRITE(darkseal_pf1_data_w) AM_BASE_MEMBER(darkseal_state, pf1_data)
-	AM_RANGE(0x2a0000, 0x2a000f) AM_WRITE(darkseal_control_1_w)
+	
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
+
+	AM_RANGE(0x220000, 0x220fff) AM_RAM AM_BASE_MEMBER(darkseal_state, pf1_rowscroll)
+	// pf2 & 4 rowscrolls are where? (maybe don't exist?)
+	AM_RANGE(0x222000, 0x222fff) AM_RAM AM_BASE_MEMBER(darkseal_state, pf3_rowscroll)
+		
+	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x262000, 0x263fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -210,6 +215,7 @@ static const gfx_layout seallayout2 =
 static GFXDECODE_START( darkseal )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx2", 0, seallayout,  768, 16 )	/* Tiles 16x16 */
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,    0, 16 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx3", 0, seallayout, 1024, 16 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx4", 0, seallayout2, 256, 32 )	/* Sprites 16x16 */
 GFXDECODE_END
@@ -225,6 +231,32 @@ static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
+
+static const deco16ic_interface darkseal_deco16ic_tilegen1_intf =
+{
+	"screen",
+	0, 3, // both these tilemaps need to be twice the y size of usual!
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0x00, 0x00, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
+	NULL,
+	NULL,
+	0,1
+};
+
+
+static const deco16ic_interface darkseal_deco16ic_tilegen2_intf =
+{
+	"screen",
+	0, 1,
+	0x0f, 0x0f,	/* trans masks (default values) */
+	0x00, 0x00, /* color base */
+	0x0f, 0x0f,	/* color masks (default values) */
+	NULL,
+	NULL,
+	2,3
+};
+
 
 static MACHINE_CONFIG_START( darkseal, darkseal_state )
 
@@ -250,8 +282,14 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 	MCFG_GFXDECODE(darkseal)
 	MCFG_PALETTE_LENGTH(2048)
 
+	MCFG_DECO16IC_ADD("tilegen1", darkseal_deco16ic_tilegen1_intf)
+
+	MCFG_DECO16IC_ADD("tilegen2", darkseal_deco16ic_tilegen2_intf)
+
 	MCFG_DEVICE_ADD("spritegen", decospr_, 0)
-	decospr_device_config::set_gfx_region(device, 3);
+	decospr_device_config::set_gfx_region(device, 4);
+
+
 
 	MCFG_VIDEO_START(darkseal)
 

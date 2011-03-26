@@ -150,6 +150,12 @@ Rowscroll style:
 		- convert to c++ device
 		- should the decryption functions for the tilemap chips be here too?
 
+	it seems overall height / width of the tilemaps can be configured somehow
+	darkseal clearly needs 64 rows, whereas other games need 32.
+
+	width seems configurable in a similar way, with nitroball and lockload
+	needing narrower tilemaps.  lockload/dragngun might be a good study case
+	as they run on the same harwdare, and both rely on different behavior.
 
 ***************************************************************************/
 
@@ -554,7 +560,7 @@ WRITE16_DEVICE_HANDLER( deco16ic_pf1_data_w )
 	COMBINE_DATA(&deco16ic->pf1_data[offset]);
 
 	tilemap_mark_tile_dirty(deco16ic->pf1_tilemap_8x8, offset);
-	if (offset < 0x800)
+//	if (offset < 0x800)
 		tilemap_mark_tile_dirty(deco16ic->pf1_tilemap_16x16, offset);
 }
 
@@ -565,7 +571,7 @@ WRITE16_DEVICE_HANDLER( deco16ic_pf2_data_w )
 	COMBINE_DATA(&deco16ic->pf2_data[offset]);
 
 	tilemap_mark_tile_dirty(deco16ic->pf2_tilemap_8x8, offset);
-	if (offset < 0x800)
+//	if (offset < 0x800)
 		tilemap_mark_tile_dirty(deco16ic->pf2_tilemap_16x16, offset);
 }
 
@@ -912,21 +918,29 @@ static DEVICE_START( deco16ic )
 	deco16ic->pf1_colourmask = intf->col_mask1;
 	deco16ic->pf2_colourmask = intf->col_mask2;
 
-	deco16ic->pf1_tilemap_16x16 =	tilemap_create_device(device, get_pf1_tile_info, deco16_scan_rows, 16, 16, intf->full_width12 ? 64 : 32, 32);
+	int fullheight = 0;
+	int fullwidth = 0;
+
+	if (intf->full_width12&2)
+		fullheight = 1;
+
+	if (intf->full_width12&1)
+		fullwidth = 1;
+
+	deco16ic->pf1_tilemap_16x16 =	tilemap_create_device(device, get_pf1_tile_info, deco16_scan_rows, 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
 //	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, intf->full_width12 ? 64 : 32, 32);
 	deco16ic->pf1_tilemap_8x8 = tilemap_create_device(device, get_pf1_tile_info_b, tilemap_scan_rows, 8, 8, 64 , 32); // nitroball
 
 	deco16ic->pf12_8x8_gfx_bank = intf->_8x8_gfxregion;
 	deco16ic->pf12_16x16_gfx_bank = intf->_16x16_gfxregion;
 
-
 	if (intf->split)
-		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, intf->full_width12 ? 64 : 32, 32);
+		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 	else
-		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, intf->full_width12 ? 64 : 32, 32);
+		deco16ic->pf2_tilemap_16x16 =	tilemap_create_device(device, get_pf2_tile_info, deco16_scan_rows, 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 
-	deco16ic->pf2_tilemap_8x8 = tilemap_create_device(device, get_pf2_tile_info_b, tilemap_scan_rows, 8, 8, intf->full_width12 ? 64 : 32, 32);
-
+	deco16ic->pf2_tilemap_8x8 = tilemap_create_device(device, get_pf2_tile_info_b, tilemap_scan_rows, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+	
 	tilemap_set_transparent_pen(deco16ic->pf1_tilemap_8x8, 0);
 	tilemap_set_transparent_pen(deco16ic->pf2_tilemap_8x8, 0);
 	tilemap_set_transparent_pen(deco16ic->pf1_tilemap_16x16, 0);
