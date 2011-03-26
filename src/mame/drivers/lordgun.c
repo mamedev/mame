@@ -1022,7 +1022,7 @@ ROM_END
 ROM_START( alienchac )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000
 	// load the world version code in the top half, or it does not work. Are these program roms half size?
-	ROM_LOAD( "igsc0102.u81",     0x00000, 0x200000, NO_DUMP CRC(e3432be3) SHA1(d3597c885571d4a996afaaf29c78da123798371e) )
+	ROM_LOAD( "igsc0102.u81",     0x00000, 0x200000, BAD_DUMP CRC(e3432be3) SHA1(d3597c885571d4a996afaaf29c78da123798371e) )
 	ROM_LOAD16_BYTE( "hfh_p.u80", 0x00000, 0x080000, BAD_DUMP CRC(5175ebdc) SHA1(4a0bdda0f8291f895f888bfd45328b2b124b9051) )
 	ROM_LOAD16_BYTE( "hfh_p.u79", 0x00001, 0x080000, BAD_DUMP CRC(42ad978c) SHA1(eccb96e7170902b37989c8f207e1a821f29b2475) )
 
