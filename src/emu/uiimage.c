@@ -96,6 +96,7 @@ struct _file_selector_menu_state
 {
 	file_manager_menu_state *manager_menustate;
 	file_selector_entry *entrylist;
+	char filename_buffer[1024];
 };
 
 
@@ -670,7 +671,6 @@ static void append_file_selector_entry_menu_item(ui_menu *menu, const file_selec
 }
 
 
-
 /*-------------------------------------------------
     menu_file_selector_populate - creates and
     allocates all menu items for a directory
@@ -778,6 +778,8 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 	file_selector_menu_state *menustate;
 	file_create_menu_state *child_menustate;
 	const file_selector_entry *entry;
+	const file_selector_entry *selected_entry = NULL;
+	int bestmatch = 0;
 
 	/* get menu state */
 	menustate = (file_selector_menu_state *) state;
@@ -843,6 +845,79 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 					break;
 			}
 		}
+		else if (event->iptkey == IPT_SPECIAL)
+		{
+			int buflen = strlen(menustate->filename_buffer);
+			bool update_selected = FALSE;
+			
+			/* if it's a backspace and we can handle it, do so */
+			if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
+			{
+				*(char *)utf8_previous_char(&menustate->filename_buffer[buflen]) = 0;
+				update_selected = TRUE;
+
+				if (ARRAY_LENGTH(menustate->filename_buffer) > 0)
+					ui_popup_time(ERROR_MESSAGE_TIME, "%s", menustate->filename_buffer);
+			}
+			/* if it's any other key and we're not maxed out, update */
+			else if (event->unichar >= ' ' && event->unichar < 0x7f)
+			{
+				buflen += utf8_from_uchar(&menustate->filename_buffer[buflen], ARRAY_LENGTH(menustate->filename_buffer) - buflen, event->unichar);
+				menustate->filename_buffer[buflen] = 0;
+				update_selected = TRUE;
+
+				if (ARRAY_LENGTH(menustate->filename_buffer) > 0)
+					ui_popup_time(ERROR_MESSAGE_TIME, "%s", menustate->filename_buffer);
+			}
+
+			if (update_selected)
+			{
+				const file_selector_entry *cur_selected = (const file_selector_entry *)ui_menu_get_selection(menu);
+
+				// check for entries which matches our filename_buffer:
+				// from current entry to the end
+				for (entry = cur_selected; entry != NULL; entry = entry->next)
+				{
+					if (entry->basename != NULL && menustate->filename_buffer != NULL)
+					{
+						int match = 0;
+						for (int i = 0; i < ARRAY_LENGTH(menustate->filename_buffer); i++)
+						{
+							if (mame_strnicmp(entry->basename, menustate->filename_buffer, i) == 0)
+								match = i;
+						}
+						
+						if (match > bestmatch)
+						{
+							bestmatch = match;
+							selected_entry = entry;
+						}
+					}
+				}
+				// and from the first entry to current one
+				for (entry = menustate->entrylist; entry != cur_selected; entry = entry->next)
+				{
+					if (entry->basename != NULL && menustate->filename_buffer != NULL)
+					{
+						int match = 0;
+						for (int i = 0; i < ARRAY_LENGTH(menustate->filename_buffer); i++)
+						{
+							if (mame_strnicmp(entry->basename, menustate->filename_buffer, i) == 0)
+								match = i;
+						}
+						
+						if (match > bestmatch)
+						{
+							bestmatch = match;
+							selected_entry = entry;
+						}
+					}
+				}
+					
+				if (selected_entry != NULL && selected_entry != cur_selected)
+					ui_menu_set_selection(menu, (void *) selected_entry);
+			}
+		}		
 	}
 }
 
