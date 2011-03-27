@@ -164,7 +164,7 @@ static READ8_HANDLER( imago_sprites_offset_r )
 	return 0xff; //not really used
 }
 
-static ADDRESS_MAP_START( fastfred_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, videoram)
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( fastfred_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jumpcoas_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, attributesram)
@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( jumpcoas_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( imago_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_READ(imago_sprites_offset_r)
 	AM_RANGE(0x2000, 0x6fff) AM_ROM
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( imago_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r, interrupt_enable_w)
@@ -979,8 +979,8 @@ ROM_END
 static DRIVER_INIT( flyboy )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
 	state->hardware_type = 1;
 }
 
@@ -993,32 +993,32 @@ static DRIVER_INIT( flyboyb )
 static DRIVER_INIT( fastfred )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	state->hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	state->hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84b )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	state->hardware_type = 2;
 }
 
 static DRIVER_INIT( boggy84 )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, boggy84_custom_io_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0, boggy84_custom_io_r);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0);
 	state->hardware_type = 2;
 }
 

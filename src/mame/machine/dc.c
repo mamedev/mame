@@ -416,7 +416,7 @@ void dc_update_interrupt_status(running_machine *machine)
 	{
 		if((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+			address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 			printf("Wave DMA HW trigger\n");
 			wave_dma_execute(space);
@@ -428,7 +428,7 @@ void dc_update_interrupt_status(running_machine *machine)
 	{
 		if((dc_sysctrl_regs[SB_PDTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_PDTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+			address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 			printf("PVR-DMA HW trigger\n");
 			pvr_dma_execute(space);

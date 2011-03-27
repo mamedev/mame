@@ -25,7 +25,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( mpu5_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( mpu5_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 ADDRESS_MAP_END
 

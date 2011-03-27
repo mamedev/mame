@@ -160,7 +160,7 @@ public:
 static void IntReq( running_machine *machine, int num )
 {
 	crystal_state *state = machine->driver_data<crystal_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	UINT32 IntEn = space->read_dword(0x01800c08);
 	UINT32 IntPend = space->read_dword(0x01800c0c);
 	if (IntEn & (1 << num))
@@ -242,7 +242,7 @@ static WRITE32_HANDLER( IntAck_w )
 static IRQ_CALLBACK( icallback )
 {
 	crystal_state *state = device->machine->driver_data<crystal_state>();
-	address_space *space = device->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->memory().space(AS_PROGRAM);
 	UINT32 IntPend = space->read_dword(0x01800c0c);
 	int i;
 
@@ -464,7 +464,7 @@ static WRITE32_HANDLER( DMA1_w )
 }
 
 
-static ADDRESS_MAP_START( crystal_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x01200000, 0x0120000f) AM_READ(Input_r)
@@ -634,7 +634,7 @@ static void SetVidReg( address_space *space, UINT16 reg, UINT16 val )
 static SCREEN_UPDATE( crystal )
 {
 	crystal_state *state = screen->machine->driver_data<crystal_state>();
-	address_space *space = screen->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int DoFlip;
 
 	UINT32 B0 = 0x0;
@@ -695,7 +695,7 @@ static SCREEN_UPDATE( crystal )
 static SCREEN_EOF(crystal)
 {
 	crystal_state *state = machine->driver_data<crystal_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 head, tail;
 	int DoFlip = 0;
 

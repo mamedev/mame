@@ -11,7 +11,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( mephisto_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mephisto_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM

@@ -78,11 +78,11 @@ SCREEN_UPDATE(atvtrack)
 	return 0;
 }
 
-static ADDRESS_MAP_START( atvtrack_map, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( atvtrack_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atvtrack_port, ADDRESS_SPACE_IO, 64 )
+static ADDRESS_MAP_START( atvtrack_port, AS_IO, 64 )
 ADDRESS_MAP_END
 
 

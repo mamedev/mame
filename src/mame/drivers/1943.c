@@ -50,7 +50,7 @@ static READ8_HANDLER( c1943_protection_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( c1943_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( c1943_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( c1943_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(_1943_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
@@ -603,7 +603,7 @@ static DRIVER_INIT( 1943b )
 	DRIVER_INIT_CALL( 1943 );
 	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
 	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc007, 0xc007, 0, 0, _1943b_c007_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc007, 0xc007, 0, 0, _1943b_c007_r);
 
 }
 

@@ -710,7 +710,7 @@ static WRITE8_HANDLER( nobb_outport24_w )
  *************************************/
 
 /* main memory map */
-static ADDRESS_MAP_START( system1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(system1_state, ram)
@@ -724,7 +724,7 @@ static ADDRESS_MAP_START( system1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
-static ADDRESS_MAP_START( nobo_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
@@ -738,7 +738,7 @@ static ADDRESS_MAP_START( nobo_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* I/O map for systems with an 8255 PPI */
-static ADDRESS_MAP_START( system1_ppi_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
@@ -750,7 +750,7 @@ static ADDRESS_MAP_START( system1_ppi_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 /* I/O map for systems with a Z80 PIO chip */
-static ADDRESS_MAP_START( system1_pio_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( system1_pio_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
@@ -769,7 +769,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76496_w)
@@ -785,14 +785,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nob_mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nob_mcu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE_MEMBER(system1_state, nob_mcu_latch)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE_MEMBER(system1_state, nob_mcu_status)
@@ -4546,11 +4546,11 @@ static DRIVER_INIT( dakkochn )
 
 	mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4);
 
-//  memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
-//  memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
-//  memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+//  memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
+//  memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
+//  memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
 
-//  memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+//  memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
 }
 
 
@@ -4608,8 +4608,8 @@ static READ8_HANDLER( nob_start_r )
 
 static DRIVER_INIT( nob )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	DRIVER_INIT_CALL(bank44);
 
@@ -4640,7 +4640,7 @@ static DRIVER_INIT( nobb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 	UINT8 *ROM2 = machine->region("soundcpu")->base();
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
@@ -4656,7 +4656,7 @@ static DRIVER_INIT( nobb )
 
 static DRIVER_INIT( bootleg )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
@@ -4664,7 +4664,7 @@ static DRIVER_INIT( bootleg )
 
 static DRIVER_INIT( bootsys2 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x20000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
@@ -4684,7 +4684,7 @@ static DRIVER_INIT( choplift )
 
 static DRIVER_INIT( shtngmst )
 {
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 	memory_install_read_port(iospace, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
 	memory_install_read_port(iospace, 0x18, 0x18, 0x00, 0x03, "18");
 	memory_install_read_port(iospace, 0x1c, 0x1c, 0x00, 0x02, "GUNX");

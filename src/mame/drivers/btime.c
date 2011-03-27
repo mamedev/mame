@@ -355,7 +355,7 @@ static WRITE8_HANDLER( disco_w )
 }
 
 
-static ADDRESS_MAP_START( btime_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(btime_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, rambase)
@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( btime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cookrace_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(btime_state, rambase)
 	AM_RANGE(0x0500, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, videoram, videoram_size)
@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( cookrace_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfff9, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tisland_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(tisland_w)	/* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, rambase)
@@ -410,7 +410,7 @@ static ADDRESS_MAP_START( tisland_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zoar_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(zoar_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, rambase)
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( zoar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(lnc_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE_MEMBER(btime_state, rambase)
@@ -447,7 +447,7 @@ static ADDRESS_MAP_START( lnc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmonkey_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(mmonkey_w)	/* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE_MEMBER(btime_state, rambase)
@@ -464,7 +464,7 @@ static ADDRESS_MAP_START( mmonkey_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bnj_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, rambase)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
@@ -482,7 +482,7 @@ static ADDRESS_MAP_START( bnj_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( disco_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(disco_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_BASE_MEMBER(btime_state, rambase)
@@ -501,7 +501,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_BASE_MEMBER(btime_state, audio_rambase)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
@@ -512,7 +512,7 @@ static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( disco_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
@@ -2071,7 +2071,7 @@ ROM_END
 
 static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 {
-	address_space *space = machine->device(cputag)->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device(cputag)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine->region(cputag)->base();
 	offs_t addr;
@@ -2101,7 +2101,7 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 
 static void init_rom1(running_machine *machine)
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
@@ -2176,7 +2176,7 @@ static DRIVER_INIT( cookrace )
 	btime_state *state = machine->driver_data<btime_state>();
 	decrypt_C10707_cpu(machine, "maincpu");
 
-	memory_install_read_bank(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
+	memory_install_read_bank(machine->device("audiocpu")->memory().space(AS_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
 	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
@@ -2193,9 +2193,9 @@ static DRIVER_INIT( wtennis )
 	btime_state *state = machine->driver_data<btime_state>();
 	decrypt_C10707_cpu(machine, "maincpu");
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 
-	memory_install_read_bank(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
+	memory_install_read_bank(machine->device("audiocpu")->memory().space(AS_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
 	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }

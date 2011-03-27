@@ -30,14 +30,14 @@ static struct sms_vdp *md_sms_vdp;
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
 
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START( sms_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0x0000 , 0xbfff) AM_ROM
 //  AM_RANGE(0xc000 , 0xdfff) AM_RAM AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 #endif
 
 
-ADDRESS_MAP_START( sms_io_map, ADDRESS_SPACE_IO, 8 )
+ADDRESS_MAP_START( sms_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -1480,7 +1480,7 @@ READ8_HANDLER( sms_ioport_gg00_r )
 
 void init_extra_gg_ports(running_machine* machine, const char* tag)
 {
-	address_space *io = machine->device(tag)->memory().space(ADDRESS_SPACE_IO);
+	address_space *io = machine->device(tag)->memory().space(AS_IO);
 	memory_install_read8_handler     (io, 0x00, 0x00, 0, 0, sms_ioport_gg00_r);
 }
 
@@ -1643,7 +1643,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine, 
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	address_space *io = machine->device(tag)->memory().space(ADDRESS_SPACE_IO);
+	address_space *io = machine->device(tag)->memory().space(AS_IO);
 	device_t *sn = machine->device("snsnd");
 
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
@@ -1666,16 +1666,16 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(machine->device(tag)->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* main ram area */
-	sms_mainram = (UINT8 *)memory_install_ram(machine->device(tag)->memory().space(ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, NULL);
+	sms_mainram = (UINT8 *)memory_install_ram(machine->device(tag)->memory().space(AS_PROGRAM), 0xc000, 0xdfff, 0, 0x2000, NULL);
 	memset(sms_mainram,0x00,0x2000);
 
 	megatech_set_genz80_as_sms_standard_ports(machine,  tag);
 
 	/* fixed rom bank area */
-	sms_rom = (UINT8 *)memory_install_rom(machine->device(tag)->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, NULL);
+	sms_rom = (UINT8 *)memory_install_rom(machine->device(tag)->memory().space(AS_PROGRAM), 0x0000, 0xbfff, 0, 0, NULL);
 
 	memcpy(sms_rom, machine->region("maincpu")->base(), 0xc000);
 
@@ -1683,14 +1683,14 @@ void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const cha
 	{
 
 
-		memory_install_write8_handler(machine->device(tag)->memory().space(ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
+		memory_install_write8_handler(machine->device(tag)->memory().space(AS_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
 
 	}
 	else if (mapper == MAPPER_CODEMASTERS )
 	{
-		memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x0000, 0, 0, codemasters_rom_bank_0000_w);
-		memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4000, 0x4000, 0, 0, codemasters_rom_bank_4000_w);
-		memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0, codemasters_rom_bank_8000_w);
+		memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x0000, 0, 0, codemasters_rom_bank_0000_w);
+		memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x4000, 0, 0, codemasters_rom_bank_4000_w);
+		memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x8000, 0, 0, codemasters_rom_bank_8000_w);
 	}
 //  smsgg_backupram = NULL;
 }

@@ -35,12 +35,12 @@ WRITE16_HANDLER( toki_control_w )
 
 SCREEN_EOF( toki )
 {
-	buffer_spriteram16_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
+	buffer_spriteram16_w(machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 }
 
 SCREEN_EOF( tokib )
 {
-	buffer_spriteram16_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
+	buffer_spriteram16_w(machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 }
 
 static TILE_GET_INFO( get_text_tile_info )

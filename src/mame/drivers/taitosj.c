@@ -198,7 +198,7 @@ static CUSTOM_INPUT( input_port_4_f0_r )
 }
 
 
-static ADDRESS_MAP_START( taitosj_main_nomcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -238,7 +238,7 @@ ADDRESS_MAP_END
 
 
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
-static ADDRESS_MAP_START( taitosj_main_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -301,7 +301,7 @@ static CUSTOM_INPUT( kikstart_gear_r )
 }
 
 
-static ADDRESS_MAP_START( kikstart_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( kikstart_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( taitosj_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay2", ay8910_address_data_w)
@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( taitosj_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( taitosj_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( taitosj_mcu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(taitosj_68705_portA_r, taitosj_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(taitosj_68705_portB_r, taitosj_68705_portB_w)
@@ -2742,7 +2742,7 @@ static DRIVER_INIT( spacecr )
 	init_common(machine);
 
 	/* install protection handler */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd48b, 0xd48b, 0, 0, spacecr_prot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd48b, 0xd48b, 0, 0, spacecr_prot_r);
 }
 
 static DRIVER_INIT( alpine )
@@ -2750,8 +2750,8 @@ static DRIVER_INIT( alpine )
 	init_common(machine);
 
 	/* install protection handlers */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd50f, 0xd50f, 0, 0, alpine_protection_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd50f, 0xd50f, 0, 0, alpine_protection_w);
 }
 
 static DRIVER_INIT( alpinea )
@@ -2759,8 +2759,8 @@ static DRIVER_INIT( alpinea )
 	init_common(machine);
 
 	/* install protection handlers */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd50e, 0xd50e, 0, 0, alpinea_bankswitch_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd50e, 0xd50e, 0, 0, alpinea_bankswitch_w);
 }
 
 static DRIVER_INIT( junglhbr )
@@ -2768,7 +2768,7 @@ static DRIVER_INIT( junglhbr )
 	init_common(machine);
 
 	/* inverter on bits 0 and 1 */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x9000, 0xbfff, 0, 0, junglhbr_characterram_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9000, 0xbfff, 0, 0, junglhbr_characterram_w);
 }
 
 GAME( 1981, spaceskr, 0,        nomcu,    spaceskr,   taitosj, ROT0,   "Taito Corporation", "Space Seeker", GAME_SUPPORTS_SAVE )

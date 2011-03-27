@@ -586,7 +586,7 @@ static WRITE16_HANDLER( cuebrick_nvbank_w )
 	state->cuebrick_nvram_bank = data >> 8;
 }
 
-static ADDRESS_MAP_START( cuebrick_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
@@ -607,7 +607,7 @@ static ADDRESS_MAP_START( cuebrick_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mia_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
@@ -629,7 +629,7 @@ static ADDRESS_MAP_START( mia_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tmnt_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(tmnt_paletteram_word_w) AM_BASE_GENERIC(paletteram)
@@ -650,7 +650,7 @@ static ADDRESS_MAP_START( tmnt_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( punkshot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /* main RAM */
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -670,7 +670,7 @@ static ADDRESS_MAP_START( punkshot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( lgtnfght_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x090000, 0x093fff) AM_RAM	/*main RAM */
@@ -699,7 +699,7 @@ static WRITE16_HANDLER( ssriders_soundkludge_w )
 	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE("k052109", k052109_word_r, k052109_word_w)
 	AM_RANGE(0x204000, 0x207fff) AM_RAM	/* main RAM */
@@ -743,7 +743,7 @@ static WRITE16_HANDLER( k053251_glfgreat_w )
 	}
 }
 
-static ADDRESS_MAP_START( glfgreat_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE_MEMBER(tmnt_state, spriteram)
@@ -767,7 +767,7 @@ static ADDRESS_MAP_START( glfgreat_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( prmrsocr_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE_MEMBER(tmnt_state, spriteram)
@@ -1032,7 +1032,7 @@ logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers 
 }
 #endif
 
-static ADDRESS_MAP_START( tmnt2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_BASE_MEMBER(tmnt_state, tmnt2_rom)
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_BASE_MEMBER(tmnt_state, sunset_104000)	/* main RAM */
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -1058,7 +1058,7 @@ static ADDRESS_MAP_START( tmnt2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ssriders_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -1084,7 +1084,7 @@ static ADDRESS_MAP_START( ssriders_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sunsetbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -1110,7 +1110,7 @@ static ADDRESS_MAP_START( sunsetbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( thndrx2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -1129,7 +1129,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( mia_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mia_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
@@ -1138,7 +1138,7 @@ static ADDRESS_MAP_START( mia_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tmnt_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmnt_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(tmnt_sres_r, tmnt_sres_w)	/* title music & UPD7759C reset */
@@ -1151,7 +1151,7 @@ static ADDRESS_MAP_START( tmnt_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( punkshot_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( punkshot_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1160,7 +1160,7 @@ static ADDRESS_MAP_START( punkshot_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( lgtnfght_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lgtnfght_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1168,7 +1168,7 @@ static ADDRESS_MAP_START( lgtnfght_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( glfgreat_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( glfgreat_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf82f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
@@ -1176,7 +1176,7 @@ static ADDRESS_MAP_START( glfgreat_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ssriders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssriders_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1185,7 +1185,7 @@ static ADDRESS_MAP_START( ssriders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( thndrx2_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( thndrx2_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_MIRROR(0x0010) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1204,7 +1204,7 @@ static WRITE8_DEVICE_HANDLER( k054539_ctrl_w )
 	k054539_w(device, 0x200 + offset, data);
 }
 
-static ADDRESS_MAP_START( prmrsocr_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( prmrsocr_audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

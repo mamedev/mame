@@ -1028,7 +1028,7 @@ static void sound_w(running_machine *machine, UINT8 data)
 
 	if (state->soundcpu != NULL)
 	{
-		address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 		soundlatch_w(space, 0, data & 0xff);
 		device_set_input_line(state->soundcpu, 0, HOLD_LINE);
 	}
@@ -1431,7 +1431,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs, offs_t inputoffs)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1471,7 +1471,7 @@ static void altbeast_i8751_sim(running_machine *machine)
 static void ddux_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1509,7 +1509,7 @@ static void goldnaxe_i8751_init(running_machine *machine)
 static void goldnaxe_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1541,7 +1541,7 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 static void tturf_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1565,7 +1565,7 @@ static void tturf_i8751_sim(running_machine *machine)
 static void wb3_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1792,7 +1792,7 @@ static WRITE16_HANDLER( sjryuko_custom_io_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( system16b_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w)
 ADDRESS_MAP_END
@@ -1805,7 +1805,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank1")
@@ -1813,7 +1813,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1830,7 +1830,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(segaic16_memory_mapper_r, segaic16_memory_mapper_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SERVICE")
@@ -6986,7 +6986,7 @@ static MACHINE_START( isgsm )
 	memory_set_bankptr(machine,ISGSM_MAIN_BANK, machine->region("bios")->base());
 }
 
-static ADDRESS_MAP_START( isgsm_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( isgsm_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) // this area is ALWAYS read-only, even when the game is banked in
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression

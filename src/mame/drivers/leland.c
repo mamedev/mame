@@ -62,7 +62,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map_program, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(leland_battery_ram_w) AM_SHARE("battery")
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( master_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( master_map_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( master_map_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
 	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("custom", leland_80186_response_r, leland_80186_command_lo_w)
@@ -88,7 +88,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slave_small_map_program, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_small_map_program, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xdfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( slave_small_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_large_map_program, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_large_map_program, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(leland_slave_large_banksw_w)
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( slave_large_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_map_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( slave_map_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
 	AM_RANGE(0x40, 0x5f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
@@ -1981,11 +1981,11 @@ ROM_END
 static void init_master_ports(running_machine *machine, UINT8 mvram_base, UINT8 io_base)
 {
 	/* set up the master CPU VRAM I/O */
-	memory_install_readwrite8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), mvram_base, mvram_base + 0x1f, 0, 0, leland_mvram_port_r, leland_mvram_port_w);
+	memory_install_readwrite8_handler(machine->device("master")->memory().space(AS_IO), mvram_base, mvram_base + 0x1f, 0, 0, leland_mvram_port_r, leland_mvram_port_w);
 
 	/* set up the master CPU I/O ports */
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), io_base, io_base + 0x1f, 0, 0, leland_master_input_r);
-	memory_install_write8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), io_base, io_base + 0x0f, 0, 0, leland_master_output_w);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), io_base, io_base + 0x1f, 0, 0, leland_master_input_r);
+	memory_install_write8_handler(machine->device("master")->memory().space(AS_IO), io_base, io_base + 0x0f, 0, 0, leland_master_output_w);
 }
 
 
@@ -2002,8 +2002,8 @@ static DRIVER_INIT( cerberus )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x80, 0x80, 0, 0, cerberus_dial_1_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x90, 0x90, 0, 0, cerberus_dial_2_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0x80, 0x80, 0, 0, cerberus_dial_1_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0x90, 0x90, 0, 0, cerberus_dial_2_r);
 }
 
 
@@ -2052,7 +2052,7 @@ static DRIVER_INIT( alleymas )
 	/* kludge warning: the game uses location E0CA to determine if the joysticks are available */
 	/* it gets cleared by the code, but there is no obvious way for the value to be set to a */
 	/* non-zero value. If the value is zero, the joystick is never read. */
-	state->alleymas_kludge_mem = memory_install_write8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe0ca, 0xe0ca, 0, 0, alleymas_joystick_kludge);
+	state->alleymas_kludge_mem = memory_install_write8_handler(machine->device("master")->memory().space(AS_PROGRAM), 0xe0ca, 0xe0ca, 0, 0, alleymas_joystick_kludge);
 }
 
 
@@ -2077,9 +2077,9 @@ static DRIVER_INIT( dangerz )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xf4, 0xf4, 0, 0, dangerz_input_upper_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, dangerz_input_y_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xfc, 0xfc, 0, 0, dangerz_input_x_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xf4, 0xf4, 0, 0, dangerz_input_upper_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xf8, 0xf8, 0, 0, dangerz_input_y_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xfc, 0xfc, 0, 0, dangerz_input_x_r);
 }
 
 
@@ -2128,10 +2128,10 @@ static DRIVER_INIT( redlin2p )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc0, 0, 0, redline_pedal_1_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xd0, 0xd0, 0, 0, redline_pedal_2_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, redline_wheel_2_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, redline_wheel_1_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xc0, 0xc0, 0, 0, redline_pedal_1_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xd0, 0xd0, 0, 0, redline_pedal_2_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xf8, 0xf8, 0, 0, redline_wheel_2_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xfb, 0xfb, 0, 0, redline_wheel_1_r);
 }
 
 
@@ -2162,9 +2162,9 @@ static DRIVER_INIT( viper )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xa4, 0xa4, 0, 0, dangerz_input_upper_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xb8, 0xb8, 0, 0, dangerz_input_y_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xbc, 0xbc, 0, 0, dangerz_input_x_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xa4, 0xa4, 0, 0, dangerz_input_upper_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xb8, 0xb8, 0, 0, dangerz_input_y_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xbc, 0xbc, 0, 0, dangerz_input_x_r);
 }
 
 
@@ -2182,8 +2182,8 @@ static DRIVER_INIT( teamqb )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, "IN4");
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, "IN5");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7c, 0x7c, 0, 0, "IN4");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7f, 0x7f, 0, 0, "IN5");
 }
 
 
@@ -2201,8 +2201,8 @@ static DRIVER_INIT( aafb )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, "IN4");
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, "IN5");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7c, 0x7c, 0, 0, "IN4");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7f, 0x7f, 0, 0, "IN5");
 }
 
 
@@ -2220,8 +2220,8 @@ static DRIVER_INIT( aafbb )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, "IN4");
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, "IN5");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7c, 0x7c, 0, 0, "IN4");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7f, 0x7f, 0, 0, "IN5");
 }
 
 
@@ -2239,8 +2239,8 @@ static DRIVER_INIT( aafbd2p )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, "IN4");
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, "IN5");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7c, 0x7c, 0, 0, "IN4");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7f, 0x7f, 0, 0, "IN5");
 }
 
 
@@ -2259,9 +2259,9 @@ static DRIVER_INIT( offroad )
 	init_master_ports(machine, 0x40, 0x80);	/* yes, this is intentional */
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
 }
 
 
@@ -2279,9 +2279,9 @@ static DRIVER_INIT( offroadt )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
-	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
+	memory_install_read8_handler(machine->device("master")->memory().space(AS_IO), 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
 }
 
 
@@ -2299,7 +2299,7 @@ static DRIVER_INIT( pigout )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read_port(machine->device("master")->memory().space(ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, "IN4");
+	memory_install_read_port(machine->device("master")->memory().space(AS_IO), 0x7f, 0x7f, 0, 0, "IN4");
 }
 
 

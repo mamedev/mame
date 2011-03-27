@@ -1211,7 +1211,7 @@ static WRITE32_HANDLER( s12_dma_bias_w )
 	state->m_n_dmabias = data;
 }
 
-static ADDRESS_MAP_START( namcos12_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE(bankoffset_w)			/* banking */
 	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(namcos12_state, sharedram) /* shared ram?? */
@@ -1293,8 +1293,8 @@ static READ32_HANDLER( system11gun_r )
 
 static void system11gun_install( running_machine *machine )
 {
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
-	memory_install_read32_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
+	memory_install_read32_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
 }
 
 static WRITE32_HANDLER( kcoff_w )
@@ -1366,7 +1366,7 @@ static READ32_HANDLER( tektagt_protection_3_r )
 static MACHINE_RESET( namcos12 )
 {
 	namcos12_state *state = machine->driver_data<namcos12_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	psx_machine_init(machine);
 	bankoffset_w(space,0,0,0xffffffff);
 	state->has_tektagt_dma = 0;
@@ -1412,7 +1412,7 @@ static MACHINE_RESET( namcos12 )
 }
 
 /* H8/3002 MCU stuff */
-static ADDRESS_MAP_START( s12h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE( "c352", c352_r, c352_w )
@@ -1593,7 +1593,7 @@ static READ8_HANDLER( s12_mcu_gun_v_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( s12h8iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( s12h8iomap, AS_IO, 8 )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s12_mcu_p8_r ) AM_WRITENOP
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s12_mcu_pa_r, s12_mcu_pa_w )

@@ -717,7 +717,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 
 static MACHINE_RESET( superpac )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -727,7 +727,7 @@ static MACHINE_RESET( superpac )
 
 static MACHINE_RESET( phozon )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -737,7 +737,7 @@ static MACHINE_RESET( phozon )
 
 static MACHINE_RESET( mappy )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -872,7 +872,7 @@ static INTERRUPT_GEN( mappy_interrupt_1 )
 }
 
 
-static ADDRESS_MAP_START( superpac_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( superpac_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_BASE_MEMBER(mappy_state,videoram)	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_BASE_MEMBER(mappy_state,spriteram)		/* work RAM with embedded sprite RAM */
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(superpac_flipscreen_r, superpac_flipscreen_w)
@@ -884,7 +884,7 @@ static ADDRESS_MAP_START( superpac_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phozon_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( phozon_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE("share2") AM_BASE_MEMBER(mappy_state,videoram)	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_BASE_MEMBER(mappy_state,spriteram) AM_SHARE("share3") /* shared RAM with CPU #2/sprite RAM*/
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the sound CPU */
@@ -895,7 +895,7 @@ static ADDRESS_MAP_START( phozon_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM									/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mappy_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mappy_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM_WRITE(mappy_videoram_w) AM_BASE_MEMBER(mappy_state,videoram)		/* video RAM */
 	AM_RANGE(0x1000, 0x27ff) AM_RAM AM_BASE_MEMBER(mappy_state,spriteram)		/* work RAM with embedded sprite RAM */
 	AM_RANGE(0x3800, 0x3fff) AM_WRITE(mappy_scroll_w)				/* scroll */
@@ -908,18 +908,18 @@ static ADDRESS_MAP_START( mappy_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( superpac_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( superpac_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU (also sound registers) */
 	AM_RANGE(0x2000, 0x200f) AM_WRITE(superpac_latch_w)                   /* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( phozon_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( phozon_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0xe000, 0xffff) AM_ROM											/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mappy_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mappy_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU (also sound registers) */
 	AM_RANGE(0x2000, 0x200f) AM_WRITE(mappy_latch_w)						/* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM											/* ROM code */
@@ -927,7 +927,7 @@ ADDRESS_MAP_END
 
 
 /* extra CPU only present in Phozon */
-static ADDRESS_MAP_START( phozon_cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( phozon_cpu3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(superpac_videoram_w) AM_SHARE("share2")	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("share3")			/* shared RAM with CPU #2/sprite RAM*/
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with CPU #2 */
@@ -2240,13 +2240,13 @@ static DRIVER_INIT( grobda )
        the DAC might be built-in after all.
       */
 	device_t *dac = machine->device("dac");
-	memory_install_write8_device_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
+	memory_install_write8_device_handler(machine->device("sub")->memory().space(AS_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
 }
 
 static DRIVER_INIT( digdug2 )
 {
 	/* appears to not use the watchdog */
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x8000, 0, 0);
 }
 
 

@@ -1318,7 +1318,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		scsp->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(device->machine->firstcpu->memory().space(ADDRESS_SPACE_PROGRAM), scsp);
+			dma_scsp(device->machine->firstcpu->memory().space(AS_PROGRAM), scsp);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;

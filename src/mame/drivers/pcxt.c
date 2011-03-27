@@ -705,7 +705,7 @@ static IRQ_CALLBACK(irq_callback)
 	return r;
 }
 
-static ADDRESS_MAP_START( filetto_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //irq vectors
 	AM_RANGE(0x00400, 0x007ff) AM_RAM AM_BASE_MEMBER(pcxt_state, work_ram)
 	AM_RANGE(0x00800, 0x9ffff) AM_RAM //work RAM 640KB
@@ -714,7 +714,7 @@ static ADDRESS_MAP_START( filetto_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( filetto_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
@@ -743,7 +743,7 @@ static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03f8, 0x03ff) AM_RAM //rs232c (serial) port
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tetriskr_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control

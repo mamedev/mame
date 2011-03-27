@@ -248,9 +248,9 @@ static MACHINE_START( gottlieb )
 	if (state->laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
-		memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
-		memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
-		memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
+		memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
+		memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
+		memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		state->laserdisc_bit_timer = machine->scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
@@ -698,7 +698,7 @@ static INTERRUPT_GEN( gottlieb_interrupt )
  *
  *************************************/
 
-static ADDRESS_MAP_START( reactor_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, spriteram)							/* FRSEL */
@@ -719,7 +719,7 @@ static ADDRESS_MAP_START( reactor_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)	/* or ROM */
@@ -2613,7 +2613,7 @@ static DRIVER_INIT( romtiles )
 static DRIVER_INIT( stooges )
 {
 	DRIVER_INIT_CALL(ramtiles);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
 }
 
 

@@ -90,7 +90,7 @@ void namcoc7x_on_driver_init(running_machine *machine)
 	// install speedup cheat
 	for (cpu = machine->device("maincpu"); cpu != NULL; cpu = cpu->typenext())
 		if (cpu->type() == M37702)
-			memory_install_readwrite16_handler(cpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, speedup_r, speedup_w);
+			memory_install_readwrite16_handler(cpu->memory().space(AS_PROGRAM), 0x82, 0x83, 0, 0, speedup_r, speedup_w);
 }
 
 void namcoc7x_set_host_ram(UINT32 *hostram)
@@ -125,7 +125,7 @@ static WRITE16_HANDLER( c7x_shared_w )
 	}
 }
 
-ADDRESS_MAP_START( namcoc7x_mcu_map, ADDRESS_SPACE_PROGRAM, 16 )
+ADDRESS_MAP_START( namcoc7x_mcu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_r, c352_w)
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM AM_BASE(&namcoc7x_mcuram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c7x", 0x8c000)
@@ -136,7 +136,7 @@ ADDRESS_MAP_START( namcoc7x_mcu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x308000, 0x308003) AM_NOP	// volume control IC?
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( namcoc7x_mcu_share_map, ADDRESS_SPACE_PROGRAM, 16 )
+ADDRESS_MAP_START( namcoc7x_mcu_share_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_r, c352_w )
 	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( c7x_shared_r, c7x_shared_w ) AM_BASE(&namcoc7x_mcuram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c7x", 0x8c000)
@@ -178,7 +178,7 @@ static READ8_HANDLER( mcu_port7_r )
 	return 0;
 }
 
-ADDRESS_MAP_START( namcoc7x_mcu_io, ADDRESS_SPACE_IO, 8 )
+ADDRESS_MAP_START( namcoc7x_mcu_io, AS_IO, 8 )
 	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ( mcu_port4_r ) AM_WRITE( mcu_port4_w )
 	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READ( mcu_port5_r ) AM_WRITE( mcu_port5_w )
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ( mcu_port6_r ) AM_WRITENOP

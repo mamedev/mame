@@ -102,7 +102,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, legacy
 	mips->program->accessors(mips->memory);
 
 	/* allocate the virtual TLB */
-	mips->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, 2 * mips->tlbentries + 2, 0);
+	mips->vtlb = vtlb_alloc(device, AS_PROGRAM, 2 * mips->tlbentries + 2, 0);
 
 	/* allocate a timer for the compare interrupt */
 	mips->compare_int_timer = device->machine->scheduler().timer_alloc(FUNC(compare_int_callback), (void *)device);
@@ -238,10 +238,10 @@ void mips3com_asid_changed(mips3_state *mips)
     from logical to physical
 -------------------------------------------------*/
 
-int mips3com_translate_address(mips3_state *mips, int space, int intention, offs_t *address)
+int mips3com_translate_address(mips3_state *mips, address_spacenum space, int intention, offs_t *address)
 {
 	/* only applies to the program address space */
-	if (space == ADDRESS_SPACE_PROGRAM)
+	if (space == AS_PROGRAM)
 	{
 		const vtlb_entry *table = vtlb_table(mips->vtlb);
 		vtlb_entry entry = table[*address >> MIPS3_MIN_PAGE_SHIFT];
@@ -468,9 +468,9 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = MIPS3_MAX_PADDR_SHIFT;break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = MIPS3_MAX_PADDR_SHIFT;break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_LOGADDR_WIDTH_PROGRAM: info->i = 32;					break;
 		case CPUINFO_INT_PAGE_SHIFT_PROGRAM:	info->i = MIPS3_MIN_PAGE_SHIFT;	break;
 

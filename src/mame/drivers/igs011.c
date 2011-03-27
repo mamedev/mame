@@ -963,7 +963,7 @@ static WRITE16_HANDLER( igs011_prot_addr_w )
 
 //  state->prot2 = 0x00;
 
-	address_space *sp = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *sp = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = space->machine->region("maincpu")->base();
 
 	// Plug previous address range with ROM access
@@ -1800,7 +1800,7 @@ static DRIVER_INIT( drgnwrldv21 )
 	drgnwrld_type2_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd4c0, 0xd4ff, 0, 0, drgnwrldv21_igs011_prot2_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd4c0, 0xd4ff, 0, 0, drgnwrldv21_igs011_prot2_r);
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -1940,7 +1940,7 @@ static DRIVER_INIT( dbc )
 
 	dbc_decrypt(machine);
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x10600, 0x107ff, 0, 0, dbc_igs011_prot2_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x10600, 0x107ff, 0, 0, dbc_igs011_prot2_r);
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -1969,7 +1969,7 @@ static DRIVER_INIT( ryukobou )
 
 	ryukobou_decrypt(machine);
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x10600, 0x107ff, 0, 0, ryukobou_igs011_prot2_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x10600, 0x107ff, 0, 0, ryukobou_igs011_prot2_r);
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
@@ -2117,7 +2117,7 @@ static DRIVER_INIT( nkishusp )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16 )
 //  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
 //  AM_RANGE( 0x01dd70, 0x01dd77 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x01dd78, 0x01dd79 ) AM_READ ( igs011_prot1_r )
@@ -2151,7 +2151,7 @@ static ADDRESS_MAP_START( drgnwrld, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_3_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnwrld_igs012, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnwrld_igs012, AS_PROGRAM, 16 )
 	// IGS012
 	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE( igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
 	AM_RANGE( 0x001610, 0x00161f ) AM_READ ( igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
@@ -2196,7 +2196,7 @@ static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
 //  popmessage("oki %04x",data);
 }
 
-static ADDRESS_MAP_START( lhb, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16 )
 //  lhb: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
@@ -2236,7 +2236,7 @@ static ADDRESS_MAP_START( lhb, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_5_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16 )
 //  xymg: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
@@ -2275,7 +2275,7 @@ static ADDRESS_MAP_START( xymg, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_3_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wlcc, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( wlcc, AS_PROGRAM, 16 )
 //  wlcc: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
@@ -2314,7 +2314,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( lhb2, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16 )
 //  lhb2: IGS011 protection dynamically mapped at 1ff8x
 //  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
@@ -2411,7 +2411,7 @@ static WRITE16_HANDLER( vbowl_link_1_w )	{ }
 static WRITE16_HANDLER( vbowl_link_2_w )	{ }
 static WRITE16_HANDLER( vbowl_link_3_w )	{ }
 
-static ADDRESS_MAP_START( vbowl, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16 )
 //  vbowl: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )

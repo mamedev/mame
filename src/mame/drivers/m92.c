@@ -385,7 +385,7 @@ static WRITE16_HANDLER( m92_sound_reset_w )
 /*****************************************************************************/
 
 /* appears to be an earlier board */
-static ADDRESS_MAP_START( lethalth_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lethalth_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_RAM_WRITE(m92_vram_w) AM_BASE_MEMBER(m92_state, vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( lethalth_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m92_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( m92_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank2")	/* Mirror of rom:  Used by In The Hunt as protection */
@@ -409,7 +409,7 @@ static ADDRESS_MAP_START( m92_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m92_portmap, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( m92_portmap, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -428,7 +428,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITENOP /* Irq controller? */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
@@ -2155,7 +2155,7 @@ static DRIVER_INIT( majtitl2 )
 	init_m92(machine, 1);
 
 	/* This game has an eprom on the game board */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
 
 	state->game_kludge = 2;
 }
@@ -2178,7 +2178,7 @@ static DRIVER_INIT( lethalth )
 	state->irq_vectorbase = 0x20;
 
 	/* NOP out the bankswitcher */
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_IO), 0x20, 0x21, 0, 0);
 }
 
 static DRIVER_INIT( nbbatman )

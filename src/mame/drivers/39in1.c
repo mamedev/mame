@@ -1463,7 +1463,7 @@ static DRIVER_INIT( 39in1 )
 	memory_install_read32_handler (space, 0xa0151648, 0xa015164b, 0, 0, prot_cheater_r);
 }
 
-static ADDRESS_MAP_START( 39in1_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( 39in1_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 	AM_RANGE(0x00400000, 0x005fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x04000000, 0x047fffff) AM_READWRITE( cpld_r, cpld_w )

@@ -267,7 +267,7 @@ int atari_input_disabled(running_machine *machine)
 
 
 
-static ADDRESS_MAP_START(a600xl_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)	/* self test */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM	/* game cartridge */
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START(a600xl_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READ( mcu_portA_r ) AM_WRITE( mcu_portA_w )
 	AM_RANGE(0x0001, 0x0001) AM_READ( mcu_portB_r ) AM_WRITE( mcu_portB_w )

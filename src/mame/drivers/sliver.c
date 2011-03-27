@@ -427,7 +427,7 @@ static WRITE16_HANDLER(sound_w)
 	cputag_set_input_line(space->machine, "audiocpu", MCS51_INT0_LINE, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( sliver_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sliver_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(sliver_RAMDAC_offset_w)
@@ -464,11 +464,11 @@ static WRITE8_HANDLER(oki_setbank)
 	memcpy(sound+0x20000, sound+0x100000+0x20000*bank, 0x20000);
 }
 
-static ADDRESS_MAP_START( soundmem_prg, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( soundmem_prg, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( soundmem_io, AS_IO, 8 )
 	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_r)
 	/* ports */

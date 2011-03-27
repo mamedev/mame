@@ -791,7 +791,7 @@ static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( funworld_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( funworld_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
@@ -825,7 +825,7 @@ static WRITE8_HANDLER( question_bank_w )
 	funquiz_question_bank = data;
 }
 
-static ADDRESS_MAP_START( funquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( funquiz_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
@@ -843,7 +843,7 @@ static ADDRESS_MAP_START( funquiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magicrd2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( magicrd2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
@@ -859,7 +859,7 @@ static ADDRESS_MAP_START( magicrd2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cuoreuno_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
@@ -874,7 +874,7 @@ static ADDRESS_MAP_START( cuoreuno_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( saloon_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( saloon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("IN1")
@@ -4238,7 +4238,7 @@ static DRIVER_INIT( multiwin )
 ******************************************************/
 {
 	UINT8 *ROM = machine->region("maincpu")->base();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	int x;
 
@@ -4271,7 +4271,7 @@ static DRIVER_INIT( royalcdc )
 ******************************************************/
 
 	UINT8 *ROM = machine->region("maincpu")->base();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	int x;
 

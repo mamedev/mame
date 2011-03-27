@@ -118,7 +118,7 @@ static TIMER_CALLBACK( vidc_vblank )
 /* TODO: what type of DMA this is, burst or cycle steal? Docs doesn't explain it (4 usec is the DRAM refresh). */
 static TIMER_CALLBACK( vidc_video_tick )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	static UINT8 *vram = machine->region("vram")->base();
 	UINT32 size;
 
@@ -136,7 +136,7 @@ static TIMER_CALLBACK( vidc_video_tick )
 /* audio DMA */
 static TIMER_CALLBACK( vidc_audio_tick )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 ulaw_comp;
 	INT16 res;
 	UINT8 ch;

@@ -187,7 +187,7 @@ static WRITE16_HANDLER( semicom_soundcmd_w )
 
 /* Snow Bros Memory Map */
 
-static ADDRESS_MAP_START( snowbros_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
@@ -203,12 +203,12 @@ static ADDRESS_MAP_START( snowbros_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
@@ -260,17 +260,17 @@ static WRITE8_HANDLER( prot_io_w )
 }
 
 /* Semicom AT89C52 MCU */
-static ADDRESS_MAP_START( protection_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( protection_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( protection_iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( protection_iomap, AS_IO, 8 )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(prot_io_r,prot_io_w)
 ADDRESS_MAP_END
 
 /* Winter Bobble - bootleg GFX chip */
 
-static ADDRESS_MAP_START( wintbob_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
@@ -288,7 +288,7 @@ ADDRESS_MAP_END
 
 /* Honey Dolls */
 
-static ADDRESS_MAP_START( honeydol_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( honeydol_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(snowbros_state, hyperpac_ram)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP	/* ? */
@@ -304,13 +304,13 @@ static ADDRESS_MAP_START( honeydol_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb01fff) AM_RAM AM_BASE_SIZE_MEMBER(snowbros_state, spriteram, spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( honeydol_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( honeydol_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( honeydol_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( honeydol_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)								// not connected?
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
@@ -327,7 +327,7 @@ static WRITE16_HANDLER( twinadv_68000_sound_w )
 	}
 }
 
-static ADDRESS_MAP_START( twinadv_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
@@ -353,7 +353,7 @@ static WRITE8_DEVICE_HANDLER( twinadv_oki_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(bank * 0x40000);
 }
 
-static ADDRESS_MAP_START( twinadv_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( twinadv_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(soundlatch_r, soundlatch_w) // back to 68k?
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", twinadv_oki_bank_w) // oki bank?
@@ -368,7 +368,7 @@ sound hardware is also different
 
 */
 
-static ADDRESS_MAP_START( hyperpac_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hyperpac_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(snowbros_state, hyperpac_ram)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(semicom_soundcmd_w)
@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( hyperpac_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(snowbros_irq2_ack_w)	/* IRQ 2 acknowledge */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyperpac_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hyperpac_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
@@ -502,7 +502,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 
 
-static ADDRESS_MAP_START( snowbros3_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x03ffff) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff) AM_RAM
 	AM_RANGE( 0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
@@ -521,7 +521,7 @@ ADDRESS_MAP_END
 
 /* Final Tetris */
 
-static ADDRESS_MAP_START( finalttr_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( finalttr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(snowbros_state, hyperpac_ram)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(semicom_soundcmd_w)
@@ -2272,7 +2272,7 @@ static DRIVER_INIT( moremorp )
 //      state->hyperpac_ram[0xf000/2 + i] = PROTDATA[i];
 
 	/* explicit check in the code */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, moremorp_0a_read );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200000, 0x200001, 0, 0, moremorp_0a_read );
 }
 
 
@@ -2673,7 +2673,7 @@ static DRIVER_INIT(4in1boot)
 		memcpy(src,buffer,len);
 		auto_free(machine, buffer);
 	}
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, _4in1_02_read );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200000, 0x200001, 0, 0, _4in1_02_read );
 }
 
 static DRIVER_INIT(snowbro3)
@@ -2700,7 +2700,7 @@ static READ16_HANDLER( _3in1_read )
 
 static DRIVER_INIT( 3in1semi )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, _3in1_read );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200000, 0x200001, 0, 0, _3in1_read );
 }
 
 static READ16_HANDLER( cookbib3_read )
@@ -2710,7 +2710,7 @@ static READ16_HANDLER( cookbib3_read )
 
 static DRIVER_INIT( cookbib3 )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200000, 0x200001, 0, 0, cookbib3_read );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200000, 0x200001, 0, 0, cookbib3_read );
 }
 
 static DRIVER_INIT( pzlbreak )

@@ -93,7 +93,7 @@ static READ32_HANDLER( psattack_unk_r )
 	return 0xffffffff;
 }
 
-static ADDRESS_MAP_START( psattack_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( psattack_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x01402204, 0x01402207) AM_READ(psattack_unk_r)
 	AM_RANGE(0x01402804, 0x01402807) AM_READ(psattack_unk_r)

@@ -25,7 +25,7 @@ struct pc_vga_interface
 	read8_space_func read_dipswitch;
 
 	/* where the ports go */
-	int port_addressspace;
+	address_spacenum port_addressspace;
 	offs_t port_offset;
 };
 

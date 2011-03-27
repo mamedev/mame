@@ -82,7 +82,7 @@ static READ16_HANDLER( calendar_r )
 }
 
 
-static ADDRESS_MAP_START( othldrby_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( othldrby_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(calendar_r, calendar_w)

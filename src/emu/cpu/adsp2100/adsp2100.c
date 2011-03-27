@@ -286,21 +286,21 @@ UINT32 adsp2181_device_config::execute_input_lines() const
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *adsp2100_device_config::memory_space_config(int spacenum) const
+const address_space_config *adsp2100_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return	(spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
 			NULL;
 }
 
-const address_space_config *adsp2101_device_config::memory_space_config(int spacenum) const
+const address_space_config *adsp2101_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return	(spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :
 			NULL;
 }
 
-const address_space_config *adsp2181_device_config::memory_space_config(int spacenum) const
+const address_space_config *adsp2181_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return	(spacenum == AS_PROGRAM) ? &m_program_config :
 			(spacenum == AS_DATA) ? &m_data_config :

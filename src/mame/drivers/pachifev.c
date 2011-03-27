@@ -130,7 +130,7 @@ static READ8_HANDLER(controls_r)
     return output_bit;
 }
 
-static ADDRESS_MAP_START( pachifev_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8 )
     AM_RANGE(0x0000, 0xdfff) AM_ROM
 
     AM_RANGE(0xe000, 0xe7ff) AM_RAM
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( pachifev_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0xfffc, 0xffff) AM_NOP /* nmi */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pachifev_cru, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pachifev_cru, AS_IO, 8 )
     AM_RANGE(0x000, 0x000) AM_READ(controls_r)
 ADDRESS_MAP_END
 
@@ -309,7 +309,7 @@ static INTERRUPT_GEN( pachifev_vblank_irq )
 		/* I wish I had found a better way to handle cocktail inputs, but I can't find a way to access internal RAM */
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
 		/* All I found is that in main RAM, 0xe00f.b determines the player : 0x00 = player 1 and 0x01 = player 2. */
-		address_space *ramspace = device->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *ramspace = device->memory().space(AS_PROGRAM);
 		UINT8 player = 0;
 
 		if ((ramspace->read_byte(0xe00f) == 0x01) && ((input_port_read(device->machine, "DSW1") & 0x08) == 0x00))

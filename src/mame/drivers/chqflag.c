@@ -148,7 +148,7 @@ static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( chqflag_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chqflag_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM												/* RAM */
 	AM_RANGE(0x1000, 0x17ff) AM_RAMBANK("bank1")								/* banked RAM (RAM/051316 (chip 1)) */
 	AM_RANGE(0x1800, 0x1fff) AM_RAMBANK("bank2")								/* palette + RAM */
@@ -190,7 +190,7 @@ static WRITE8_HANDLER( k007232_bankswitch_w )
 	k007232_set_bank(state->k007232_2, bank_A, bank_B);
 }
 
-static ADDRESS_MAP_START( chqflag_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chqflag_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(k007232_bankswitch_w)	/* 007232 bankswitch */

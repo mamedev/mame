@@ -336,7 +336,7 @@ static UINT32 dp_clock = 0;
 
 static void sp_dma(running_machine *machine, int direction)
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i, c;
 
 	if (sp_dma_length == 0)

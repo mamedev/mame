@@ -81,7 +81,7 @@ static WRITE16_HANDLER( unknown_w )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( m90_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( m90_main_cpu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank1")	/* Quiz F1 only */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( m90_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dynablsb_main_cpu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x6000e, 0x60fff) AM_RAM AM_BASE_SIZE_MEMBER(m90_state, spriteram, spriteram_size)
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( dynablsb_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bomblord_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bomblord_main_cpu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xc000e, 0xc0fff) AM_RAM AM_BASE_SIZE_MEMBER(m90_state, spriteram, spriteram_size)
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( bomblord_main_cpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m90_main_cpu_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( m90_main_cpu_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x80, 0x8f) AM_WRITE(m90_video_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynablsb_cpu_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( dynablsb_cpu_io_map, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_WRITE(m72_sound_command_w)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
@@ -133,12 +133,12 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( m90_sound_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m90_sound_cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m90_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( m90_sound_cpu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bbmanw_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( bbmanw_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x42, 0x42) AM_READWRITE(soundlatch_r, m72_sound_irq_ack_w)

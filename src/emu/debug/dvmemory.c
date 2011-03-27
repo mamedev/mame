@@ -154,7 +154,7 @@ void debug_view_memory::enumerate_sources()
 	// first add all the devices' address spaces
 	device_memory_interface *memintf = NULL;
 	for (bool gotone = m_machine.m_devicelist.first(memintf); gotone; gotone = memintf->next(memintf))
-		for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			address_space *space = memintf->space(spacenum);
 			if (space != NULL)

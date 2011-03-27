@@ -141,8 +141,8 @@
 /* ----- 32-bit Floating Point Arithmetic Operations ----- */
 #define UML_FSLOAD(block, dst, base, index)					do { block->append().fsload(dst, base, index); } while (0)
 #define UML_FSSTORE(block, base, index, src1)				do { block->append().fsstore(base, index, src1); } while (0)
-#define UML_FSREAD(block, dst, src1, space)					do { block->append().fsread(dst, src1, ADDRESS_SPACE_##space); } while (0)
-#define UML_FSWRITE(block, dst, src1, space)				do { block->append().fswrite(dst, src1, ADDRESS_SPACE_##space); } while (0)
+#define UML_FSREAD(block, dst, src1, space)					do { block->append().fsread(dst, src1, AS_##space); } while (0)
+#define UML_FSWRITE(block, dst, src1, space)				do { block->append().fswrite(dst, src1, AS_##space); } while (0)
 #define UML_FSMOV(block, dst, src1)							do { block->append().fsmov(dst, src1); } while (0)
 #define UML_FSMOVc(block, cond, dst, src1)					do { block->append().fsmov(cond, dst, src1); } while (0)
 #define UML_FSTOINT(block, dst, src1, size, round)			do { block->append().fstoint(dst, src1, size, round); } while (0)
@@ -163,8 +163,8 @@
 /* ----- 64-bit Floating Point Arithmetic Operations ----- */
 #define UML_FDLOAD(block, dst, base, index)					do { block->append().fdload(dst, base, index); } while (0)
 #define UML_FDSTORE(block, base, index, src1)				do { block->append().fdstore(base, index, src1); } while (0)
-#define UML_FDREAD(block, dst, src1, space)					do { block->append().fdread(dst, src1, ADDRESS_SPACE_##space); } while (0)
-#define UML_FDWRITE(block, dst, src1, space)				do { block->append().fdwrite(dst, src1, ADDRESS_SPACE_##space); } while (0)
+#define UML_FDREAD(block, dst, src1, space)					do { block->append().fdread(dst, src1, AS_##space); } while (0)
+#define UML_FDWRITE(block, dst, src1, space)				do { block->append().fdwrite(dst, src1, AS_##space); } while (0)
 #define UML_FDMOV(block, dst, src1)							do { block->append().fdmov(dst, src1); } while (0)
 #define UML_FDMOVc(block, cond, dst, src1)					do { block->append().fdmov(cond, dst, src1); } while (0)
 #define UML_FDTOINT(block, dst, src1, size, round)			do { block->append().fdtoint(dst, src1, size, round); } while (0)

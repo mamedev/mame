@@ -400,7 +400,7 @@ Notes:
 #include "cpu/powerpc/ppc.h"
 #include "includes/naomibd.h"
 
-static ADDRESS_MAP_START( gc_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x7fe00000, 0x7fffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")	/* Program ROM */
 ADDRESS_MAP_END
 

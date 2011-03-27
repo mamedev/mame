@@ -409,7 +409,7 @@ static WRITE8_HANDLER( mermaid_p3_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_memory, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_memory, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( master_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( master_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(master_bankswitch_w) // correct?
@@ -425,7 +425,7 @@ static ADDRESS_MAP_START( master_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_memory, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_memory, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_BASE_MEMBER(hvyunit_state, videoram)
@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( slave_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( slave_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
@@ -451,13 +451,13 @@ static ADDRESS_MAP_START( slave_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_memory, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_memory, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
@@ -465,7 +465,7 @@ static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcu_io, AS_IO, 8 )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(mermaid_p0_r, mermaid_p0_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(mermaid_p1_r, mermaid_p1_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(mermaid_p2_r, mermaid_p2_w)

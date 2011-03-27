@@ -218,7 +218,7 @@ static DRIVER_INIT(hshavoc)
 */
 
 	{
-		address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 		memory_nop_write(space, 0x200000, 0x201fff, 0, 0);
 	}
 

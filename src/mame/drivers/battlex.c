@@ -76,7 +76,7 @@ static CUSTOM_INPUT( battlex_in0_b4_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( battlex_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( battlex_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(battlex_videoram_w) AM_BASE_MEMBER(battlex_state, videoram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(battlex_state, spriteram)
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( battlex_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM")

@@ -164,7 +164,7 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 	}
 }
 
-static ADDRESS_MAP_START( pcat_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
@@ -190,7 +190,7 @@ static READ8_HANDLER(pcat_nit_io_r)
 	}
 }
 
-static ADDRESS_MAP_START( pcat_nit_io, ADDRESS_SPACE_IO, 32 )
+static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32 )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ins8250_r, ins8250_w, 0xffffffff)
@@ -217,7 +217,7 @@ static const struct pc_vga_interface vga_interface =
 	NULL,
 	NULL,
 	NULL,
-	ADDRESS_SPACE_IO,
+	AS_IO,
 	0x0000
 };
 

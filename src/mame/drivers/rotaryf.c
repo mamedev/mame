@@ -84,7 +84,7 @@ static SCREEN_UPDATE( rotaryf )
 }
 
 
-static ADDRESS_MAP_START( rotaryf_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( rotaryf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_MIRROR(0x4000) AM_ROM
 //  AM_RANGE(0x6ffb, 0x6ffb) AM_READ(random_r) ??
 //  AM_RANGE(0x6ffd, 0x6ffd) AM_READ(random_r) ??
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( rotaryf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rotaryf_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( rotaryf_io_map, AS_IO, 8 )
 //  AM_RANGE(0x00, 0x00) AM_READ_PORT("UNK")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("COIN")
 	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW")

@@ -51,15 +51,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-// the configuration for a general device
-enum device_space
-{
-	AS_PROGRAM = 0,
-	AS_DATA = 1,
-	AS_IO = 2
-};
-
-
 // Translation intentions
 const int TRANSLATE_TYPE_MASK		= 0x03;		// read write or fetch
 const int TRANSLATE_USER_MASK		= 0x04;		// user mode or fully privileged
@@ -112,15 +103,15 @@ public:
 	virtual ~device_config_memory_interface();
 
 	// basic information getters
-	address_map_constructor address_map(int spacenum = 0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : NULL; }
-	const address_space_config *space_config(int spacenum = 0) const { return memory_space_config(spacenum); }
+	address_map_constructor address_map(address_spacenum spacenum = AS_0) const { return (spacenum < ARRAY_LENGTH(m_address_map)) ? m_address_map[spacenum] : NULL; }
+	const address_space_config *space_config(address_spacenum spacenum = AS_0) const { return memory_space_config(spacenum); }
 
 	// static inline helpers
-	static void static_set_addrmap(device_config *device, int spacenum, address_map_constructor map);
+	static void static_set_addrmap(device_config *device, address_spacenum spacenum, address_map_constructor map);
 
 protected:
 	// required overrides
-	virtual const address_space_config *memory_space_config(int spacenum) const = 0;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const = 0;
 
 	// optional operation overrides
 	virtual bool interface_validity_check(emu_options &options, const game_driver &driver) const;
@@ -145,26 +136,26 @@ public:
 	const device_config_memory_interface &memory_config() const { return m_memory_config; }
 
 	// basic information getters
-	const address_space_config *space_config(int spacenum = 0) const { return m_memory_config.space_config(spacenum); }
+	const address_space_config *space_config(address_spacenum spacenum = AS_0) const { return m_memory_config.space_config(spacenum); }
 	address_space *space(int index = 0) const { return m_addrspace[index]; }
-	address_space *space(device_space index) const { return m_addrspace[static_cast<int>(index)]; }
+	address_space *space(address_spacenum index) const { return m_addrspace[static_cast<int>(index)]; }
 
 	// address space accessors
-	void set_address_space(int spacenum, address_space &space);
+	void set_address_space(address_spacenum spacenum, address_space &space);
 
 	// address translation
-	bool translate(int spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
+	bool translate(address_spacenum spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
 
 	// read/write access
-	bool read(int spacenum, offs_t offset, int size, UINT64 &value) { return memory_read(spacenum, offset, size, value); }
-	bool write(int spacenum, offs_t offset, int size, UINT64 value) { return memory_write(spacenum, offset, size, value); }
+	bool read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value) { return memory_read(spacenum, offset, size, value); }
+	bool write(address_spacenum spacenum, offs_t offset, int size, UINT64 value) { return memory_write(spacenum, offset, size, value); }
 	bool readop(offs_t offset, int size, UINT64 &value) { return memory_readop(offset, size, value); }
 
 protected:
 	// optional operation overrides
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address);
-	virtual bool memory_read(int spacenum, offs_t offset, int size, UINT64 &value);
-	virtual bool memory_write(int spacenum, offs_t offset, int size, UINT64 value);
+	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
+	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value);
 	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
 
 	// interface-level overrides
@@ -185,7 +176,7 @@ protected:
 //  to sthe given address space's configuration
 //-------------------------------------------------
 
-inline const address_space_config *devconfig_get_space_config(const device_config &devconfig, int spacenum = 0)
+inline const address_space_config *devconfig_get_space_config(const device_config &devconfig, address_spacenum spacenum = AS_0)
 {
 	const device_config_memory_interface *intf;
 	if (!devconfig.interface(intf))

@@ -70,7 +70,7 @@ legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig
 {
 	// build up our address spaces; legacy devices don't have logical spaces
 	memset(m_space_config, 0, sizeof(m_space_config));
-	for (int spacenum = 0; spacenum < ARRAY_LENGTH(m_space_config); spacenum++)
+	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_space_config); spacenum++)
 	{
 		m_space_config[spacenum].m_name = (spacenum == 1) ? "data" : (spacenum == 2) ? "i/o" : "program";
 		m_space_config[spacenum].m_endianness = static_cast<endianness_t>(get_legacy_config_int(DEVINFO_INT_ENDIANNESS));
@@ -347,7 +347,7 @@ void legacy_cpu_device::execute_burn(INT32 cycles)
 //  on the provided address
 //-------------------------------------------------
 
-bool legacy_cpu_device::memory_translate(int spacenum, int intention, offs_t &address)
+bool legacy_cpu_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
 {
 	if (m_translate != NULL)
 		return (*m_translate)(this, spacenum, intention, &address) ? true : false;
@@ -360,7 +360,7 @@ bool legacy_cpu_device::memory_translate(int spacenum, int intention, offs_t &ad
 //  device specific overrides
 //-------------------------------------------------
 
-bool legacy_cpu_device::memory_read(int spacenum, offs_t offset, int size, UINT64 &value)
+bool legacy_cpu_device::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
 {
 	if (m_read != NULL)
 		return (*m_read)(this, spacenum, offset, size, &value) ? true : false;
@@ -373,7 +373,7 @@ bool legacy_cpu_device::memory_read(int spacenum, offs_t offset, int size, UINT6
 //  for device specific overrides
 //-------------------------------------------------
 
-bool legacy_cpu_device::memory_write(int spacenum, offs_t offset, int size, UINT64 value)
+bool legacy_cpu_device::memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value)
 {
 	if (m_write != NULL)
 		return (*m_write)(this, spacenum, offset, size, value) ? true : false;

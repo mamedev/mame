@@ -97,7 +97,7 @@ static WRITE8_HANDLER( simpsons_k053247_w )
 void simpsons_video_banking( running_machine *machine, int bank )
 {
 	simpsons_state *state = machine->driver_data<simpsons_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (bank & 1)
 	{

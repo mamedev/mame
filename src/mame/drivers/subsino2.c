@@ -934,7 +934,7 @@ static WRITE16_HANDLER( bishjan_outputs_w )
 }
 
 
-static ADDRESS_MAP_START( bishjan_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
@@ -1115,7 +1115,7 @@ static READ8_HANDLER( mtrain_prot_r )
 	return "SUBSION"[offset];
 }
 
-static ADDRESS_MAP_START( mtrain_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mtrain_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x06fff ) AM_ROM
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM AM_SHARE("nvram")	// battery
@@ -1148,7 +1148,7 @@ static ADDRESS_MAP_START( mtrain_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0a000, 0x0ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mtrain_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mtrain_io, AS_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 ADDRESS_MAP_END
 
@@ -1182,7 +1182,7 @@ static WRITE8_HANDLER( saklove_outputs_w )
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", state->outputs[0], state->outputs[1], state->outputs[2], state->outputs[3]);
 }
 
-static ADDRESS_MAP_START( saklove_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( saklove_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram")	// battery
 
 	// read lo (L1)   (only half tilemap?)
@@ -1207,7 +1207,7 @@ static ADDRESS_MAP_START( saklove_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( saklove_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( saklove_io, AS_IO, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE( ss9601_scrollctrl_w )
 
 	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
@@ -1273,7 +1273,7 @@ static WRITE8_HANDLER( xplan_outputs_w )
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", state->outputs[0], state->outputs[1], state->outputs[2], state->outputs[3]);
 }
 
-static ADDRESS_MAP_START( xplan_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( xplan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram")	// battery
 
 	// write both (L1, byte_lo2)
@@ -1307,7 +1307,7 @@ static ADDRESS_MAP_START( xplan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xplan_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( xplan_io, AS_IO, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 
 	AM_RANGE(0x0020, 0x0020) AM_WRITE( ss9601_byte_lo2_w )
@@ -1377,14 +1377,14 @@ static WRITE8_HANDLER( xtrain_outputs_w )
 //  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", state->outputs[0], state->outputs[1], state->outputs[2], state->outputs[3]);
 }
 
-static ADDRESS_MAP_START( expcard_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( expcard_io, AS_IO, 8 )
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE( expcard_outputs_w ) AM_BASE_MEMBER(subsino2_state, outputs )
 
 	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xtrain_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( xtrain_io, AS_IO, 8 )
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE( xtrain_outputs_w ) AM_BASE_MEMBER(subsino2_state, outputs )
 

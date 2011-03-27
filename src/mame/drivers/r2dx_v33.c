@@ -196,7 +196,7 @@ static SCREEN_UPDATE( rdx_v33 )
 	{
 		static UINT32 src_addr = 0x100000;
 		static int frame;
-		address_space *space = screen->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *space = screen->machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 		//if(input_code_pressed_once(screen->machine,KEYCODE_A))
 		//  src_addr+=0x800;
@@ -347,7 +347,7 @@ static WRITE16_HANDLER( mcu_table2_w )
 }
 
 
-static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
 	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
@@ -424,7 +424,7 @@ static WRITE16_HANDLER( nzerotea_sound_comms_w )
 	}
 }
 
-static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
 
 	/* results from cop? */

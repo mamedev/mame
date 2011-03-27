@@ -298,7 +298,7 @@ static SOUND_START( gottlieb1 )
  *
  *************************************/
 
-static ADDRESS_MAP_START( gottlieb_sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gottlieb_sound1_map, AS_PROGRAM, 8 )
 	/* A15 not decoded except in expansion socket */
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
@@ -547,7 +547,7 @@ static SOUND_START( gottlieb2 )
  *
  *************************************/
 
-static ADDRESS_MAP_START( gottlieb_speech2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gottlieb_speech2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1fff) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, sp0250_latch)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(speech_control_w)
@@ -560,7 +560,7 @@ static ADDRESS_MAP_START( gottlieb_speech2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gottlieb_audio2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gottlieb_audio2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x3c00) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac1", gottlieb_dac_w) AM_BASE_MEMBER(gottlieb_state, dac_data)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3fff) AM_READ(audio_data_r)

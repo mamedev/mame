@@ -496,7 +496,7 @@ void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int ch
 		slapstic_init(device->machine, chipnum);
 
 		/* install the memory handlers */
-		state->slapstic = memory_install_readwrite16_handler(device->memory().space(ADDRESS_SPACE_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
+		state->slapstic = memory_install_readwrite16_handler(device->memory().space(AS_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
 
 		/* allocate memory for a copy of bank 0 */
 		state->slapstic_bank0 = auto_alloc_array(device->machine, UINT8, 0x2000);
@@ -762,7 +762,7 @@ static void update_6502_irq(running_machine *machine)
 static TIMER_CALLBACK( delayed_sound_reset )
 {
 	atarigen_state *state = machine->driver_data<atarigen_state>();
-	address_space *space = state->sound_cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->sound_cpu->memory().space(AS_PROGRAM);
 
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
@@ -1123,7 +1123,7 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 		/* scanline IRQ ack here */
 		case 0x1e:
 			/* hack: this should be a device */
-			atarigen_scanline_int_ack_w(screen.machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
+			atarigen_scanline_int_ack_w(screen.machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0, 0xffff);
 			break;
 
 		/* log anything else */

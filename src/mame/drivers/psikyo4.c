@@ -374,7 +374,7 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 		set_hotgmck_pcm_bank(space->machine, 1);
 }
 
-static ADDRESS_MAP_START( ps4_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM		// program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo4_state, spriteram, spriteram_size)
@@ -1072,7 +1072,7 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 	set_hotgmck_pcm_bank(machine, 0);
 	set_hotgmck_pcm_bank(machine, 1);
 
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
 	machine->state().register_postload(hotgmck_pcm_bank_postload, (void *)0);
 	machine->state().register_postload(hotgmck_pcm_bank_postload, (void *)1);
 }
@@ -1086,17 +1086,17 @@ static DRIVER_INIT( hotgmck )
 
 static DRIVER_INIT( loderndf )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderndf_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderndf_speedup_r );
 }
 
 static DRIVER_INIT( loderdfa )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderdfa_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderdfa_speedup_r );
 }
 
 static DRIVER_INIT( hotdebut )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x600001c, 0x600001f, 0, 0, hotdebut_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x600001c, 0x600001f, 0, 0, hotdebut_speedup_r );
 }
 
 

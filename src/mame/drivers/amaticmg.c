@@ -426,7 +426,7 @@ static PALETTE_INIT( amaticmg )
 *      Memory Map Information       *
 ************************************/
 
-static ADDRESS_MAP_START( amaticmg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( amaticmg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 //  AM_RANGE(0x0000, 0x0000) AM_RAM // AM_SHARE("nvram")
 //  AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -435,7 +435,7 @@ static ADDRESS_MAP_START( amaticmg_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_colorram_w) AM_BASE(&amaticmg_colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amaticmg_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)

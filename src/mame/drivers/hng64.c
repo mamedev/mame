@@ -1041,7 +1041,7 @@ static WRITE32_HANDLER( hng64_sprite_clear_odd_w )
 <ElSemi> 0xBF800000-0xBF808000 S-RAM
 <ElSemi> 0x60000000-0x60001000 Comm dualport ram
 */
-static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32 )
 
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE_MEMBER(hng64_state, mainram)
 	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("user3", 0) AM_BASE_MEMBER(hng64_state, cart)
@@ -1253,11 +1253,11 @@ WRITE8_HANDLER( hng64_comm_shared_w )
 }
 #endif
 
-static ADDRESS_MAP_START( hng_comm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hng_comm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0xffff) AM_READWRITE( hng64_comm_memory_r, hng64_comm_memory_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hng_comm_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hng_comm_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* Reserved for the KL5C80 internal hardware */
 	AM_RANGE(0x00, 0x07) AM_WRITE( hng64_comm_io_mmu ) AM_BASE_MEMBER(hng64_state, com_mmu_mem)
@@ -1278,7 +1278,7 @@ static ADDRESS_MAP_START( hng_comm_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hng_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hng_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe0000, 0xfffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END

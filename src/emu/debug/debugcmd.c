@@ -298,12 +298,12 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "bpenable",  CMDFLAG_NONE, 1, 0, 1, execute_bpdisenable);
 	debug_console_register_command(machine, "bplist",    CMDFLAG_NONE, 0, 0, 0, execute_bplist);
 
-	debug_console_register_command(machine, "wpset",     CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 5, execute_wpset);
-	debug_console_register_command(machine, "wp",        CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 5, execute_wpset);
-	debug_console_register_command(machine, "wpdset",    CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 5, execute_wpset);
-	debug_console_register_command(machine, "wpd",       CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 5, execute_wpset);
-	debug_console_register_command(machine, "wpiset",    CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 5, execute_wpset);
-	debug_console_register_command(machine, "wpi",       CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpset",     CMDFLAG_NONE, AS_PROGRAM, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wp",        CMDFLAG_NONE, AS_PROGRAM, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpdset",    CMDFLAG_NONE, AS_DATA, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpd",       CMDFLAG_NONE, AS_DATA, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpiset",    CMDFLAG_NONE, AS_IO, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpi",       CMDFLAG_NONE, AS_IO, 3, 5, execute_wpset);
 	debug_console_register_command(machine, "wpclear",   CMDFLAG_NONE, 0, 0, 1, execute_wpclear);
 	debug_console_register_command(machine, "wpdisable", CMDFLAG_NONE, 0, 0, 1, execute_wpdisenable);
 	debug_console_register_command(machine, "wpenable",  CMDFLAG_NONE, 1, 0, 1, execute_wpdisenable);
@@ -311,17 +311,17 @@ void debug_command_init(running_machine *machine)
 
 	debug_console_register_command(machine, "hotspot",   CMDFLAG_NONE, 0, 0, 3, execute_hotspot);
 
-	debug_console_register_command(machine, "save",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 4, execute_save);
-	debug_console_register_command(machine, "saved",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 4, execute_save);
-	debug_console_register_command(machine, "savei",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 4, execute_save);
+	debug_console_register_command(machine, "save",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, execute_save);
+	debug_console_register_command(machine, "saved",     CMDFLAG_NONE, AS_DATA, 3, 4, execute_save);
+	debug_console_register_command(machine, "savei",     CMDFLAG_NONE, AS_IO, 3, 4, execute_save);
 
-	debug_console_register_command(machine, "load",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 4, execute_load);
-	debug_console_register_command(machine, "loadd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 4, execute_load);
-	debug_console_register_command(machine, "loadi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 4, execute_load);
+	debug_console_register_command(machine, "load",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, execute_load);
+	debug_console_register_command(machine, "loadd",     CMDFLAG_NONE, AS_DATA, 3, 4, execute_load);
+	debug_console_register_command(machine, "loadi",     CMDFLAG_NONE, AS_IO, 3, 4, execute_load);
 
-	debug_console_register_command(machine, "dump",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 6, execute_dump);
-	debug_console_register_command(machine, "dumpd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 6, execute_dump);
-	debug_console_register_command(machine, "dumpi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 6, execute_dump);
+	debug_console_register_command(machine, "dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 6, execute_dump);
+	debug_console_register_command(machine, "dumpd",     CMDFLAG_NONE, AS_DATA, 3, 6, execute_dump);
+	debug_console_register_command(machine, "dumpi",     CMDFLAG_NONE, AS_IO, 3, 6, execute_dump);
 
 	debug_console_register_command(machine, "cheatinit", CMDFLAG_NONE, 0, 0, 4, execute_cheatinit);
 	debug_console_register_command(machine, "ci",        CMDFLAG_NONE, 0, 0, 4, execute_cheatinit);
@@ -340,12 +340,12 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "cheatundo", CMDFLAG_NONE, 0, 0, 0, execute_cheatundo);
 	debug_console_register_command(machine, "cu",        CMDFLAG_NONE, 0, 0, 0, execute_cheatundo);
 
-	debug_console_register_command(machine, "f",         CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command(machine, "find",      CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command(machine, "fd",        CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command(machine, "findd",     CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command(machine, "fi",        CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_IO, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command(machine, "findi",     CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_IO, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "f",         CMDFLAG_KEEP_QUOTES, AS_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "find",      CMDFLAG_KEEP_QUOTES, AS_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "fd",        CMDFLAG_KEEP_QUOTES, AS_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "findd",     CMDFLAG_KEEP_QUOTES, AS_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "fi",        CMDFLAG_KEEP_QUOTES, AS_IO, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "findi",     CMDFLAG_KEEP_QUOTES, AS_IO, 3, MAX_COMMAND_PARAMS, execute_find);
 
 	debug_console_register_command(machine, "dasm",      CMDFLAG_NONE, 0, 3, 5, execute_dasm);
 
@@ -359,9 +359,9 @@ void debug_command_init(running_machine *machine)
 
 	debug_console_register_command(machine, "source",    CMDFLAG_NONE, 0, 1, 1, execute_source);
 
-	debug_console_register_command(machine, "map",		CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 1, 1, execute_map);
-	debug_console_register_command(machine, "mapd",		CMDFLAG_NONE, ADDRESS_SPACE_DATA, 1, 1, execute_map);
-	debug_console_register_command(machine, "mapi",		CMDFLAG_NONE, ADDRESS_SPACE_IO, 1, 1, execute_map);
+	debug_console_register_command(machine, "map",		CMDFLAG_NONE, AS_PROGRAM, 1, 1, execute_map);
+	debug_console_register_command(machine, "mapd",		CMDFLAG_NONE, AS_DATA, 1, 1, execute_map);
+	debug_console_register_command(machine, "mapi",		CMDFLAG_NONE, AS_IO, 1, 1, execute_map);
 	debug_console_register_command(machine, "memdump",	CMDFLAG_NONE, 0, 0, 1, execute_memdump);
 
 	debug_console_register_command(machine, "symlist",	CMDFLAG_NONE, 0, 0, 1, execute_symlist);
@@ -1437,7 +1437,7 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 
 	/* loop over all CPUs */
 	for (device_t *device = machine->m_devicelist.first(); device != NULL; device = device->next())
-		for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 			if (device->debug()->watchpoint_first(spacenum) != NULL)
 			{
 				static const char *const types[] = { "unkn ", "read ", "write", "r/w  " };
@@ -1718,7 +1718,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 	memset(cheat_region, 0, sizeof(cheat_region));
 
 	/* validate parameters */
-	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, ADDRESS_SPACE_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 3) ? param[3] : NULL, AS_PROGRAM, &space))
 		return;
 
 	if (ref == 0)
@@ -1832,7 +1832,7 @@ static void execute_cheatinit(running_machine *machine, int ref, int params, con
 			return;
 		}
 
-		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
+		if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, &space))
 			return;
 
 		cheat_map *newmap = auto_alloc_array(machine, cheat_map, cheat.length + real_length);
@@ -1899,7 +1899,7 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 		return;
 	}
 
-	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, &space))
 		return;
 
 	if (params > 1 && !debug_command_parameter_number(machine, param[1], &comp_value))
@@ -2054,7 +2054,7 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 	UINT64 sizemask;
 	FILE *f = NULL;
 
-	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, ADDRESS_SPACE_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, &cheat.cpu, AS_PROGRAM, &space))
 		return;
 
 	if (!debug_command_parameter_cpu(machine, &cheat.cpu, &cpu))
@@ -2066,9 +2066,9 @@ static void execute_cheatlist(running_machine *machine, int ref, int params, con
 	switch (space->spacenum())
 	{
 		default:
-		case ADDRESS_SPACE_PROGRAM:	spaceletter = 'p';	break;
-		case ADDRESS_SPACE_DATA:	spaceletter = 'd';	break;
-		case ADDRESS_SPACE_IO:		spaceletter = 'i';	break;
+		case AS_PROGRAM:	spaceletter = 'p';	break;
+		case AS_DATA:	spaceletter = 'd';	break;
+		case AS_IO:		spaceletter = 'i';	break;
 	}
 
 	switch (cheat.width)
@@ -2253,7 +2253,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		return;
 	if (!debug_command_parameter_number(machine, param[3], &bytes))
 		return;
-	if (!debug_command_parameter_cpu_space(machine, (params > 4) ? param[4] : NULL, ADDRESS_SPACE_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 4) ? param[4] : NULL, AS_PROGRAM, &space))
 		return;
 
 	/* determine the width of the bytes */
@@ -2437,7 +2437,7 @@ static void execute_history(running_machine *machine, int ref, int params, const
 {
 	/* validate parameters */
 	address_space *space;
-	if (!debug_command_parameter_cpu_space(machine, (params > 0) ? param[0] : NULL, ADDRESS_SPACE_PROGRAM, &space))
+	if (!debug_command_parameter_cpu_space(machine, (params > 0) ? param[0] : NULL, AS_PROGRAM, &space))
 		return;
 
 	UINT64 count = device_debug::HISTORY_SIZE;

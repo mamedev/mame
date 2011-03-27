@@ -545,7 +545,7 @@ static PALETTE_INIT( avt )
 *********************************************/
 
 /* avtnfl, avtbingo */
-static ADDRESS_MAP_START( avt_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( avt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
@@ -553,7 +553,7 @@ static ADDRESS_MAP_START( avt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE_MEMBER(avt_state, colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avt_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( avt_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x03) unk, maybe IO
 //  AM_RANGE(0x00, 0x00)  AM_READ_PORT("IN0")

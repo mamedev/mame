@@ -772,7 +772,7 @@ static WRITE8_HANDLER( subsino_out_b_w )
 *                              Memory Maps                                 *
 ***************************************************************************/
 
-static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( srider_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
@@ -801,7 +801,7 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sharkpy_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
@@ -836,7 +836,7 @@ that announces to the player that the card deck changes. If the protection check
 this event makes the game to reset without any money in the bank.
 */
 
-static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09000 ) AM_WRITE( subsino_out_a_w )
@@ -919,7 +919,7 @@ static WRITE8_HANDLER( flash_w )
 	}
 }
 
-static ADDRESS_MAP_START( victor5_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( victor5_map, AS_PROGRAM, 8 )
 	AM_IMPORT_FROM( victor21_map )
 	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE( flash_r, flash_w )
 	AM_RANGE( 0x0900b, 0x0900b ) AM_READNOP //"flash" status, bit 0
@@ -932,7 +932,7 @@ static READ8_HANDLER( hwcheck_r )
 	return 0x55;
 }
 
-static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
@@ -981,7 +981,7 @@ static WRITE8_HANDLER( subsino_out_c_w )
 //  popmessage("data %02x\n",data);
 }
 
-static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
 	AM_RANGE( 0x09000, 0x09000 ) AM_READ_PORT( "SW1" )
@@ -1112,7 +1112,7 @@ static READ8_HANDLER( reel_scrollattr_r )
 	return state->reel1_attr[offset];
 }
 
-static ADDRESS_MAP_START( stisub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( stisub_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
@@ -1153,7 +1153,7 @@ ADDRESS_MAP_END
                         Magic Train (Clear NVRAM ROM?)
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mtrainnv_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
 
 	AM_RANGE( 0x0c000, 0x0cfff ) AM_RAM
@@ -1190,7 +1190,7 @@ static ADDRESS_MAP_START( mtrainnv_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( subsino_iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( subsino_iomap, AS_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 ADDRESS_MAP_END
 

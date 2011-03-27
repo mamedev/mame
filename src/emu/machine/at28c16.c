@@ -22,7 +22,7 @@
 
 const device_type AT28C16 = at28c16_device_config::static_alloc_device_config;
 
-static ADDRESS_MAP_START( at28c16_map8, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( at28c16_map8, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x081f) AM_RAM
 ADDRESS_MAP_END
 
@@ -95,7 +95,7 @@ bool at28c16_device_config::device_validity_check( emu_options &options, const g
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *at28c16_device_config::memory_space_config( int spacenum ) const
+const address_space_config *at28c16_device_config::memory_space_config( address_spacenum spacenum ) const
 {
 	return ( spacenum == 0 ) ? &m_space_config : NULL;
 }

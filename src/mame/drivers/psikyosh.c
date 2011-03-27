@@ -518,7 +518,7 @@ P1KEY11  29|30  P2KEY11
 
 
 // ps3v1
-static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32 )
 // rom mapping
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
@@ -544,7 +544,7 @@ static ADDRESS_MAP_START( ps3v1_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 // ps5, ps5v2
-static ADDRESS_MAP_START( ps5_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32 )
 // rom mapping
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 // inputs/eeprom
@@ -1270,7 +1270,7 @@ static DRIVER_INIT( mjgtaste )
 {
 	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x03000000, 0x03000003, 0, 0, mjgtaste_input_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x03000000, 0x03000003, 0, 0, mjgtaste_input_r);
 }
 
 

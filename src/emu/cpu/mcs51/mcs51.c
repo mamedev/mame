@@ -2404,20 +2404,20 @@ static CPU_INIT( ds5002fp )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(program_12bit, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8)
 	AM_RANGE(0x00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_13bit, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8)
 	AM_RANGE(0x00, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_7bit, ADDRESS_SPACE_DATA, 8)
+static ADDRESS_MAP_START(data_7bit, AS_DATA, 8)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_8bit, ADDRESS_SPACE_DATA, 8)
+static ADDRESS_MAP_START(data_8bit, AS_DATA, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
 ADDRESS_MAP_END
@@ -2487,15 +2487,15 @@ static CPU_GET_INFO( mcs51 )
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 20; /* rough guess */				break;
 		case CPUINFO_INT_INPUT_LINES:       			info->i = 3;								break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;						break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;						break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;						break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;						break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 9; /* due to sfr mapping */					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;						break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 18; /* 128k for ds5002fp */							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:	info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;						break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;						break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;						break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 8;						break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 9; /* due to sfr mapping */					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;						break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 18; /* 128k for ds5002fp */							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;							break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;								break;
 		case CPUINFO_INT_PC:							info->i = PC;								break;
@@ -2529,9 +2529,9 @@ static CPU_GET_INFO( mcs51 )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8051);				break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mcs51_state->icount;				break;
 
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = NULL;	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map8 = NULL;	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = NULL;	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map8 = NULL;	break;
 
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I8051");					break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "MCS-51");					break;
@@ -2579,7 +2579,7 @@ CPU_GET_INFO( i8031 )
 {
 	switch (state)
 	{
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I8031");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
@@ -2590,8 +2590,8 @@ CPU_GET_INFO( i8051 )
 {
 	switch (state)
 	{
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I8051");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
@@ -2603,7 +2603,7 @@ CPU_GET_INFO( i8032 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8052);				break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I8032");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
@@ -2615,8 +2615,8 @@ CPU_GET_INFO( i8052 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8052);				break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I8052");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
@@ -2627,8 +2627,8 @@ CPU_GET_INFO( i8751 )
 {
 	switch (state)
 	{
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_12bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I8751");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
 	}
@@ -2639,8 +2639,8 @@ CPU_GET_INFO( i8752 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(program_13bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);	break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8052);				break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I8752");					break;
 		default:										CPU_GET_INFO_CALL(mcs51);					break;
@@ -2658,8 +2658,8 @@ CPU_GET_INFO( i80c31 )
 	switch (state)
 	{
 		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80c31);			break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = NULL;	break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);	break;
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80c51);			break;
 		case DEVINFO_STR_NAME:							strcpy(info->s, "I80C31");					break;
 		default:										CPU_GET_INFO_CALL(i8031);					break;

@@ -111,7 +111,7 @@ static WRITE8_HANDLER( pengo_coin_counter_w )
 }
 
 
-static ADDRESS_MAP_START( pengo_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pengo_state, videoram) /* video and color RAM, scratchpad RAM, sprite codes */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pengo_state, colorram)
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( pengo_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jrpacmbl_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE_MEMBER(pengo_state, videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
@@ -674,7 +674,7 @@ static DRIVER_INIT( penta )
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },	/* ...1...1...0.... */
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }		/* ...1...1...1.... */
 	};
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 	UINT8 *rom = machine->region("maincpu")->base();
 	int A;

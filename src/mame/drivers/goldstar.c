@@ -137,7 +137,7 @@ static READ8_HANDLER( protection_r )
 	return data[state->dataoffset++];
 }
 
-static ADDRESS_MAP_START( goldstar_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( goldstar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goldstar_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
 ADDRESS_MAP_END
@@ -180,7 +180,7 @@ static WRITE8_HANDLER( ncb3_port81_w )
 }
 
 
-static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76496_w)	/* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ncb3_readwriteport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( ncb3_readwriteport, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set1 is used...
 //  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set2 is used...
@@ -252,7 +252,7 @@ static WRITE8_HANDLER( cm_outport1_w )
 	/* lamps? */
 }
 
-static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
@@ -274,7 +274,7 @@ static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nfm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nfm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
@@ -298,7 +298,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cm_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cmast91_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cmast91_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
@@ -321,7 +321,7 @@ static ADDRESS_MAP_START( cmast91_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( amcoe1_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( amcoe1_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amcoe2_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -360,7 +360,7 @@ static WRITE8_HANDLER( lucky8_outport_w )
 
 }
 
-static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
@@ -404,7 +404,7 @@ static WRITE8_HANDLER( magodds_outb860_w )
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-static ADDRESS_MAP_START(magodds_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1") AM_SHARE("nvram")
@@ -428,7 +428,7 @@ static ADDRESS_MAP_START(magodds_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kkojnoli_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kkojnoli_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* definitely no NVRAM */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
@@ -467,7 +467,7 @@ ADDRESS_MAP_END
 //  popmessage("Output: %02X", data);
 //}
 
-static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wcat3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
@@ -522,7 +522,7 @@ static READ8_HANDLER( unkch_unk_r )
 
 
 /* newer / more capable hw */
-static ADDRESS_MAP_START( unkch_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
@@ -574,7 +574,7 @@ static WRITE8_HANDLER( unkcm_0x12_w )
 }
 
 
-static ADDRESS_MAP_START( unkch_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)
@@ -9853,8 +9853,8 @@ static DRIVER_INIT( schery97 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -9883,7 +9883,7 @@ static DRIVER_INIT( schery97a )
 
 
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x16, 0x16, 0, 0, fixedval38_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -9910,7 +9910,7 @@ static DRIVER_INIT( skill98 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -9937,7 +9937,7 @@ static DRIVER_INIT( fb36xc1 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x31, 0x31, 0, 0, fixedval68_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x31, 0x31, 0, 0, fixedval68_r);
 
 }
 
@@ -9974,11 +9974,11 @@ static DRIVER_INIT( fbse354 )
 		ROM[i] = x;
 	}
 	// nfb96b needs both of these
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x23, 0x23, 0, 0, fixedval80_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x5a, 0x5a, 0, 0, fixedvalaa_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x23, 0x23, 0, 0, fixedval80_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x5a, 0x5a, 0, 0, fixedvalaa_r);
 
 	// csel96b
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x6e, 0x6e, 0, 0, fixedval96_r);
 
 }
 
@@ -10006,7 +10006,7 @@ static DRIVER_INIT( fbse362 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x2e, 0x2e, 0, 0, fixedvalbe_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x2e, 0x2e, 0, 0, fixedvalbe_r);
 
 }
 
@@ -10038,8 +10038,8 @@ static DRIVER_INIT( rp35 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x5e, 0x5e, 0, 0, fixedval84_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x36, 0x36, 0, 0, fixedval90_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x5e, 0x5e, 0, 0, fixedval84_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x36, 0x36, 0, 0, fixedval90_r);
 }
 
 static READ8_HANDLER( fixedvalb2_r )
@@ -10066,7 +10066,7 @@ static DRIVER_INIT( rp36 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x34, 0x34, 0, 0, fixedvalb2_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x34, 0x34, 0, 0, fixedvalb2_r);
 }
 
 static READ8_HANDLER( fixedval48_r )
@@ -10093,7 +10093,7 @@ static DRIVER_INIT( rp36c3 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x17, 0x17, 0, 0, fixedval48_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x17, 0x17, 0, 0, fixedval48_r);
 }
 
 static READ8_HANDLER( fixedval09_r )
@@ -10125,8 +10125,8 @@ static DRIVER_INIT( po33 )
 
 		ROM[i] = x;
 	}
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x32, 0x32, 0, 0, fixedval74_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x12, 0x12, 0, 0, fixedval09_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x32, 0x32, 0, 0, fixedval74_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x12, 0x12, 0, 0, fixedval09_r);
 	/* oki6295 at 0x20 */
 }
 
@@ -10154,7 +10154,7 @@ static DRIVER_INIT( tc132axt )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fixedval58_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x21, 0x21, 0, 0, fixedval58_r);
 }
 
 static READ8_HANDLER( fixedvale4_r )
@@ -10186,8 +10186,8 @@ static DRIVER_INIT( match133 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedvalc7_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x16, 0x16, 0, 0, fixedvalc7_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
 }
 
 static DRIVER_INIT(cherrys)
@@ -10252,7 +10252,7 @@ static DRIVER_INIT( unkch4 )
 static DRIVER_INIT( tonypok )
 {
 	// the ppi doesn't seem to work properly, so just install the inputs directly
-	address_space *io = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *io = machine->device("maincpu")->memory().space(AS_IO);
 	memory_install_read_port(io, 0x04, 0x04, 0, 0, "IN0" );
 	memory_install_read_port(io, 0x05, 0x05, 0, 0, "IN1" );
 	memory_install_read_port(io, 0x06, 0x06, 0, 0, "IN2" );

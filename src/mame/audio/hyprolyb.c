@@ -25,7 +25,7 @@ static DEVICE_START( hyprolyb_adpcm )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
 
-	state->space = device->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	state->space = device->machine->device("audiocpu")->memory().space(AS_PROGRAM);
 	state->msm = device->machine->device("msm");
 	device->save_item(NAME(state->adpcm_ready));	// only bootlegs
 	device->save_item(NAME(state->adpcm_busy));
@@ -89,7 +89,7 @@ static READ8_DEVICE_HANDLER( hyprolyb_adpcm_data_r )
 	return soundlatch2_r(state->space, offset);
 }
 
-static ADDRESS_MAP_START( hyprolyb_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_data_r)
 	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_ready_r)

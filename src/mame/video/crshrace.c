@@ -219,7 +219,7 @@ SCREEN_UPDATE( crshrace )
 
 SCREEN_EOF( crshrace )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 	buffer_spriteram16_2_w(space, 0, 0, 0xffff);

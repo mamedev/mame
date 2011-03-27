@@ -15,7 +15,7 @@
 #include "audio/taito_zm.h"
 #include "sound/zsg2.h"
 
-static ADDRESS_MAP_START(taitozoom_map, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(taitozoom_map, AS_PROGRAM, 16)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 	AM_RANGE(0x800000, 0x800fff) AM_DEVREADWRITE("zsg2", zsg2_r, zsg2_w)
@@ -41,7 +41,7 @@ static WRITE8_HANDLER(tms_ctrl_w)
 	tms_ctrl = data;
 }
 
-static ADDRESS_MAP_START(taitozoom_io_map, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START(taitozoom_io_map, AS_IO, 8)
 	AM_RANGE(MN10200_PORT1, MN10200_PORT1) AM_READWRITE(tms_ctrl_r, tms_ctrl_w)
 ADDRESS_MAP_END
 

@@ -64,7 +64,7 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 */
 
 
-static ADDRESS_MAP_START( ginganin_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ginganin_map, AS_PROGRAM, 16 )
 /* The ROM area: 10000-13fff is written with: 0000 0000 0000 0001, at startup only. Why? */
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x023fff) AM_RAM
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( MC6840_write_port_1_w )
 	state->MC6840_register1 = data;
 }
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(MC6840_control_port_0_w)	/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(MC6840_control_port_1_w)	/* Takahiro Nogi. 1999/09/27 */

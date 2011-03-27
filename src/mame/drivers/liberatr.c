@@ -214,7 +214,7 @@ READ8_MEMBER( liberatr_state::port0_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( liberatr_map, ADDRESS_SPACE_PROGRAM, 8, liberatr_state )
+static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)
@@ -247,7 +247,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( liberat2_map, ADDRESS_SPACE_PROGRAM, 8, liberatr_state )
+static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)

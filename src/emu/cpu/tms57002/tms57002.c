@@ -1107,7 +1107,7 @@ static CPU_SET_INFO(tms57002)
 {
 }
 
-static ADDRESS_MAP_START(internal_pgm, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(internal_pgm, AS_PROGRAM, 32)
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1125,22 +1125,22 @@ CPU_GET_INFO(tms57002)
 	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i = 4; break;
 	case CPUINFO_INT_MIN_CYCLES:				info->i = 1; break;
 	case CPUINFO_INT_MAX_CYCLES:				info->i = 3; break;
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:		info->i = 32; break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:		info->i = 8; break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:		info->i = -2; break;
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 8; break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:		info->i = 20; break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:		info->i = 0; break;
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 0; break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:			info->i = 0; break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:			info->i = 0; break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:		info->i = 32; break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 8; break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:		info->i = -2; break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:		info->i = 8; break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:		info->i = 20; break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:		info->i = 0; break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_IO:			info->i = 0; break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:			info->i = 0; break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:			info->i = 0; break;
 	case CPUINFO_FCT_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(tms57002); break;
 	case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(tms57002); break;
 	case CPUINFO_FCT_RESET:						info->reset = CPU_RESET_NAME(tms57002); break;
 	case CPUINFO_FCT_EXECUTE:					info->execute = CPU_EXECUTE_NAME(tms57002); break;
 	case CPUINFO_FCT_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(tms57002); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount = &s->icount; break;
-	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:info->internal_map32 = ADDRESS_MAP_NAME(internal_pgm); break;
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:info->internal_map32 = ADDRESS_MAP_NAME(internal_pgm); break;
 	case DEVINFO_STR_NAME:						strcpy( info->s, "TMS57002" ); break;
 	case DEVINFO_STR_FAMILY:				strcpy( info->s, "Texas Instruments TMS57002 (DASP)" ); break;
 	case DEVINFO_STR_VERSION:				strcpy( info->s, "1.0" ); break;

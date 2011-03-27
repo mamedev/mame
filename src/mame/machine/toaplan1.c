@@ -83,7 +83,7 @@ READ16_HANDLER( demonwld_dsp_r )
 	UINT16 input_data = 0;
 
 	switch (state->main_ram_seg) {
-		case 0xc00000:	mainspace = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+		case 0xc00000:	mainspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 						input_data = mainspace->read_word(state->main_ram_seg + state->dsp_addr_w);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", cpu_get_previouspc(space->cpu), state->main_ram_seg + state->dsp_addr_w);
@@ -101,7 +101,7 @@ WRITE16_HANDLER( demonwld_dsp_w )
 	state->dsp_execute = 0;
 	switch (state->main_ram_seg) {
 		case 0xc00000:	if ((state->dsp_addr_w < 3) && (data == 0)) state->dsp_execute = 1;
-						mainspace = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+						mainspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 						mainspace->write_word(state->main_ram_seg + state->dsp_addr_w, data);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", cpu_get_previouspc(space->cpu), state->main_ram_seg + state->dsp_addr_w);

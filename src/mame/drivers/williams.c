@@ -514,7 +514,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( defender_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( defender_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(williams_state, videoram)
 	/* range from 0xc000-0xcfff is mapped programmatically below */
 	AM_RANGE(0xc000, 0xc00f) AM_BASE_GENERIC(paletteram)
@@ -551,7 +551,7 @@ void defender_install_io_space(address_space *space)
  *
  *************************************/
 
-static ADDRESS_MAP_START( williams_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_BASE_GENERIC(paletteram)
@@ -566,7 +566,7 @@ static ADDRESS_MAP_START( williams_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( williams_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_extra_ram_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_BASE_GENERIC(paletteram)
@@ -589,7 +589,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( blaster_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( blaster_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x4000, 0x8fff) AM_READ_BANK("bank2") AM_WRITEONLY
 	AM_RANGE(0xbb00, 0xbbff) AM_WRITEONLY AM_BASE_MEMBER(williams_state, blaster_palette_0)
@@ -617,7 +617,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( williams2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE_MEMBER(williams_state, williams2_tileram)
@@ -639,7 +639,7 @@ static ADDRESS_MAP_START( williams2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( williams2_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams2_extra_ram_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE_MEMBER(williams_state, williams2_tileram)
@@ -669,14 +669,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( defender_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( defender_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w)
 	AM_RANGE(0xb000, 0xffff) AM_ROM		/* most games start at $F000, Sinistar starts at $B000 */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM		/* MC6810 RAM */
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w)
@@ -691,7 +691,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( williams2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams2_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM		/* MC6810 RAM */
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia_2", pia6821_r, pia6821_w)
@@ -2729,7 +2729,7 @@ static DRIVER_INIT( mayday )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* install a handler to catch protection checks */
-	state->mayday_protection = memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa190, 0xa191, 0, 0, mayday_protection_r);
+	state->mayday_protection = memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa190, 0xa191, 0, 0, mayday_protection_r);
 }
 
 
@@ -2767,7 +2767,7 @@ static DRIVER_INIT( bubbles )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* bubbles has a full 8-bit-wide CMOS */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, bubbles_cmos_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcc00, 0xcfff, 0, 0, bubbles_cmos_w);
 }
 
 
@@ -2814,13 +2814,13 @@ static DRIVER_INIT( spdball )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* add a third PIA */
-	memory_install_readwrite8_device_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), pia_3, 0xc808, 0xc80b, 0, 0, pia6821_r, pia6821_w);
+	memory_install_readwrite8_device_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), pia_3, 0xc808, 0xc80b, 0, 0, pia6821_r, pia6821_w);
 
 	/* install extra input handlers */
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc800, 0xc800, 0, 0, "AN0");
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc801, 0xc801, 0, 0, "AN1");
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc802, 0xc802, 0, 0, "AN2");
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc803, 0xc803, 0, 0, "AN3");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xc800, 0, 0, "AN0");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc801, 0xc801, 0, 0, "AN1");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc802, 0xc802, 0, 0, "AN2");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc803, 0xc803, 0, 0, "AN3");
 }
 
 
@@ -2828,7 +2828,7 @@ static DRIVER_INIT( alienar )
 {
 	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcbff, 0xcbff, 0, 0);
 }
 
 
@@ -2836,7 +2836,7 @@ static DRIVER_INIT( alienaru )
 {
 	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xcbff, 0xcbff, 0, 0);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcbff, 0xcbff, 0, 0);
 }
 
 

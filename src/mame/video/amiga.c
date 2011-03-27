@@ -207,7 +207,7 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 	{
 		if (LOG_COPPER)
 			logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2, amiga_custom_names[state->copper_pending_offset & 0xff], state->copper_pending_data);
-		amiga_custom_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), state->copper_pending_offset, state->copper_pending_data, 0xffff);
+		amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), state->copper_pending_offset, state->copper_pending_data, 0xffff);
 		state->copper_pending_offset = 0;
 	}
 
@@ -263,7 +263,7 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 			{
 				if (LOG_COPPER)
 					logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2, amiga_custom_names[word0 & 0xff], word1);
-				amiga_custom_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), word0, word1, 0xffff);
+				amiga_custom_w(machine->device("maincpu")->memory().space(AS_PROGRAM), word0, word1, 0xffff);
 			}
 			else	// additional 2 cycles needed for non-Agnus registers
 			{

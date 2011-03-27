@@ -230,7 +230,7 @@ static WRITE8_DEVICE_HANDLER( sprint4_attract_w )
 }
 
 
-static ADDRESS_MAP_START( sprint4_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprint4_cpu_map, AS_PROGRAM, 8 )
 
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 

@@ -212,13 +212,13 @@ static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chi
 			/*   02 - read data into latches 00,01 from 2 * (address in 07,08,09) */
 			if (data == 0x01)
 			{
-				address_space *targetspace = chip->cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+				address_space *targetspace = chip->cpu->memory().space(AS_PROGRAM);
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
 				targetspace->write_word(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
 			}
 			else if (data == 0x02)
 			{
-				address_space *targetspace = chip->cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+				address_space *targetspace = chip->cpu->memory().space(AS_PROGRAM);
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
 				result = targetspace->read_word(addr);
@@ -295,7 +295,7 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip, int decrypt)
 {
 	int rgnum;
-	address_space *space = chip->cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = chip->cpu->memory().space(AS_PROGRAM);
 
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 

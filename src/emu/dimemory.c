@@ -137,7 +137,7 @@ device_config_memory_interface::~device_config_memory_interface()
 //  does not exist
 //-------------------------------------------------
 
-const address_space_config *device_config_memory_interface::memory_space_config(int spacenum) const
+const address_space_config *device_config_memory_interface::memory_space_config(address_spacenum spacenum) const
 {
 	return NULL;
 }
@@ -148,7 +148,7 @@ const address_space_config *device_config_memory_interface::memory_space_config(
 //  to set up VBLANK interrupts on the device
 //-------------------------------------------------
 
-void device_config_memory_interface::static_set_addrmap(device_config *device, int spacenum, address_map_constructor map)
+void device_config_memory_interface::static_set_addrmap(device_config *device, address_spacenum spacenum, address_map_constructor map)
 {
 	device_config_memory_interface *memory = dynamic_cast<device_config_memory_interface *>(device);
 	if (memory == NULL)
@@ -171,7 +171,7 @@ bool device_config_memory_interface::interface_validity_check(emu_options &optio
 	bool error = false;
 
 	// loop over all address spaces
-	for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+	for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 	{
 		const address_space_config *spaceconfig = space_config(spacenum);
 		if (spaceconfig != NULL)
@@ -342,7 +342,7 @@ device_memory_interface::~device_memory_interface()
 //  to a device
 //-------------------------------------------------
 
-void device_memory_interface::set_address_space(int spacenum, address_space &space)
+void device_memory_interface::set_address_space(address_spacenum spacenum, address_space &space)
 {
 	assert(spacenum < ARRAY_LENGTH(m_addrspace));
 	m_addrspace[spacenum] = &space;
@@ -356,7 +356,7 @@ void device_memory_interface::set_address_space(int spacenum, address_space &spa
 //  translation is supported
 //-------------------------------------------------
 
-bool device_memory_interface::memory_translate(int spacenum, int intention, offs_t &address)
+bool device_memory_interface::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
 {
 	// by default it maps directly
 	return true;
@@ -371,7 +371,7 @@ bool device_memory_interface::memory_translate(int spacenum, int intention, offs
 //  handled by bypassing the memory system
 //-------------------------------------------------
 
-bool device_memory_interface::memory_read(int spacenum, offs_t offset, int size, UINT64 &value)
+bool device_memory_interface::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
 {
 	// by default, we don't do anything
 	return false;
@@ -386,7 +386,7 @@ bool device_memory_interface::memory_read(int spacenum, offs_t offset, int size,
 //  handled by bypassing the memory system
 //-------------------------------------------------
 
-bool device_memory_interface::memory_write(int spacenum, offs_t offset, int size, UINT64 value)
+bool device_memory_interface::memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value)
 {
 	// by default, we don't do anything
 	return false;

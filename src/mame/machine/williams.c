@@ -432,7 +432,7 @@ TIMER_DEVICE_CALLBACK( williams2_endscreen_callback )
 static STATE_POSTLOAD( williams2_postload )
 {
 	williams_state *state = machine->driver_data<williams_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	williams2_bank_select_w(space, 0, state->vram_bank);
 }
 
@@ -452,7 +452,7 @@ MACHINE_START( williams2 )
 
 MACHINE_RESET( williams2 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* make sure our banking is reset */
 	williams2_bank_select_w(space, 0, 0);
@@ -725,7 +725,7 @@ WRITE8_HANDLER( williams2_7segment_w )
 static STATE_POSTLOAD( defender_postload )
 {
 	williams_state *state = machine->driver_data<williams_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	defender_bank_select_w(space, 0, state->vram_bank);
 }
 
@@ -743,7 +743,7 @@ MACHINE_START( defender )
 
 MACHINE_RESET( defender )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	MACHINE_RESET_CALL(williams_common);
 

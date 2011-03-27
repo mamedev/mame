@@ -220,7 +220,7 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	}
 }
 
-static ADDRESS_MAP_START( cham24_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cham24_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_r, ppu2c0x_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
@@ -304,7 +304,7 @@ static MACHINE_START( cham24 )
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", machine->region("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
@@ -315,7 +315,7 @@ static MACHINE_START( cham24 )
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
 	/* and read/write handlers */
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);
+	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);
 }
 
 static DRIVER_INIT( cham24 )

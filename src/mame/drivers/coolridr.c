@@ -624,7 +624,7 @@ static WRITE32_HANDLER( sysh1_char_w )
 	}
 }
 
-static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
@@ -642,7 +642,7 @@ static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coolridr_submap, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE("share2")
 
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM //communication RAM
@@ -679,7 +679,7 @@ ADDRESS_MAP_END
 // SH-1 or SH-2 almost certainly copies the program down to here: the ROM containing the program is 32-bit wide and the 68000 is 16-bit
 // the SCSP is believed to be hardcoded to decode the first 4 MB like this for a master/slave config
 // (see also Model 3):
-static ADDRESS_MAP_START( system_h1_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 //  AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM
@@ -1187,8 +1187,8 @@ static READ32_HANDLER( coolridr_hack2_r )
 
 static DRIVER_INIT( coolridr )
 {
-//  memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack1_r );
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60d8894, 0x060d8897, 0, 0, coolridr_hack2_r );
+//  memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack1_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60d8894, 0x060d8897, 0, 0, coolridr_hack2_r );
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders (US)",GAME_NOT_WORKING|GAME_NO_SOUND )

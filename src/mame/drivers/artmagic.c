@@ -424,7 +424,7 @@ static WRITE16_HANDLER( protection_bit_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x220000, 0x23ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("nvram")
@@ -441,7 +441,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stonebal_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
@@ -464,7 +464,7 @@ static READ16_HANDLER(unk_r)
 	return space->machine->rand();
 }
 
-static ADDRESS_MAP_START( shtstar_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
@@ -505,7 +505,7 @@ static const tms34010_config tms_config =
 };
 
 
-static ADDRESS_MAP_START( tms_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, vram0)
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, vram1)
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
@@ -515,7 +515,7 @@ static ADDRESS_MAP_START( tms_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stonebal_tms_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( stonebal_tms_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, vram0)
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, vram1)
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
@@ -532,16 +532,16 @@ ADDRESS_MAP_END
  *************************************/
 
 /* see adp.c */
-static ADDRESS_MAP_START( shtstar_subcpu_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( shtstar_subcpu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shtstar_guncpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( shtstar_guncpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shtstar_guncpu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( shtstar_guncpu_io_map, AS_IO, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1172,7 +1172,7 @@ static DRIVER_INIT( ultennis )
 	state->protection_handler = ultennis_protection;
 
 	/* additional (protection?) hack */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x300000, 0x300001, 0, 0, ultennis_hack_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x300000, 0x300001, 0, 0, ultennis_hack_r);
 }
 
 

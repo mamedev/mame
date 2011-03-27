@@ -38,7 +38,7 @@ static WRITE8_HANDLER ( coinlock_w )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( chaknpop_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chaknpop_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(chaknpop_state, mcu_ram)
 	AM_RANGE(0x8800, 0x8800) AM_READWRITE(chaknpop_mcu_port_a_r, chaknpop_mcu_port_a_w)

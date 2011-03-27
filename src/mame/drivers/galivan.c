@@ -75,7 +75,7 @@ static WRITE8_HANDLER( ninjemak_videoreg_w )
 
 
 
-static ADDRESS_MAP_START( galivan_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	// The next three entires need to be looked at.  It's ugly.
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( galivan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe100, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjemak_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	// The next three entires need to be looked at.  It's ugly.
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( ninjemak_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_READ(IO_port_c0_r) /* dangar needs to return 0x58 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjemak_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1") AM_WRITE(ninjemak_gfxbank_w)
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
@@ -128,12 +128,12 @@ static ADDRESS_MAP_START( ninjemak_io_map, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP         // ??
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_w)
@@ -1043,20 +1043,20 @@ static WRITE8_HANDLER( youmab_84_w )
 
 static DRIVER_INIT( youmab )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank3");
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank3");
 	memory_set_bankptr(machine,  "bank3", machine->region("maincpu")->base());
 
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank2");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank2");
 	memory_configure_bank(machine, "bank2", 0, 2, machine->region("user2")->base(), 0x4000);
 	memory_set_bank(machine, "bank2", 0);
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..
 
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd800, 0xd81f, 0, 0); // scrolling isn't here..
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xd81f, 0, 0); // scrolling isn't here..
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x8a, 0x8a, 0, 0, youmab_8a_r); // ???
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x8a, 0x8a, 0, 0, youmab_8a_r); // ???
 
 }
 

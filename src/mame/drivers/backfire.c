@@ -248,7 +248,7 @@ static WRITE32_HANDLER( backfire_spriteram2_w )
 
 
 
-static ADDRESS_MAP_START( backfire_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
@@ -685,7 +685,7 @@ static DRIVER_INIT( backfire )
 	deco156_decrypt(machine);
 	machine->device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
 }
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", GAME_SUPPORTS_SAVE )

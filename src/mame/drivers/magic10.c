@@ -282,7 +282,7 @@ static WRITE16_HANDLER( magic10_out_w )
 *       Memory Maps        *
 ***************************/
 
-static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magic10a_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( magic10a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magic102_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
@@ -333,7 +333,7 @@ static ADDRESS_MAP_START( magic102_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE_MEMBER(magic10_state, vregs)	// video registers?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotslot_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( hotslot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE_MEMBER(magic10_state, vregs)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgsafari_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE_MEMBER(magic10_state, layer1_videoram)
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE_MEMBER(magic10_state, layer0_videoram)

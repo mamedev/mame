@@ -131,14 +131,14 @@ static READ16_HANDLER( peno_rand2 )
 }
 #endif
 
-static ADDRESS_MAP_START( ttchamp_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16 )
     AM_RANGE(0x00000, 0x0ffff) AM_RAM
     AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE_MEMBER(ttchamp_state, peno_vram)
     AM_RANGE(0x20000, 0x7ffff) AM_ROMBANK("bank1") // ?
     AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ttchamp_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16 )
     AM_RANGE(0x0000, 0x0001) AM_WRITENOP
 
     AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")

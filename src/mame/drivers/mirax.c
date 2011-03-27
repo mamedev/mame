@@ -221,7 +221,7 @@ static WRITE8_HANDLER( mirax_sound_cmd_w )
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(mirax_state, videoram)
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( mirax_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mirax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)

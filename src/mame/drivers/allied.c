@@ -10,7 +10,7 @@ public:
 		: driver_device(machine, config) { }
 };
 
-static ADDRESS_MAP_START( allied_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( allied_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1400, 0x1fff) AM_ROM

@@ -208,7 +208,7 @@ static WRITE16_HANDLER( cclownz_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( lethalj_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
@@ -897,19 +897,19 @@ ROM_END
 
 static DRIVER_INIT( ripribit )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
 }
 
 
 static DRIVER_INIT( cfarm )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
 }
 
 
 static DRIVER_INIT( cclownz )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
 }
 
 

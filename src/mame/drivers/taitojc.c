@@ -795,7 +795,7 @@ static WRITE32_HANDLER(jc_output_w)
 	//mame_printf_debug("jc_output_w: %d, %d\n", offset, (data >> 16) & 0xffff);
 }
 
-static ADDRESS_MAP_START( taitojc_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
 	AM_RANGE(0x00400000, 0x01bfffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_BASE_MEMBER(taitojc_state,vram)
@@ -858,12 +858,12 @@ static READ8_HANDLER(hc11_analog_r)
 }
 
 
-static ADDRESS_MAP_START( hc11_pgm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hc11_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8 )
 	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_NOP
 	AM_RANGE(MC68HC11_IO_PORTG,     MC68HC11_IO_PORTG    ) AM_READWRITE(hc11_comm_r, hc11_comm_w)
 	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_NOP
@@ -1048,11 +1048,11 @@ static READ16_HANDLER(dsp_intersection_r)
     0x7030: Unknown write
 */
 
-static ADDRESS_MAP_START( tms_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_data_map, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16 )
 	//AM_RANGE(0x1400, 0x1401) AM_RAM
 	AM_RANGE(0x6a01, 0x6a02) AM_WRITE(dsp_unk2_w)
 	AM_RANGE(0x6a11, 0x6a12) AM_NOP		// same as 0x6a01..02 for the second renderer chip?

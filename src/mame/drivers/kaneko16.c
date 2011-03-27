@@ -360,7 +360,7 @@ static WRITE16_HANDLER( kaneko16_eeprom_w )
                                 The Berlin Wall
 ***************************************************************************/
 
-static ADDRESS_MAP_START( berlwall, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x30e000, 0x30ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)		// Sprites
@@ -404,7 +404,7 @@ static WRITE16_DEVICE_HANDLER( bakubrkr_oki_bank_sw )
 	}
 }
 
-static ADDRESS_MAP_START( bakubrkr, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREAD("ay1", kaneko16_YM2149_r)	// Sound
@@ -438,7 +438,7 @@ ADDRESS_MAP_END
                                     Blaze On
 ***************************************************************************/
 
-static ADDRESS_MAP_START( blazeon, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( blazeon, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM		// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
@@ -497,7 +497,7 @@ static WRITE16_HANDLER( bloodwar_coin_lockout_w )
 	}
 }
 
-static ADDRESS_MAP_START( bloodwar, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&kaneko16_mcu_ram)		// Shared With MCU
@@ -559,7 +559,7 @@ static WRITE16_DEVICE_HANDLER( bonkadv_oki_1_bank_w )
 }
 
 
-static ADDRESS_MAP_START( bonkadv, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&kaneko16_mcu_ram)		// Shared With MCU
@@ -635,7 +635,7 @@ static WRITE16_DEVICE_HANDLER( gtmr_oki_1_bank_w )
 	}
 }
 
-static ADDRESS_MAP_START( gtmr_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0ffffd) AM_ROM																		// ROM
 	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr_wheel_r)														// Wheel Value
 
@@ -711,7 +711,7 @@ static READ16_HANDLER( gtmr2_IN1_r )
 	return	(input_port_read(space->machine, "P2") & (input_port_read(space->machine, "FAKE") | ~0x7100));
 }
 
-static ADDRESS_MAP_START( gtmr2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0ffffd) AM_ROM // ROM
 	AM_RANGE(0x0ffffe, 0x0fffff) AM_READ(gtmr2_wheel_r)	// Wheel Value
 
@@ -764,7 +764,7 @@ ADDRESS_MAP_END
                                 Magical Crystal
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mgcrystl, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM		// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE("ay1", kaneko16_YM2149_r, kaneko16_YM2149_w)	// Sound
@@ -829,7 +829,7 @@ static WRITE16_HANDLER( brapboys_oki_bank_w )
 }
 
 
-static ADDRESS_MAP_START( shogwarr, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&kaneko16_mainram)		// Work RAM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(calc3_mcu_ram_w) AM_BASE(&kaneko16_mcu_ram)	// Shared With MCU
@@ -871,12 +871,12 @@ ADDRESS_MAP_END
                                     Blaze On
 ***************************************************************************/
 
-static ADDRESS_MAP_START( blazeon_soundmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( blazeon_soundmem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM		// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blazeon_soundport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( blazeon_soundport, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
@@ -2150,12 +2150,12 @@ static const UINT16 shogwarr_default_eeprom[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0010, 0x0000, 0x0000, 0xFFFF
 };
 
-static ADDRESS_MAP_START( shogwarr_oki1_map, 0, 8 )
+static ADDRESS_MAP_START( shogwarr_oki1_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank10")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shogwarr_oki2_map, 0, 8 )
+static ADDRESS_MAP_START( shogwarr_oki2_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
@@ -2189,11 +2189,11 @@ static MACHINE_CONFIG_START( shogwarr, driver_device )
 
 	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, shogwarr_oki1_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, shogwarr_oki1_map)
 
 	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, shogwarr_oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, shogwarr_oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -2208,14 +2208,14 @@ static const UINT16 brapboys_default_eeprom[64] = {
 	0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0x0035, 0xFFFF, 0xFFFF, 0xFFFF
 };
 
-static ADDRESS_MAP_START( brapboys_oki2_map, 0, 8 )
+static ADDRESS_MAP_START( brapboys_oki2_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( brapboys, shogwarr )
 	MCFG_SOUND_MODIFY("oki2")
-	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, brapboys_oki2_map)
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_93C46_ADD("eeprom")
@@ -3877,7 +3877,7 @@ static DRIVER_INIT( shogwarr )
 static DRIVER_INIT( brapboys )
 {
 	// sample banking is different on brap boys for the music, why? GALs / PALs ?
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe00000, 0xe00001, 0, 0, brapboys_oki_bank_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe00000, 0xe00001, 0, 0, brapboys_oki_bank_w);
 
 	// default sample banks
 	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);

@@ -70,7 +70,7 @@ DIP locations verified for:
 static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 {
 	bagman_state *state = device->machine->driver_data<bagman_state>();
-	address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
 	if (state->ls259_buf[offset] != (data&1) )
@@ -110,7 +110,7 @@ static WRITE8_DEVICE_HANDLER( bagman_interrupt_w )
 	cpu_interrupt_enable(device, data);
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, videoram)
@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, videoram)
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("aysnd", ay8910_r)
@@ -934,7 +934,7 @@ static DRIVER_INIT( bagman )
 
 	/* Unmap video enable register, not available on earlier hardware revision(s)
        Bagman is supposed to have glitches during screen transitions */
-	memory_unmap_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0);
+	memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa003, 0xa003, 0, 0);
 	*state->video_enable = 1;
 }
 

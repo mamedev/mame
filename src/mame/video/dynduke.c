@@ -253,7 +253,7 @@ SCREEN_UPDATE( dynduke )
 
 SCREEN_EOF( dynduke )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff); // Could be a memory location instead
 }

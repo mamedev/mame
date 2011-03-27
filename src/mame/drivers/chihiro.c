@@ -552,12 +552,12 @@ static WRITE32_HANDLER( smbus_w )
 }
 
 
-static ADDRESS_MAP_START( xbox_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(xbox_map_io, ADDRESS_SPACE_IO, 32)
+static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32)
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r, pci_32le_w)
 	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)

@@ -49,7 +49,7 @@ struct _ide_config
 
 #define MCFG_IDE_BUS_MASTER_SPACE(_cpu, _space) \
 	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, bmcpu, _cpu) \
-	MCFG_DEVICE_CONFIG_DATA32(ide_config, bmspace, ADDRESS_SPACE_##_space)
+	MCFG_DEVICE_CONFIG_DATA32(ide_config, bmspace, AS_##_space)
 
 
 

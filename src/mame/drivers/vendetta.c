@@ -166,7 +166,7 @@ static WRITE8_HANDLER( vendetta_K052109_w )
 static void vendetta_video_banking( running_machine *machine, int select )
 {
 	vendetta_state *state = machine->driver_data<vendetta_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (select & 1)
 	{
@@ -235,7 +235,7 @@ static READ8_DEVICE_HANDLER( vendetta_sound_r )
 
 /********************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x5f80, 0x5f9f) AM_DEVREADWRITE("k054000", k054000_r, k054000_w)
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( esckids_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM							// 053248 64K SRAM
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("P1")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P2")
@@ -286,7 +286,7 @@ static ADDRESS_MAP_START( esckids_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

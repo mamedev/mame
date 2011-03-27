@@ -172,7 +172,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	timer[1] = machine->device<timer_device>("cage_timer1");
 
 	if (speedup)
-		speedup_ram = memory_install_write32_handler(cage_cpu->memory().space(ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
+		speedup_ram = memory_install_write32_handler(cage_cpu->memory().space(AS_PROGRAM), speedup, speedup, 0, 0, speedup_w);
 
 	for (chan = 0; chan < DAC_BUFFER_CHANNELS; chan++)
 	{
@@ -615,7 +615,7 @@ static const tms3203x_config cage_config =
 };
 
 
-static ADDRESS_MAP_START( cage_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
@@ -626,7 +626,7 @@ static ADDRESS_MAP_START( cage_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cage_map_seattle, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")

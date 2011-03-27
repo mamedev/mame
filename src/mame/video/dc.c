@@ -1949,7 +1949,7 @@ static void render_tri(bitmap_t *bitmap, texinfo *ti, const vert *v)
 
 static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int cs,rs,ns;
 	UINT32 c;
 #if 0

@@ -762,7 +762,7 @@ static MACHINE_RESET( bfm_sc1 )
 // scorpion1 board memory map ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)				// reel 2+3 latch
@@ -805,7 +805,7 @@ ADDRESS_MAP_END
 // scorpion1 board + adder2 expansion memory map ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( memmap_adder2, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap_adder2, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)	  // reel 2+3 latch
@@ -854,7 +854,7 @@ ADDRESS_MAP_END
 // scorpion1 board + upd7759 soundcard memory map ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_nec_uk, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc1_nec_uk, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)	  // reel 2+3 latch

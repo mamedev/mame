@@ -217,7 +217,7 @@ DRIVER_INIT( dingoe )
 			rom[i] = BITSWAP8(rom[i],7,6,5,0,3,2,1,4);
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
 
 }
 #endif
@@ -266,19 +266,19 @@ CUSTOM_INPUT( _4in1_fake_port_r )
 DRIVER_INIT( pisces )
 {
 	/* the coin lockout was replaced */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( checkmaj )
 {
 	/* for the title screen */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
 }
 
 DRIVER_INIT( dingo )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, dingo_3000_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3035, 0x3035, 0, 0, dingo_3035_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3000, 0x3000, 0, 0, dingo_3000_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3035, 0x3035, 0, 0, dingo_3035_r);
 }
 
 
@@ -296,7 +296,7 @@ static UINT8 decode_mooncrst(UINT8 data,offs_t addr)
 
 DRIVER_INIT( mooncrsu )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa000, 0xa002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xa002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( mooncrst )
@@ -313,13 +313,13 @@ DRIVER_INIT( mooncrst )
 
 DRIVER_INIT( mooncrgx )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000, 0x6002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000, 0x6002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( moonqsr )
 {
 	offs_t i;
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
@@ -397,7 +397,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT( 4in1 )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t i, len = machine->region("maincpu")->bytes();
 	UINT8 *RAM = machine->region("maincpu")->base();
 
@@ -421,5 +421,5 @@ INTERRUPT_GEN( hunchbks_vh_interrupt )
 DRIVER_INIT( ladybugg )
 {
 /* Doesn't actually use the bank, but it mustn't have a coin lock! */
-memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
+memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
 }

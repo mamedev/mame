@@ -78,7 +78,7 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 	device->machine->scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_BASE_MEMBER(trucocl_state, videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_BASE_MEMBER(trucocl_state, colorram)

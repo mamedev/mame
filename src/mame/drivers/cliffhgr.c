@@ -229,13 +229,13 @@ static MACHINE_RESET( cliffhgr )
 
 /********************************************************/
 
-static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM		/* ROM */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
 	AM_RANGE(0xe800, 0xefff) AM_RAM		/* RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mainport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mainport, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x44, 0x44) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0x45, 0x45) AM_READ(TMS9928A_vram_r)

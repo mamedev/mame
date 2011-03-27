@@ -85,7 +85,7 @@ static READ8_HANDLER( test_r )
 }
 
 
-static ADDRESS_MAP_START( lions_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lions_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(_86lions_state, lions_vram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)

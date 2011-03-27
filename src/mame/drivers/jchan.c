@@ -504,7 +504,7 @@ static WRITE16_HANDLER( jchan_suprnova_sprite32regs_2_w )
 }
 
 
-static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
@@ -529,7 +529,7 @@ static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
 
@@ -789,8 +789,8 @@ static DRIVER_INIT( jchan )
 	jchan_state *state = machine->driver_data<jchan_state>();
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 	// install these here, putting them in the memory map causes issues
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x403ffe, 0x403fff, 0, 0, main2sub_cmd_w );
-	memory_install_write16_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x403ffe, 0x403fff, 0, 0, main2sub_cmd_w );
+	memory_install_write16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
 
 
 	memset(state->mcu_com, 0, 4 * sizeof( UINT16 ) );

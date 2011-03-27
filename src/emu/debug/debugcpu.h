@@ -146,7 +146,7 @@ public:
 
 	// commonly-used pass-throughs
 	offs_t pc() const { return (m_state != NULL) ? m_state->pc() : 0; }
-	int logaddrchars(int spacenum = AS_PROGRAM) const { return (m_memory != NULL && m_memory->space(spacenum) != NULL) ? m_memory->space(spacenum)->logaddrchars() : 8; }
+	int logaddrchars(address_spacenum spacenum = AS_0) const { return (m_memory != NULL && m_memory->space(spacenum) != NULL) ? m_memory->space(spacenum)->logaddrchars() : 8; }
 	int min_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
 	int max_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
 
@@ -193,7 +193,7 @@ public:
 	void breakpoint_enable_all(bool enable = true);
 
 	// watchpoints
-	watchpoint *watchpoint_first(int spacenum) const { return m_wplist[spacenum]; }
+	watchpoint *watchpoint_first(address_spacenum spacenum) const { return m_wplist[spacenum]; }
 	int watchpoint_set(address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action);
 	bool watchpoint_clear(int wpnum);
 	void watchpoint_clear_all();

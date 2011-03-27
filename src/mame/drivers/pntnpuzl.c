@@ -389,7 +389,7 @@ static READ16_HANDLER( pntnpuzl_28001a_r )
 
 
 
-static ADDRESS_MAP_START( pntnpuzl_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READNOP //|
 	AM_RANGE(0x100000, 0x100001) AM_READNOP	//| irq lines clear

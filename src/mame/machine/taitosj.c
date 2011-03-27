@@ -38,7 +38,7 @@ MACHINE_START( taitosj )
 MACHINE_RESET( taitosj )
 {
 	taitosj_state *state = machine->driver_data<taitosj_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
 	taitosj_bankswitch_w(space, 0, 0);
@@ -218,7 +218,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	}
 	if (~data & 0x10)
 	{
-		address_space *cpu0space = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *cpu0space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu), state->portA_out, state->address));
 
 		cpu0space->write_byte(state->address, state->portA_out);
@@ -228,7 +228,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	}
 	if (~data & 0x20)
 	{
-		address_space *cpu0space = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *cpu0space = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 		state->portA_in = cpu0space->read_byte(state->address);
 		LOG(("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(space->cpu), state->portA_in, state->address));
 	}

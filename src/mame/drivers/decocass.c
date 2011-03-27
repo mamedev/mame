@@ -115,7 +115,7 @@ static READ8_HANDLER( mirrorcolorram_r )
 }
 
 
-static ADDRESS_MAP_START( decocass_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE(ram_w) AM_BASE_MEMBER(decocass_state, rambase)
 	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(decocass_state, charram) /* still RMS3 RAM */
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_BASE_SIZE_MEMBER(decocass_state, fgvideoram, fgvideoram_size)  /* DSP3 RAM */
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( decocass_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(decocass_sound_nmi_enable_r, decocass_sound_nmi_enable_w)
 	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(decocass_sound_data_ack_reset_r, decocass_sound_data_ack_reset_w)
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( decocass_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( decocass_mcu_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( decocass_mcu_portmap, AS_IO, 8 )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(i8041_p1_r, i8041_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8041_p2_r, i8041_p2_w)
 ADDRESS_MAP_END
@@ -1324,7 +1324,7 @@ ROM_END
 static DRIVER_INIT( decocass )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
@@ -1363,8 +1363,8 @@ static DRIVER_INIT( decocrom )
 		state->decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, "bank1");
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, decocass_de0091_w);
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000, 0xafff, 0, 0, "bank1");
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000, 0xafff, 0, 0, decocass_de0091_w);
 	memory_configure_bank(machine, "bank1", 0, 1, state->charram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user3")->base(), 0);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 1, &state->decrypted[0x6000], 0);
@@ -1372,7 +1372,7 @@ static DRIVER_INIT( decocrom )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* install the bank selector */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);
 
 	state->save_pointer(NAME(state->decrypted2), romlength);
 }

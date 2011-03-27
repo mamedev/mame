@@ -376,7 +376,7 @@ static void timer_ack_callback(running_machine *machine)
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 
 	soundlatch_w(space, 0, param);
 	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
@@ -709,7 +709,7 @@ static WRITE16_HANDLER( smgp_excs_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -748,7 +748,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -770,14 +770,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -792,13 +792,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( smgp_comm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smgp_comm_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -2822,7 +2822,7 @@ static DRIVER_INIT( aburner2 )
 
 	state->road_priority = 0;
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
 }
 
 
@@ -2844,14 +2844,14 @@ static DRIVER_INIT( loffire )
 	state->adc_reverse[1] = state->adc_reverse[3] = 1;
 
 	/* install extra synchronization on core shared memory */
-	state->loffire_sync = memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
+	state->loffire_sync = memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
 }
 
 
 static DRIVER_INIT( smgp )
 {
 	xboard_generic_init(machine);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
 }
 
 

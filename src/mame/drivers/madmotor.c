@@ -36,7 +36,7 @@ static WRITE16_HANDLER( madmotor_sound_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( madmotor_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x180000, 0x18001f) AM_WRITEONLY AM_BASE_MEMBER(madmotor_state, pf1_control)
 	AM_RANGE(0x184000, 0x1847ff) AM_RAM AM_BASE_MEMBER(madmotor_state, pf1_rowscroll)
@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r,ym2151_w)

@@ -258,7 +258,7 @@ static WRITE32_HANDLER( gstream_tilemap3_scrolly_w )
 	state->tmap3_scrolly = data;
 }
 
-static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE_MEMBER(gstream_state, workram) // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
 	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE_MEMBER(gstream_state, vram) // video ram
@@ -344,7 +344,7 @@ static WRITE32_HANDLER( gstream_oki_4040_w )
 	// data == 0 or data == 0x81
 }
 
-static ADDRESS_MAP_START( gstream_io, ADDRESS_SPACE_IO, 32 )
+static ADDRESS_MAP_START( gstream_io, AS_IO, 32 )
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
 	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
 	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")	// extra coin switches etc
@@ -634,7 +634,7 @@ static READ32_HANDLER( gstream_speedup_r )
 
 static DRIVER_INIT( gstream )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
 }
 
 

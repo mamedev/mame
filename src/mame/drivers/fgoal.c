@@ -205,7 +205,7 @@ static WRITE8_HANDLER( fgoal_sound2_w )
 }
 
 
-static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x00ef) AM_RAM
 

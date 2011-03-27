@@ -111,7 +111,7 @@ static SCREEN_UPDATE(monzagp)
 	return 0;
 }
 
-static ADDRESS_MAP_START( monzagp_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( monzagp_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -211,7 +211,7 @@ static WRITE8_HANDLER(port3_w)
 #define  I8039_bus  0x120
 */
 
-static ADDRESS_MAP_START( monzagp_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( monzagp_io, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(rng_r,port_w)
 	AM_RANGE(0x100, 0x100) AM_WRITE(port0_w)
 	AM_RANGE(0x101, 0x101) AM_WRITE(port1_w)

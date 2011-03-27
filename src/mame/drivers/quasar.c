@@ -144,7 +144,7 @@ static READ8_HANDLER( audio_t1_r )
 
 // memory map taken from the manual
 
-static ADDRESS_MAP_START( quasar, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( quasar, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE_MEMBER(quasar_state, bullet_ram)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( quasar, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x73ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quasar_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( quasar_io, AS_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_READWRITE(quasar_IO_r, video_page_select_w)
 	AM_RANGE(0x08, 0x0b) AM_WRITE(io_page_select_w)
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, quasar_sh_command_w)
@@ -172,11 +172,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0x7f) AM_RAM
 	AM_RANGE(0x80, 0x80) AM_READ(quasar_sh_command_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)

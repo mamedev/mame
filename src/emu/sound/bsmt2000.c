@@ -56,14 +56,14 @@ const device_type BSMT2000 = bsmt2000_device_config::static_alloc_device_config;
 
 
 // program map for the DSP (points to internal ROM)
-static ADDRESS_MAP_START( tms_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 
 // I/O map for the DSP
-static ADDRESS_MAP_START( tms_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( tms_io_map, AS_IO, 16 )
 	AM_RANGE(0, 0) AM_DEVREADWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_register_r, tms_rom_addr_w)
 	AM_RANGE(1, 1) AM_DEVREADWRITE_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_data_r, tms_rom_bank_w)
 	AM_RANGE(2, 2) AM_DEVREAD_MODERN(DEVICE_SELF_OWNER, bsmt2000_device, tms_rom_r)
@@ -84,7 +84,7 @@ MACHINE_CONFIG_END
 
 // default address map for the external memory interface
 // the BSMT can address a full 32 bits but typically only 24 are used
-static ADDRESS_MAP_START( bsmt2000, 0, 8 )
+static ADDRESS_MAP_START( bsmt2000, AS_0, 8 )
 	AM_RANGE(0x00000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -177,7 +177,7 @@ machine_config_constructor bsmt2000_device_config::machine_config_additions() co
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *bsmt2000_device_config::memory_space_config(int spacenum) const
+const address_space_config *bsmt2000_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }

@@ -73,7 +73,7 @@ static WRITE8_HANDLER( output_1_w )
 	state->bell_io = (data & 0x80)>>4;
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_MEMBER(cchance_state, objram)

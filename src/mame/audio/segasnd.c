@@ -239,12 +239,12 @@ WRITE8_HANDLER( sega_speech_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( speech_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( speech_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( speech_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( speech_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(speech_rom_r)
 	AM_RANGE(0x00, 0xff) AM_DEVWRITE("speech", sp0250_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(speech_p1_r, speech_p1_w)
@@ -889,17 +889,17 @@ static WRITE8_HANDLER( usb_workram_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( usb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( usb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(&usb.program_ram)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( usb_map_rom, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( usb_map_rom, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( usb_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( usb_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(usb_workram_r, usb_workram_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(usb_p1_r, usb_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(usb_p2_w)

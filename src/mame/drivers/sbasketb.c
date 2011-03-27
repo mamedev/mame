@@ -61,7 +61,7 @@ static WRITE8_HANDLER( sbasketb_coin_counter_w )
 }
 
 
-static ADDRESS_MAP_START( sbasketb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_BASE_MEMBER(sbasketb_state, colorram)
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_BASE_MEMBER(sbasketb_state, videoram)
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( sbasketb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbasketb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sbasketb_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)

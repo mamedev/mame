@@ -253,7 +253,7 @@ static WRITE16_HANDLER( livequiz_coin_w )
 #endif
 }
 
-static ADDRESS_MAP_START( livequiz_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW_PLAYER1")
@@ -330,7 +330,7 @@ static WRITE16_HANDLER( hammer_led_w )
 #endif
 }
 
-static ADDRESS_MAP_START( hammer_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW")

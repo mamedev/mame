@@ -151,7 +151,7 @@ static WRITE16_HANDLER(bmc_2_videoram_w)
 	tilemap_mark_tile_dirty(state->tilemap_2, offset);
 }
 
-static ADDRESS_MAP_START( koftball_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_BASE_MEMBER(koftball_state, main_ram)
 

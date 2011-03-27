@@ -76,27 +76,27 @@ static WRITE8_HANDLER( torus_coin_counter_w )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(paradise_vram_0_w) AM_BASE_MEMBER(paradise_state, vram_0)	/* Foreground */ \
 
 
-static ADDRESS_MAP_START( paradise_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( paradise_map, AS_PROGRAM, 8 )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM	// RAM
 	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(paradise_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xe100, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tgtball_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tgtball_map, AS_PROGRAM, 8 )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM	// RAM
 	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_BASE_SIZE_MEMBER(paradise_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xda00, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( torus_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( torus_map, AS_PROGRAM, 8 )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(paradise_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xe000, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE_MEMBER(paradise_state, paletteram)	// Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)	// Flip Screen
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w) AM_BASE_MEMBER(paradise_state, videoram)	// Pixmap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( torus_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( torus_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE_MEMBER(paradise_state, paletteram)	// Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w)	// Flip Screen
@@ -1050,14 +1050,14 @@ static DRIVER_INIT (tgtball)
 {
 	paradise_state *state = machine->driver_data<paradise_state>();
 	state->sprite_inc = 4;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
 }
 
 static DRIVER_INIT (torus)
 {
 	paradise_state *state = machine->driver_data<paradise_state>();
 	state->sprite_inc = 4;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
 }
 
 

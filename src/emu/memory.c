@@ -893,7 +893,7 @@ class address_space_specific : public address_space
 
 public:
 	// construction/destruction
-	address_space_specific(device_memory_interface &memory, int spacenum)
+	address_space_specific(device_memory_interface &memory, address_spacenum spacenum)
 		: address_space(memory, spacenum, _Large),
 		  m_read(*this, _Large),
 		  m_write(*this, _Large)
@@ -1563,7 +1563,7 @@ void memory_init(running_machine *machine)
 	// loop over devices and spaces within each device
 	device_memory_interface *memory = NULL;
 	for (bool gotone = machine->m_devicelist.first(memory); gotone; gotone = memory->next(memory))
-		for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			// if there is a configuration for this space, we need an address space
 			const address_space_config *spaceconfig = memory->space_config(spacenum);
@@ -1786,7 +1786,7 @@ static STATE_POSTLOAD( bank_reattach )
 //  address_space - constructor
 //-------------------------------------------------
 
-address_space::address_space(device_memory_interface &memory, int spacenum, bool large)
+address_space::address_space(device_memory_interface &memory, address_spacenum spacenum, bool large)
 	: machine(memory.device().machine),
 	  cpu(&memory.device()),
 	  m_machine(*memory.device().machine),
@@ -1827,7 +1827,7 @@ address_space::~address_space()
 //  allocate - static smart allocator of subtypes
 //-------------------------------------------------
 
-address_space &address_space::allocate(running_machine &machine, const address_space_config &config, device_memory_interface &memory, int spacenum)
+address_space &address_space::allocate(running_machine &machine, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum)
 {
 	// allocate one of the appropriate type
 	bool large = (config.addr2byte_end(0xffffffffUL >> (32 - config.m_addrbus_width)) >= (1 << 18));
@@ -1933,7 +1933,7 @@ inline void address_space::adjust_addresses(offs_t &start, offs_t &end, offs_t &
 
 void address_space::prepare_map()
 {
-	const memory_region *devregion = (m_spacenum == ADDRESS_SPACE_0) ? m_machine.region(m_device.tag()) : NULL;
+	const memory_region *devregion = (m_spacenum == AS_0) ? m_machine.region(m_device.tag()) : NULL;
 	UINT32 devregionsize = (devregion != NULL) ? devregion->bytes() : 0;
 
 	// allocate the address map
@@ -1966,7 +1966,7 @@ void address_space::prepare_map()
 		}
 
 		// if this is a ROM handler without a specified region, attach it to the implicit region
-		if (m_spacenum == ADDRESS_SPACE_0 && entry->m_read.m_type == AMH_ROM && entry->m_region == NULL)
+		if (m_spacenum == AS_0 && entry->m_read.m_type == AMH_ROM && entry->m_region == NULL)
 		{
 			// make sure it fits within the memory region before doing so, however
 			if (entry->m_byteend < devregionsize)
@@ -3020,7 +3020,7 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 	// if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing
 	const memory_region *region = m_machine.region(m_device.tag());
 	if (entry->m_read.m_type == AMH_RAM ||
-		(entry->m_read.m_type == AMH_ROM && (m_spacenum != ADDRESS_SPACE_0 || region == NULL || entry->m_addrstart >= region->bytes())))
+		(entry->m_read.m_type == AMH_ROM && (m_spacenum != AS_0 || region == NULL || entry->m_addrstart >= region->bytes())))
 		return true;
 
 	// all other cases don't need backing

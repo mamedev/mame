@@ -150,7 +150,7 @@ static WRITE8_HANDLER( mrgoemon_flipscreen_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( gberet_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, colorram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, videoram)
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( gberet_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gberetb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, colorram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, videoram)
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( gberetb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf900, 0xf901) AM_WRITE(gberetb_scroll_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrgoemon_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, colorram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, videoram)

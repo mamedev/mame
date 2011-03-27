@@ -117,7 +117,7 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sidepckt_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE_MEMBER(sidepckt_state,videoram) AM_SIZE_MEMBER(sidepckt_state,videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( sidepckt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_w)
@@ -379,14 +379,14 @@ ROM_END
 
 static DRIVER_INIT( sidepckt )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepckt_i8751_w  );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3018, 0x3018, 0, 0, sidepckt_i8751_w  );
 }
 
 static DRIVER_INIT( sidepctj )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepctj_i8751_w  );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3018, 0x3018, 0, 0, sidepctj_i8751_w  );
 }
 
 

@@ -39,7 +39,7 @@ Encryption PAL 16R4 on CPU board
 DRIVER_INIT( empcity )
 {
 	stfight_state *state = machine->driver_data<stfight_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
@@ -85,7 +85,7 @@ DRIVER_INIT( stfight )
 MACHINE_RESET( stfight )
 {
 	stfight_state *state = machine->driver_data<stfight_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	state->adpcm_data_offs = state->adpcm_data_end = 0;
 	state->toggle = 0;
 	state->fm_data = 0;

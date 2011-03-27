@@ -109,7 +109,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( murogem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("crtc", mc6845_register_w)

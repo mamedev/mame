@@ -273,7 +273,7 @@ static WRITE16_HANDLER( midres_sound_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( dec0_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf1_control_0_w)								/* text layer */
 	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf1_control_1_w)
@@ -300,14 +300,14 @@ static ADDRESS_MAP_START( dec0_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)								/* Sprites */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( robocop_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( robocop_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM									/* Main ram */
 	AM_RANGE(0x1f2000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(dec0_state, robocop_shared_ram)	/* Shared ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hippodrm_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hippodrm_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x180000, 0x1800ff) AM_READWRITE(hippodrm_shared_r, hippodrm_shared_w)
 	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITE(dec0_pf3_control_8bit_w)
@@ -318,7 +318,7 @@ static ADDRESS_MAP_START( hippodrm_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1ff402, 0x1ff403) AM_READ_PORT("VBLANK")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slyspy_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
 	/* These locations aren't real!  They are just there so memory is allocated */
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( slyspy_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x31c000, 0x31c00f) AM_READ(slyspy_protection_r) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( midres_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(dec0_state, ram)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram)
@@ -389,7 +389,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( dec0_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( dec0_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( slyspy_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slyspy_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READNOP /* Protection counter */
@@ -410,7 +410,7 @@ static ADDRESS_MAP_START( slyspy_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( midres_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( midres_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE("ym2", ym3812_w)
 	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE("ym1", ym2203_w)
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( midres_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( secretab_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf2_control_0_w)
 	AM_RANGE(0x240010, 0x240017) AM_WRITE(dec0_pf2_control_1_w)
@@ -448,7 +448,7 @@ static ADDRESS_MAP_START( secretab_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE_MEMBER(dec0_state, spriteram) /* Sprites */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( automat_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
 	AM_RANGE(0x240000, 0x240007) AM_WRITE(dec0_pf1_control_0_w)			/* text layer */
@@ -486,7 +486,7 @@ static WRITE8_HANDLER( automat_adpcm_w )
 	state->automat_adpcm_byte = data;
 }
 
-static ADDRESS_MAP_START( automat_s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 //  AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2203_control_port_0_w)
 //  AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2203_write_port_0_w)
@@ -497,7 +497,7 @@ static ADDRESS_MAP_START( automat_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(dec0_mcu_port_r, dec0_mcu_port_w)
 ADDRESS_MAP_END
@@ -2905,10 +2905,10 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 
 static DRIVER_INIT( midresb )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00180000, 0x0018000f, 0, 0,  dec0_controls_r );
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x001a0000, 0x001a000f, 0, 0,  dec0_rotary_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00180000, 0x0018000f, 0, 0,  dec0_controls_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x001a0000, 0x001a000f, 0, 0,  dec0_rotary_r );
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00180014, 0x00180015, 0, 0, midres_sound_w );
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00180014, 0x00180015, 0, 0, midres_sound_w );
 }
 
 /******************************************************************************/

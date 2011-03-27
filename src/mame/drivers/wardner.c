@@ -152,7 +152,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		address_space *mainspace;
 		UINT8 *RAM = space->machine->region("maincpu")->base();
 
-		mainspace = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+		mainspace = space->machine->device("maincpu")->memory().space(AS_PROGRAM);
 		state->wardner_membank = data;
 
 		if (data)
@@ -188,7 +188,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 STATE_POSTLOAD( wardner_restore_bank )
 {
 	wardner_state *state = machine->driver_data<wardner_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	wardner_ramrom_bank_sw(space,0,1);	/* Dummy value to ensure restoration */
 	wardner_ramrom_bank_sw(space,0,state->wardner_membank);
@@ -197,7 +197,7 @@ STATE_POSTLOAD( wardner_restore_bank )
 
 /***************************** Z80 Main Memory Map **************************/
 
-static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("crtc", mc6845_register_w)
@@ -237,7 +237,7 @@ ADDRESS_MAP_END
 
 /***************************** Z80 Sound Memory Map *************************/
 
-static ADDRESS_MAP_START( sound_program_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x807f) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")	/* Shared RAM with Main Z80 */
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( sound_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
@@ -253,13 +253,13 @@ ADDRESS_MAP_END
 
 /***************************** TMS32010 Memory Map **************************/
 
-static ADDRESS_MAP_START( DSP_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( DSP_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000, 0x5ff) AM_ROM
 ADDRESS_MAP_END
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( DSP_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16 )
 	AM_RANGE(0, 0) AM_WRITE(wardner_dsp_addrsel_w)
 	AM_RANGE(1, 1) AM_READWRITE(wardner_dsp_r, wardner_dsp_w)
 	AM_RANGE(3, 3) AM_WRITE(twincobr_dsp_bio_w)

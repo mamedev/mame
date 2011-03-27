@@ -116,7 +116,7 @@ static MACHINE_RESET( sound_ym2203 )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lastday_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc007) AM_WRITE(dooyong_bgscroll8_w)
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( lastday_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pollux_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( pollux_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gulfstrm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( gulfstrm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bluehawk_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSWA")
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( bluehawk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flytiger_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( flytiger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, txvideoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( primella_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( primella_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc08, 0xfc0f) AM_WRITE(dooyong_fgscroll8_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rshark_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)	/* super-x needs this and is similar */
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( rshark_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE(dooyong_fg2scroll16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superx_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0dcfff) AM_RAM
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( superx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x08c010, 0x08c01f) AM_WRITE(dooyong_fg2scroll16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popbingo_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( popbingo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastday_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastday_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( lastday_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pollux_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pollux_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( pollux_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf804, 0xf805) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bluehawk_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bluehawk_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)

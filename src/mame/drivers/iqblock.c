@@ -120,13 +120,13 @@ static const ppi8255_interface ppi8255_intf =
 };
 
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(iqblock_state, rambase)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
 	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w)
 	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
@@ -444,7 +444,7 @@ static DRIVER_INIT( iqblock )
 	machine->generic.paletteram2.u8       = rom + 0x12800;
 	state->fgvideoram = rom + 0x16800;
 	state->bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
 	state->video_type=1;
 }
 
@@ -467,7 +467,7 @@ static DRIVER_INIT( grndtour )
 	machine->generic.paletteram2.u8       = rom + 0x12800;
 	state->fgvideoram = rom + 0x16800;
 	state->bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
 	state->video_type=0;
 }
 

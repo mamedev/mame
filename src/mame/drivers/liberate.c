@@ -71,9 +71,9 @@ static WRITE8_HANDLER( deco16_bank_w )
 	state->bank = data;
 
 	if (state->bank)
-		memory_install_read8_handler(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
+		memory_install_read8_handler(state->maincpu->memory().space(AS_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
 	else
-		memory_install_read_bank(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, "bank1");
+		memory_install_read_bank(state->maincpu->memory().space(AS_PROGRAM), 0x8000, 0x800f, 0, 0, "bank1");
 }
 
 static READ8_HANDLER( prosoccr_bank_r )
@@ -181,9 +181,9 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 	state->bank = data & 1;
 
 	if (state->bank)
-		memory_install_read8_handler(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
+		memory_install_read8_handler(state->maincpu->memory().space(AS_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
 	else
-		memory_install_read8_handler(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, prosoccr_charram_r);
+		memory_install_read8_handler(state->maincpu->memory().space(AS_PROGRAM), 0x8000, 0x800f, 0, 0, prosoccr_charram_r);
 
 }
 
@@ -241,7 +241,7 @@ static WRITE8_HANDLER( prosport_charram_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE_MEMBER(liberate_state, paletteram)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_BASE_MEMBER(liberate_state, bg_vram)
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( prosport_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberate_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( liberate_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( liberate_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prosoccr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( prosoccr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(prosoccr_bank_r)
@@ -281,17 +281,17 @@ static ADDRESS_MAP_START( prosoccr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( deco16_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( deco16_io_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(deco16_bank_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prosoccr_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( prosoccr_io_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(prosoccr_io_bank_w)
 	//AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberatb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( liberatb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00fe, 0x00fe) AM_READ_PORT("IN0")
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
@@ -315,7 +315,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( prosoccr_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( prosoccr_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( prosoccr_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberate_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( liberate_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8910_data_w)
@@ -1357,7 +1357,7 @@ ROM_END
 
 static void sound_cpu_decrypt(running_machine *machine)
 {
-	address_space *space = machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine->region("audiocpu")->base();
 	int i;
@@ -1385,13 +1385,13 @@ static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
 
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa000, 0xa000, 0, 0, "IN0");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xa000, 0, 0, "IN0");
 }
 
 static DRIVER_INIT( liberate )
 {
 	int A;
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *ROM = machine->region("maincpu")->base();
 

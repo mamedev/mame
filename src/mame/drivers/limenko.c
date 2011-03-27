@@ -150,7 +150,7 @@ static WRITE32_HANDLER( spriteram_buffer_w )
   MEMORY MAPS
 *****************************************************************************************************/
 
-static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE_MEMBER(limenko_state, mainram)
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(limenko_state, fg_videoram)
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( limenko_io_map, ADDRESS_SPACE_IO, 32 )
+static ADDRESS_MAP_START( limenko_io_map, AS_IO, 32 )
 	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 
 /* Spotty memory map */
 
-static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE_MEMBER(limenko_state, mainram)
 	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(limenko_state, fg_videoram)
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spotty_io_map, ADDRESS_SPACE_IO, 32 )
+static ADDRESS_MAP_START( spotty_io_map, AS_IO, 32 )
 	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x0800, 0x0803) AM_WRITENOP // hopper related
@@ -223,7 +223,7 @@ static READ8_HANDLER( spotty_sound_r )
 		return space->machine->device<okim6295_device>("oki")->read(*space,0);
 }
 
-static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spotty_sound_io_map, AS_IO, 8 )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write) //? sound latch and ?
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
 ADDRESS_MAP_END
@@ -1041,7 +1041,7 @@ static READ32_HANDLER( spotty_speedup_r )
 static DRIVER_INIT( dynabomb )
 {
 	limenko_state *state = machine->driver_data<limenko_state>();
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
 
 	state->spriteram_bit = 1;
 }
@@ -1049,7 +1049,7 @@ static DRIVER_INIT( dynabomb )
 static DRIVER_INIT( legendoh )
 {
 	limenko_state *state = machine->driver_data<limenko_state>();
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
 
 	state->spriteram_bit = 1;
 }
@@ -1057,7 +1057,7 @@ static DRIVER_INIT( legendoh )
 static DRIVER_INIT( sb2003 )
 {
 	limenko_state *state = machine->driver_data<limenko_state>();
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
 
 	state->spriteram_bit = 1;
 }
@@ -1078,7 +1078,7 @@ static DRIVER_INIT( spotty )
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
 
 	state->spriteram_bit = 1;
 }

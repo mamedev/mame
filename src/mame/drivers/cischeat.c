@@ -254,7 +254,7 @@ static WRITE16_HANDLER( bigrun_paletteram16_w )
 	if ( (offset >= 0x3600/2) && (offset <= 0x37ff/2) ) { palette_set_color(space->machine, 0xe00 + offset - 0x3600/2, MAKE_RGB(r,g,b) ); return;}
 }
 
-static ADDRESS_MAP_START( bigrun_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigrun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x080000, 0x083fff) AM_READWRITE(bigrun_vregs_r, bigrun_vregs_w) AM_BASE_MEMBER(cischeat_state, vregs)	// Vregs
 	AM_RANGE(0x084000, 0x087fff) AM_RAM													// Linking with other units
@@ -307,7 +307,7 @@ static WRITE16_HANDLER( cischeat_paletteram16_w )
 	if ( (offset >= 0x5000/2) && (offset <= 0x5fff/2) ) { palette_set_color(space->machine, 0xe00 + offset - 0x5000/2, MAKE_RGB(r,g,b) ); return;}
 }
 
-static ADDRESS_MAP_START( cischeat_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cischeat_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM 																	// ROM
 	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(cischeat_vregs_r, cischeat_vregs_w)  AM_BASE_MEMBER(cischeat_state, vregs)	// Vregs
 	AM_RANGE(0x088000, 0x088fff) AM_RAM 																	// Linking with other units
@@ -367,7 +367,7 @@ static WRITE16_HANDLER( f1gpstar_paletteram16_w )
     098800-099000
     0F8000-0F9000   */
 
-static ADDRESS_MAP_START( f1gpstar_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpstar_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM 																	// ROM
 	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(f1gpstar_vregs_r, f1gpstar_vregs_w) AM_BASE_MEMBER(cischeat_state, vregs)	// Vregs
 	AM_RANGE(0x088000, 0x088fff) AM_RAM																		// Linking with other units
@@ -393,7 +393,7 @@ ADDRESS_MAP_END
 **************************************************************************/
 
 // Same as f1gpstar, but vregs are slightly different:
-static ADDRESS_MAP_START( f1gpstr2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpstr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x080000, 0x087fff) AM_READWRITE(f1gpstr2_vregs_r, f1gpstr2_vregs_w) AM_BASE_MEMBER(cischeat_state, vregs)	// Vregs (slightly different from f1gpstar)
 	AM_RANGE(0x088000, 0x088fff) AM_RAM																		// Linking with other units
@@ -536,7 +536,7 @@ static WRITE16_HANDLER( scudhamm_oki_bank_w )
 	}
 }
 
-static ADDRESS_MAP_START( scudhamm_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( scudhamm_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(scudhamm_vregs_w) AM_BASE_MEMBER(cischeat_state, vregs)				// Video Registers + RAM
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_BASE_MEMBER(cischeat_state, scrollram[0])	// Scroll RAM 0
@@ -619,7 +619,7 @@ static WRITE16_HANDLER( armchmp2_leds_w )
 	}
 }
 
-static ADDRESS_MAP_START( armchmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( armchmp2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM 																// ROM
 	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(scudhamm_vregs_w) AM_BASE_MEMBER(cischeat_state, vregs)				// Video Registers + RAM
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(cischeat_scrollram_0_w) AM_BASE_MEMBER(cischeat_state, scrollram[0])	// Scroll RAM 0
@@ -648,14 +648,14 @@ ADDRESS_MAP_END
                                 Big Run
 **************************************************************************/
 
-static ADDRESS_MAP_START( bigrun_map2, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigrun_map2, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM 									// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram1_r, sharedram1_w)	// Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[0])		// Road RAM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM 									// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigrun_map3, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigrun_map3, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram2_r, sharedram2_w)	// Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[1])		// Road RAM
@@ -667,7 +667,7 @@ ADDRESS_MAP_END
                                 Cisco Heat
 **************************************************************************/
 
-static ADDRESS_MAP_START( cischeat_map2, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cischeat_map2, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram1_r, sharedram1_w)	// Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[0])		// Road RAM
@@ -676,7 +676,7 @@ static ADDRESS_MAP_START( cischeat_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x23ffff) AM_READ(rom_2_r)							// ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cischeat_map3, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cischeat_map3, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x040000, 0x047fff) AM_READWRITE(sharedram2_r, sharedram2_w)	// Shared RAM (with Main CPU)
 	AM_RANGE(0x080000, 0x0807ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[1])		// Road RAM
@@ -691,7 +691,7 @@ ADDRESS_MAP_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-static ADDRESS_MAP_START( f1gpstar_map2, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpstar_map2, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x080000, 0x0807ff) AM_READWRITE(sharedram1_r, sharedram1_w)	// Shared RAM (with Main CPU)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[0])		// Road RAM
@@ -699,7 +699,7 @@ static ADDRESS_MAP_START( f1gpstar_map2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP							// watchdog
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( f1gpstar_map3, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpstar_map3, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM										// ROM
 	AM_RANGE(0x080000, 0x0807ff) AM_READWRITE(sharedram2_r, sharedram2_w)	// Shared RAM (with Main CPU)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE_MEMBER(cischeat_state, roadram[1])		// Road RAM
@@ -734,7 +734,7 @@ static WRITE16_HANDLER( bigrun_soundbank_w )
 	}
 }
 
-static ADDRESS_MAP_START( bigrun_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigrun_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM													// ROM
 	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r, bigrun_soundbank_w)	// From Main CPU
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)							// To Main CPU
@@ -755,7 +755,7 @@ static WRITE16_DEVICE_HANDLER( cischeat_soundbank_w )
 	if (ACCESSING_BITS_0_7)	oki->set_bank_base(0x40000 * (data & 1) );
 }
 
-static ADDRESS_MAP_START( cischeat_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cischeat_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM													// ROM
 	AM_RANGE(0x040002, 0x040003) AM_DEVWRITE("oki1", cischeat_soundbank_w)				// Sample Banking
 	AM_RANGE(0x040004, 0x040005) AM_DEVWRITE("oki2", cischeat_soundbank_w)				// Sample Banking
@@ -772,7 +772,7 @@ ADDRESS_MAP_END
                             F1 GrandPrix Star
 **************************************************************************/
 
-static ADDRESS_MAP_START( f1gpstar_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpstar_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM													// ROM
 	AM_RANGE(0x040004, 0x040005) AM_DEVWRITE("oki1", cischeat_soundbank_w)				// Sample Banking   (cischeat: 40002)
 	AM_RANGE(0x040008, 0x040009) AM_DEVWRITE("oki2", cischeat_soundbank_w)				// Sample Banking   (cischeat: 40004)
@@ -788,7 +788,7 @@ ADDRESS_MAP_END
                             F1 GrandPrix Star II
 **************************************************************************/
 
-static ADDRESS_MAP_START( f1gpstr2_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpstr2_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM // ROM
 	AM_RANGE(0x040004, 0x040005) AM_DEVWRITE("oki1", cischeat_soundbank_w)					// Sample Banking
 	AM_RANGE(0x040008, 0x040009) AM_DEVWRITE("oki2", cischeat_soundbank_w)					// Sample Banking
@@ -820,7 +820,7 @@ static WRITE16_HANDLER( f1gpstr2_io_w )
 	COMBINE_DATA(&state->vregs[offset + 0x1000/2]);
 }
 
-static ADDRESS_MAP_START( f1gpstr2_io_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpstr2_io_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM											// ROM
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(f1gpstr2_io_r, f1gpstr2_io_w)		//
 	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(cischeat_state, f1gpstr2_ioready)	//
@@ -2554,7 +2554,7 @@ ROM_END
 
 static DRIVER_INIT( wildplt )
 {
-	memory_install_read16_handler(machine->device("cpu1")->memory().space(ADDRESS_SPACE_PROGRAM), 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
+	memory_install_read16_handler(machine->device("cpu1")->memory().space(AS_PROGRAM), 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
 
 	DRIVER_INIT_CALL(f1gpstar);
 }

@@ -90,7 +90,7 @@ static SCREEN_UPDATE( taitotz )
 	return 0;
 }
 
-static ADDRESS_MAP_START( ppc603e_mem, ADDRESS_SPACE_PROGRAM, 64)
+static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64)
 	AM_RANGE(0x00000000, 0x00000007) AM_RAM   // Register/RAM access port? - Written 128k+256k times on boot
 	AM_RANGE(0x00000008, 0x0000000f) AM_RAM   // Register/RAM address port?
 	AM_RANGE(0x40000000, 0x400fffff) AM_RAM   // Work RAM

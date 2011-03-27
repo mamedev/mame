@@ -271,7 +271,7 @@ Shark   Zame
 
 /***************************** 68000 Memory Map *****************************/
 
-static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM		/* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -301,12 +301,12 @@ ADDRESS_MAP_END
 
 /***************************** Z80 Memory Map *******************************/
 
-static ADDRESS_MAP_START( sound_program_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(twincobr_state, sharedram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")			/* Twin Cobra - Coin/Start */
@@ -318,13 +318,13 @@ ADDRESS_MAP_END
 
 /***************************** TMS32010 Memory Map **************************/
 
-static ADDRESS_MAP_START( DSP_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( DSP_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( DSP_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16 )
 	AM_RANGE(0, 0) AM_WRITE(twincobr_dsp_addrsel_w)
 	AM_RANGE(1, 1) AM_READWRITE(twincobr_dsp_r, twincobr_dsp_w)
 	AM_RANGE(2, 2) AM_READWRITE(fsharkbt_dsp_r, fsharkbt_dsp_w)
@@ -335,7 +335,7 @@ ADDRESS_MAP_END
 
 /******************* Flying Shark Bootleg i8741 Memory Map *******************/
 
-static ADDRESS_MAP_START( fsharkbt_i8741_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fsharkbt_i8741_io_map, AS_IO, 8 )
 	/* IO map unknown as program code isn't dumped */
 ADDRESS_MAP_END
 

@@ -543,7 +543,7 @@ All PRGx go to B-board. Provision for up to 4MB of ROM space, which was never us
 
 */
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")			/* Player input ports */
 	/* forgottn, willow, cawing, nemo, varth read from 800010. Probably debug input leftover from development */
@@ -584,7 +584,7 @@ SOUNDA15   = pin13 =   (  I1 )
 /SOUNDCE   = pin12 = ! ( !I0 & (!I1 | ( I1 & !I2)) )
 */
 
-static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
@@ -596,7 +596,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf00a, 0xf00a) AM_READ(soundlatch2_r) /* Sound timer fade */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qsound_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( qsound_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")			/* Player input ports */
 	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)			/* System input ports / Dip Switches */
@@ -614,7 +614,7 @@ static ADDRESS_MAP_START( qsound_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( qsound_sub_map, ADDRESS_SPACE_PROGRAM, 8 )	// used by cps2.c too
+ADDRESS_MAP_START( qsound_sub_map, AS_PROGRAM, 8 )	// used by cps2.c too
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* banked (contains music data) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(cps_state, qsound_sharedram1)
@@ -3090,7 +3090,7 @@ static MACHINE_CONFIG_DERIVED( wofhfh, cps1_12MHz )
 MACHINE_CONFIG_END
 
 /* incomplete */
-static ADDRESS_MAP_START( sf2mdt_z80map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sf2mdt_z80map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
@@ -9965,10 +9965,10 @@ static DRIVER_INIT( forgottn )
 
 	/* Forgotten Worlds has a NEC uPD4701AC on the B-board handling dial inputs from the CN-MOWS connector. */
 	/* The memory mapping is handled by PAL LWIO */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x800040, 0x800041, 0, 0, forgottn_dial_0_reset_w);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x800048, 0x800049, 0, 0, forgottn_dial_1_reset_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x800052, 0x800055, 0, 0, forgottn_dial_0_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80005a, 0x80005d, 0, 0, forgottn_dial_1_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x800040, 0x800041, 0, 0, forgottn_dial_0_reset_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x800048, 0x800049, 0, 0, forgottn_dial_1_reset_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x800052, 0x800055, 0, 0, forgottn_dial_0_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80005a, 0x80005d, 0, 0, forgottn_dial_1_r);
 
 	state->save_item(NAME(state->dial));
 
@@ -9982,8 +9982,8 @@ static DRIVER_INIT( sf2ee )
 {
 	/* This specific revision of SF2 has the CPS-B custom mapped at a different address. */
 	/* The mapping is handled by the PAL IOB2 on the B-board */
-	memory_unmap_readwrite(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x800140, 0x80017f, 0, 0);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8001c0, 0x8001ff, 0, 0, cps1_cps_b_r, cps1_cps_b_w);
+	memory_unmap_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x800140, 0x80017f, 0, 0);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8001c0, 0x8001ff, 0, 0, cps1_cps_b_r, cps1_cps_b_w);
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -9991,7 +9991,7 @@ static DRIVER_INIT( sf2ee )
 static DRIVER_INIT( sf2thndr )
 {
 	/* This particular hack uses a modified B-board PAL which mirrors the CPS-B registers at an alternate address */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8001c0, 0x8001ff, 0, 0, cps1_cps_b_r, cps1_cps_b_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8001c0, 0x8001ff, 0, 0, cps1_cps_b_r, cps1_cps_b_w);
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -9999,7 +9999,7 @@ static DRIVER_INIT( sf2thndr )
 static DRIVER_INIT( sf2hack )
 {
 	/* some SF2 hacks have some inputs wired to the LSB instead of MSB */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x800018, 0x80001f, 0, 0, cps1_hack_dsw_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x800018, 0x80001f, 0, 0, cps1_hack_dsw_r);
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10032,7 +10032,7 @@ static DRIVER_INIT( pang3n )
 {
 	/* Pang 3 is the only non-QSound game to have an EEPROM. */
 	/* It is mapped in the CPS-B address range so probably is on the C-board. */
-	memory_install_readwrite_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80017a, 0x80017b, 0, 0, "EEPROMIN", "EEPROMOUT");
+	memory_install_readwrite_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80017a, 0x80017b, 0, 0, "EEPROMIN", "EEPROMOUT");
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10083,11 +10083,11 @@ static DRIVER_INIT( sf2mdt )
 		rom[i + 3] = rom[i + 6];
 		rom[i + 6] = tmp;
 	}
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x70c01a, 0x70c01b, 0, 0, sf2mdt_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x70c01c, 0x70c01d, 0, 0, sf2mdt_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x70c01e, 0x70c01f, 0, 0, sf2mdt_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x70c010, 0x70c011, 0, 0, sf2mdt_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x70c018, 0x70c019, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x70c01a, 0x70c01b, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x70c01c, 0x70c01d, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x70c01e, 0x70c01f, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x70c010, 0x70c011, 0, 0, sf2mdt_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x70c018, 0x70c019, 0, 0, sf2mdt_r);
 
 	DRIVER_INIT_CALL(cps1);
 }
@@ -10095,7 +10095,7 @@ static DRIVER_INIT( sf2mdt )
 static DRIVER_INIT( dinohunt )
 {
 	// is this shared with the new sound hw?
-	UINT8* ram = (UINT8*)memory_install_ram(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf18000, 0xf19fff, 0, 0, 0);
+	UINT8* ram = (UINT8*)memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf18000, 0xf19fff, 0, 0, 0);
 	memset(ram,0xff,0x2000);
 	DRIVER_INIT_CALL(cps1);
 }

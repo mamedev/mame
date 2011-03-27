@@ -458,7 +458,7 @@ static const namco_53xx_interface namco_53xx_intf =
 
 static MACHINE_RESET( polepos )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -476,7 +476,7 @@ static MACHINE_RESET( polepos )
  * CPU memory structures
  *********************************************************************/
 
-static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")	/* Battery Backup */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)				/* Motion Object */
@@ -497,14 +497,14 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_DEVWRITE("polepos", polepos_engine_sound_msb_w)	/* Car Sound ( Upper Nibble ) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( z80_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(polepos_adc_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
-static ADDRESS_MAP_START( z8002_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x1ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE_MEMBER(polepos_state, sprite16_memory)	/* Motion Object */
@@ -1007,12 +1007,12 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START( sound_z80_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_z80_bootleg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2700, 0x27ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_z80_bootleg_iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -1986,15 +1986,15 @@ ROM_END
 static DRIVER_INIT( topracern )
 {
 	/* extra direct mapped inputs read */
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, "STEER");
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "IN0");
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSWA");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_IO), 0x02, 0x02, 0, 0, "STEER");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_IO), 0x03, 0x03, 0, 0, "IN0");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x04, 0, 0, "DSWA");
 }
 
 static DRIVER_INIT( polepos2 )
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	memory_install_read16_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
+	memory_install_read16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
 }
 
 

@@ -452,7 +452,7 @@ static WRITE16_HANDLER( ddealer_mcu_shared_w )
 	}
 }
 
-static ADDRESS_MAP_START( ddealer, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -671,7 +671,7 @@ static READ16_HANDLER( ddealer_mcu_r )
 
 static DRIVER_INIT( ddealer )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
 }
 
 ROM_START( ddealer )

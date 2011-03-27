@@ -384,7 +384,7 @@ static READ8_DEVICE_HANDLER ( combatsc_ym2203_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( combatsc_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(combatsc_pf_control_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combatsc_scrollram_r, combatsc_scrollram_w)
 //  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
@@ -411,7 +411,7 @@ static ADDRESS_MAP_START( combatsc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( combatscb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x04ff) AM_RAM
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combatscb_bankselect_w)
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_MEMBER(combatsc_state, paletteram)		/* palette */
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( combatscb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM										/* ROM */
 	AM_RANGE(0x8000, 0x87ef) AM_RAM										/* RAM */
 	AM_RANGE(0x87f0, 0x87ff) AM_RAM										/* ??? */
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 #endif
 
-static ADDRESS_MAP_START( combatsc_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 
@@ -711,7 +711,7 @@ static MACHINE_START( combatsc )
 static MACHINE_RESET( combatsc )
 {
 	combatsc_state *state = machine->driver_data<combatsc_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	memset(state->io_ram,  0x00, 0x4000);
@@ -995,7 +995,7 @@ ROM_END
 static DRIVER_INIT( combatsc )
 {
 	/* joystick instead of trackball */
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
 }
 
 

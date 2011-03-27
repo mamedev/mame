@@ -191,7 +191,7 @@ static WRITE32_HANDLER( gunbustr_gun_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( gunbustr_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(gunbustr_state, ram)										/* main CPUA ram */
 	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE_SIZE_MEMBER(gunbustr_state, spriteram, spriteram_size)				/* Sprite ram */
@@ -417,7 +417,7 @@ static READ32_HANDLER( main_cycle_r )
 static DRIVER_INIT( gunbustr )
 {
 	/* Speedup handler */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x203acc, 0x203acf, 0, 0, main_cycle_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x203acc, 0x203acf, 0, 0, main_cycle_r);
 }
 
 GAME( 1992, gunbustr, 0,      gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )

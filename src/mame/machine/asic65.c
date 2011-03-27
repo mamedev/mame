@@ -138,7 +138,7 @@ void asic65_config(running_machine *machine, int asictype)
 
 void asic65_reset(running_machine *machine, int state)
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* rom-based means reset and clear states */
 	if (asic65.cpu != NULL)
@@ -513,12 +513,12 @@ static READ16_HANDLER( asci65_get_bio )
  *
  *************************************/
 
-static ADDRESS_MAP_START( asic65_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( asic65_program_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( asic65_io_map, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( asic65_io_map, AS_IO, 16 )
 	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE(asic65_68k_r, asic65_68k_w)
 	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE(asic65_stat_r, asic65_stat_w)
 	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(asci65_get_bio)

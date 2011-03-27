@@ -79,32 +79,32 @@ const device_type SHARP_UNK128MBIT = sharp_unk128mbit_device_config::static_allo
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( memory_map8_512Kb, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_512Kb, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x00ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map8_1Mb, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_1Mb, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x01ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map8_8Mb, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_8Mb, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map8_16Mb, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_16Mb, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( memory_map16_4Mb, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( memory_map16_4Mb, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map16_16Mb, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( memory_map16_16Mb, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map16_64Mb, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( memory_map16_64Mb, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -226,7 +226,7 @@ intelfsh16_device_config::intelfsh16_device_config(const machine_config &mconfig
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *intelfsh_device_config::memory_space_config(int spacenum) const
+const address_space_config *intelfsh_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }

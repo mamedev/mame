@@ -123,14 +123,14 @@ static const ay8910_interface ay8910_config =
 	DEVCB_HANDLER(ayportb_w)
 };
 
-static ADDRESS_MAP_START( fortecar_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_MEMBER(fortecar_state, ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fortecar_ports, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_register_w)

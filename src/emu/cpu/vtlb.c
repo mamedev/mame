@@ -31,7 +31,7 @@
 struct _vtlb_state
 {
 	cpu_device *		cpudevice;			/* CPU device */
-	int					space;				/* address space */
+	address_spacenum	space;				/* address space */
 	int 				dynamic;			/* number of dynamic entries */
 	int					fixed;				/* number of fixed entries */
 	int					dynindex;			/* index of next dynamic entry */
@@ -54,7 +54,7 @@ struct _vtlb_state
     given CPU
 -------------------------------------------------*/
 
-vtlb_state *vtlb_alloc(device_t *cpu, int space, int fixed_entries, int dynamic_entries)
+vtlb_state *vtlb_alloc(device_t *cpu, address_spacenum space, int fixed_entries, int dynamic_entries)
 {
 	vtlb_state *vtlb;
 

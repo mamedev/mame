@@ -226,7 +226,7 @@ static WRITE32_HANDLER( superchs_stick_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( superchs_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( superchs_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(superchs_state, ram)
 	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_SIZE_MEMBER(superchs_state, spriteram, spriteram_size)
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( superchs_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)	/* stick int request */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superchs_cpub_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( superchs_cpub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_word_w) /* Only written upon errors */
@@ -463,8 +463,8 @@ static READ16_HANDLER( sub_cycle_r )
 static DRIVER_INIT( superchs )
 {
 	/* Speedup handlers */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x100000, 0x100003, 0, 0, main_cycle_r);
-	memory_install_read16_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x100000, 0x100003, 0, 0, main_cycle_r);
+	memory_install_read16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
 }
 
 GAMEL( 1992, superchs, 0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0, layout_superchs )

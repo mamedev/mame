@@ -1200,7 +1200,7 @@ static WRITE8_HANDLER( sound_dummy_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( system32_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( system32_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x0f0000) AM_RAM	AM_BASE_MEMBER(segas32_state, system32_workram)
@@ -1218,7 +1218,7 @@ static ADDRESS_MAP_START( system32_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( multi32_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( multi32_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -1248,7 +1248,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( system32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( system32_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_w)
@@ -1256,7 +1256,7 @@ static ADDRESS_MAP_START( system32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(segas32_state, z80_shared_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( system32_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( system32_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_r, ym3438_w)
@@ -1269,14 +1269,14 @@ static ADDRESS_MAP_START( system32_sound_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( multi32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( multi32_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("sega", multipcm_r, multipcm_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(segas32_state, z80_shared_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multi32_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( multi32_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ymsnd", ym3438_r, ym3438_w)
@@ -1295,7 +1295,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( ga2_v25_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ga2_v25_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE_MEMBER(segas32_state, ga2_dpram)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("mcu", 0)
@@ -4010,14 +4010,14 @@ static DRIVER_INIT( arescue )
 {
 	segas32_state *state = machine->driver_data<segas32_state>();
 	segas32_common_init(machine, analog_custom_io_r, analog_custom_io_w);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
 
 	state->dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x810000, 0x810001, 0, 0, arescue_handshake_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x810000, 0x810001, 0, 0, arescue_handshake_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
 
 	state->sw1_output = arescue_sw1_output;
 }
@@ -4028,8 +4028,8 @@ static DRIVER_INIT( arabfgt )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	/* install protection handlers */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa00100, 0xa0011f, 0, 0, arf_wakeup_protection_r);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, arabfgt_protection_r, arabfgt_protection_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00100, 0xa0011f, 0, 0, arf_wakeup_protection_r);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa00fff, 0, 0, arabfgt_protection_r, arabfgt_protection_w);
 }
 
 
@@ -4040,8 +4040,8 @@ static DRIVER_INIT( brival )
 
 	/* install protection handlers */
 	state->system32_protram = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x20ba00, 0x20ba07, 0, 0, brival_protection_r);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, brival_protection_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20ba00, 0x20ba07, 0, 0, brival_protection_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa00fff, 0, 0, brival_protection_w);
 }
 
 
@@ -4051,7 +4051,7 @@ static DRIVER_INIT( darkedge )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	/* install protection handlers */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, darkedge_protection_r, darkedge_protection_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, darkedge_protection_r, darkedge_protection_w);
 	state->system32_prot_vblank = darkedge_fd1149_vblank;
 }
 
@@ -4060,7 +4060,7 @@ static DRIVER_INIT( dbzvrvs )
 	segas32_common_init(machine, NULL, NULL);
 
 	/* install protection handlers */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, dbzvrvs_protection_r, dbzvrvs_protection_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, dbzvrvs_protection_r, dbzvrvs_protection_w);
 }
 
 static WRITE16_HANDLER( f1en_comms_echo_w )
@@ -4076,10 +4076,10 @@ static DRIVER_INIT( f1en )
 	segas32_common_init(machine, analog_custom_io_r, analog_custom_io_w);
 
 	state->dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
 
 	state->sw1_output = radm_sw1_output;
 }
@@ -4098,7 +4098,7 @@ static DRIVER_INIT( ga2 )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	decrypt_ga2_protrom(machine);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa00000, 0xa00fff, 0, 0, ga2_dpram_r, ga2_dpram_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa00fff, 0, 0, ga2_dpram_r, ga2_dpram_w);
 }
 
 
@@ -4165,7 +4165,7 @@ static DRIVER_INIT( scross )
 	segas32_state *state = machine->driver_data<segas32_state>();
 	multipcm_device *multipcm = machine->device<multipcm_device>("sega");
 	segas32_common_init(machine, analog_custom_io_r, analog_custom_io_w);
-	memory_install_write8_device_handler(machine->device("soundcpu")->memory().space(ADDRESS_SPACE_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
+	memory_install_write8_device_handler(machine->device("soundcpu")->memory().space(AS_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
 
 	state->sw1_output = scross_sw1_output;
 	state->sw2_output = scross_sw2_output;
@@ -4183,7 +4183,7 @@ static DRIVER_INIT( sonic )
 	segas32_common_init(machine, sonic_custom_io_r, sonic_custom_io_w);
 
 	/* install protection handlers */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x20E5C4, 0x20E5C5, 0, 0, sonic_level_load_protection);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20E5C4, 0x20E5C5, 0, 0, sonic_level_load_protection);
 }
 
 
@@ -4208,7 +4208,7 @@ static DRIVER_INIT( svf )
 static DRIVER_INIT( jleague )
 {
 	segas32_common_init(machine, NULL, NULL);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x20F700, 0x20F705, 0, 0, jleague_protection_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20F700, 0x20F705, 0, 0, jleague_protection_w);
 }
 
 

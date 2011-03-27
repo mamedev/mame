@@ -369,9 +369,9 @@ static READ8_HANDLER( m72_snd_cpu_sample_r )
 INLINE DRIVER_INIT( m72_8751 )
 {
 	m72_state *state = machine->driver_data<m72_state>();
-	address_space *program = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
-	address_space *io = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
-	address_space *sndio = machine->device("soundcpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *program = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *io = machine->device("maincpu")->memory().space(AS_IO);
+	address_space *sndio = machine->device("soundcpu")->memory().space(AS_IO);
 	device_t *dac = machine->device("dac");
 
 	state->protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
@@ -453,7 +453,7 @@ static int find_sample(int num)
 
 static INTERRUPT_GEN(fake_nmi)
 {
-	address_space *space = device->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->memory().space(AS_PROGRAM);
 	int sample = m72_sample_r(space,0);
 	if (sample)
 		m72_sample_w(device->machine->device("dac"),0,sample);
@@ -750,9 +750,9 @@ static void install_protection_handler(running_machine *machine, const UINT8 *co
 	state->protection_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
 	state->protection_code = code;
 	state->protection_crc =  crc;
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, "bank1");
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, protection_w);
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb0000, 0xb0fff, 0, 0, "bank1");
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb0000, 0xb0fff, 0, 0, protection_w);
 	memory_set_bankptr(machine, "bank1", state->protection_ram);
 }
 
@@ -760,28 +760,28 @@ static DRIVER_INIT( bchopper )
 {
 	install_protection_handler(machine, bchopper_code,bchopper_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( mrheli )
 {
 	install_protection_handler(machine, bchopper_code,mrheli_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspirit )
 {
 	install_protection_handler(machine, nspirit_code,nspirit_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( imgfight )
 {
 	install_protection_handler(machine, imgfight_code,imgfight_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
 }
 
 static DRIVER_INIT( loht )
@@ -789,7 +789,7 @@ static DRIVER_INIT( loht )
 	m72_state *state = machine->driver_data<m72_state>();
 	install_protection_handler(machine, loht_code,loht_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(state->videoram2,0,0x4000);
@@ -799,33 +799,33 @@ static DRIVER_INIT( xmultiplm72 )
 {
 	install_protection_handler(machine, xmultiplm72_code,xmultiplm72_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, xmultiplm72_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, xmultiplm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( dbreedm72 )
 {
 	install_protection_handler(machine, dbreedm72_code,dbreedm72_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dbreedm72_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, dbreedm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( airduel )
 {
 	install_protection_handler(machine, airduel_code,airduel_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
 }
 
 static DRIVER_INIT( dkgenm72 )
 {
 	install_protection_handler(machine, dkgenm72_code,dkgenm72_crc);
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( gallop )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
 }
 
 
@@ -882,7 +882,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 
 
 #define CPU1_MEMORY(NAME,ROMSIZE,WORKRAM)								\
-static ADDRESS_MAP_START( NAME##_map, ADDRESS_SPACE_PROGRAM, 16 )		\
+static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 )		\
 	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM									\
 	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM	/* work RAM */			\
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, spriteram, spriteram_size)	\
@@ -901,7 +901,7 @@ CPU1_MEMORY( rtype,       0x40000, 0x40000 )
 CPU1_MEMORY( xmultiplm72, 0x80000, 0x80000 )
 CPU1_MEMORY( dbreedm72,   0x80000, 0x90000 )
 
-static ADDRESS_MAP_START( xmultipl_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x9c000, 0x9ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
@@ -913,7 +913,7 @@ static ADDRESS_MAP_START( xmultipl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbreed_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x88000, 0x8bfff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
@@ -925,7 +925,7 @@ static ADDRESS_MAP_START( dbreed_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
@@ -938,7 +938,7 @@ static ADDRESS_MAP_START( rtype2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE_MEMBER(m72_state, majtitle_rowscrollram)
 	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
@@ -954,7 +954,7 @@ static ADDRESS_MAP_START( majtitle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
@@ -966,7 +966,7 @@ static ADDRESS_MAP_START( hharry_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharryu_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
@@ -980,7 +980,7 @@ static ADDRESS_MAP_START( hharryu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
@@ -994,7 +994,7 @@ static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m72_portmap, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( m72_portmap, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1010,7 +1010,7 @@ static ADDRESS_MAP_START( m72_portmap, ADDRESS_SPACE_IO, 16 )
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_portmap, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1023,7 +1023,7 @@ static ADDRESS_MAP_START( rtype2_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poundfor_portmap, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16 )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
@@ -1036,7 +1036,7 @@ static ADDRESS_MAP_START( poundfor_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_portmap, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1050,7 +1050,7 @@ static ADDRESS_MAP_START( majtitle_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x8e, 0x8f) AM_WRITE(majtitle_gfx_ctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_portmap, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1065,7 +1065,7 @@ static ADDRESS_MAP_START( hharry_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kengo_portmap, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16 )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1079,16 +1079,16 @@ static ADDRESS_MAP_START( kengo_portmap, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_ram_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(m72_state, soundram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_rom_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_rom_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( rtype_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
@@ -1096,7 +1096,7 @@ static ADDRESS_MAP_START( rtype_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
@@ -1105,7 +1105,7 @@ static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x84, 0x84) AM_READ(m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
@@ -1116,7 +1116,7 @@ static ADDRESS_MAP_START( rtype2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( poundfor_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_WRITE(poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1124,7 +1124,7 @@ static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x42, 0x42) AM_WRITE(m72_sound_irq_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
 	/* External access */
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(m72_mcu_high_w)

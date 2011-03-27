@@ -367,7 +367,7 @@ static const segaic16_memory_map_entry outrun_info[] =
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	soundlatch_w(space, 0, param);
 	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
@@ -788,7 +788,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( outrun_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( outrun_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w)
 ADDRESS_MAP_END
@@ -801,7 +801,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM AM_BASE(&cpu1rom)
@@ -818,14 +818,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

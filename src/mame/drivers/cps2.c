@@ -814,7 +814,7 @@ static READ16_HANDLER( joy_or_paddle_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cps2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM																			/* 68000 ROM */
 	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, output, output_size)						/* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
@@ -845,7 +845,7 @@ static ADDRESS_MAP_START( cps2_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dead_cps2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM																			/* 68000 ROM */
 	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, output, output_size)						/* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
@@ -8012,7 +8012,7 @@ static DRIVER_INIT ( pzloop2 )
 
 	state->save_item(NAME(state->readpaddle));
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
 
 static READ16_HANDLER( gigamn2_dummyqsound_r )
@@ -8030,7 +8030,7 @@ static WRITE16_HANDLER( gigamn2_dummyqsound_w )
 static DRIVER_INIT( gigamn2 )
 {
 	cps_state *state = machine->driver_data<cps_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	int length = machine->region("maincpu")->bytes();
 
@@ -8039,7 +8039,7 @@ static DRIVER_INIT( gigamn2 )
 	state->gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
 	state->save_pointer(NAME(state->gigamn2_dummyqsound_ram), 0x20000 / 2);
 
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
 	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
 }

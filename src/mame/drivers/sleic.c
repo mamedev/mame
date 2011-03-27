@@ -11,7 +11,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( sleic_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sleic_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM

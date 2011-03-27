@@ -580,7 +580,7 @@ static WRITE8_HANDLER( megaplay_game_w )
 	state->mp_bios_bank_addr = ((state->mp_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
-static ADDRESS_MAP_START( megaplay_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
@@ -601,7 +601,7 @@ static ADDRESS_MAP_START( megaplay_bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* basically from src/drivers/segasyse.c */
-static ADDRESS_MAP_START( megaplay_bios_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_w)	/* SN76489 */
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)	/* VDP */
@@ -885,13 +885,13 @@ static DRIVER_INIT(megaplay)
 	mplay_start(machine);
 
 	/* for now ... */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa10000, 0xa1001f, 0, 0, megaplay_io_read, megaplay_io_write);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa10000, 0xa1001f, 0, 0, megaplay_io_read, megaplay_io_write);
 
 	/* megaplay has ram shared with the bios cpu here */
-	memory_install_ram(machine->device("genesis_snd_z80")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, &state->ic36_ram[0]);
+	memory_install_ram(machine->device("genesis_snd_z80")->memory().space(AS_PROGRAM), 0x2000, 0x3fff, 0, 0, &state->ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
 
 	DRIVER_INIT_CALL(megatech_bios); // create the SMS vdp etc.
 

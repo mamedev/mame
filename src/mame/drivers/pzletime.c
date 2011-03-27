@@ -205,7 +205,7 @@ static CUSTOM_INPUT( ticket_status_r )
 	return (state->ticket && !(field->port->machine->primary_screen->frame_number() % 128));
 }
 
-static ADDRESS_MAP_START( pzletime_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_BASE_MEMBER(pzletime_state, video_regs)
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)

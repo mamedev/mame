@@ -280,7 +280,7 @@ static READ16_DEVICE_HANDLER( jpm_upd7759_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( 68000_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( 68000_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE(rombank_w)
 	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK("bank1")

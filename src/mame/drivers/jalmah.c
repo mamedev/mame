@@ -688,7 +688,7 @@ static WRITE16_HANDLER( urashima_dma_w )
 static void daireika_palette_dma(running_machine *machine, UINT16 val)
 {
 	//jalmah_state *state = machine->driver_data<jalmah_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 index_1, index_2, src_addr, tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
@@ -958,7 +958,7 @@ static WRITE16_HANDLER( jalmah_flip_screen_w )
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( jalmah, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
@@ -982,7 +982,7 @@ static ADDRESS_MAP_START( jalmah, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(jalmah_state, jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( urashima, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
@@ -2394,8 +2394,8 @@ static READ16_HANDLER( suchipi_mcu_r )
 static DRIVER_INIT( urashima )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, urashima_mcu_r );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, urashima_mcu_w );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, urashima_mcu_r );
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80012, 0x80013, 0, 0, urashima_mcu_w );
 
 	state->mcu_prg = 0x12;
 }
@@ -2403,8 +2403,8 @@ static DRIVER_INIT( urashima )
 static DRIVER_INIT( daireika )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, daireika_mcu_r );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, daireika_mcu_w );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, daireika_mcu_r );
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80012, 0x80013, 0, 0, daireika_mcu_w );
 
 	state->mcu_prg = 0x11;
 }
@@ -2412,8 +2412,8 @@ static DRIVER_INIT( daireika )
 static DRIVER_INIT( mjzoomin )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
 
 	state->mcu_prg = 0x13;
 }
@@ -2421,7 +2421,7 @@ static DRIVER_INIT( mjzoomin )
 static DRIVER_INIT( kakumei )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
 
 	state->mcu_prg = 0x21;
 }
@@ -2429,7 +2429,7 @@ static DRIVER_INIT( kakumei )
 static DRIVER_INIT( kakumei2 )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
 
 	state->mcu_prg = 0x22;
 }
@@ -2437,7 +2437,7 @@ static DRIVER_INIT( kakumei2 )
 static DRIVER_INIT( suchipi )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
 
 	state->mcu_prg = 0x23;
 }

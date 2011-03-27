@@ -16,11 +16,11 @@
 
 const device_type X2212 = x2212_device_config::static_alloc_device_config;
 
-static ADDRESS_MAP_START( x2212_sram_map, ADDRESS_SPACE_0, 8 )
+static ADDRESS_MAP_START( x2212_sram_map, AS_0, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x2212_e2prom_map, ADDRESS_SPACE_1, 8 )
+static ADDRESS_MAP_START( x2212_e2prom_map, AS_1, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -71,7 +71,7 @@ device_t *x2212_device_config::alloc_device(running_machine &machine) const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *x2212_device_config::memory_space_config(int spacenum) const
+const address_space_config *x2212_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_sram_space_config : (spacenum == 1) ? &m_e2prom_space_config : NULL;
 }

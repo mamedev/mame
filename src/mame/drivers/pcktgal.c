@@ -70,7 +70,7 @@ static READ8_DEVICE_HANDLER( pcktgal_adpcm_reset_r )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( pcktgal_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pcktgal_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pcktgal_videoram_w) AM_BASE_MEMBER(pcktgal_state, videoram)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_MEMBER(pcktgal_state, spriteram, spriteram_size)
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( pcktgal_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pcktgal_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
@@ -407,7 +407,7 @@ ROM_END
 static DRIVER_INIT( deco222 )
 {
 	int A;
-	address_space *space = machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine->region("audiocpu")->base();
 

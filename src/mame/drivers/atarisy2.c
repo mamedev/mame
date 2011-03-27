@@ -346,7 +346,7 @@ static WRITE16_HANDLER( bankselect_w )
 
 static STATE_POSTLOAD( bankselect_postload )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 
 	bankselect_w(space, 0, state->bankselect[0], 0xffff);
@@ -799,7 +799,7 @@ static WRITE8_HANDLER( coincount_w )
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_WRITE(atarisy2_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w) AM_BASE_MEMBER(atarisy2_state, bankselect)
@@ -830,7 +830,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_RAM AM_SHARE("eeprom")
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)

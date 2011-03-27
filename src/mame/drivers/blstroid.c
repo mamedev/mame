@@ -90,7 +90,7 @@ static READ16_HANDLER( inputs_r )
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x7c0000) AM_ROM
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x7f81fe) AM_WRITE(watchdog_reset16_w)

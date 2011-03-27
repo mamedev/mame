@@ -397,7 +397,7 @@ static WRITE32_HANDLER( kinst_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(kinst_state, rambase)
 	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE_MEMBER(kinst_state, rambase2)

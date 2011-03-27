@@ -1073,7 +1073,7 @@ static DRIVER_INIT( slqz2 )
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( iqblocka_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( iqblocka_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
@@ -1141,7 +1141,7 @@ static READ8_HANDLER( input_r )
 	}
 }
 
-static ADDRESS_MAP_START( iqblocka_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE_MEMBER(igs017_state, spriteram)
@@ -1271,7 +1271,7 @@ static WRITE16_HANDLER( mgcs_paletteram_xRRRRRGGGGGBBBBB_w )
 	palette_set_color_rgb(space->machine, offset/2, pal5bit(rgb >> 0), pal5bit(rgb >> 5), pal5bit(rgb >> 10));
 }
 
-static ADDRESS_MAP_START( mgcs, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
 	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE( mgcs_magic_w )
@@ -1374,7 +1374,7 @@ static READ16_HANDLER( sdmg2_magic_r )
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( sdmg2, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 	AM_RANGE(0x202000, 0x202fff) AM_READWRITE( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE_MEMBER(igs017_state, spriteram)
@@ -1495,7 +1495,7 @@ static READ16_HANDLER( mgdha_magic_r )
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( mgdha_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x876000, 0x876003) AM_WRITE( mgdha_magic_w )

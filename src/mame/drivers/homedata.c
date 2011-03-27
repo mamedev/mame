@@ -542,7 +542,7 @@ static WRITE8_HANDLER( bankswitch_w )
 /********************************************************************************/
 
 
-static ADDRESS_MAP_START( mrokumei_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrokumei_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
@@ -563,20 +563,20 @@ static ADDRESS_MAP_START( mrokumei_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrokumei_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrokumei_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xfffc, 0xfffd) AM_WRITENOP	/* stack writes happen here, but there's no RAM */
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mrokumei_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mrokumei_sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrokumei_sound_io_r, mrokumei_sound_io_w) /* read address is 16-bit, write address is only 8-bit */
 ADDRESS_MAP_END
 
 /********************************************************************************/
 
-static ADDRESS_MAP_START( reikaids_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( reikaids_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(reikaids_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM	/* work RAM */
@@ -595,12 +595,12 @@ static ADDRESS_MAP_START( reikaids_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( reikaids_upd7807_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( reikaids_upd7807_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")	/* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_RAM	/* Internal RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( reikaids_upd7807_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( reikaids_upd7807_io_map, AS_IO, 8 )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(reikaids_upd7807_porta_r, reikaids_upd7807_porta_w)
 	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
@@ -610,7 +610,7 @@ ADDRESS_MAP_END
 /**************************************************************************/
 
 
-static ADDRESS_MAP_START( pteacher_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pteacher_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
 	AM_RANGE(0x4000, 0x5eff) AM_RAM
 	AM_RANGE(0x5f00, 0x5fff) AM_RAM
@@ -629,13 +629,13 @@ static ADDRESS_MAP_START( pteacher_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pteacher_upd7807_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pteacher_upd7807_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(pteacher_snd_answer_w)
 	AM_RANGE(0x0000, 0xfeff) AM_ROMBANK("bank2")	/* External ROM (Banked) */
 	AM_RANGE(0xff00, 0xffff) AM_RAM	/* Internal RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pteacher_upd7807_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pteacher_upd7807_io_map, AS_IO, 8 )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(pteacher_upd7807_porta_r, pteacher_upd7807_porta_w)
 	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_READ_PORT("COIN") AM_WRITE(pteacher_upd7807_portc_w)
@@ -1222,7 +1222,7 @@ static MACHINE_RESET( homedata )
 static MACHINE_RESET( pteacher )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	pteacher_upd7807_portc_w(space, 0, 0xff);
@@ -1239,7 +1239,7 @@ static MACHINE_RESET( pteacher )
 static MACHINE_RESET( reikaids )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_upd7807_portc_w(space, 0, 0xff);
@@ -1432,11 +1432,11 @@ static INPUT_PORTS_START( mirderby )
 INPUT_PORTS_END
 
 
-static ADDRESS_MAP_START( cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM // videoram
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
@@ -1461,7 +1461,7 @@ static WRITE8_HANDLER( mirderby_prot_w )
 }
 
 
-static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(mrokumei_videoram_w) AM_BASE_MEMBER(homedata_state, videoram)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM /* work ram */
@@ -2032,15 +2032,15 @@ static DRIVER_INIT( jogakuen )
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
        but with just these two addresses swapped. Instead of creating a new
        MachineDriver, I just fix them here. */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
 }
 
 static DRIVER_INIT( mjikaga )
 {
 	/* Mahjong Ikagadesuka is different as well. */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7802, 0x7802, 0, 0, pteacher_snd_r);
-	memory_install_write8_handler(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7802, 0x7802, 0, 0, pteacher_snd_r);
+	memory_install_write8_handler(machine->device("audiocpu")->memory().space(AS_PROGRAM), 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
 }
 
 static DRIVER_INIT( reikaids )

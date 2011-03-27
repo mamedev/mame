@@ -42,7 +42,7 @@
 #ifndef __EXPRESS_H__
 #define __EXPRESS_H__
 
-#include "osdcore.h"
+#include "emu.h"
 
 
 //**************************************************************************
@@ -184,9 +184,9 @@ public:
 	typedef UINT64 (*execute_func)(symbol_table &table, void *symref, int numparams, const UINT64 *paramlist);
 
 	// callback functions for memory reads/writes
-	typedef expression_error::error_code (*valid_func)(void *cbparam, const char *name, int space);
-	typedef UINT64 (*read_func)(void *cbparam, const char *name, int space, UINT32 offset, int size);
-	typedef void (*write_func)(void *cbparam, const char *name, int space, UINT32 offset, int size, UINT64 value);
+	typedef expression_error::error_code (*valid_func)(void *cbparam, const char *name, expression_space space);
+	typedef UINT64 (*read_func)(void *cbparam, const char *name, expression_space space, UINT32 offset, int size);
+	typedef void (*write_func)(void *cbparam, const char *name, expression_space space, UINT32 offset, int size, UINT64 value);
 
 	enum read_write
 	{
@@ -218,9 +218,9 @@ public:
 	void set_value(const char *symbol, UINT64 value);
 
 	// memory accessors
-	expression_error::error_code memory_valid(const char *name, int space);
-	UINT64 memory_value(const char *name, int space, UINT32 offset, int size);
-	void set_memory_value(const char *name, int space, UINT32 offset, int size, UINT64 value);
+	expression_error::error_code memory_valid(const char *name, expression_space space);
+	UINT64 memory_value(const char *name, expression_space space, UINT32 offset, int size);
+	void set_memory_value(const char *name, expression_space space, UINT32 offset, int size, UINT64 value);
 
 private:
 	// internal state

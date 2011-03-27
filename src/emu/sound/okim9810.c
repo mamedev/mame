@@ -62,7 +62,7 @@ const UINT32 okim9810_device::s_sampling_freq_table[16] =
 };
 
 // default address map
-static ADDRESS_MAP_START( okim9810, 0, 8 )
+static ADDRESS_MAP_START( okim9810, AS_0, 8 )
     AM_RANGE(0x000000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -110,7 +110,7 @@ device_t *okim9810_device_config::alloc_device(running_machine &machine) const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *okim9810_device_config::memory_space_config(int spacenum) const
+const address_space_config *okim9810_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }

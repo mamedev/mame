@@ -564,12 +564,12 @@ static READ8_HANDLER(meritm_ds1644_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( meritm_crt250_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( meritm_crt250_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_questions_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( meritm_crt250_questions_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(meritm_crt250_questions_lo_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(meritm_crt250_questions_hi_w)
@@ -577,7 +577,7 @@ static ADDRESS_MAP_START( meritm_crt250_questions_map, ADDRESS_SPACE_PROGRAM, 8 
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READWRITE(v9938_0_vram_r, v9938_0_vram_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(v9938_0_status_r, v9938_0_command_w)
@@ -595,7 +595,7 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READWRITE(v9938_0_vram_r, v9938_0_vram_w)
 	AM_RANGE(0x11, 0x11) AM_READWRITE(v9938_0_status_r, v9938_0_command_w)
@@ -614,13 +614,13 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( meritm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3") AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meritm_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(meritm_psd_a15_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(watchdog_reset_w)
@@ -1831,7 +1831,7 @@ static DRIVER_INIT(megat3te)
 
 	ds1204_init(machine, megat3_ds1204_key, megat3_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
 
@@ -1850,7 +1850,7 @@ static DRIVER_INIT(megat4te)
 
 	ds1204_init(machine, 0, megat4te_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
 
@@ -1861,7 +1861,7 @@ static DRIVER_INIT(megat4st)
 
 	ds1204_init(machine, 0, megat4te_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
 
@@ -1881,7 +1881,7 @@ static DRIVER_INIT(megat5t)
 
 	ds1204_init(machine, 0, megat5_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 }
 

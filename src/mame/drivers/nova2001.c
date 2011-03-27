@@ -176,7 +176,7 @@ static MACHINE_START( ninjakun )
  *
  *************************************/
 
-static ADDRESS_MAP_START( nova2001_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nova2001_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_BASE_MEMBER(nova2001_state, fg_videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_BASE_MEMBER(nova2001_state, bg_videoram)
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( nova2001_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ninjakun_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ninjakun_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( ninjakun_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share6")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjakun_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ninjakun_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( ninjakun_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pkunwar_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pkunwar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(nova2001_state, spriteram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_BASE_MEMBER(nova2001_state, bg_videoram)
@@ -245,13 +245,13 @@ static ADDRESS_MAP_START( pkunwar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pkunwar_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pkunwar_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pkunwar_flipscreen_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( raiders5_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( raiders5_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(nova2001_state, spriteram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_BASE_MEMBER(nova2001_state, fg_videoram)
@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( raiders5_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raiders5_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( raiders5_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_r)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( raiders5_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(pkunwar_flipscreen_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raiders5_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( raiders5_io, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READNOP /* unknown */
 ADDRESS_MAP_END
 

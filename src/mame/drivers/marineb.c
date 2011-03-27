@@ -81,7 +81,7 @@ static MACHINE_START( marineb )
 	state->save_item(NAME(state->marineb_active_low_flipscreen));
 }
 
-static ADDRESS_MAP_START( marineb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_BASE_MEMBER(marineb_state, videoram)
@@ -99,12 +99,12 @@ static ADDRESS_MAP_START( marineb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( marineb_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( marineb_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ay1", ay8910_address_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wanted_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( wanted_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)

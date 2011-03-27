@@ -14,7 +14,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( kissp_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( kissp_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

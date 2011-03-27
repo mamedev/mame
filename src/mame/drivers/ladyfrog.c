@@ -134,7 +134,7 @@ static READ8_HANDLER( snd_flag_r )
 	return state->snd_flag | 0xfd;
 }
 
-static ADDRESS_MAP_START( ladyfrog_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ladyfrog_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc07f) AM_RAM
 	AM_RANGE(0xc080, 0xc87f) AM_READWRITE(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE_MEMBER(ladyfrog_state, videoram, videoram_size)
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( ladyfrog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ladyfrog_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ladyfrog_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP

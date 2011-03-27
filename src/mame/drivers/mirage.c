@@ -95,7 +95,7 @@ static SCREEN_UPDATE( mirage )
 
 static SCREEN_EOF( mirage )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
@@ -135,7 +135,7 @@ static WRITE16_HANDLER( okim0_rombank_w )
 	state->oki_bgm->set_bank_base(0x40000 * (data & 0x7));
 }
 
-static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mirage_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	/* tilemaps */
 	AM_RANGE(0x100000, 0x101fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w) // 0x100000 - 0x101fff tested

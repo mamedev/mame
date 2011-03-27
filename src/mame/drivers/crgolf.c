@@ -252,7 +252,7 @@ static WRITE8_DEVICE_HANDLER( crgolfhi_sample_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -600,7 +600,7 @@ ROM_END
 static DRIVER_INIT( crgolfhi )
 {
 	device_t *msm = machine->device("msm");
-	memory_install_write8_device_handler(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	memory_install_write8_device_handler(machine->device("audiocpu")->memory().space(AS_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 
 

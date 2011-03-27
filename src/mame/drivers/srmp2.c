@@ -394,7 +394,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 **************************************************************************/
 
 
-static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u16)		/* Sprites Code + X + Attr */
@@ -415,7 +415,7 @@ static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")				/* Coinage */
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(mjyuugi_flags_w)			/* Coin Counter */
@@ -456,7 +456,7 @@ static WRITE8_HANDLER( srmp3_flags_w )
 }
 
 
-static ADDRESS_MAP_START( srmp3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( srmp3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* rom bank */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")	/* work ram */
@@ -467,7 +467,7 @@ static ADDRESS_MAP_START( srmp3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram3.u8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_WRITENOP								/* elapsed interrupt signal */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)	/* coin, service | GFX bank, counter, lockout */
@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe2, 0xe2) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rmgoldyh_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( rmgoldyh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* rom bank */
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_SHARE("nvram")	/* work ram */
@@ -509,7 +509,7 @@ static WRITE8_HANDLER( rmgoldyh_rombank_w )
 	memory_set_bankptr(space->machine, "bank1", &ROM[addr]);
 }
 
-static ADDRESS_MAP_START( rmgoldyh_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( rmgoldyh_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x60, 0x60) AM_WRITE(rmgoldyh_rombank_w)						/* ROM bank select */

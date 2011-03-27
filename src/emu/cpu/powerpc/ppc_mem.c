@@ -277,11 +277,11 @@ exception:
 	return 0;
 }
 
-static int ppc_translate_address_cb(int space, offs_t *addr)
+static int ppc_translate_address_cb(address_spacenum space, offs_t *addr)
 {
 	int success = 1;
 
-	if (space == ADDRESS_SPACE_PROGRAM)
+	if (space == AS_PROGRAM)
 	{
 		if (MSR & MSR_DR)
 			success = ppc_translate_address(addr, PPC_TRANSLATE_CODE | PPC_TRANSLATE_READ | PPC_TRANSLATE_NOEXCEPTION);

@@ -591,7 +591,7 @@ static WRITE64_HANDLER(voodoo3_lfb_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START(viper_map, ADDRESS_SPACE_PROGRAM, 64)
+static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM
 	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE(epic_64be_r, epic_64be_w)
 	AM_RANGE(0x82000000, 0x83ffffff) AM_DEVREADWRITE32("voodoo", banshee_r, banshee_w, U64(0xffffffffffffffff))
@@ -674,7 +674,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(viper)
 {
-//  memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff207fff, 0, 0, hdd_r, hdd_w ); //TODO
+//  memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), ide, 0xff200000, 0xff207fff, 0, 0, hdd_r, hdd_w ); //TODO
 }
 
 static DRIVER_INIT(vipercf)
@@ -683,8 +683,8 @@ static DRIVER_INIT(vipercf)
 
 	DRIVER_INIT_CALL(viper);
 
-	memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), ide, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
-	memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
+	memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), ide, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
+	memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), ide, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
 }
 
 

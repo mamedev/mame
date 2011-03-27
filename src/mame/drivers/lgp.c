@@ -138,7 +138,7 @@ static WRITE8_HANDLER(ldp_write)
 
 
 /* PROGRAM MAPS */
-static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x7fff) AM_ROM
 	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_BASE_MEMBER(lgp_state, tile_ram)
 	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_BASE_MEMBER(lgp_state, tile_control_ram)
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( main_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000,0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_program_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0x8000,0x83ff) AM_RAM
 	AM_RANGE(0x8400,0x8407) AM_RAM		/* Needs handler!  Communications? */
@@ -163,13 +163,13 @@ ADDRESS_MAP_END
 
 
 /* IO MAPS */
-static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0xfd,0xfd) AM_READ_PORT("IN_TEST")
 //  AM_RANGE(0xfe,0xfe) AM_READ_PORT("IN_TEST")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

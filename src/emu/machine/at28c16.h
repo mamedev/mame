@@ -61,7 +61,7 @@ protected:
 	virtual bool device_validity_check( emu_options &options, const game_driver &driver ) const;
 
 	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config( int spacenum = 0 ) const;
+	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const;
 
 	// device-specific configuration
 	address_space_config m_space_config;

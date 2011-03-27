@@ -246,7 +246,7 @@ static WRITE8_HANDLER( popflame_protection_w )
 
 
 
-static ADDRESS_MAP_START( naughtyb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( naughtyb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram)
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( naughtyb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)	// DSW0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popflame_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( popflame_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram)
@@ -854,10 +854,10 @@ ROM_END
 static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x9000, 0x9000, 0, 0, popflame_protection_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x9090, 0x9090, 0, 0, popflame_protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9000, 0x9000, 0, 0, popflame_protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9090, 0x9090, 0, 0, popflame_protection_r);
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb000, 0xb0ff, 0, 0, popflame_protection_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb000, 0xb0ff, 0, 0, popflame_protection_w);
 }
 
 
@@ -887,7 +887,7 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 static DRIVER_INIT( trvmstr )
 {
 	/* install questions' handlers  */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
 }
 
 

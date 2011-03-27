@@ -211,7 +211,7 @@ WRITE16_HANDLER(brival_protection_w)
 
 void darkedge_fd1149_vblank(device_t *device)
 {
-	address_space *space = device->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->memory().space(AS_PROGRAM);
 
 	space->write_word(0x20f072, 0);
 	space->write_word(0x20f082, 0);

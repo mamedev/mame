@@ -45,7 +45,7 @@ SCREEN_UPDATE( s3c2410 )
 
 DEVICE_START( s3c2410 )
 {
-	address_space *space = device->machine->device( "maincpu")->memory().space( ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device( "maincpu")->memory().space( AS_PROGRAM);
 	DEVICE_START_CALL(s3c24xx);
 	memory_install_readwrite32_device_handler( space, device, 0x48000000, 0x4800003b, 0, 0, s3c24xx_memcon_r, s3c24xx_memcon_w);
 	memory_install_readwrite32_device_handler( space, device, 0x49000000, 0x4900005b, 0, 0, s3c24xx_usb_host_r, s3c24xx_usb_host_w);

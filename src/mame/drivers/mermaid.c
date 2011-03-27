@@ -138,7 +138,7 @@ static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( mermaid_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_BASE_MEMBER(mermaid_state, videoram2)
@@ -196,7 +196,7 @@ static WRITE8_HANDLER( rougien_sample_playback_w )
 	state->adpcm_play_reg = data & 1;
 }
 
-static ADDRESS_MAP_START( rougien_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( rougien_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(rougien_sample_playback_w)
 	AM_RANGE(0xe802, 0xe802) AM_WRITE(rougien_sample_rom_hi_w)
 	AM_RANGE(0xe803, 0xe803) AM_WRITE(rougien_sample_rom_lo_w)

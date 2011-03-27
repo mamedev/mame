@@ -168,7 +168,7 @@ static INTERRUPT_GEN( interrupt_A )
 }
 
 
-static ADDRESS_MAP_START( megasys1A_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
@@ -250,7 +250,7 @@ static WRITE16_HANDLER( ip_select_w )
 }
 
 
-static ADDRESS_MAP_START( megasys1B_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044000, 0x0443ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_BASE_MEMBER(megasys1_state, vregs)
@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_C	INTERRUPT_NUM_B
 #define interrupt_C		interrupt_B
 
-static ADDRESS_MAP_START( megasys1C_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE(megasys1_vregs_C_r,megasys1_vregs_C_w) AM_BASE_MEMBER(megasys1_state, vregs)
@@ -296,7 +296,7 @@ static INTERRUPT_GEN( interrupt_D )
 	device_set_input_line(device, 2, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( megasys1D_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c9fff) AM_RAM_WRITE(megasys1_vregs_D_w) AM_BASE_MEMBER(megasys1_state, vregs)
 	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_BASE_MEMBER(megasys1_state, objectram)
@@ -390,7 +390,7 @@ static READ8_DEVICE_HANDLER( oki_status_r )
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( megasys1A_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
@@ -408,7 +408,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( megasys1B_sound_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
@@ -427,14 +427,14 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( z80_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( z80_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
@@ -3702,7 +3702,7 @@ static READ16_HANDLER( edfbl_input_r )
 
 static DRIVER_INIT( edfbl )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe0002, 0xe000b, 0, 0, edfbl_input_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe0002, 0xe000b, 0, 0, edfbl_input_r);
 }
 
 
@@ -3761,13 +3761,13 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	memory_install_write16_device_handler(machine->device("soundcpu")->memory().space(ADDRESS_SPACE_PROGRAM), oki1, 0xa0000, 0xa0003, 0, 0, okim6295_both_w);
-	memory_install_write16_device_handler(machine->device("soundcpu")->memory().space(ADDRESS_SPACE_PROGRAM), oki2, 0xc0000, 0xc0003, 0, 0, okim6295_both_w);
+	memory_install_write16_device_handler(machine->device("soundcpu")->memory().space(AS_PROGRAM), oki1, 0xa0000, 0xa0003, 0, 0, okim6295_both_w);
+	memory_install_write16_device_handler(machine->device("soundcpu")->memory().space(AS_PROGRAM), oki2, 0xc0000, 0xc0003, 0, 0, okim6295_both_w);
 }
 
 static DRIVER_INIT( peekaboo )
 {
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
 }
 
 static DRIVER_INIT( phantasm )
@@ -3814,7 +3814,7 @@ static DRIVER_INIT( soldamj )
 	astyanax_rom_decode(machine, "maincpu");
 
 	/* Sprite RAM is mirrored */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
 static DRIVER_INIT( soldam )
@@ -3822,7 +3822,7 @@ static DRIVER_INIT( soldam )
 	phantasm_rom_decode(machine, "maincpu");
 
 	/* Sprite RAM is mirrored */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
 
@@ -3847,7 +3847,7 @@ static DRIVER_INIT( monkelf )
 	UINT16 *ROM = (UINT16*)machine->region("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71;
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
 
 	state->ram += 0x10000/2;
 

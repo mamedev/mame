@@ -274,7 +274,7 @@ static READ8_HANDLER(denseib_770079_r)
 
 
 
-static ADDRESS_MAP_START( snesb_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( snesb_map, AS_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x400000, 0x5fffff) AM_READ(snes_r_bank3)						/* ROM (and reserved in Mode 20) */
@@ -296,7 +296,7 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 	spc_ram_w(device, offset + 0x100, data);
 }
 
-static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)  	/* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
@@ -553,7 +553,7 @@ static DRIVER_INIT(kinstb)
 	}
 
 	state->shared_ram = auto_alloc_array(machine, INT8, 0x100);
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
 
 	DRIVER_INIT_CALL(snes_hirom);
 }
@@ -595,7 +595,7 @@ static DRIVER_INIT( ffight2b )
 	rom[0x7ffc] = 0x54;
 
 	state->ffight2b_coins = 0;
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
 
 	DRIVER_INIT_CALL(snes);
 }
@@ -654,15 +654,15 @@ static DRIVER_INIT( sblast2b )
 	dst[0xfffd] = 0x7a;
 
 	/*  protection checks */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x75bd37, 0x75bd37, 0, 0, sb2b_75bd37_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6a6000, 0x6a6fff, 0, 0, sb2b_6a6xxx_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x75bd37, 0x75bd37, 0, 0, sb2b_75bd37_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6a6000, 0x6a6fff, 0, 0, sb2b_6a6xxx_r);
 
 	/* extra inputs */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, sb2b_770071_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x770079, 0x770079, 0, 0, sb2b_770079_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770071, 0x770071, 0, 0, sb2b_770071_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770079, 0x770079, 0, 0, sb2b_770079_r);
 
 	/* handler to read boot code */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x007000, 0x007fff, 0, 0, sb2b_7xxx_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x007000, 0x007fff, 0, 0, sb2b_7xxx_r);
 
 	DRIVER_INIT_CALL(snes_hirom);
 }
@@ -685,9 +685,9 @@ static DRIVER_INIT( iron )
 	}
 
 	/* extra inputs */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, iron_770071_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x770073, 0x770073, 0, 0, iron_770073_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x770079, 0x770079, 0, 0, iron_770079_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770071, 0x770071, 0, 0, iron_770071_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770073, 0x770073, 0, 0, iron_770073_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770079, 0x770079, 0, 0, iron_770079_r);
 
 	DRIVER_INIT_CALL(snes);
 }
@@ -730,8 +730,8 @@ static DRIVER_INIT( denseib )
 	rom[0xfffd] = 0xf7;
 
 	/* extra inputs */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x770071, 0x770071, 0, 0, denseib_770071_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x770079, 0x770079, 0, 0, denseib_770079_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770071, 0x770071, 0, 0, denseib_770071_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770079, 0x770079, 0, 0, denseib_770079_r);
 
 	DRIVER_INIT_CALL(snes_hirom);
 }

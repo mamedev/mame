@@ -214,7 +214,7 @@ static WRITE8_HANDLER( wiz_coin_counter_w )
 	coin_counter_w(space->machine, offset,data);
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Wiz */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stinger_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
@@ -1034,7 +1034,7 @@ static DRIVER_INIT( stinger )
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	int size = machine->region("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
@@ -1071,13 +1071,13 @@ static DRIVER_INIT( stinger )
 
 static DRIVER_INIT( scion )
 {
-	memory_nop_write(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4000, 0x4001, 0, 0);
+	memory_nop_write(machine->device("audiocpu")->memory().space(AS_PROGRAM), 0x4000, 0x4001, 0, 0);
 }
 
 
 static DRIVER_INIT( wiz )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd400, 0xd400, 0, 0, wiz_protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd400, 0xd400, 0, 0, wiz_protection_r);
 }
 
 

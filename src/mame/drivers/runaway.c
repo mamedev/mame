@@ -81,7 +81,7 @@ static WRITE8_HANDLER( runaway_irq_ack_w )
 }
 
 
-static ADDRESS_MAP_START( runaway_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( runaway_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_BASE_MEMBER(runaway_state, video_ram)
 	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(runaway_state, sprite_ram)

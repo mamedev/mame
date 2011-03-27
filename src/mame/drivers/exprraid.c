@@ -243,7 +243,7 @@ static READ8_HANDLER( vblank_r )
 	return input_port_read(space->machine, "IN0");
 }
 
-static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE_MEMBER(exprraid_state, main_ram)
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_SIZE_MEMBER(exprraid_state, spriteram, spriteram_size)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE_MEMBER(exprraid_state, videoram)
@@ -266,11 +266,11 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( master_io_map, AS_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_r, ym3526_w)
@@ -778,13 +778,13 @@ static DRIVER_INIT( exprraid )
 
 static DRIVER_INIT( wexpressb )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpressb2 )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 

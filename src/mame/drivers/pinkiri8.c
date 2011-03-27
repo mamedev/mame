@@ -58,7 +58,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( janshi_vdp_map8, 0, 8 )
+static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8 )
 
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE_MEMBER(pinkiri8_state, janshi_back_vram) // bg tilemap?
 	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE_MEMBER(pinkiri8_state, janshi_vram1) // xpos, colour, tile number etc.
@@ -90,7 +90,7 @@ public:
 protected:
 	virtual void device_config_complete();
 	virtual bool device_validity_check(emu_options &options, const game_driver &driver) const;
-	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 	address_space_config		m_space_config;
 };
 
@@ -138,7 +138,7 @@ bool janshi_vdp_device_config::device_validity_check(emu_options &options, const
 	return error;
 }
 
-const address_space_config *janshi_vdp_device_config::memory_space_config(int spacenum) const
+const address_space_config *janshi_vdp_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }
@@ -407,7 +407,7 @@ static SCREEN_UPDATE( pinkiri8 )
 	return 0;
 }
 
-static ADDRESS_MAP_START( pinkiri8_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pinkiri8_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0bfff) AM_ROM
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM
 	AM_RANGE(0x0e000, 0x0ffff) AM_ROM
@@ -495,7 +495,7 @@ static READ8_HANDLER( mux_p1_r )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( pinkiri8_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pinkiri8_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_RAM //Z180 internal I/O
 	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)
@@ -1250,9 +1250,9 @@ static READ8_HANDLER( ronjan_patched_prot_r )
 
 static DRIVER_INIT( ronjan )
 {
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x90, 0x90, 0, 0, ronjan_prot_r, ronjan_prot_w);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x66, 0x66, 0, 0, ronjan_prot_status_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x9f, 0x9f, 0, 0, ronjan_patched_prot_r);
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x90, 0x90, 0, 0, ronjan_prot_r, ronjan_prot_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x66, 0x66, 0, 0, ronjan_prot_status_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x9f, 0x9f, 0, 0, ronjan_patched_prot_r);
 }
 
 GAME( 1992,  janshi,    0,   pinkiri8, janshi,    0,      ROT0, "Eagle",         "Janshi",          GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

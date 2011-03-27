@@ -46,7 +46,7 @@ static WRITE32_HANDLER(tty_w)	// set breakpoint at bfc01430 to catch when it's p
 //  printf("%c", data);
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM				// this is a sufficient amount to get "RAM OK"
 	AM_RANGE(0x1c000000, 0x1c000003) AM_WRITE(tty_w)		// RSS OS code uses this one
 	AM_RANGE(0x1c000014, 0x1c000017) AM_READ(tty_ready_r)

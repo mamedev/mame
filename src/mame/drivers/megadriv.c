@@ -991,7 +991,7 @@ static WRITE16_HANDLER( pico_68k_io_write )
 	}
 }
 
-static ADDRESS_MAP_START( pico_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pico_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(pico_68k_io_read, pico_68k_io_write)

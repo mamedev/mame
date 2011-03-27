@@ -557,7 +557,7 @@ static INTERRUPT_GEN( m15_interrupt )
  *
  *************************************/
 
-static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, videoram, videoram_size)
@@ -571,7 +571,7 @@ static ADDRESS_MAP_START( m10_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m11_main, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, videoram, videoram_size)
@@ -585,7 +585,7 @@ static ADDRESS_MAP_START( m11_main, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m15_main, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, memory) /* scratch ram */
 	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_BASE_MEMBER(m10_state, rom)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, videoram, videoram_size)

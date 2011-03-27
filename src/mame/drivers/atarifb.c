@@ -147,7 +147,7 @@ static PALETTE_INIT( atarifb )
  *
  *************************************/
 
-static ADDRESS_MAP_START( atarifb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarifb_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap1_videoram)
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( atarifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atarifb4_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarifb4_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap1_videoram)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( atarifb4_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( abaseb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( abaseb_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap1_videoram)
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( abaseb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( soccer_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( soccer_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x025f) AM_RAM_WRITE(atarifb_alpha1_videoram_w) AM_BASE_MEMBER(atarifb_state, alphap1_videoram)

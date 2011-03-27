@@ -1549,7 +1549,7 @@ static MACHINE_RESET( demon_sound )
 }
 
 
-static ADDRESS_MAP_START( demon_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ay1", ay8910_r)
@@ -1562,7 +1562,7 @@ static ADDRESS_MAP_START( demon_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( demon_sound_ports, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_w)
 	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_w)
@@ -1622,7 +1622,7 @@ static WRITE8_HANDLER( qb3_sound_w )
 static MACHINE_RESET( qb3_sound )
 {
 	MACHINE_RESET_CALL(demon_sound);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, qb3_sound_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x04, 0, 0, qb3_sound_w);
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */

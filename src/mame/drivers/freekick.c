@@ -162,7 +162,7 @@ static WRITE8_HANDLER( freekick_ff_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( pbillrd_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pbillrd_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( pbillrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( freekickb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( freekickb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)	// tilemap
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( freekickb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gigas_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gigas_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(freek_videoram_w) AM_BASE_MEMBER(freekick_state, videoram)
@@ -221,13 +221,13 @@ static ADDRESS_MAP_START( gigas_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc03, 0xfc03) AM_DEVWRITE("sn4", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gigas_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gigas_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oigas_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( oigas_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spinner_r, spinner_select_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP //unused dip 3
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( oigas_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_WRITE(oigas_5_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( freekickb_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( freekickb_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(freekick_ff_r, freekick_ff_w)
 ADDRESS_MAP_END
@@ -1108,7 +1108,7 @@ ROM_END
 
 static DRIVER_INIT(gigasb)
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	space->set_decrypted_region(0x0000, 0xbfff, machine->region("maincpu")->base() + 0x10000);
 }
 

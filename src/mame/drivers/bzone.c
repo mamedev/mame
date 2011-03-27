@@ -296,7 +296,7 @@ static WRITE8_DEVICE_HANDLER( redbaron_joysound_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bzone_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
@@ -316,7 +316,7 @@ static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
@@ -797,7 +797,7 @@ static WRITE8_HANDLER( analog_select_w )
 
 static DRIVER_INIT( bradley )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	memory_install_ram(space, 0x400, 0x7ff, 0, 0, NULL);
 	memory_install_read_port(space, 0x1808, 0x1808, 0, 0, "1808");
 	memory_install_read_port(space, 0x1809, 0x1809, 0, 0, "1809");

@@ -363,7 +363,7 @@ static SCREEN_UPDATE(luckgrln)
 	return 0;
 }
 
-static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("rom_data",0x10000)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("rom_data",0x00000)
@@ -542,7 +542,7 @@ static WRITE8_HANDLER(counters_w)
 
 
 /* are some of these reads / writes mirrored? there seem to be far too many */
-static ADDRESS_MAP_START( portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff) // i think
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
 	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)

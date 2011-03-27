@@ -86,7 +86,7 @@ static WRITE8_HANDLER( subcpu_reset_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_BASE_MEMBER(wiping_state, videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_BASE_MEMBER(wiping_state, colorram)
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("wiping", wiping_sound_w)
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(shared1_r,shared1_w)

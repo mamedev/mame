@@ -87,12 +87,12 @@ static WRITE8_HANDLER( jsa3_io_w );
  *
  *************************************/
 
-static ADDRESS_MAP_START( jsa3_oki_map, 0, 8 )
+static ADDRESS_MAP_START( jsa3_oki_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank12")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank13")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jsa3_oki2_map, 0, 8 )
+static ADDRESS_MAP_START( jsa3_oki2_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank14")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank15")
 ADDRESS_MAP_END
@@ -147,7 +147,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	/* install POKEY memory handlers */
 	if (pokey != NULL)
-		memory_install_readwrite8_device_handler(jsacpu->memory().space(ADDRESS_SPACE_PROGRAM), pokey, 0x2c00, 0x2c0f, 0, 0, pokey_r, pokey_w);
+		memory_install_readwrite8_device_handler(jsacpu->memory().space(AS_PROGRAM), pokey, 0x2c00, 0x2c0f, 0, 0, pokey_r, pokey_w);
 
 	init_save_state(machine);
 	atarijsa_reset();
@@ -748,7 +748,7 @@ static void update_all_volumes(running_machine *machine )
  *
  *************************************/
 
-static ADDRESS_MAP_START( atarijsa1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa1_io_r, jsa1_io_w)
@@ -756,7 +756,7 @@ static ADDRESS_MAP_START( atarijsa1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atarijsa2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa2_io_r, jsa2_io_w)
@@ -765,7 +765,7 @@ ADDRESS_MAP_END
 
 
 /* full map verified from schematics and Batman GALs */
-static ADDRESS_MAP_START( atarijsa3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3_io_r, jsa3_io_w)
@@ -773,7 +773,7 @@ static ADDRESS_MAP_START( atarijsa3_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atarijsa3s_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa3s_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3s_io_r, jsa3s_io_w)
@@ -895,7 +895,7 @@ MACHINE_CONFIG_DERIVED( jsa_iii_mono, jsa_ii_mono )
 	MCFG_CPU_PROGRAM_MAP(atarijsa3_map)
 
 	MCFG_DEVICE_MODIFY("adpcm")
-	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki_map)
 MACHINE_CONFIG_END
 
 
@@ -927,11 +927,11 @@ MACHINE_CONFIG_FRAGMENT( jsa_iiis_stereo )
 
 	MCFG_OKIM6295_ADD("adpcml", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki_map)
 
 	MCFG_OKIM6295_ADD("adpcmr", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, jsa3_oki2_map)
 MACHINE_CONFIG_END
 
 

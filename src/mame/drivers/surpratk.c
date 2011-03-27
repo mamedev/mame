@@ -90,7 +90,7 @@ static WRITE8_HANDLER( surpratk_5fc0_w )
 
 /********************************************/
 
-static ADDRESS_MAP_START( surpratk_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(surpratk_state, ram)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")					/* banked ROM */

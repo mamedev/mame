@@ -563,7 +563,7 @@ DIP locations verified for:
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( arkanoid_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( arkanoid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( arkanoid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("aysnd", ay8910_address_w)
@@ -593,7 +593,7 @@ static ADDRESS_MAP_START( bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_READNOP	/* fixes instant death in final level */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hexa_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hexa_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -604,7 +604,7 @@ static ADDRESS_MAP_START( hexa_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_BASE_SIZE_MEMBER(arkanoid_state, videoram, videoram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(arkanoid_68705_port_a_r, arkanoid_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READ_PORT("MUX")
@@ -1446,10 +1446,10 @@ ROM_END
 
 static void arkanoid_bootleg_init( running_machine *machine )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf000, 0xf000, 0, 0, arkanoid_bootleg_f000_r );
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf002, 0xf002, 0, 0, arkanoid_bootleg_f002_r );
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd018, 0xd018, 0, 0, arkanoid_bootleg_d018_w );
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd008, 0xd008, 0, 0, arkanoid_bootleg_d008_r );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf000, 0xf000, 0, 0, arkanoid_bootleg_f000_r );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf002, 0xf002, 0, 0, arkanoid_bootleg_f002_r );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd018, 0xd018, 0, 0, arkanoid_bootleg_d018_w );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd008, 0xd008, 0, 0, arkanoid_bootleg_d008_r );
 }
 
 static DRIVER_INIT( arkangc )
@@ -1541,7 +1541,7 @@ static DRIVER_INIT( tetrsark )
 		ROM[x] = ROM[x] ^ 0x94;
 	}
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd008, 0xd008, 0, 0, tetrsark_d008_w );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd008, 0xd008, 0, 0, tetrsark_d008_w );
 }
 
 

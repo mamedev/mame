@@ -1511,12 +1511,12 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			temp = (state->i80186.mem.peripheral & 0xffc0) << 4;
 			if (state->i80186.mem.middle_size & 0x0040)
 			{
-				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(ADDRESS_SPACE_PROGRAM), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
+				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(AS_PROGRAM), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(ADDRESS_SPACE_IO), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
+				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(AS_IO), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
 			}
 
 			/* we need to do this at a time when the 80186 context is swapped in */
@@ -1582,12 +1582,12 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			temp = (data & 0x0fff) << 8;
 			if (data & 0x1000)
 			{
-				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(ADDRESS_SPACE_PROGRAM), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
+				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(AS_PROGRAM), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(ADDRESS_SPACE_IO), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
+				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(AS_IO), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;
@@ -2207,24 +2207,24 @@ WRITE8_DEVICE_HANDLER( ataxx_80186_control_w )
  *
  *************************************/
 
-ADDRESS_MAP_START( leland_80186_map_program, ADDRESS_SPACE_PROGRAM, 16 )
+ADDRESS_MAP_START( leland_80186_map_program, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_MIRROR(0x1c000) AM_RAM
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( ataxx_80186_map_io, ADDRESS_SPACE_IO, 16 )
+ADDRESS_MAP_START( ataxx_80186_map_io, AS_IO, 16 )
 	AM_RANGE(0xff00, 0xffff) AM_DEVREADWRITE("custom", i80186_internal_port_r, i80186_internal_port_w)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( redline_80186_map_io, ADDRESS_SPACE_IO, 16 )
+ADDRESS_MAP_START( redline_80186_map_io, AS_IO, 16 )
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("custom", redline_dac_w)
 	AM_RANGE(0xff00, 0xffff) AM_DEVREADWRITE("custom", i80186_internal_port_r, i80186_internal_port_w)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( leland_80186_map_io, ADDRESS_SPACE_IO, 16 )
+ADDRESS_MAP_START( leland_80186_map_io, AS_IO, 16 )
 	AM_RANGE(0x0000, 0x000b) AM_DEVWRITE("custom", dac_w)
 	AM_RANGE(0x0080, 0x008b) AM_DEVWRITE("custom", dac_w)
 	AM_RANGE(0x00c0, 0x00cb) AM_DEVWRITE("custom", dac_w)

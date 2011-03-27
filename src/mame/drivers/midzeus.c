@@ -567,7 +567,7 @@ static READ32_HANDLER( invasn_gun_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
@@ -582,7 +582,7 @@ static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
@@ -1122,7 +1122,7 @@ static READ8_HANDLER( PIC16C5X_T0_clk_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( pic_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pic_io_map, AS_IO, 8 )
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
@@ -1413,7 +1413,7 @@ static DRIVER_INIT( invasn )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
 }
 
 
@@ -1423,8 +1423,8 @@ static DRIVER_INIT( crusnexo )
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
 	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user2")->base(), 0x400000*4);
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
-	memory_install_write32_handler    (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
+	memory_install_write32_handler    (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
 }
 
 

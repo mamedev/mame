@@ -488,7 +488,7 @@ static READ8_HANDLER( turbotag_kludge_r )
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( mcrmono_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcrmono_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( mcrmono_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* I/O map verified from schematics */
-static ADDRESS_MAP_START( mcrmono_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcrmono_portmap, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP0")
@@ -522,7 +522,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( spyhunt_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spyhunt_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE_MEMBER(mcr3_state, videoram)
@@ -533,7 +533,7 @@ static ADDRESS_MAP_START( spyhunt_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
-static ADDRESS_MAP_START( spyhunt_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS
@@ -1541,16 +1541,16 @@ static void mcr_common_init(running_machine *machine, int sound_board)
 static DRIVER_INIT( demoderm )
 {
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x01, 0x01, 0, 0, demoderm_ip1_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, demoderm_ip2_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, demoderm_op6_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x01, 0x01, 0, 0, demoderm_ip1_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x02, 0x02, 0, 0, demoderm_ip2_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, demoderm_op6_w);
 }
 
 
 static DRIVER_INIT( sarge )
 {
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, turbocs_data_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, turbocs_data_w);
 }
 
 
@@ -1558,10 +1558,10 @@ static DRIVER_INIT( maxrpm )
 {
 	mcr3_state *state = machine->driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x01, 0x01, 0, 0, maxrpm_ip1_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, maxrpm_ip2_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, maxrpm_op5_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, maxrpm_op6_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x01, 0x01, 0, 0, maxrpm_ip1_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x02, 0x02, 0, 0, maxrpm_ip2_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x05, 0x05, 0, 0, maxrpm_op5_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, maxrpm_op6_w);
 
 	state_save_register_global(machine, state->maxrpm_adc_control);
 	state_save_register_global(machine, state->maxrpm_adc_select);
@@ -1574,26 +1574,26 @@ static DRIVER_INIT( maxrpm )
 static DRIVER_INIT( rampage )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, rampage_ip4_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, rampage_op6_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x04, 0, 0, rampage_ip4_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, rampage_op6_w);
 }
 
 
 static DRIVER_INIT( powerdrv )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, powerdrv_ip2_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, powerdrv_op5_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, powerdrv_op6_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x02, 0x02, 0, 0, powerdrv_ip2_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x05, 0x05, 0, 0, powerdrv_op5_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, powerdrv_op6_w);
 }
 
 
 static DRIVER_INIT( stargrds )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, stargrds_ip0_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, stargrds_op5_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, stargrds_op6_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x00, 0x00, 0, 0, stargrds_ip0_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x05, 0x05, 0, 0, stargrds_op5_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, stargrds_op6_w);
 }
 
 
@@ -1635,7 +1635,7 @@ static DRIVER_INIT( turbotag )
 	machine->device<cpu_device>("csdcpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 
 	/* kludge for bad ROM read */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0b53, 0x0b53, 0, 0, turbotag_kludge_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0b53, 0x0b53, 0, 0, turbotag_kludge_r);
 }
 
 

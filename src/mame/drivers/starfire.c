@@ -151,7 +151,7 @@ static READ8_HANDLER( fireone_input_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(starfire_scratch_r, starfire_scratch_w)
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(starfire_colorram_r, starfire_colorram_w) AM_BASE_MEMBER(starfire_state, starfire_colorram)

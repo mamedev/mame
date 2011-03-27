@@ -238,7 +238,7 @@ Interrupts:
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_READNOP   /* 6850 ACIA */
@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( zoo_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( zoo_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_READNOP   /* ACIA */
@@ -273,7 +273,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(qix_68705_portA_r, qix_68705_portA_w) AM_BASE_MEMBER(qix_state, _68705_port_out)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(qix_68705_portB_r, qix_68705_portB_w)
@@ -1257,8 +1257,8 @@ static int kram3_decrypt(int address, int value)
 
 static DRIVER_INIT( kram3 )
 {
-	address_space *mainspace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
-	address_space *videospace = machine->device("videocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *mainspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *videospace = machine->device("videocpu")->memory().space(AS_PROGRAM);
 	//const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i;

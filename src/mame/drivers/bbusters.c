@@ -327,7 +327,7 @@ static READ16_HANDLER( mechatt_gun_r )
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( bbusters_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE_MEMBER(bbusters_state, ram)
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE_MEMBER(bbusters_state, videoram)
@@ -357,7 +357,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( mechatt_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x06ffff) AM_ROM
 	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_BASE_MEMBER(bbusters_state, ram)
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE_MEMBER(bbusters_state, videoram)
@@ -378,19 +378,19 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(soundlatch_r, sound_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sounda_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sounda_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2608_r, ym2608_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
@@ -666,7 +666,7 @@ static const ym2610_interface ym2610_config =
 
 static SCREEN_EOF( bbuster )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 	buffer_spriteram16_2_w(space,0,0,0xffff);
@@ -674,7 +674,7 @@ static SCREEN_EOF( bbuster )
 
 static SCREEN_EOF( mechatt )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 

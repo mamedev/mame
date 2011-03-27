@@ -323,7 +323,7 @@ static SCREEN_UPDATE( spaceg )
  *
  *************************************/
 
-static ADDRESS_MAP_START( spaceg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spaceg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM

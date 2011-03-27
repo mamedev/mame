@@ -25,7 +25,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( vega_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

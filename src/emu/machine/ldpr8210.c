@@ -275,7 +275,7 @@ INLINE void update_audio_squelch(laserdisc_state *ld)
     PR-8210 ROM AND MACHINE INTERFACES
 ***************************************************************************/
 
-static ADDRESS_MAP_START( pr8210_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pr8210_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(pr8210_pia_r, pr8210_pia_w)
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(pr8210_bus_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(pr8210_port1_w)
@@ -989,7 +989,7 @@ static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
     SIMUTREK ROM AND MACHINE INTERFACES
 ***************************************************************************/
 
-static ADDRESS_MAP_START( simutrek_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( simutrek_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(simutrek_data_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(simutrek_port2_r, simutrek_port2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(simutrek_t0_r)

@@ -319,7 +319,7 @@ static INTERRUPT_GEN( panic_interrupt )
 		/* only enabled if game in progress! */
 
 		if ((input_port_read(device->machine, "SYSTEM") & 0xc0) != 0xc0)
-			panic_sound_output_w(device->memory().space(ADDRESS_SPACE_PROGRAM), 17, 1);
+			panic_sound_output_w(device->memory().space(AS_PROGRAM), 17, 1);
 
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
 	}
@@ -417,7 +417,7 @@ static WRITE8_HANDLER( flip_screen_w )
 }
 
 
-static ADDRESS_MAP_START( panic_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(cosmic_state, videoram, videoram_size)
 	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cosmic_state, spriteram, spriteram_size)
@@ -432,7 +432,7 @@ static ADDRESS_MAP_START( panic_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cosmica_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(cosmic_state, videoram, videoram_size)
 	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cosmic_state, spriteram, spriteram_size)
@@ -446,12 +446,12 @@ static ADDRESS_MAP_START( cosmica_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cosmicg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cosmicg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(cosmic_state, videoram, videoram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cosmicg_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( cosmicg_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( magspot_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cosmic_state, spriteram, spriteram_size)
@@ -1596,17 +1596,17 @@ static DRIVER_INIT( cosmica )
 
 static DRIVER_INIT( devzone )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
 }
 
 
 static DRIVER_INIT( nomnlnd )
 {
 	device_t *dac = machine->device("dac");
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
-	memory_install_write8_device_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4800, 0x4800, 0, 0);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_device_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
 }
 
 static DRIVER_INIT( panic )

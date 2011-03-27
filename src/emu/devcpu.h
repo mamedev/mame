@@ -53,14 +53,6 @@
 //  CONSTANTS
 //**************************************************************************
 
-// alternate address space names for common use
-enum
-{
-	ADDRESS_SPACE_PROGRAM = ADDRESS_SPACE_0,	// program address space
-	ADDRESS_SPACE_DATA = ADDRESS_SPACE_1,		// data address space
-	ADDRESS_SPACE_IO = ADDRESS_SPACE_2			// I/O address space
-};
-
 // CPU information constants
 const int MAX_REGS = 256;
 enum
@@ -80,14 +72,14 @@ enum
 		CPUINFO_INT_MAX_CYCLES,								// R/O: maximum cycles for a single instruction
 
 		CPUINFO_INT_LOGADDR_WIDTH,							// R/O: address bus size for logical accesses in each space (0=same as physical)
-		CPUINFO_INT_LOGADDR_WIDTH_PROGRAM = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_PROGRAM,
-		CPUINFO_INT_LOGADDR_WIDTH_DATA = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_DATA,
-		CPUINFO_INT_LOGADDR_WIDTH_IO = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACE_IO,
+		CPUINFO_INT_LOGADDR_WIDTH_PROGRAM = CPUINFO_INT_LOGADDR_WIDTH + AS_PROGRAM,
+		CPUINFO_INT_LOGADDR_WIDTH_DATA = CPUINFO_INT_LOGADDR_WIDTH + AS_DATA,
+		CPUINFO_INT_LOGADDR_WIDTH_IO = CPUINFO_INT_LOGADDR_WIDTH + AS_IO,
 		CPUINFO_INT_LOGADDR_WIDTH_LAST = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACES - 1,
 		CPUINFO_INT_PAGE_SHIFT,								// R/O: size of a page log 2 (i.e., 12=4096), or 0 if paging not supported
-		CPUINFO_INT_PAGE_SHIFT_PROGRAM = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_PROGRAM,
-		CPUINFO_INT_PAGE_SHIFT_DATA = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_DATA,
-		CPUINFO_INT_PAGE_SHIFT_IO = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACE_IO,
+		CPUINFO_INT_PAGE_SHIFT_PROGRAM = CPUINFO_INT_PAGE_SHIFT + AS_PROGRAM,
+		CPUINFO_INT_PAGE_SHIFT_DATA = CPUINFO_INT_PAGE_SHIFT + AS_DATA,
+		CPUINFO_INT_PAGE_SHIFT_IO = CPUINFO_INT_PAGE_SHIFT + AS_IO,
 		CPUINFO_INT_PAGE_SHIFT_LAST = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACES - 1,
 
 		CPUINFO_INT_INPUT_STATE,							// R/W: states for each input line
@@ -120,9 +112,9 @@ enum
 		CPUINFO_FCT_EXECUTE,								// R/O: int (*execute)(legacy_cpu_device *device, int cycles)
 		CPUINFO_FCT_BURN,									// R/O: void (*burn)(legacy_cpu_device *device, int cycles)
 		CPUINFO_FCT_DISASSEMBLE,							// R/O: offs_t (*disassemble)(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
-		CPUINFO_FCT_TRANSLATE,								// R/O: int (*translate)(legacy_cpu_device *device, int space, int intention, offs_t *address)
-		CPUINFO_FCT_READ,									// R/O: int (*read)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 *value)
-		CPUINFO_FCT_WRITE,									// R/O: int (*write)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 value)
+		CPUINFO_FCT_TRANSLATE,								// R/O: int (*translate)(legacy_cpu_device *device, address_spacenum space, int intention, offs_t *address)
+		CPUINFO_FCT_READ,									// R/O: int (*read)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 *value)
+		CPUINFO_FCT_WRITE,									// R/O: int (*write)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 value)
 		CPUINFO_FCT_READOP,									// R/O: int (*readop)(legacy_cpu_device *device, UINT32 offset, int size, UINT64 *value)
 		CPUINFO_FCT_DEBUG_INIT,								// R/O: void (*debug_init)(legacy_cpu_device *device)
 		CPUINFO_FCT_IMPORT_STATE,							// R/O: void (*import_state)(legacy_cpu_device *device, const device_state_entry &entry)
@@ -248,15 +240,15 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define CPU_BURN_CALL(name)				CPU_BURN_NAME(name)(device, cycles)
 
 #define CPU_TRANSLATE_NAME(name)		cpu_translate_##name
-#define CPU_TRANSLATE(name)				int CPU_TRANSLATE_NAME(name)(legacy_cpu_device *device, int space, int intention, offs_t *address)
+#define CPU_TRANSLATE(name)				int CPU_TRANSLATE_NAME(name)(legacy_cpu_device *device, address_spacenum space, int intention, offs_t *address)
 #define CPU_TRANSLATE_CALL(name)		CPU_TRANSLATE_NAME(name)(device, space, intention, address)
 
 #define CPU_READ_NAME(name)				cpu_read_##name
-#define CPU_READ(name)					int CPU_READ_NAME(name)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 *value)
+#define CPU_READ(name)					int CPU_READ_NAME(name)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 *value)
 #define CPU_READ_CALL(name)				CPU_READ_NAME(name)(device, space, offset, size, value)
 
 #define CPU_WRITE_NAME(name)			cpu_write_##name
-#define CPU_WRITE(name)					int CPU_WRITE_NAME(name)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 value)
+#define CPU_WRITE(name)					int CPU_WRITE_NAME(name)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 value)
 #define CPU_WRITE_CALL(name)			CPU_WRITE_NAME(name)(device, space, offset, size, value)
 
 #define CPU_READOP_NAME(name)			cpu_readop_##name
@@ -317,9 +309,9 @@ typedef void (*cpu_reset_func)(legacy_cpu_device *device);
 typedef void (*cpu_exit_func)(legacy_cpu_device *device);
 typedef void (*cpu_execute_func)(legacy_cpu_device *device);
 typedef void (*cpu_burn_func)(legacy_cpu_device *device, int cycles);
-typedef int	(*cpu_translate_func)(legacy_cpu_device *device, int space, int intention, offs_t *address);
-typedef int	(*cpu_read_func)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 *value);
-typedef int	(*cpu_write_func)(legacy_cpu_device *device, int space, UINT32 offset, int size, UINT64 value);
+typedef int	(*cpu_translate_func)(legacy_cpu_device *device, address_spacenum space, int intention, offs_t *address);
+typedef int	(*cpu_read_func)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 *value);
+typedef int	(*cpu_write_func)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 value);
 typedef int	(*cpu_readop_func)(legacy_cpu_device *device, UINT32 offset, int size, UINT64 *value);
 typedef void (*cpu_debug_init_func)(legacy_cpu_device *device);
 typedef offs_t (*cpu_disassemble_func)(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
@@ -407,7 +399,7 @@ protected:
 	virtual UINT32 execute_default_irq_vector() const { return get_legacy_config_int(CPUINFO_INT_DEFAULT_IRQ_VECTOR); }
 
 	// device_config_memory_interface overrides
-	virtual const address_space_config *memory_space_config(int spacenum = 0) const { return (spacenum < ARRAY_LENGTH(m_space_config) && m_space_config[spacenum].m_addrbus_width != 0) ? &m_space_config[spacenum] : NULL; }
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const { return (spacenum < ARRAY_LENGTH(m_space_config) && m_space_config[spacenum].m_addrbus_width != 0) ? &m_space_config[spacenum] : NULL; }
 
 	// device_config_disasm_interface overrides
 	virtual UINT32 disasm_min_opcode_bytes() const { return get_legacy_config_int(CPUINFO_INT_MIN_INSTRUCTION_BYTES); }
@@ -472,9 +464,9 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) { set_legacy_runtime_int(CPUINFO_INT_INPUT_STATE + inputnum, state); }
 
 	// device_memory_interface overrides
-	virtual bool memory_translate(int spacenum, int intention, offs_t &address);
-	virtual bool memory_read(int spacenum, offs_t offset, int size, UINT64 &value);
-	virtual bool memory_write(int spacenum, offs_t offset, int size, UINT64 value);
+	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value);
+	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value);
 	virtual bool memory_readop(offs_t offset, int size, UINT64 &value);
 
 	// device_state_interface overrides

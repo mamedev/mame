@@ -48,9 +48,9 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 	}
 
 	/* address space handlers */
-	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
 	{
-		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
 
 		device_t *targetdev = device->siblingdevice(config->tag);
 		if (targetdev == NULL)
@@ -137,9 +137,9 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 	}
 
 	/* address space handlers */
-	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
 	{
-		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
 
 		device_t *targetdev = device->siblingdevice(config->tag);
 		if (targetdev == NULL)
@@ -235,9 +235,9 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 	}
 
 	/* address space handlers */
-	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->readspace != NULL)
 	{
-		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
 
 		device_t *targetdev = device->siblingdevice(config->tag);
 		if (targetdev == NULL)
@@ -314,9 +314,9 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 	}
 
 	/* address space handlers */
-	else if (config->type >= DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
+	else if (config->type >= DEVCB_TYPE_MEMORY(AS_PROGRAM) && config->type < DEVCB_TYPE_MEMORY(ADDRESS_SPACES) && config->writespace != NULL)
 	{
-		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(ADDRESS_SPACE_PROGRAM);
+		FPTR spacenum = (FPTR)config->type - (FPTR)DEVCB_TYPE_MEMORY(AS_PROGRAM);
 
 		device_t *targetdev = device->siblingdevice(config->tag);
 		if (targetdev == NULL)

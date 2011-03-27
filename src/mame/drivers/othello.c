@@ -124,7 +124,7 @@ static SCREEN_UPDATE( othello )
 	return 0;
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(othello_state, videoram)
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( tilebank_w )
 	logerror("tilebank -> %x\n", data);
 }
 
-static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -229,12 +229,12 @@ static WRITE8_HANDLER( ay_data_w )
 	if (state->ay_select & 2) ay8910_data_w(state->ay2, 0, data);
 }
 
-static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( audio_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(latch_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay_data_w)
@@ -308,7 +308,7 @@ static READ8_HANDLER( n7751_t1_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( n7751_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8 )
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)

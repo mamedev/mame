@@ -315,7 +315,7 @@ static WRITE32_HANDLER( sound_w )
 	}
 }
 
-static ADDRESS_MAP_START( bballoon_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_BASE_MEMBER(ghosteo_state, steppingstone) AM_MIRROR(0x40000000)
 	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
@@ -437,7 +437,7 @@ static READ32_HANDLER( bballoon_speedup_r )
 
 static MACHINE_RESET( bballoon )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4d000010, 0x4d000013, 0, 0, bballoon_speedup_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4d000010, 0x4d000013, 0, 0, bballoon_speedup_r);
 	s3c2410 = machine->device("s3c2410");
 }
 

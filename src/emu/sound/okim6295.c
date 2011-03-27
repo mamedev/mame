@@ -75,7 +75,7 @@ const UINT8 okim6295_device::s_volume_table[16] =
 };
 
 // default address map
-static ADDRESS_MAP_START( okim6295, 0, 8 )
+static ADDRESS_MAP_START( okim6295, AS_0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -136,7 +136,7 @@ void okim6295_device_config::static_set_pin7(device_config *device, int pin7)
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *okim6295_device_config::memory_space_config(int spacenum) const
+const address_space_config *okim6295_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }

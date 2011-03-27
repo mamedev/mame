@@ -696,7 +696,7 @@ address_map_entry64::address_map_entry64(address_map &map, offs_t start, offs_t 
 //  address_map - constructor
 //-------------------------------------------------
 
-address_map::address_map(const device_config &devconfig, int spacenum)
+address_map::address_map(const device_config &devconfig, address_spacenum spacenum)
 	: m_spacenum(spacenum),
 	  m_databits(0xff),
 	  m_unmapval(0),
@@ -741,7 +741,7 @@ address_map::~address_map()
 //  values
 //-------------------------------------------------
 
-void address_map::configure(UINT8 spacenum, UINT8 databits)
+void address_map::configure(address_spacenum spacenum, UINT8 databits)
 {
 	assert(m_spacenum == spacenum);
 	if (m_databits == 0xff)

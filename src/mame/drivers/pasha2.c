@@ -206,7 +206,7 @@ static WRITE16_HANDLER( pasha2_lamps_w )
 				(data & 0x400) ? 'B' : '-');
 }
 
-static ADDRESS_MAP_START( pasha2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pasha2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(pasha2_state, wram)
 	AM_RANGE(0x40000000, 0x4001ffff) AM_RAM_WRITE(bitmap_0_w)
 	AM_RANGE(0x40020000, 0x4003ffff) AM_RAM_WRITE(bitmap_1_w)
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( pasha2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pasha2_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( pasha2_io, AS_IO, 16 )
 	AM_RANGE(0x08, 0x0b) AM_READNOP //sound status?
 	AM_RANGE(0x18, 0x1b) AM_READNOP //sound status?
 	AM_RANGE(0x20, 0x23) AM_WRITE(pasha2_lamps_w)
@@ -471,7 +471,7 @@ static READ16_HANDLER( pasha2_speedup_r )
 
 static DRIVER_INIT( pasha2 )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
 
 	memory_set_bankptr(machine, "bank1", machine->region("user2")->base());
 }

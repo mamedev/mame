@@ -77,7 +77,7 @@ static SCREEN_UPDATE( taitopjc )
 	return 0;
 }
 
-static ADDRESS_MAP_START( ppc603e_mem, ADDRESS_SPACE_PROGRAM, 64)
+static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM // Work RAM
 	AM_RANGE(0x40000000, 0x40000007) AM_RAM // Screen RAM (+ others?) data port
 	AM_RANGE(0x40000008, 0x4000000f) AM_RAM // Screen RAM (+ others?) address port

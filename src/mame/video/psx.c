@@ -3939,7 +3939,7 @@ INTERRUPT_GEN( psx_vblank )
 
 void psx_gpu_reset( running_machine *machine )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	psx_gpu_w(space, 1, 0, 0xffffffff );
 }

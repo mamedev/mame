@@ -530,12 +530,12 @@ static WRITE16_HANDLER( cpuregs_w )
  * Internal memory map
  **************************************************************************/
 
-static ADDRESS_MAP_START( internal_pgm, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16 )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM					// SARAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("share11")	// DARAM B0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_data, ADDRESS_SPACE_DATA, 16 )
+static ADDRESS_MAP_START( internal_data, AS_DATA, 16 )
 	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
 	AM_RANGE(0x0060, 0x007f) AM_RAM					// DARAM B2
 	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("share11")	// DARAM B0
@@ -560,11 +560,11 @@ static CPU_SET_INFO( tms )
 static CPU_READ( tms )
 {
 	tms32051_state *cpustate = get_safe_token(device);
-	if (space == ADDRESS_SPACE_PROGRAM)
+	if (space == AS_PROGRAM)
 	{
 		*value = (PM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
 	}
-	else if (space == ADDRESS_SPACE_DATA)
+	else if (space == AS_DATA)
 	{
 		*value = (DM_READ16(cpustate, offset>>1) >> ((offset & 1) ? 0 : 8)) & 0xff;
 	}
@@ -589,15 +589,15 @@ static CPU_GET_INFO( tms )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 5;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -1;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 16;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = -1;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = -1;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 16;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = -1;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
@@ -638,8 +638,8 @@ static CPU_GET_INFO( tms )
 		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32051);		break;
 		case CPUINFO_FCT_READ:							info->read = CPU_READ_NAME(tms);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(internal_pgm); break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: info->internal_map16 = ADDRESS_MAP_NAME(internal_data); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(internal_pgm); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA: info->internal_map16 = ADDRESS_MAP_NAME(internal_data); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "TMS3205x");			break;

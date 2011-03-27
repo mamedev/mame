@@ -102,7 +102,7 @@ static WRITE8_HANDLER( chsuper_vram_w )
 	vram[offset] = data;
 }
 
-static ADDRESS_MAP_START( chsuper_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chsuper_prg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0efff) AM_ROM
 	AM_RANGE(0x00000, 0x01fff) AM_WRITE( chsuper_vram_w )
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_REGION("maincpu", 0xf000)
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 //  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
-static ADDRESS_MAP_START( chsuper_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( chsuper_portmap, AS_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 	AM_RANGE( 0x00e8, 0x00e8 ) AM_READ_PORT("IN0")
 	AM_RANGE( 0x00e9, 0x00e9 ) AM_READ_PORT("IN1")

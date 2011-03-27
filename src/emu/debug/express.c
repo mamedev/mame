@@ -528,7 +528,7 @@ void symbol_table::set_value(const char *symbol, UINT64 value)
 //  memory name/space/offset combination is valid
 //-------------------------------------------------
 
-expression_error::error_code symbol_table::memory_valid(const char *name, int space)
+expression_error::error_code symbol_table::memory_valid(const char *name, expression_space space)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)
@@ -546,7 +546,7 @@ expression_error::error_code symbol_table::memory_valid(const char *name, int sp
 //  memory_value - return a value read from memory
 //-------------------------------------------------
 
-UINT64 symbol_table::memory_value(const char *name, int space, UINT32 offset, int size)
+UINT64 symbol_table::memory_value(const char *name, expression_space space, UINT32 offset, int size)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)
@@ -565,7 +565,7 @@ UINT64 symbol_table::memory_value(const char *name, int space, UINT32 offset, in
 //  set_memory_value - write a value to memory
 //-------------------------------------------------
 
-void symbol_table::set_memory_value(const char *name, int space, UINT32 offset, int size, UINT64 value)
+void symbol_table::set_memory_value(const char *name, expression_space space, UINT32 offset, int size, UINT64 value)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)

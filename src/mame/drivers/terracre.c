@@ -197,7 +197,7 @@ static MACHINE_START( amazon )
 	state_save_register_global_array(machine, state->mAmazonProtReg);
 }
 
-static ADDRESS_MAP_START( terracre_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_BASE_MEMBER(terracre_state, spriteram)
 	AM_RANGE(0x020200, 0x021fff) AM_RAM
@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( terracre_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_BASE_MEMBER(terracre_state, videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( amazon_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_BASE_MEMBER(terracre_state, spriteram)
 	AM_RANGE(0x040200, 0x040fff) AM_RAM
@@ -231,12 +231,12 @@ static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_3526_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_signed_w)
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( sound_3526_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_2203_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_signed_w)
@@ -1030,7 +1030,7 @@ static DRIVER_INIT( horekid )
 {
 	terracre_state *state = machine->driver_data<terracre_state>();
 	state->mpProtData = mHoreKidProtData;
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x44004, 0x44005, 0, 0, horekid_IN2_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x44004, 0x44005, 0, 0, horekid_IN2_r);
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */

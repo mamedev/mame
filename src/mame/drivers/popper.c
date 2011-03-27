@@ -152,7 +152,7 @@ static READ8_HANDLER( popper_soundcpu_nmi_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( popper_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( popper_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xc000, 0xc1bf) AM_RAM
 	AM_RANGE(0xc1c0, 0xc1ff) AM_RAM_WRITE(popper_ol_videoram_w) AM_BASE_MEMBER(popper_state, ol_videoram)
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( popper_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xffff, 0xffff) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popper_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( popper_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_READNOP					//?? all read once at startup and the

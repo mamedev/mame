@@ -53,14 +53,20 @@
 //**************************************************************************
 
 // address spaces
-enum
+enum address_spacenum
 {
-	ADDRESS_SPACE_0,				// first address space
-	ADDRESS_SPACE_1,				// second address space
-	ADDRESS_SPACE_2,				// third address space
-	ADDRESS_SPACE_3,				// fourth address space
-	ADDRESS_SPACES					// maximum number of address spaces
+	AS_0,							// first address space
+	AS_1,							// second address space
+	AS_2,							// third address space
+	AS_3,							// fourth address space
+	ADDRESS_SPACES,					// maximum number of address spaces
+
+	// alternate address space names for common use
+	AS_PROGRAM = AS_0,				// program address space
+	AS_DATA = AS_1,					// data address space
+	AS_IO = AS_2					// I/O address space
 };
+DECLARE_ENUM_OPERATORS(address_spacenum);
 
 // read or write constants
 enum read_or_write
@@ -337,18 +343,18 @@ class address_space : public bindable_object
 
 protected:
 	// construction/destruction
-	address_space(device_memory_interface &memory, int spacenum, bool large);
+	address_space(device_memory_interface &memory, address_spacenum spacenum, bool large);
 	~address_space();
 
 public:
 	// public allocator
-	static address_space &allocate(running_machine &machine, const address_space_config &config, device_memory_interface &memory, int spacenum);
+	static address_space &allocate(running_machine &machine, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum);
 
 	// getters
 	address_space *next() const { return m_next; }
 	device_t &device() const { return m_device; }
 	const char *name() const { return m_name; }
-	int spacenum() const { return m_spacenum; }
+	address_spacenum spacenum() const { return m_spacenum; }
 	address_map *map() const { return m_map; }
 
 	direct_read_data &direct() const { return m_direct; }
@@ -551,7 +557,7 @@ protected:
 	offs_t					m_logaddrmask;		// logical address mask
 	offs_t					m_logbytemask;		// byte-converted logical address mask
 	UINT64					m_unmap;			// unmapped value
-	UINT8					m_spacenum;			// address space index
+	address_spacenum		m_spacenum;			// address space index
 	bool					m_debugger_access;	// treat accesses as coming from the debugger
 	bool					m_log_unmap;		// log unmapped accesses in this space?
 	direct_read_data &		m_direct;			// fast direct-access read info

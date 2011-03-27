@@ -47,7 +47,7 @@ static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, bgvideoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, bgattribram)
@@ -69,7 +69,7 @@ ADDRESS_MAP_END
  *************************************/
 
 #define Main_PortMap( name, base )										\
-static ADDRESS_MAP_START( name##_portmap, ADDRESS_SPACE_IO, 8 )			\
+static ADDRESS_MAP_START( name##_portmap, AS_IO, 8 )			\
 	ADDRESS_MAP_GLOBAL_MASK(0xff)									\
 	AM_RANGE(base+0, base+0) AM_WRITE(interrupt_enable_w)				\
 	AM_RANGE(base+1, base+1) AM_WRITE(kyugo_flipscreen_w)				\
@@ -90,7 +90,7 @@ Main_PortMap( srdmissn, 0x08 )
  *************************************/
 
 #define Sub_MemMap( name, rom_end, shared, in0, in1, in2 )					\
-static ADDRESS_MAP_START( name##_sub_map, ADDRESS_SPACE_PROGRAM, 8 )		\
+static ADDRESS_MAP_START( name##_sub_map, AS_PROGRAM, 8 )		\
 	AM_RANGE(0x0000, rom_end) AM_ROM										\
 	AM_RANGE(shared, shared+0x7ff) AM_RAM AM_SHARE("share1")						\
 	AM_RANGE(in0, in0) AM_READ_PORT("SYSTEM")								\
@@ -113,7 +113,7 @@ Sub_MemMap( flashgala,0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
  *************************************/
 
 #define Sub_PortMap( name, ay0_base, ay1_base )											\
-static ADDRESS_MAP_START( name##_sub_portmap, ADDRESS_SPACE_IO, 8 )						\
+static ADDRESS_MAP_START( name##_sub_portmap, AS_IO, 8 )						\
 	ADDRESS_MAP_GLOBAL_MASK(0xff)														\
 	AM_RANGE(ay0_base+0, ay0_base+1) AM_DEVWRITE("ay1", ay8910_address_data_w)	\
 	AM_RANGE(ay0_base+2, ay0_base+2) AM_DEVREAD("ay1", ay8910_r)					\
@@ -465,7 +465,7 @@ static MACHINE_START( kyugo )
 static MACHINE_RESET( kyugo )
 {
 	kyugo_state *state = machine->driver_data<kyugo_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	// must start with interrupts and sub CPU disabled
 	cpu_interrupt_enable(machine->device("maincpu"), 0);
 	kyugo_sub_cpu_control_w(space, 0, 0);
@@ -1333,7 +1333,7 @@ ROM_END
 static DRIVER_INIT( gyrodine )
 {
 	/* add watchdog */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe000, 0xe000, 0, 0, watchdog_reset_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xe000, 0, 0, watchdog_reset_w);
 }
 
 
@@ -1342,10 +1342,10 @@ static DRIVER_INIT( srdmissn )
 	kyugo_state *state = machine->driver_data<kyugo_state>();
 
 	/* shared RAM is mapped at 0xe000 as well  */
-	memory_install_ram(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe000, 0xe7ff, 0, 0, state->shared_ram);
+	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xe7ff, 0, 0, state->shared_ram);
 
 	/* extra RAM on sub CPU  */
-	memory_install_ram(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8800, 0x8fff, 0, 0, NULL);
+	memory_install_ram(machine->device("sub")->memory().space(AS_PROGRAM), 0x8800, 0x8fff, 0, 0, NULL);
 }
 
 

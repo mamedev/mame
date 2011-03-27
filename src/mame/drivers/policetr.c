@@ -254,7 +254,7 @@ static const eeprom_interface eeprom_interface_policetr =
  *
  *************************************/
 
-static ADDRESS_MAP_START( policetr_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( policetr_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(policetr_state, rambase)
 	AM_RANGE(0x00200000, 0x0020000f) AM_WRITE(policetr_video_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_READ(policetr_video_r)
@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( policetr_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sshooter_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( sshooter_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(policetr_state, rambase)
 	AM_RANGE(0x00200000, 0x00200003) AM_WRITE(policetr_bsmt2000_data_w)
 	AM_RANGE(0x00300000, 0x00300003) AM_WRITE(policetr_palette_offset_w)
@@ -679,14 +679,14 @@ ROM_END
 static DRIVER_INIT( policetr )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
 	state->speedup_pc = 0x1fc028ac;
 }
 
 static DRIVER_INIT( plctr13b )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
 	state->speedup_pc = 0x1fc028bc;
 }
 
@@ -694,14 +694,14 @@ static DRIVER_INIT( plctr13b )
 static DRIVER_INIT( sshooter )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
 	state->speedup_pc = 0x1fc03470;
 }
 
 static DRIVER_INIT( sshoot12 )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
 	state->speedup_pc = 0x1fc033e0;
 }
 

@@ -115,7 +115,7 @@ void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 #define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, tag, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 /* read/write handlers for a given CPU's address space */
-#define DEVCB_MEMORY_HANDLER(cpu,space,func) { DEVCB_TYPE_MEMORY(ADDRESS_SPACE_##space), (cpu), NULL, NULL, (func) }
+#define DEVCB_MEMORY_HANDLER(cpu,space,func) { DEVCB_TYPE_MEMORY(AS_##space), (cpu), NULL, NULL, (func) }
 
 /* read handlers for an I/O port by tag */
 #define DEVCB_INPUT_PORT(tag)				{ DEVCB_TYPE_INPUT, (tag), NULL, NULL, NULL }

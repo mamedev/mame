@@ -26,7 +26,7 @@ static INTERRUPT_GEN( higemaru_interrupt )
 }
 
 
-static ADDRESS_MAP_START( higemaru_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( higemaru_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")

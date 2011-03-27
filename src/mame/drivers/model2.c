@@ -1351,7 +1351,7 @@ static WRITE32_HANDLER(model2_3d_zclip_w)
 }
 
 /* common map for all Model 2 versions */
-static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_BASE_MEMBER(model2_state, workram)
@@ -1399,7 +1399,7 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 /* original Model 2 overrides */
-static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM
 	AM_RANGE(0x00220000, 0x0023ffff) AM_ROM AM_REGION("maincpu", 0x20000)
 
@@ -1430,7 +1430,7 @@ static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 /* 2A-CRX overrides */
-static ADDRESS_MAP_START( model2a_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
@@ -1459,7 +1459,7 @@ static ADDRESS_MAP_START( model2a_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 /* 2B-CRX overrides */
-static ADDRESS_MAP_START( model2b_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
@@ -1494,7 +1494,7 @@ static ADDRESS_MAP_START( model2b_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 /* 2C-CRX overrides */
-static ADDRESS_MAP_START( model2c_crx_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
@@ -1858,7 +1858,7 @@ static WRITE16_HANDLER( m1_snd_68k_latch2_w )
 {
 }
 
-static ADDRESS_MAP_START( model1_snd, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("audiocpu", 0x20000)	// mirror of second program ROM
 	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE( m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
@@ -1893,7 +1893,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 	}
 }
 
-static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( model2_snd, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audiocpu", 0) AM_BASE_MEMBER(model2_state, soundram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_r, scsp_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
@@ -1955,7 +1955,7 @@ static WRITE32_HANDLER(copro_sharc_buffer_w)
 	state->bufferram[offset & 0x7fff] = data;
 }
 
-static ADDRESS_MAP_START( copro_sharc_map, ADDRESS_SPACE_DATA, 32 )
+static ADDRESS_MAP_START( copro_sharc_map, AS_DATA, 32 )
 	AM_RANGE(0x0400000, 0x0bfffff) AM_READ(copro_sharc_input_fifo_r)
 	AM_RANGE(0x0c00000, 0x13fffff) AM_WRITE(copro_sharc_output_fifo_w)
 	AM_RANGE(0x1400000, 0x1bfffff) AM_READWRITE(copro_sharc_buffer_r, copro_sharc_buffer_w)
@@ -1963,7 +1963,7 @@ static ADDRESS_MAP_START( copro_sharc_map, ADDRESS_SPACE_DATA, 32 )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( geo_sharc_map, ADDRESS_SPACE_DATA, 32 )
+static ADDRESS_MAP_START( geo_sharc_map, AS_DATA, 32 )
 ADDRESS_MAP_END
 #endif
 
@@ -1982,7 +1982,7 @@ static WRITE32_HANDLER(copro_tgp_buffer_w)
 	state->bufferram[offset&0x7fff] = data;
 }
 
-static ADDRESS_MAP_START( copro_tgp_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( copro_tgp_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE_MEMBER(model2_state, tgp_program)
 	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_tgp_buffer_r, copro_tgp_buffer_w)
 	AM_RANGE(0xff800000, 0xff9fffff) AM_ROM AM_REGION("tgp", 0)
@@ -2126,12 +2126,12 @@ static READ8_HANDLER( driveio_port_str_r )
 	return sega_str[offset];
 }
 
-static ADDRESS_MAP_START( drive_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( drive_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drive_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( drive_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP //watchdog
 	AM_RANGE(0x23, 0x23) AM_WRITE(driveio_port_w)
@@ -4995,7 +4995,7 @@ ROM_END
 static DRIVER_INIT( genprot )
 {
 	model2_state *state = machine->driver_data<model2_state>();
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	state->protstate = state->protpos = 0;
 }
 
@@ -5004,7 +5004,7 @@ static DRIVER_INIT( pltkids )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	state->protstate = state->protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5016,7 +5016,7 @@ static DRIVER_INIT( zerogun )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	state->protstate = state->protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5025,7 +5025,7 @@ static DRIVER_INIT( zerogun )
 
 static DRIVER_INIT( daytonam )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x240000, 0x24ffff, 0, 0, maxx_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x240000, 0x24ffff, 0, 0, maxx_r );
 }
 
 /* very crude support for let the game set itself into stand-alone mode */
@@ -5061,8 +5061,8 @@ static DRIVER_INIT( sgt24h )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
 
 	state->protstate = state->protpos = 0;
 
@@ -5072,7 +5072,7 @@ static DRIVER_INIT( sgt24h )
 
 static DRIVER_INIT( overrev )
 {
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
 
 	//TODO: cache patch?
 }
@@ -5083,7 +5083,7 @@ static DRIVER_INIT( doa )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	state->protstate = state->protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;
@@ -5092,12 +5092,12 @@ static DRIVER_INIT( doa )
 
 static DRIVER_INIT( rchase2 )
 {
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, rchase2_devices_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, rchase2_devices_w);
 }
 
 static DRIVER_INIT( srallyc )
 {
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, srallyc_devices_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, srallyc_devices_w);
 }
 
 

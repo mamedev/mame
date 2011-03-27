@@ -854,7 +854,7 @@ static WRITE16_HANDLER( palette16_w )
  *************************************/
 
 /*------ common layout with TMS34061 at 0000 ------*/
-static ADDRESS_MAP_START( tmslo_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmslo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITENOP
 	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
@@ -870,7 +870,7 @@ ADDRESS_MAP_END
 
 
 /*------ common layout with TMS34061 at 1000 ------*/
-static ADDRESS_MAP_START( tmshi_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmshi_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x0100, 0x0100) AM_WRITENOP
 	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
@@ -886,7 +886,7 @@ ADDRESS_MAP_END
 
 
 /*------ Golden Tee Golf II 1992 layout ------*/
-static ADDRESS_MAP_START( gtg2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("40") AM_WRITE(itech8_nmi_ack_w)
 	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
 	AM_RANGE(0x0140, 0x015f) AM_WRITE(itech8_palette_w)
@@ -902,7 +902,7 @@ ADDRESS_MAP_END
 
 
 /*------ Ninja Clowns layout ------*/
-static ADDRESS_MAP_START( ninclown_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
 	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x004000, 0x07ffff) AM_ROM
@@ -925,7 +925,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /*------ YM2203-based sound ------*/
-static ADDRESS_MAP_START( sound2203_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound2203_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
@@ -936,7 +936,7 @@ ADDRESS_MAP_END
 
 
 /*------ YM2608B-based sound ------*/
-static ADDRESS_MAP_START( sound2608b_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound2608b_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x2000, 0x2000) AM_READ(sound_data_r)
 	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2608_r, ym2608_w)
@@ -946,7 +946,7 @@ ADDRESS_MAP_END
 
 
 /*------ YM3812-based sound ------*/
-static ADDRESS_MAP_START( sound3812_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound3812_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
@@ -958,7 +958,7 @@ ADDRESS_MAP_END
 
 
 /*------ external YM3812-based sound board ------*/
-static ADDRESS_MAP_START( sound3812_external_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound3812_external_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
@@ -976,12 +976,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slikz80_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( slikz80_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slikz80_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( slikz80_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(slikz80_port_r, slikz80_port_w)
 ADDRESS_MAP_END
@@ -2634,25 +2634,25 @@ ROM_END
 
 static DRIVER_INIT( grmatch )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
-	memory_unmap_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01e0, 0x01ff, 0, 0);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
+	memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01e0, 0x01ff, 0, 0);
 }
 
 
 static DRIVER_INIT( slikshot )
 {
-	memory_install_read8_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0180, 0x0180, 0, 0, slikshot_z80_r);
+	memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
 }
 
 
 static DRIVER_INIT( sstrike )
 {
-	memory_install_read8_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1180, 0x1180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1180, 0x1180, 0, 0, slikshot_z80_r);
+	memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
 }
 
 
@@ -2691,15 +2691,15 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
-	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
-	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
-	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
-	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
+	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
+	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
+	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
+	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
+	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
 
 	/* different banking mechanism (disable the old one) */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
 }
 
 

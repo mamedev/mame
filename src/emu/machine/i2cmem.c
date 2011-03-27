@@ -57,7 +57,7 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const
 
 const device_type I2CMEM = i2cmem_device_config::static_alloc_device_config;
 
-static ADDRESS_MAP_START( i2cmem_map8, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( i2cmem_map8, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -151,7 +151,7 @@ bool i2cmem_device_config::device_validity_check( emu_options &options, const ga
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *i2cmem_device_config::memory_space_config( int spacenum ) const
+const address_space_config *i2cmem_device_config::memory_space_config( address_spacenum spacenum ) const
 {
 	return ( spacenum == 0 ) ? &m_space_config : NULL;
 }

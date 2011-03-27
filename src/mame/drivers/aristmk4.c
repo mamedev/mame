@@ -786,7 +786,7 @@ static READ8_HANDLER(mk4_printer_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_status_r, mc6845_address_w)
@@ -826,7 +826,7 @@ The U87 personality rom is not required, therefore game rom code mapping is from
 */
 
 
-static ADDRESS_MAP_START( aristmk4_poker_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_status_r, mc6845_address_w)

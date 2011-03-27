@@ -149,7 +149,7 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( f3_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_BASE_MEMBER(taito_f3_state, f3_ram)
@@ -3737,8 +3737,8 @@ static DRIVER_INIT( bubsympb )
 		}
 	}
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
 }
 
 

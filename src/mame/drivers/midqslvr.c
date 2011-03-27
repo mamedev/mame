@@ -42,12 +42,12 @@ static SCREEN_UPDATE(midqslvr)
 	return 0;
 }
 
-static ADDRESS_MAP_START(midqslvr_map, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(midqslvr_map, AS_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(midqslvr_io, ADDRESS_SPACE_IO, 32)
+static ADDRESS_MAP_START(midqslvr_io, AS_IO, 32)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( midqslvr )

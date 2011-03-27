@@ -11,7 +11,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( bingo_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bingo_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1eff) AM_ROM
 	AM_RANGE(0x1f00, 0x1fff) AM_RAM

@@ -257,7 +257,7 @@ UINT32 dsp32c_device_config::execute_input_lines() const
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *dsp32c_device_config::memory_space_config(int spacenum) const
+const address_space_config *dsp32c_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_PROGRAM) ? &m_program_config : NULL;
 }

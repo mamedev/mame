@@ -268,7 +268,7 @@ static WRITE16_HANDLER( write1_w )
 //  popmessage("%04x %04x",t1,t3);
 }
 
-static ADDRESS_MAP_START( tv_vcf_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tv_vcf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( tv_vcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tv_vcf_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( tv_vcf_io, AS_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
 	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
@@ -307,7 +307,7 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6395_w )
 		okim6376_w(device, 0, (1 << 4));
 	}
 }
-static ADDRESS_MAP_START( tv_ncf_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tv_ncf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( tv_ncf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tv_ncf_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( tv_ncf_io, AS_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE( "oki", tv_ncf_oki6395_w )
 	AM_RANGE(0x000c, 0x000d) AM_READ( read1_r )
@@ -350,7 +350,7 @@ static WRITE16_HANDLER( tv_tcf_bankselect_w )
 	memory_set_bankptr(space->machine, "bank1", &ROM[bankaddress]);
 }
 
-static ADDRESS_MAP_START( tv_tcf_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
@@ -359,7 +359,7 @@ static ADDRESS_MAP_START( tv_tcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tv_tcf_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( tv_tcf_io, AS_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE( "oki", tv_oki6395_w )
 	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
@@ -409,7 +409,7 @@ static WRITE16_HANDLER( write2_w )
 	}
 }
 
-static ADDRESS_MAP_START( newmcard_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( newmcard_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( newmcard_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( newmcard_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( newmcard_io, AS_IO, 16 )
 	AM_RANGE(0x0030, 0x0033) AM_READ( newmcard_status_r )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE( tv_tcf_bankselect_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
@@ -478,7 +478,7 @@ static WRITE16_HANDLER( brasil_status_w )
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( brasil_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE_MEMBER(highvdeo_state, blit_ram) /*blitter ram*/
@@ -486,7 +486,7 @@ static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( brasil_io, ADDRESS_SPACE_IO, 16 )
+static ADDRESS_MAP_START( brasil_io, AS_IO, 16 )
 	AM_RANGE(0x0030, 0x0033) AM_READ( brasil_status_r )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE( brasil_status_w )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
@@ -1159,7 +1159,7 @@ static READ16_HANDLER( ciclone_status_r )
 
 static DRIVER_INIT( ciclone )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x0030, 0x0033, 0, 0, ciclone_status_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_IO), 0x0030, 0x0033, 0, 0, ciclone_status_r );
 }
 
 /*
@@ -1229,7 +1229,7 @@ static WRITE16_HANDLER( fashion_output_w )
 
 static DRIVER_INIT( fashion )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_output_w );
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_IO), 0x0002, 0x0003, 0, 0, fashion_output_w );
 }
 
 GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )

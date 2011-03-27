@@ -460,32 +460,32 @@ INLINE tms0980_state *get_safe_token(device_t *device)
 }
 
 
-static ADDRESS_MAP_START(tms0980_internal_rom, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START(tms0980_internal_rom, AS_PROGRAM, 16)
 	AM_RANGE( 0x0000, 0x0FFF ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms0980_internal_ram, ADDRESS_SPACE_DATA, 8)
+static ADDRESS_MAP_START(tms0980_internal_ram, AS_DATA, 8)
 	AM_RANGE( 0x0000, 0x0FFF ) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(program_10bit_8, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(program_10bit_8, AS_PROGRAM, 8)
 	AM_RANGE( 0x000, 0x3ff ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(program_11bit_8, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(program_11bit_8, AS_PROGRAM, 8)
 	AM_RANGE( 0x000, 0x7ff ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_6bit, ADDRESS_SPACE_DATA, 8)
+static ADDRESS_MAP_START(data_6bit, AS_DATA, 8)
 	AM_RANGE( 0x00, 0x3f ) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_7bit, ADDRESS_SPACE_DATA, 8)
+static ADDRESS_MAP_START(data_7bit, AS_DATA, 8)
 	AM_RANGE( 0x00, 0x7f ) AM_RAM
 ADDRESS_MAP_END
 
@@ -1121,9 +1121,9 @@ static CPU_GET_INFO( tms_generic )
 		case CPUINFO_INT_MIN_CYCLES:									info->i = 1; break;
 		case CPUINFO_INT_MAX_CYCLES:									info->i = 6; break;
 
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0; break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 8 /* 4 */; break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:			info->i = 0; break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0; break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:			info->i = 8 /* 4 */; break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:			info->i = 0; break;
 
 		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->prev_pa << 7 ) | cpustate->prev_pc ) << 1; break;
 		case CPUINFO_INT_PC:											info->i = ( ( cpustate->pa << 7 ) | cpustate->pc ) << 1; break;
@@ -1171,13 +1171,13 @@ CPU_GET_INFO( tms0980 )
 	{
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:							info->i = 2; break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:							info->i = 2; break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16 /* 9 */; break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 12; break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 7; break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 16 /* 9 */; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 12; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 7; break;
 		case CPUINFO_INT_PREVIOUSPC:									info->i = ( ( cpustate->prev_pa << 7 ) | cpustate->prev_pc ) << 1; break;
 		case CPUINFO_INT_PC:											info->i = ( ( cpustate->pa << 7 ) | cpustate->pc ) << 1; break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:					info->internal_map16 = ADDRESS_MAP_NAME( tms0980_internal_rom ); break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( tms0980_internal_ram ); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map16 = ADDRESS_MAP_NAME( tms0980_internal_rom ); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( tms0980_internal_ram ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms0980 ); break;
 		case CPUINFO_FCT_DISASSEMBLE:									info->disassemble = CPU_DISASSEMBLE_NAME( tms0980 ); break;
 		case DEVINFO_STR_NAME:											strcpy( info->s, "TMS0980" ); break;
@@ -1194,13 +1194,13 @@ CPU_GET_INFO( tms1000 )
 	{
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:							info->i = 1; break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:							info->i = 1; break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8; break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 10; break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 6; break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 10; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 6; break;
 		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->prev_pa << 6 ) | tms1000_pc_decode[ cpustate->prev_pc ]; break;
 		case CPUINFO_INT_PC:											info->i = ( cpustate->pa << 6 ) | tms1000_pc_decode[ cpustate->pc ]; break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_10bit_8 ); break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_6bit ); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_10bit_8 ); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_6bit ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1000 ); break;
 		case CPUINFO_FCT_DISASSEMBLE:									info->disassemble = CPU_DISASSEMBLE_NAME( tms1000 ); break;
 		case DEVINFO_STR_NAME:											strcpy( info->s, "TMS1000" ); break;
@@ -1249,13 +1249,13 @@ CPU_GET_INFO( tms1100 )
 
 	switch(state)
 	{
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8; break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 11; break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:			info->i = 7; break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 11; break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:			info->i = 7; break;
 		case CPUINFO_INT_PREVIOUSPC:									info->i = ( cpustate->prev_pa << 6 ) | tms1000_pc_decode[ cpustate->prev_pc ]; break;
 		case CPUINFO_INT_PC:											info->i = ( cpustate->pa << 6 ) | tms1000_pc_decode[ cpustate->pc ]; break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_11bit_8 ); break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_7bit ); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:					info->internal_map8 = ADDRESS_MAP_NAME( program_11bit_8 ); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:						info->internal_map8 = ADDRESS_MAP_NAME( data_7bit ); break;
 		case CPUINFO_FCT_INIT:											info->init = CPU_INIT_NAME( tms1100 ); break;
 		case CPUINFO_FCT_DISASSEMBLE:									info->disassemble = CPU_DISASSEMBLE_NAME( tms1100 ); break;
 		case DEVINFO_STR_NAME:											strcpy( info->s, "TMS1100" ); break;

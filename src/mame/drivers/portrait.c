@@ -118,7 +118,7 @@ static WRITE8_HANDLER( portrait_negative_scroll_w )
 	state->scroll = - (data ^ 0xff);
 }
 
-static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(portrait_bgvideo_write) AM_BASE_MEMBER(portrait_state, bgvideoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_BASE_MEMBER(portrait_state, fgvideoram)
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( portrait_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( portrait_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 

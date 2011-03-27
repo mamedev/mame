@@ -308,7 +308,7 @@ static SCREEN_UPDATE( bigfghtr )
 
 static SCREEN_EOF( bigfghtr )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }
 
@@ -487,7 +487,7 @@ static READ8_HANDLER( soundlatch_clear_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x080600, 0x083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, sharedram)
@@ -513,12 +513,12 @@ static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_READ(latch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundmem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( soundmem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( soundport, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_signed_w)

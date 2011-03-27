@@ -242,7 +242,7 @@ WRITE16_HANDLER( hdsnd68k_320ram_w )
 READ16_HANDLER( hdsnd68k_320ports_r )
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
-	address_space *iospace = state->sounddsp->memory().space(ADDRESS_SPACE_IO);
+	address_space *iospace = state->sounddsp->memory().space(AS_IO);
 	return iospace->read_word((offset & 7) << 1);
 }
 
@@ -250,7 +250,7 @@ READ16_HANDLER( hdsnd68k_320ports_r )
 WRITE16_HANDLER( hdsnd68k_320ports_w )
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
-	address_space *iospace = state->sounddsp->memory().space(ADDRESS_SPACE_IO);
+	address_space *iospace = state->sounddsp->memory().space(AS_IO);
 	iospace->write_word((offset & 7) << 1, data);
 }
 

@@ -118,13 +118,13 @@ static void reset_transient_flags(running_machine &machine);
 static void process_source_file(running_machine *machine);
 
 /* expression handlers */
-static UINT64 expression_read_memory(void *param, const char *name, int space, UINT32 address, int size);
+static UINT64 expression_read_memory(void *param, const char *name, expression_space space, UINT32 address, int size);
 static UINT64 expression_read_program_direct(address_space *space, int opcode, offs_t address, int size);
 static UINT64 expression_read_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size);
-static void expression_write_memory(void *param, const char *name, int space, UINT32 address, int size, UINT64 data);
+static void expression_write_memory(void *param, const char *name, expression_space space, UINT32 address, int size, UINT64 data);
 static void expression_write_program_direct(address_space *space, int opcode, offs_t address, int size, UINT64 data);
 static void expression_write_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size, UINT64 data);
-static expression_error::error_code expression_validate(void *param, const char *name, int space);
+static expression_error::error_code expression_validate(void *param, const char *name, expression_space space);
 
 /* variable getters/setters */
 static UINT64 get_cpunum(symbol_table &table, void *ref);
@@ -1163,7 +1163,7 @@ static device_t *expression_get_device(running_machine *machine, const char *tag
     space
 -------------------------------------------------*/
 
-static UINT64 expression_read_memory(void *param, const char *name, int spacenum, UINT32 address, int size)
+static UINT64 expression_read_memory(void *param, const char *name, expression_space spacenum, UINT32 address, int size)
 {
 	running_machine *machine = (running_machine *)param;
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
@@ -1180,7 +1180,7 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = device->memory().space(ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+			space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 			if (space != NULL)
 				result = debug_read_memory(space, space->address_to_byte(address), size, true);
 			break;
@@ -1193,7 +1193,7 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = device->memory().space(ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+			space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 			if (space != NULL)
 				result = debug_read_memory(space, space->address_to_byte(address), size, false);
 			break;
@@ -1204,13 +1204,16 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			result = expression_read_program_direct(device->memory().space(ADDRESS_SPACE_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
+			result = expression_read_program_direct(device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 
 		case EXPSPACE_REGION:
 			if (name == NULL)
 				break;
 			result = expression_read_memory_region(machine, name, address, size);
+			break;
+		
+		default:
 			break;
 	}
 	return result;
@@ -1332,7 +1335,7 @@ static UINT64 expression_read_memory_region(running_machine *machine, const char
     space
 -------------------------------------------------*/
 
-static void expression_write_memory(void *param, const char *name, int spacenum, UINT32 address, int size, UINT64 data)
+static void expression_write_memory(void *param, const char *name, expression_space spacenum, UINT32 address, int size, UINT64 data)
 {
 	running_machine *machine = (running_machine *)param;
 	device_t *device = NULL;
@@ -1348,7 +1351,7 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = device->memory().space(ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+			space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 			if (space != NULL)
 				debug_write_memory(space, space->address_to_byte(address), data, size, true);
 			break;
@@ -1361,7 +1364,7 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = device->memory().space(ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+			space = device->memory().space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 			if (space != NULL)
 				debug_write_memory(space, space->address_to_byte(address), data, size, false);
 			break;
@@ -1372,13 +1375,16 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			expression_write_program_direct(device->memory().space(ADDRESS_SPACE_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
+			expression_write_program_direct(device->memory().space(AS_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 
 		case EXPSPACE_REGION:
 			if (name == NULL)
 				break;
 			expression_write_memory_region(machine, name, address, size, data);
+			break;
+		
+		default:
 			break;
 	}
 }
@@ -1512,7 +1518,7 @@ static void expression_write_memory_region(running_machine *machine, const char 
     appropriate name
 -------------------------------------------------*/
 
-static expression_error::error_code expression_validate(void *param, const char *name, int space)
+static expression_error::error_code expression_validate(void *param, const char *name, expression_space space)
 {
 	running_machine *machine = (running_machine *)param;
 	device_t *device = NULL;
@@ -1531,7 +1537,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (device->memory().space(ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)) == NULL)
+			if (device->memory().space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)) == NULL)
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
@@ -1547,7 +1553,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (device->memory().space(ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)) == NULL)
+			if (device->memory().space(AS_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)) == NULL)
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
@@ -1561,7 +1567,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (device->memory().space(ADDRESS_SPACE_PROGRAM) == NULL)
+			if (device->memory().space(AS_PROGRAM) == NULL)
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
@@ -1571,6 +1577,9 @@ static expression_error::error_code expression_validate(void *param, const char 
 			if (machine->region(name)->base() == NULL)
 				return expression_error::INVALID_MEMORY_NAME;
 			break;
+
+		default:
+			return expression_error::NO_SUCH_MEMORY_SPACE;
 	}
 	return expression_error::NONE;
 }
@@ -2391,7 +2400,7 @@ int device_debug::watchpoint_set(address_space &space, int type, offs_t address,
 bool device_debug::watchpoint_clear(int index)
 {
 	// scan the list to see if we own this breakpoint
-	for (int spacenum = 0; spacenum < ARRAY_LENGTH(m_wplist); spacenum++)
+	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); spacenum++)
 		for (watchpoint **wp = &m_wplist[spacenum]; *wp != NULL; wp = &(*wp)->m_next)
 			if ((*wp)->m_index == index)
 			{
@@ -2415,7 +2424,7 @@ bool device_debug::watchpoint_clear(int index)
 void device_debug::watchpoint_clear_all()
 {
 	// clear the head until we run out
-	for (int spacenum = 0; spacenum < ARRAY_LENGTH(m_wplist); spacenum++)
+	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); spacenum++)
 		while (m_wplist[spacenum] != NULL)
 			watchpoint_clear(m_wplist[spacenum]->index());
 }
@@ -2429,7 +2438,7 @@ void device_debug::watchpoint_clear_all()
 bool device_debug::watchpoint_enable(int index, bool enable)
 {
 	// scan the list to see if we own this watchpoint
-	for (int spacenum = 0; spacenum < ARRAY_LENGTH(m_wplist); spacenum++)
+	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); spacenum++)
 		for (watchpoint *wp = m_wplist[spacenum]; wp != NULL; wp = wp->next())
 			if (wp->m_index == index)
 			{
@@ -2451,7 +2460,7 @@ bool device_debug::watchpoint_enable(int index, bool enable)
 void device_debug::watchpoint_enable_all(bool enable)
 {
 	// apply the enable to all watchpoints we own
-	for (int spacenum = 0; spacenum < ARRAY_LENGTH(m_wplist); spacenum++)
+	for (address_spacenum spacenum = AS_0; spacenum < ARRAY_LENGTH(m_wplist); spacenum++)
 		for (watchpoint *wp = m_wplist[spacenum]; wp != NULL; wp = wp->next())
 			watchpoint_enable(wp->index(), enable);
 }

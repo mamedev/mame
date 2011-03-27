@@ -1989,7 +1989,7 @@ static READ32_HANDLER( stv_sh2_random_r )
 }
 #endif
 
-static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE(stv_SMPC_r32, stv_SMPC_w32)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_RAM AM_SHARE("share1") AM_BASE(&stv_backupram)
@@ -2018,7 +2018,7 @@ static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE(&sound_ram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
@@ -2359,10 +2359,10 @@ DRIVER_INIT ( stv )
 	sh2drc_set_options(machine->device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
-	memory_install_write32_handler(machine->device("slave")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
-	memory_install_write32_handler(machine->device("slave")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
+	memory_install_write32_handler(machine->device("slave")->memory().space(AS_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
+	memory_install_write32_handler(machine->device("slave")->memory().space(AS_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
 
     smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  smpc_ram[0x33] = input_port_read(machine, "FAKE");

@@ -1751,7 +1751,7 @@ static MACHINE_START( firebeat )
 	state->flash[2] = machine->device<fujitsu_29f016a_device>("flash2");
 }
 
-static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE_MEMBER(firebeat_state, work_ram)
 	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE(midi_uart_r, midi_uart_w)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
@@ -1774,7 +1774,7 @@ static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)		/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spu_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	AM_RANGE(0x340000, 0x34000f) AM_READ(spu_unk_r)
@@ -2216,9 +2216,9 @@ static void init_lights(running_machine *machine, write32_space_func out1, write
 	if(!out2) out1 = lamp_output2_w;
 	if(!out3) out1 = lamp_output3_w;
 
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7d000804, 0x7d000807, 0, 0, out1);
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7d000320, 0x7d000323, 0, 0, out2);
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7d000324, 0x7d000327, 0, 0, out3);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7d000804, 0x7d000807, 0, 0, out1);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7d000320, 0x7d000323, 0, 0, out2);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7d000324, 0x7d000327, 0, 0, out3);
 }
 
 static void init_firebeat(running_machine *machine)

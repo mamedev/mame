@@ -118,7 +118,7 @@ static WRITE8_DEVICE_HANDLER( ppi1_portc_w );
     LD-V1000 ROM AND MACHINE INTERFACES
 ***************************************************************************/
 
-static ADDRESS_MAP_START( ldv1000_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ldv1000_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE("ldvppi0", ppi8255_r, ppi8255_w)
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( ldv1000_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ldv1000_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( ldv1000_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_MIRROR(0x38) AM_READWRITE(decoder_display_port_r, decoder_display_port_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(controller_r)

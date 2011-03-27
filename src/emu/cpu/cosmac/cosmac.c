@@ -257,7 +257,7 @@ UINT32 cosmac_device_config::execute_input_lines() const
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *cosmac_device_config::memory_space_config(int spacenum) const
+const address_space_config *cosmac_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	switch (spacenum)
 	{

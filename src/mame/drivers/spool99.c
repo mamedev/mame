@@ -203,7 +203,7 @@ static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 	eeprom_write_bit(device, data & 0x01);
 }
 
-static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,main)
 	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
@@ -249,7 +249,7 @@ static READ8_HANDLER( vcarn_io_r )
 	return ROM[0xa700+offset];
 }
 
-static ADDRESS_MAP_START( vcarn_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,main)
 	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)

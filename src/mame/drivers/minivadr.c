@@ -58,7 +58,7 @@ static SCREEN_UPDATE( minivadr )
 }
 
 
-static ADDRESS_MAP_START( minivadr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( minivadr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_SIZE_MEMBER(minivadr_state, videoram, videoram_size)
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("INPUTS") AM_WRITENOP		// W - ???

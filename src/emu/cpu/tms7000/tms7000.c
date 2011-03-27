@@ -131,7 +131,7 @@ static WRITE8_HANDLER( tms7000_internal_w );
 static READ8_HANDLER( tms70x0_pf_r );
 static WRITE8_HANDLER( tms70x0_pf_w );
 
-static ADDRESS_MAP_START(tms7000_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x007f)	AM_READWRITE(tms7000_internal_r, tms7000_internal_w)	/* tms7000 internal RAM */
 	AM_RANGE(0x0080, 0x00ff)	AM_NOP						/* reserved */
 	AM_RANGE(0x0100, 0x01ff)	AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)				/* tms7000 internal I/O ports */
@@ -281,15 +281,15 @@ CPU_GET_INFO( tms7000 )
         case CPUINFO_INT_MIN_CYCLES:	info->i = 1;	break;
         case CPUINFO_INT_MAX_CYCLES:	info->i = 48;	break; /* 48 represents the multiply instruction, the next highest is 17 */
 
-        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;	break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;	break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;	break;
-        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;	break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;	break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;	break;
-        case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;	break;
-        case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;	break;
-        case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:	info->i = 0;	break;
+        case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;	break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 16;	break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;	break;
+        case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;	break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;	break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;	break;
+        case DEVINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;	break;
+        case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 8;	break;
+        case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;	break;
 
         case CPUINFO_INT_INPUT_STATE + TMS7000_IRQ1_LINE:	info->i = cpustate->irq_state[TMS7000_IRQ1_LINE]; break;
         case CPUINFO_INT_INPUT_STATE + TMS7000_IRQ2_LINE:	info->i = cpustate->irq_state[TMS7000_IRQ2_LINE]; break;
@@ -315,7 +315,7 @@ CPU_GET_INFO( tms7000 )
         case CPUINFO_FCT_BURN:	info->burn = NULL;	/* Not supported */break;
         case CPUINFO_FCT_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms7000);	break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &cpustate->icount;	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(tms7000_mem); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(tms7000_mem); break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
         case DEVINFO_STR_NAME:	strcpy(info->s, "TMS7000"); break;

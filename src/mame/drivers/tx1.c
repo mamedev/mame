@@ -88,13 +88,13 @@ static INTERRUPT_GEN( z80_irq )
 
 static READ16_HANDLER( z80_shared_r )
 {
-	address_space *cpu2space = space->machine->device("audio_cpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *cpu2space = space->machine->device("audio_cpu")->memory().space(AS_PROGRAM);
 	return cpu2space->read_byte(offset);
 }
 
 static WRITE16_HANDLER( z80_shared_w )
 {
-	address_space *cpu2space = space->machine->device("audio_cpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *cpu2space = space->machine->device("audio_cpu")->memory().space(AS_PROGRAM);
 	cpu2space->write_byte(offset, data & 0xff);
 }
 
@@ -499,7 +499,7 @@ static const ppi8255_interface tx1_ppi8255_intf =
  *
  *************************************/
 
-static ADDRESS_MAP_START( tx1_main, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tx1_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM	AM_SHARE("nvram")
@@ -515,7 +515,7 @@ static ADDRESS_MAP_START( tx1_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tx1_math, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tx1_math, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_MEMBER(tx1_state, math_ram)
 	AM_RANGE(0x00800, 0x00fff) AM_READWRITE(tx1_spcs_ram_r, tx1_spcs_ram_w)
 	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE("share1")
@@ -530,7 +530,7 @@ static ADDRESS_MAP_START( tx1_math, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tx1_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tx1_sound_prg, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_MIRROR(0x800) AM_BASE_MEMBER(tx1_state, z80_ram)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(z80_intreq_w)
@@ -540,7 +540,7 @@ static ADDRESS_MAP_START( tx1_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(ts_r, ts_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tx1_sound_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tx1_sound_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
@@ -552,7 +552,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( buggyboy_main, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( buggyboy_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE_MEMBER(tx1_state, vram)
@@ -567,7 +567,7 @@ static ADDRESS_MAP_START( buggyboy_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( buggybjr_main, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( buggybjr_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_BASE_MEMBER(tx1_state, vram)
@@ -582,7 +582,7 @@ static ADDRESS_MAP_START( buggybjr_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( buggyboy_math, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( buggyboy_math, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_BASE_MEMBER(tx1_state, math_ram)
 	AM_RANGE(0x00800, 0x00fff) AM_READWRITE(buggyboy_spcs_ram_r, buggyboy_spcs_ram_w)
 	AM_RANGE(0x01000, 0x01fff) AM_RAM AM_SHARE("share1")
@@ -597,7 +597,7 @@ static ADDRESS_MAP_START( buggyboy_math, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* Buggy Boy Sound PCB TC033A */
-static ADDRESS_MAP_START( buggyboy_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( buggyboy_sound_prg, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(tx1_state, z80_ram)
 	AM_RANGE(0x6000, 0x6001) AM_READ(bb_analog_r)
@@ -608,7 +608,7 @@ static ADDRESS_MAP_START( buggyboy_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Buggy Boy Jr Sound PCB TC043 */
-static ADDRESS_MAP_START( buggybjr_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( buggybjr_sound_prg, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(tx1_state, z80_ram)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("buggyboy", tx1_pit8253_r, tx1_pit8253_w)
@@ -618,7 +618,7 @@ static ADDRESS_MAP_START( buggybjr_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Common */
-static ADDRESS_MAP_START( buggyboy_sound_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( buggyboy_sound_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("ym1", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ay8910_data_address_w)

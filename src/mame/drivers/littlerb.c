@@ -131,7 +131,7 @@ WRITE16_HANDLER( palette_reset_w )
 }
 
 /* this map is wrong because our VDP access is wrong! */
-static ADDRESS_MAP_START( littlerb_vdp_map8, 0, 16 )
+static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM_WRITE(region4_w)
 
 	/* these are definitely written by a non-incrementing access to the VDP */
@@ -182,7 +182,7 @@ public:
 	}
 
 protected:
-	virtual const address_space_config *memory_space_config(int spacenum = 0) const
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const
 	{
 		return (spacenum == 0) ? &m_space_config : NULL;
 	}
@@ -333,7 +333,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 
 }
 
-static ADDRESS_MAP_START( littlerb_main, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x000008, 0x000017) AM_WRITENOP
 	AM_RANGE(0x000020, 0x00002f) AM_WRITENOP
 	AM_RANGE(0x000070, 0x000073) AM_WRITENOP

@@ -1094,7 +1094,7 @@ static WRITE8_HANDLER( paletteram_io_w )
 
 
 
-static ADDRESS_MAP_START( sfbonus_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(sfbonus_state, nvram) AM_SIZE_MEMBER(sfbonus_state, nvram_size)
 ADDRESS_MAP_END
@@ -1169,7 +1169,7 @@ static WRITE8_HANDLER( sfbonus_2c01_w )
 }
 
 
-static ADDRESS_MAP_START( sfbonus_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8 )
 	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("KEY1")
 	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("KEY2")
 	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("KEY3")

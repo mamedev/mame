@@ -438,7 +438,7 @@ static CUSTOM_INPUT( zaxxon_coin_r )
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( zaxxon_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,videoram)
@@ -461,7 +461,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( congo_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,videoram)
@@ -487,7 +487,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( congo_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( congo_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76496_w)
@@ -1447,7 +1447,7 @@ static void zaxxonj_decode(running_machine *machine, const char *cputag)
 	};
 
 	int A;
-	address_space *space = machine->device(cputag)->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device(cputag)->memory().space(AS_PROGRAM);
 	UINT8 *rom = machine->region(cputag)->base();
 	int size = machine->region(cputag)->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
@@ -1512,15 +1512,15 @@ static DRIVER_INIT( razmataz )
 	nprinces_decode(machine, "maincpu");
 
 	/* additional input ports are wired */
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc004, 0xc004, 0, 0x18f3, "SW04");
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc008, 0xc008, 0, 0x18f3, "SW08");
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc004, 0xc004, 0, 0x18f3, "SW04");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc008, 0xc008, 0, 0x18f3, "SW08");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
 
 	/* connect the universal sound board */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 
 	/* additional state saving */
 	state->save_item(NAME(state->razmataz_dial_pos));
@@ -1533,7 +1533,7 @@ static DRIVER_INIT( ixion )
 	szaxxon_decode(machine, "maincpu");
 
 	/* connect the universal sound board */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 }
 
 

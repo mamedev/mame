@@ -46,7 +46,7 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 
 static MACHINE_RESET( srumbler )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	/* initialize banked ROM pointers */
 	srumbler_bankswitch_w(space,0,0);
 }
@@ -69,7 +69,7 @@ to the page register.
 Ignore the warnings about writing to unmapped memory.
 */
 
-static ADDRESS_MAP_START( srumbler_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM  /* RAM (of 1 sort or another) */
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(srumbler_background_w) AM_BASE_MEMBER(srumbler_state, backgroundram)
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( srumbler_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("f000")	/* Banked ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srumbler_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( srumbler_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_w)

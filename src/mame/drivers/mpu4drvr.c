@@ -1958,7 +1958,7 @@ static MACHINE_RESET( mpu4_vid )
 	state->prot_col  = 0;
 }
 
-static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, vid_mainram)
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
@@ -1974,7 +1974,7 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* TODO: Fix up MPU4 map*/
-static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
@@ -1991,7 +1991,7 @@ static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM	AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( vp_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, vid_mainram)
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
@@ -2008,7 +2008,7 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w) Word-based version of old CHR??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwbvid_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bwbvid_6809_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_data_r, acia6850_data_w)
@@ -2025,7 +2025,7 @@ static ADDRESS_MAP_START( bwbvid_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM	AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwbvid_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, vid_mainram)
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
@@ -2042,7 +2042,7 @@ static ADDRESS_MAP_START( bwbvid_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwbvid5_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, vid_mainram)
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
@@ -2192,7 +2192,7 @@ static const mc6845_interface hd6845_intf =
 };
 
 
-static ADDRESS_MAP_START( dealem_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -2828,7 +2828,7 @@ static DRIVER_INIT (crmaze3a)
 static DRIVER_INIT (mating)
 {
 	mpu4_state *state = machine->driver_data<mpu4_state>();
-	address_space *space = machine->device("video")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("video")->memory().space(AS_PROGRAM);
 	device_t *device = machine->device("oki");
 
 	/* The Mating Game has an extra 256kB RAM on the program card */

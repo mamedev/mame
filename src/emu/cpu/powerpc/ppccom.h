@@ -578,7 +578,7 @@ void ppccom_exit(powerpc_state *ppc);
 void ppccom_reset(powerpc_state *ppc);
 offs_t ppccom_dasm(powerpc_state *ppc, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-int ppccom_translate_address(powerpc_state *ppc, int space, int intention, offs_t *address);
+int ppccom_translate_address(powerpc_state *ppc, address_spacenum space, int intention, offs_t *address);
 
 void ppccom_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
 void ppccom_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);

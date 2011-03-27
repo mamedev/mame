@@ -141,7 +141,7 @@ static const mips3_config r4600_config =
 };
 
 
-static ADDRESS_MAP_START( magictg_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( magictg_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END

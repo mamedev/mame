@@ -571,7 +571,7 @@ static READ8_HANDLER( berzerk_audio_r )
 
 static SOUND_RESET(berzerk)
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *space = machine->device("maincpu")->memory().space(AS_IO);
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
 	berzerk_audio_w(space, 4, 0x40);
 }
@@ -584,7 +584,7 @@ static SOUND_RESET(berzerk)
  *
  *************************************/
 
-static ADDRESS_MAP_START( berzerk_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
@@ -595,7 +595,7 @@ static ADDRESS_MAP_START( berzerk_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( frenzy_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(berzerk_state, videoram) AM_SIZE_MEMBER(berzerk_state, videoram_size) AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
@@ -612,7 +612,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( berzerk_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( berzerk_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP
 	AM_RANGE(0x40, 0x47) AM_READWRITE(berzerk_audio_r, berzerk_audio_w)
@@ -1209,7 +1209,7 @@ ROM_END
 
 static DRIVER_INIT( moonwarp )
 {
-	address_space *io = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *io = machine->device("maincpu")->memory().space(AS_IO);
 	memory_install_read8_handler (io, 0x48, 0x48, 0, 0, moonwarp_p1_r);
 	memory_install_read8_handler (io, 0x4a, 0x4a, 0, 0, moonwarp_p2_r);
 }

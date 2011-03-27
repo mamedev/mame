@@ -172,7 +172,7 @@ SCREEN_UPDATE( srumbler )
 
 SCREEN_EOF( srumbler )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram_w(space,0,0);
 }

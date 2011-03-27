@@ -236,14 +236,14 @@ static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( chinsan_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE_MEMBER(chinsan_state, video)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chinsan_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( chinsan_io, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
 	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)

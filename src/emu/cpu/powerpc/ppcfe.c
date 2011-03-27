@@ -103,7 +103,7 @@ bool ppc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	int regnum;
 
 	// compute the physical PC
-	if (!ppccom_translate_address(&m_context, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc.physpc))
+	if (!ppccom_translate_address(&m_context, AS_PROGRAM, TRANSLATE_FETCH, &desc.physpc))
 	{
 		// uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and
 		// mark as needing to validate; otherwise, just end the sequence here

@@ -27,7 +27,7 @@ static WRITE8_HANDLER( hyperspt_coin_counter_w )
 }
 
 
-static ADDRESS_MAP_START( hyperspt_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, spriteram, spriteram_size)
 	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(hyperspt_state, scroll)	/* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( hyperspt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roadf_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, spriteram, spriteram_size)
 	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(hyperspt_state, scroll)	/* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( roadf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("snsnd", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundb_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)

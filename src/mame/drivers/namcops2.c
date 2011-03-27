@@ -43,7 +43,7 @@ static SCREEN_UPDATE(system246)
 	return 0;
 }
 
-static ADDRESS_MAP_START(ps2_map, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(ps2_map, AS_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM	// 32 MB RAM in consumer PS2s, do these have more?
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END

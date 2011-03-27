@@ -213,7 +213,7 @@ static READ8_HANDLER( champbja_alt_protection_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") /* MCU shared RAM */
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_alt_protection_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exctsccrb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // MCU not used (though it's present on the board)
 	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -298,7 +298,7 @@ static ADDRESS_MAP_START( exctsccrb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( exctsccr_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( exctsccr_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
@@ -324,7 +324,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( champbas_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( champbas_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITENOP	// 4-bit return code to main CPU (not used)
@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( champbas_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( exctsccr_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( exctsccr_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE("dac1", champbas_dac_w)
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( exctsccr_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exctsccr_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( exctsccr_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay2", ay8910_data_address_w)
@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( exctsccr_sound_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1") /* main CPU shared RAM */
 ADDRESS_MAP_END
 

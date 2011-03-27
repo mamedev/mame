@@ -57,7 +57,7 @@ static READ16_HANDLER( ghunter_trackball_high_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
 	AM_RANGE(0x03800, 0x03fff) AM_RAM AM_BASE_MEMBER(deadang_state, spriteram)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
 	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(deadang_foreground_w) AM_BASE_MEMBER(deadang_state, video_data)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
@@ -403,8 +403,8 @@ static DRIVER_INIT( ghunter )
 	seibu_sound_decrypt(machine, "audiocpu", 0x2000);
 	seibu_adpcm_decrypt(machine, "adpcm");
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80000, 0x80001, 0, 0, ghunter_trackball_low_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0001, 0, 0, ghunter_trackball_high_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80000, 0x80001, 0, 0, ghunter_trackball_low_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb0000, 0xb0001, 0, 0, ghunter_trackball_high_r);
 }
 
 /* Game Drivers */

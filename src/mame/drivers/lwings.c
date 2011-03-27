@@ -90,7 +90,7 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 
 static INTERRUPT_GEN( lwings_interrupt )
 {
-	if (interrupt_enable_r(device->memory().space(ADDRESS_SPACE_PROGRAM), 0))
+	if (interrupt_enable_r(device->memory().space(AS_PROGRAM), 0))
 		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
@@ -275,7 +275,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 	msm5205_vclk_w(device, 0);
 }
 
-static ADDRESS_MAP_START( avengers_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( avengers_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lwings_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( lwings_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trojan_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( trojan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lwings_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
@@ -355,17 +355,17 @@ static ADDRESS_MAP_START( lwings_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
-static ADDRESS_MAP_START( trojan_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( trojan_adpcm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avengers_adpcm_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( avengers_adpcm_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(avengers_adpcm_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("5205", msm5205_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trojan_adpcm_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( trojan_adpcm_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("5205", msm5205_w)

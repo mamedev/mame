@@ -57,12 +57,12 @@ const eeprom_interface eeprom_interface_93C66B =
 };
 
 
-static ADDRESS_MAP_START( eeprom_map8, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( eeprom_map16, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -183,7 +183,7 @@ bool eeprom_device_config::device_validity_check(emu_options &options, const gam
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *eeprom_device_config::memory_space_config(int spacenum) const
+const address_space_config *eeprom_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }

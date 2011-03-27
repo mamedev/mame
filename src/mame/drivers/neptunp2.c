@@ -34,7 +34,7 @@ static READ8_HANDLER( test_r )
 	return space->machine->rand();
 }
 
-static ADDRESS_MAP_START( neptunp2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( neptunp2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0xbffff) AM_ROM
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM
 
@@ -51,7 +51,7 @@ static ADDRESS_MAP_START( neptunp2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( neptunp2_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( neptunp2_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 

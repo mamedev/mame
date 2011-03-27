@@ -38,7 +38,7 @@ static SCREEN_UPDATE(tokyocop)
 	return 0;
 }
 
-static ADDRESS_MAP_START( tokyocop_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( tokyocop_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 ADDRESS_MAP_END
 

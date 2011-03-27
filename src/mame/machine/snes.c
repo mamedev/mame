@@ -133,7 +133,7 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 {
 	snes_state *state = machine->driver_data<snes_state>();
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 
 	if (!(snes_ppu.screen_disabled)) //Reset OAM address, byuu says it happens at H=10
 	{
@@ -146,14 +146,14 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 static TIMER_CALLBACK( snes_reset_hdma )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = state->maincpu->memory().space(AS_PROGRAM);
 	snes_hdma_init(cpu0space);
 }
 
 static TIMER_CALLBACK( snes_update_io )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = state->maincpu->memory().space(AS_PROGRAM);
 	state->io_read(cpu0space->machine);
 	snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
 
@@ -231,7 +231,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	// hdma reset happens at scanline 0, H=~6
 	if (snes_ppu.beam.current_vert == 0)
 	{
-		address_space *cpu0space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *cpu0space = state->maincpu->memory().space(AS_PROGRAM);
 		snes_hdma_init(cpu0space);
 	}
 
@@ -255,7 +255,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 static TIMER_CALLBACK( snes_hblank_tick )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = state->maincpu->memory().space(AS_PROGRAM);
 	int nextscan;
 
 	snes_ppu.beam.current_vert = machine->primary_screen->vpos();
@@ -1732,7 +1732,7 @@ static void snes_init_timers( running_machine *machine )
 static void snes_init_ram( running_machine *machine )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */
@@ -1987,7 +1987,7 @@ MACHINE_RESET( snes )
 DRIVER_INIT( snes )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
@@ -2053,7 +2053,7 @@ DRIVER_INIT( snes )
 DRIVER_INIT( snes_hirom )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 

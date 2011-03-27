@@ -121,7 +121,7 @@ static READ8_HANDLER( t1_r );
     22VP931 ROM AND MACHINE INTERFACES
 ***************************************************************************/
 
-static ADDRESS_MAP_START( vp931_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( vp931_portmap, AS_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xcf) AM_READWRITE(keypad_r, output0_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0xcf) AM_READWRITE(unknown_r, output1_w)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xcf) AM_READWRITE(datic_r, lcd_w)

@@ -272,7 +272,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 static MACHINE_RESET( niyanpai )
 {
 	niyanpai_state *state = machine->driver_data<niyanpai_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
@@ -338,7 +338,7 @@ static READ16_HANDLER( musobana_inputport_0_r )
 static CUSTOM_INPUT( musobana_outcoin_flag_r )
 {
 	niyanpai_state *state = field->port->machine->driver_data<niyanpai_state>();
-	address_space *space = field->port->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = field->port->machine->device("maincpu")->memory().space(AS_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on
@@ -356,7 +356,7 @@ static WRITE16_HANDLER ( musobana_inputport_w )
 	state->musobana_inputport = data;
 }
 
-static ADDRESS_MAP_START( tmp68301_regs, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tmp68301_regs, AS_PROGRAM, 16 )
 	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE(tmp68301_address_decoder_r,tmp68301_address_decoder_w)
 	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w)
 	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w)
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( tmp68301_regs, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffe00, 0xfffe4f) AM_READWRITE(tmp68301_timer_r,tmp68301_timer_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( niyanpai_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")
 
@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( niyanpai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_IMPORT_FROM( tmp68301_regs )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( musobana_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( musobana_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_IMPORT_FROM( tmp68301_regs )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mhhonban_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
@@ -478,13 +478,13 @@ static ADDRESS_MAP_START( mhhonban_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( niyanpai_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( niyanpai_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( niyanpai_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( niyanpai_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)

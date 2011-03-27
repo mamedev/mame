@@ -596,7 +596,7 @@ static WRITE64_HANDLER( vga_ega64_w ) { write64be_with_write8_handler(vga_ega_w,
 
 static void vga_cpu_interface(running_machine *machine)
 {
-	address_space *space = machine->firstcpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->firstcpu->memory().space(AS_PROGRAM);
 	static int sequencer, gc;
 	read8_space_func read_handler;
 	write8_space_func write_handler;

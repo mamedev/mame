@@ -207,7 +207,7 @@ static WRITE8_HANDLER( mw8080bw_reversable_shift_count_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_SIZE_MEMBER(mw8080bw_state, main_ram, main_ram_size)
@@ -324,7 +324,7 @@ static CUSTOM_INPUT( seawolf_erase_input_r )
 }
 
 
-static ADDRESS_MAP_START( seawolf_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( seawolf_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
@@ -437,7 +437,7 @@ static WRITE8_HANDLER( gunfight_io_w )
 }
 
 
-static ADDRESS_MAP_START( gunfight_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gunfight_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -633,7 +633,7 @@ static WRITE8_HANDLER( tornbase_io_w )
 }
 
 
-static ADDRESS_MAP_START( tornbase_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tornbase_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -753,7 +753,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( zzzap_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( zzzap_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -920,7 +920,7 @@ static WRITE8_HANDLER( maze_io_w )
 }
 
 
-static ADDRESS_MAP_START( maze_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( maze_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -990,7 +990,7 @@ static MACHINE_START( boothill )
 }
 
 
-static ADDRESS_MAP_START( boothill_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( boothill_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1084,7 +1084,7 @@ static WRITE8_HANDLER( checkmat_io_w )
 }
 
 
-static ADDRESS_MAP_START( checkmat_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( checkmat_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -1220,7 +1220,7 @@ static CUSTOM_INPUT( desertgu_dip_sw_0_1_r )
 }
 
 
-static ADDRESS_MAP_START( desertgu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( desertgu_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
@@ -1342,7 +1342,7 @@ static CUSTOM_INPUT( dplay_pitch_right_input_r )
 }
 
 
-static ADDRESS_MAP_START( dplay_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dplay_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1520,7 +1520,7 @@ static MACHINE_START( gmissile )
 }
 
 
-static ADDRESS_MAP_START( gmissile_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gmissile_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1616,7 +1616,7 @@ static MACHINE_START( m4 )
 }
 
 
-static ADDRESS_MAP_START( m4_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( m4_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1732,7 +1732,7 @@ static CUSTOM_INPUT( clowns_controller_r )
 }
 
 
-static ADDRESS_MAP_START( clowns_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( clowns_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -1869,7 +1869,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( spacwalk_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spacwalk_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
@@ -1963,7 +1963,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( shuffle_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( shuffle_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)	/* yes, 4, and no mirroring on the read handlers */
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("mb14241", mb14241_shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
@@ -2043,7 +2043,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dogpatch_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dogpatch_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -2208,7 +2208,7 @@ static WRITE8_HANDLER( spcenctr_io_w )
 }
 
 
-static ADDRESS_MAP_START( spcenctr_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( spcenctr_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xfc) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0xfc) AM_READ_PORT("IN1")
@@ -2315,7 +2315,7 @@ static MACHINE_START( phantom2 )
 }
 
 
-static ADDRESS_MAP_START( phantom2_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( phantom2_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
@@ -2441,7 +2441,7 @@ static WRITE8_HANDLER( bowler_lights_2_w )
 }
 
 
-static ADDRESS_MAP_START( bowler_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( bowler_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)  /* no masking on the reads, all 4 bits are decoded */
 	AM_RANGE(0x01, 0x01) AM_READ(bowler_shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
@@ -2632,7 +2632,7 @@ int invaders_is_cabinet_cocktail(running_machine *machine)
 }
 
 
-static ADDRESS_MAP_START( invaders_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( invaders_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
@@ -2763,7 +2763,7 @@ static CUSTOM_INPUT( blueshrk_coin_input_r )
 }
 
 
-static ADDRESS_MAP_START( blueshrk_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( blueshrk_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
@@ -2843,7 +2843,7 @@ static UINT32 invad2ct_coin_input_r(void *param)
 #endif
 
 
-static ADDRESS_MAP_START( invad2ct_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( invad2ct_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")

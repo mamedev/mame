@@ -2122,7 +2122,7 @@ static WRITE32_HANDLER( cps3_colourram_w )
 
 
 /* there are more unknown writes, but you get the idea */
-static ADDRESS_MAP_START( cps3_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("user1", 0) // Bios ROM
 	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_BASE_MEMBER(cps3_state, mainram) // Main RAM
 

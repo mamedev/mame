@@ -11,7 +11,7 @@
 
 MACHINE_RESET( skydiver )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* reset all latches */
 	skydiver_start_lamp_1_w(space, 0, 0);

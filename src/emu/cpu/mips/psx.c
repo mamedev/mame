@@ -1536,7 +1536,7 @@ int psxcpu_device::store_data_address_breakpoint( UINT32 address )
 }
 
 // On-board RAM and peripherals
-static ADDRESS_MAP_START( psxcpu_internal_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00800000, 0x1effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
 	AM_RANGE(0x20000000, 0x7fffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
@@ -1546,7 +1546,7 @@ static ADDRESS_MAP_START( psxcpu_internal_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_DEVREADWRITE(DEVICE_SELF,psx_biu_r, psx_biu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cxd8661r_internal_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x01000000, 0x1effffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
 	AM_RANGE(0x1f800400, 0x1f800fff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)
 	AM_RANGE(0x20000000, 0x7fffffff) AM_DEVREADWRITE(DEVICE_SELF,psx_berr_r, psx_berr_w)

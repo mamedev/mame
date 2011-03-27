@@ -772,7 +772,7 @@ static WRITE8_DEVICE_HANDLER( dkong_z80dma_rdy_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x3fff) AM_ROM
     AM_RANGE(0x6000, 0x6bff) AM_RAM
     AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_SIZE_MEMBER(dkong_state, sprite_ram, sprite_ram_size) /* sprite set 1 */
@@ -793,7 +793,7 @@ static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x5fff) AM_ROM
     AM_RANGE(0x6000, 0x6bff) AM_RAM
     AM_RANGE(0x6c00, 0x6fff) AM_RAM                                              /* DK3 bootleg only */
@@ -822,7 +822,7 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0xd000, 0xdfff) AM_ROM                                             /* DK3 bootleg only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dkong3_map, AS_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x5fff) AM_ROM
     AM_RANGE(0x6000, 0x67ff) AM_RAM
     AM_RANGE(0x6800, 0x6fff) AM_RAM
@@ -842,21 +842,21 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x8000, 0x9fff) AM_ROM                                       /* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dkong3_io_map, AS_IO, 8 )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("z80dma", z80dma_r, z80dma_w)  /* dma controller */
 ADDRESS_MAP_END
 
 /* Epos conversions */
 
-static ADDRESS_MAP_START( epos_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( epos_readport, AS_IO, 8 )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0xff) AM_READ(epos_decrypt_rom)  /* Switch protection logic */
 ADDRESS_MAP_END
 
 /* S2650 conversions */
 
-static ADDRESS_MAP_START( s2650_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x0fff) AM_ROM
     AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(dkong_state, sprite_ram, sprite_ram_size)  /* 0x7000 */
     AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x007f) AM_READ_PORT("IN0") AM_DEVWRITE("ls175.3d", latch8_w)
@@ -882,7 +882,7 @@ static ADDRESS_MAP_START( s2650_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x7000, 0x7fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s2650_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( s2650_io_map, AS_IO, 8 )
     AM_RANGE(0x00, 0x00) AM_READ(s2650_port0_r)
     AM_RANGE(0x01, 0x01) AM_READ(s2650_port1_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
@@ -3040,7 +3040,7 @@ static DRIVER_INIT( drakton )
             {7,1,4,0,3,6,2,5},
     };
 
-    memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
+    memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3062,7 +3062,7 @@ static DRIVER_INIT( strtheat )
             {6,3,4,1,0,7,2,5},
     };
 
-    memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
+    memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3073,21 +3073,21 @@ static DRIVER_INIT( strtheat )
     drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
     /* custom handlers supporting Joystick or Steering Wheel */
-    memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
-    memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
+    memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
+    memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
 }
 
 
 static DRIVER_INIT( dkongx )
 {
 	UINT8 *decrypted;
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *eeprom = machine->device("eeprom");
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, "bank1" );
-    memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, "bank2" );
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x5fff, 0, 0, "bank1" );
+    memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, "bank2" );
 
 	memory_install_write8_handler(space, 0xe000, 0xe000, 0, 0, braze_a15_w);
 

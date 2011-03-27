@@ -303,7 +303,7 @@ static READ8_HANDLER (pturn_custom_r)
 }
 
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_WRITENOP AM_READ(pturn_custom_r)
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r) AM_WRITE(nmi_sub_enable_w)
@@ -472,7 +472,7 @@ static INTERRUPT_GEN( pturn_main_intgen )
 
 static MACHINE_RESET( pturn )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	soundlatch_clear_w(space,0,0);
 }
 
@@ -552,8 +552,8 @@ ROM_END
 static DRIVER_INIT(pturn)
 {
 	/*
-    memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
-    memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
+    memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
+    memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
     */
 }
 

@@ -183,7 +183,7 @@ static MACHINE_START( kangaroo_mcu )
 	kangaroo_state *state = machine->driver_data<kangaroo_state>();
 
 	MACHINE_START_CALL(kangaroo);
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
 	state->save_item(NAME(state->clock));
 }
 
@@ -252,7 +252,7 @@ static WRITE8_HANDLER( kangaroo_coin_counter_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(kangaroo_videoram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
@@ -272,7 +272,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(soundlatch_r)
@@ -282,7 +282,7 @@ ADDRESS_MAP_END
 
 
 /* yes, this is identical */
-static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(soundlatch_r)

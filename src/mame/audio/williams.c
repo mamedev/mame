@@ -95,7 +95,7 @@ static WRITE8_HANDLER( narc_slave_sync_w );
 ****************************************************************************/
 
 /* CVSD readmem/writemem structures */
-static ADDRESS_MAP_START( williams_cvsd_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_cvsd_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("cvsdpia", pia6821_r, pia6821_w)
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 
 /* NARC master readmem/writemem structures */
-static ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(narc_master_talkback_w)
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( williams_narc_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* NARC slave readmem/writemem structures */
-static ADDRESS_MAP_START( williams_narc_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_narc_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_DEVWRITE("cvsd", cvsd_clock_set_w)
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_DEVWRITE("cvsd", cvsd_digit_clock_clear_w)
@@ -136,7 +136,7 @@ ADDRESS_MAP_END
 
 
 /* ADPCM readmem/writemem structures */
-static ADDRESS_MAP_START( williams_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_adpcm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(adpcm_bank_select_w)
 	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -486,7 +486,7 @@ void williams_cvsd_data_w(running_machine *machine, int data)
 
 void williams_cvsd_reset_w(int state)
 {
-	address_space *space = sound_cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 
 	/* going high halts the CPU */
 	if (state)
@@ -581,7 +581,7 @@ static WRITE8_HANDLER( narc_slave_sync_w )
 
 void williams_narc_data_w(int data)
 {
-	address_space *space = sound_cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 
 	soundlatch_w(space, 0, data & 0xff);
 	device_set_input_line(sound_cpu, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
@@ -598,7 +598,7 @@ void williams_narc_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		address_space *space = sound_cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 		narc_master_bank_select_w(space, 0, 0);
 		narc_slave_bank_select_w(space, 0, 0);
 		init_audio_state(space->machine);
@@ -668,7 +668,7 @@ static WRITE8_HANDLER( adpcm_talkback_w )
 
 void williams_adpcm_data_w(int data)
 {
-	address_space *space = sound_cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 	soundlatch_w(space, 0, data & 0xff);
 	if (!(data & 0x200))
 	{
@@ -684,7 +684,7 @@ void williams_adpcm_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		address_space *space = sound_cpu->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *space = sound_cpu->memory().space(AS_PROGRAM);
 		adpcm_bank_select_w(space, 0, 0);
 		init_audio_state(space->machine);
 		device_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);

@@ -90,7 +90,7 @@ static WRITE8_HANDLER( sound_nmi_ack_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mnchmobl_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, sprite_xpos)
@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( mnchmobl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xbf03, 0xbf03) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_data_w)

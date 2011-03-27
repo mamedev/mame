@@ -133,7 +133,7 @@ static WRITE16_HANDLER( lastduel_sound_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( lastduel_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( lastduel_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0003) AM_WRITENOP /* Written rarely */
 	AM_RANGE(0xfc0800, 0xfc0fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( lastduel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( madgear_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( madgear_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xfc1800, 0xfc1fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("DSW1") AM_WRITE(lastduel_flip_w)
@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
@@ -179,7 +179,7 @@ static WRITE8_HANDLER( mg_bankswitch_w )
 	memory_set_bank(space->machine, "bank1", data & 0x01);
 }
 
-static ADDRESS_MAP_START( madgear_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM

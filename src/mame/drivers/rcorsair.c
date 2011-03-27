@@ -59,7 +59,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( rcorsair_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( rcorsair_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 

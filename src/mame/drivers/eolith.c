@@ -119,7 +119,7 @@ static READ32_HANDLER( hidctch3_pen2_r )
 	return xpos + (ypos*168*2);
 }
 
-static ADDRESS_MAP_START( eolith_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( eolith_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
 	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
 	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE(eolith_vram_r, eolith_vram_w)
@@ -1138,15 +1138,15 @@ static DRIVER_INIT( hidctch2 )
 
 static DRIVER_INIT( hidctch3 )
 {
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfc200000, 0xfc200003, 0, 0); // this generates pens vibration
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfc200000, 0xfc200003, 0, 0); // this generates pens vibration
 
 	// It is not clear why the first reads are needed too
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
 
 	init_eolith_speedup(machine);
 }

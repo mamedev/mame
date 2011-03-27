@@ -144,7 +144,7 @@ static CUSTOM_INPUT( dorachan_v128_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( dorachan_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dorachan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_ROM
@@ -164,7 +164,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dorachan_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dorachan_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITENOP
 	AM_RANGE(0x02, 0x02) AM_WRITENOP

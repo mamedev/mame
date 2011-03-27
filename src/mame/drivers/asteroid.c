@@ -234,7 +234,7 @@ static WRITE8_HANDLER( llander_led_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( asteroid_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(asteroid_state, ram1)
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( asteroid_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astdelux_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(asteroid_state, ram1)
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( astdelux_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( llander_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( llander_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x1f00)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
@@ -921,14 +921,14 @@ ROM_END
 
 static DRIVER_INIT( asteroidb )
 {
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
-	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
+	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
 }
 
 
 static DRIVER_INIT( asterock )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2000, 0x2007, 0, 0, asterock_IN0_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x2007, 0, 0, asterock_IN0_r);
 }
 
 

@@ -166,7 +166,7 @@ INLINE const ppu2c0x_interface *get_interface( device_t *device )
 
 /* default address map */
 // make this INTERNAL, default should just be enough to avoid compile errors, print error messages!
-static ADDRESS_MAP_START( ppu2c0x, 0, 8 )
+static ADDRESS_MAP_START( ppu2c0x, AS_0, 8 )
 	AM_RANGE(0x3f00, 0x3fff) AM_READWRITE(ppu2c0x_palette_read, ppu2c0x_palette_write)
 ADDRESS_MAP_END
 

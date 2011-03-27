@@ -125,7 +125,7 @@ WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
-	return soundlatch_r(device->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM),0);
+	return soundlatch_r(device->machine->device("audiocpu")->memory().space(AS_PROGRAM),0);
 }
 
 static void filter_w(device_t *device, int data)
@@ -289,12 +289,12 @@ static const ay8910_interface ad2083_ay8910_interface_2 =
 	DEVCB_NULL
 };
 
-static ADDRESS_MAP_START( ad2083_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ad2083_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ad2083_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( ad2083_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("tmsprom", ad2083_tms5110_ctrl_w)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_address_w)

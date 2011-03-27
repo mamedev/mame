@@ -910,7 +910,7 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 static STATE_POSTLOAD( schaser_reinit_555_time_remain )
 {
 	_8080bw_state *state = machine->driver_data<_8080bw_state>();
-	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(AS_PROGRAM);
 	state->schaser_effect_555_time_remain = attotime::from_double(state->schaser_effect_555_time_remain_savable);
 	schaser_sh_port_2_w(space, 0, state->port_2_last_extra);
 }
@@ -933,7 +933,7 @@ MACHINE_START( schaser_sh )
 MACHINE_RESET( schaser_sh )
 {
 	_8080bw_state *state = machine->driver_data<_8080bw_state>();
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->schaser_effect_555_is_low = 0;
 	state->schaser_effect_555_timer->adjust(attotime::never);

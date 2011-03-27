@@ -390,7 +390,7 @@ static WRITE8_HANDLER( unknown_w )
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0xbfff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE_MEMBER(segag80v_state, mainram)
@@ -399,7 +399,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbc, 0xbc) /* AM_READ ??? */
 	AM_RANGE(0xbd, 0xbe) AM_WRITE(multiply_w)
@@ -1312,7 +1312,7 @@ ROM_END
 static DRIVER_INIT( elim2 )
 {
 	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(70);
@@ -1327,7 +1327,7 @@ static DRIVER_INIT( elim2 )
 static DRIVER_INIT( elim4 )
 {
 	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(76);
@@ -1346,7 +1346,7 @@ static DRIVER_INIT( elim4 )
 static DRIVER_INIT( spacfury )
 {
 	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(64);
@@ -1363,7 +1363,7 @@ static DRIVER_INIT( spacfury )
 static DRIVER_INIT( zektor )
 {
 	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 	device_t *ay = machine->device("aysnd");
 
 	/* configure security */
@@ -1386,8 +1386,8 @@ static DRIVER_INIT( zektor )
 static DRIVER_INIT( tacscan )
 {
 	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *pgmspace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *pgmspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(76);
@@ -1406,8 +1406,8 @@ static DRIVER_INIT( tacscan )
 static DRIVER_INIT( startrek )
 {
 	segag80v_state *state = machine->driver_data<segag80v_state>();
-	address_space *pgmspace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
-	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *pgmspace = machine->device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	/* configure security */
 	state->decrypt = segag80_security(64);

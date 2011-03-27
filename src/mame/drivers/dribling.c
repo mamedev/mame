@@ -213,7 +213,7 @@ static const ppi8255_interface ppi8255_intf[2] =
  *
  *************************************/
 
-static ADDRESS_MAP_START( dribling_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dribling_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(dribling_state, videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( dribling_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(ioread, iowrite)
 ADDRESS_MAP_END

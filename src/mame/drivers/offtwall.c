@@ -275,7 +275,7 @@ static READ16_HANDLER( unknown_verify_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_BASE_MEMBER(offtwall_state, bankrom_base)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
@@ -497,9 +497,9 @@ static DRIVER_INIT( offtwall )
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->spritecache_count = memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
-	state->bankswitch_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x037ec2, 0x037f39, 0, 0, bankswitch_r);
-	state->unknown_verify_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3fdf1e, 0x3fdf1f, 0, 0, unknown_verify_r);
+	state->spritecache_count = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
+	state->bankswitch_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x037ec2, 0x037f39, 0, 0, bankswitch_r);
+	state->unknown_verify_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3fdf1e, 0x3fdf1f, 0, 0, unknown_verify_r);
 }
 
 
@@ -510,9 +510,9 @@ static DRIVER_INIT( offtwalc )
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->spritecache_count = memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
-	state->bankswitch_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x037eca, 0x037f43, 0, 0, bankswitch_r);
-	state->unknown_verify_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3fdf24, 0x3fdf25, 0, 0, unknown_verify_r);
+	state->spritecache_count = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
+	state->bankswitch_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x037eca, 0x037f43, 0, 0, bankswitch_r);
+	state->unknown_verify_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3fdf24, 0x3fdf25, 0, 0, unknown_verify_r);
 }
 
 

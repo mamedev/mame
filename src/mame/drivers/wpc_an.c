@@ -14,7 +14,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( wpc_an_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( wpc_an_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

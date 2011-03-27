@@ -408,11 +408,11 @@ class address_map
 {
 public:
 	// construction/destruction
-	address_map(const device_config &devconfig, int spacenum);
+	address_map(const device_config &devconfig, address_spacenum spacenum);
 	~address_map();
 
 	// configuration
-	void configure(UINT8 _spacenum, UINT8 _databits);
+	void configure(address_spacenum _spacenum, UINT8 _databits);
 
 	// setters
 	void set_global_mask(offs_t mask);
@@ -425,7 +425,7 @@ public:
 	address_map_entry64 *add(offs_t start, offs_t end, address_map_entry64 *ptr);
 
 	// public data
-	UINT8					m_spacenum;			// space number of the map
+	address_spacenum		m_spacenum;			// space number of the map
 	UINT8					m_databits;			// data bits represented by the map
 	UINT8					m_unmapval;			// unmapped memory value
 	offs_t					m_globalmask;		// global mask

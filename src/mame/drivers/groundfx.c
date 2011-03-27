@@ -215,7 +215,7 @@ static WRITE32_HANDLER( motor_control_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( groundfx_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_BASE_MEMBER(groundfx_state, ram) /* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_BASE_SIZE_MEMBER(groundfx_state, spriteram, spriteram_size) /* sprite ram */
@@ -464,7 +464,7 @@ static DRIVER_INIT( groundfx )
 	int data;
 
 	/* Speedup handlers */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x20b574, 0x20b577, 0, 0, irq_speedup_r_groundfx);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20b574, 0x20b577, 0, 0, irq_speedup_r_groundfx);
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;

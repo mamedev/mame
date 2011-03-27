@@ -744,7 +744,7 @@ static TIMER_CALLBACK( h8_timer_3_cb )
 	timer_8bit_expire(h8, 1, 1);
 }
 
-static ADDRESS_MAP_START( h8_3334_internal_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( h8_3334_internal_map, AS_PROGRAM, 8 )
 	// 512B RAM
 	AM_RANGE(0xfb80, 0xff7f) AM_RAM
 	AM_RANGE(0xff88, 0xffff) AM_READWRITE( h8330_itu_r, h8330_itu_w )
@@ -769,20 +769,20 @@ CPU_GET_INFO( h8_3334 )
 	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:		info->i           = 10;							break;
 
 		// Bus sizes
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;						break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;						break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;						break;
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;						break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;						break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;						break;
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;						break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 16;						break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:	info->i = 0;						break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 8;						break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 16;						break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:	info->i = 0;						break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;						break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;						break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;						break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_IO:	info->i = 8;						break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:	info->i = 16;						break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:	info->i = 0;						break;
 
 		// Internal maps
-	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(h8_3334_internal_map); break;
-	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = NULL;	break;
-	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map16 = NULL;	break;
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map8 = ADDRESS_MAP_NAME(h8_3334_internal_map); break;
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_DATA:    info->internal_map8 = NULL;	break;
+	case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_IO:      info->internal_map16 = NULL;	break;
 
 		// CPU misc parameters
 	case DEVINFO_STR_NAME:					strcpy(info->s, "H8/3334");						break;

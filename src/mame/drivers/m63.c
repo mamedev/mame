@@ -430,7 +430,7 @@ static WRITE8_HANDLER( fghtbskt_samples_w )
 		sample_start_raw(state->samples, 0, state->samplebuf + ((data & 0xf0) << 8), 0x2000, 8000, 0);
 }
 
-static ADDRESS_MAP_START( m63_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( m63_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( m63_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fghtbskt_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fghtbskt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -477,12 +477,12 @@ static ADDRESS_MAP_START( fghtbskt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(fghtbskt_samples_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( i8039_port_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( i8039_port_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(snddata_r, snddata_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)

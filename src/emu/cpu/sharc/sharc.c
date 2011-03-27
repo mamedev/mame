@@ -960,7 +960,7 @@ static CPU_SET_INFO( adsp21062 )
 static CPU_READ( sharc )
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
-	if (space == ADDRESS_SPACE_PROGRAM)
+	if (space == AS_PROGRAM)
 	{
 		int address = offset >> 3;
 
@@ -986,7 +986,7 @@ static CPU_READ( sharc )
 			*value = 0;
 		}
 	}
-	else if (space == ADDRESS_SPACE_DATA)
+	else if (space == AS_DATA)
 	{
 		int address = offset >> 2;
 		if (address >= 0x20000)
@@ -1046,7 +1046,7 @@ static CPU_READOP( sharc )
 }
 
 // This is just used to stop the debugger from complaining about executing from I/O space
-static ADDRESS_MAP_START( internal_pgm, ADDRESS_SPACE_PROGRAM, 64 )
+static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64 )
 	AM_RANGE(0x20000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1068,15 +1068,15 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 40;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 24;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -3;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 32;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 32;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = -2;					break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 64;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 24;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = -3;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 32;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = -2;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 		case CPUINFO_INT_INPUT_STATE:					info->i = CLEAR_LINE;					break;
 
@@ -1193,7 +1193,7 @@ static CPU_GET_INFO( sharc )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 		case CPUINFO_FCT_READ:							info->read = CPU_READ_NAME(sharc);		break;
 		case CPUINFO_FCT_READOP:						info->readop = CPU_READOP_NAME(sharc);	break;
-		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(internal_pgm); break;
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map64 = ADDRESS_MAP_NAME(internal_pgm); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "SHARC");				break;

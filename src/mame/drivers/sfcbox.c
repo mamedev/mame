@@ -62,7 +62,7 @@ PSS-64  - SUPER FAMICOM BOX Commercial Optional Cart (Only rumored to exist)
 #include "includes/snes.h"
 #include "audio/snes_snd.h"
 
-static ADDRESS_MAP_START( snes_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8)
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x400000, 0x5fffff) AM_READ(snes_r_bank3)						/* ROM (and reserved in Mode 20) */
@@ -83,7 +83,7 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 	spc_ram_w(device, offset + 0x100, data);
 }
 
-static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)  	/* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)

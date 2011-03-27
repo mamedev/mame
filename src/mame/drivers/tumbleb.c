@@ -656,7 +656,7 @@ static WRITE16_DEVICE_HANDLER( tumbleb2_soundmcu_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( tumblepopb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tumblepopb_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 #if TUMBLEP_HACK
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY	/* To write levels modifications */
@@ -678,7 +678,7 @@ static ADDRESS_MAP_START( tumblepopb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x342400, 0x34247f) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 #if FNCYWLD_HACK
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITEONLY	/* To write levels modifications */
@@ -707,7 +707,7 @@ static READ16_HANDLER( semibase_unknown_r )
 	return space->machine->rand();
 }
 
-static ADDRESS_MAP_START( htchctch_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_READ(semibase_unknown_r)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(semicom_soundcmd_w)
@@ -725,7 +725,7 @@ static ADDRESS_MAP_START( htchctch_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jumppop_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( jumppop_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -748,7 +748,7 @@ static WRITE16_HANDLER( jumpkids_sound_w )
 	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( suprtrio_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( suprtrio_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size)
 	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_BASE_MEMBER(tumbleb_state, control)
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( suprtrio_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pangpang_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pangpang_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -796,7 +796,7 @@ static WRITE8_HANDLER( oki_sound_bank_w )
 	memcpy(&oki[0x30000], &oki[(data * 0x10000) + 0x40000], 0x10000);
 }
 
-static ADDRESS_MAP_START( semicom_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( semicom_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -806,7 +806,7 @@ static ADDRESS_MAP_START( semicom_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suprtrio_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( suprtrio_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
@@ -820,7 +820,7 @@ static WRITE8_HANDLER(jumppop_z80_bank_w)
 	memory_set_bankptr(space->machine, "bank1", space->machine->region("audiocpu")->base() + 0x10000 + (0x4000 * data));
 }
 
-static ADDRESS_MAP_START( jumppop_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jumppop_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -833,7 +833,7 @@ static READ8_HANDLER(jumppop_z80latch_r)
 	return soundlatch_r(space, 0);
 }
 
-static ADDRESS_MAP_START( jumppop_sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( jumppop_sound_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
@@ -845,7 +845,7 @@ ADDRESS_MAP_END
 
 /* Jump Kids */
 
-static ADDRESS_MAP_START( jumpkids_main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( jumpkids_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(jumpkids_sound_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
@@ -873,7 +873,7 @@ static WRITE8_HANDLER( jumpkids_oki_bank_w )
 	memcpy(sound1 + 0x20000, sound2 + bank * 0x20000, 0x20000);
 }
 
-static ADDRESS_MAP_START( jumpkids_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( jumpkids_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(jumpkids_oki_bank_w)
@@ -930,11 +930,11 @@ static WRITE8_HANDLER( prot_io_w )
 
 
 /* Semicom AT89C52 MCU */
-static ADDRESS_MAP_START( protection_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( protection_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( protection_iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( protection_iomap, AS_IO, 8 )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(prot_io_r,prot_io_w)
 ADDRESS_MAP_END
 
@@ -3395,7 +3395,7 @@ static DRIVER_INIT( tumbleb2 )
 	tumblepb_patch_code(machine, 0x000132);
 	#endif
 
-	memory_install_write16_device_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), oki, 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
+	memory_install_write16_device_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), oki, 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
 
 }
 
@@ -3433,7 +3433,7 @@ static READ16_HANDLER( bcstory_1a0_read )
 static DRIVER_INIT ( bcstory )
 {
 	tumblepb_gfx1_rearrange(machine);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x180008, 0x180009, 0, 0, bcstory_1a0_read ); // io should be here??
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x180008, 0x180009, 0, 0, bcstory_1a0_read ); // io should be here??
 }
 
 
@@ -3675,7 +3675,7 @@ static DRIVER_INIT( htchctch )
 
 	HCROM[0x1e228/2] = 0x4e75;
 
-	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x140000, 0x1407ff, 0, 0 ); // kill palette writes as the interrupt code we don't have controls them
+	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x140000, 0x1407ff, 0, 0 ); // kill palette writes as the interrupt code we don't have controls them
 
 
 	{
@@ -3739,10 +3739,10 @@ static DRIVER_INIT( chokchok )
 	DRIVER_INIT_CALL(htchctch);
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x140000, 0x140fff, 0, 0, paletteram16_xxxxBBBBGGGGRRRR_word_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x140000, 0x140fff, 0, 0, paletteram16_xxxxBBBBGGGGRRRR_word_w);
 
 	/* slightly different banking */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x100002, 0x100003, 0, 0, chokchok_tilebank_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x100002, 0x100003, 0, 0, chokchok_tilebank_w);
 }
 
 static DRIVER_INIT( wlstar )
@@ -3751,7 +3751,7 @@ static DRIVER_INIT( wlstar )
 	tumblepb_gfx1_rearrange(machine);
 
 	/* slightly different banking */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
 
 	state->protbase = 0x0000;
 }

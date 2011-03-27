@@ -201,7 +201,7 @@ static SCREEN_UPDATE( chanbara )
 	return 0;
 }
 
-static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_BASE_MEMBER(chanbara_state, videoram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_BASE_MEMBER(chanbara_state, colorram)

@@ -135,6 +135,6 @@ WRITE8_HANDLER( astdelux_led_w )
 
 MACHINE_RESET( asteroid )
 {
-	asteroid_bank_switch_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0);
-	avgdvg_reset_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0);
+	asteroid_bank_switch_w(machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	avgdvg_reset_w(machine->device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 }

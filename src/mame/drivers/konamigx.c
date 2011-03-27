@@ -538,7 +538,7 @@ static WRITE32_HANDLER( control_w )
   waitskip.mask = MASK;      \
   resume_trigger= 1000;      \
   memory_install_read32_handler \
-  (0, ADDRESS_SPACE_PROGRAM, (BASE+START)&~3, (BASE+END)|3, 0, 0, waitskip_r);}
+  (0, AS_PROGRAM, (BASE+START)&~3, (BASE+END)|3, 0, 0, waitskip_r);}
 
 static int suspension_active, resume_trigger;
 #ifdef UNUSED_FUNCTION
@@ -1159,7 +1159,7 @@ static WRITE32_HANDLER( type1_cablamps_w )
 /* 68EC020 memory handlers */
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( gx_base_memmap, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// BIOS ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM	// main program ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM	// data ROM
@@ -1191,7 +1191,7 @@ static ADDRESS_MAP_START( gx_base_memmap, ADDRESS_SPACE_PROGRAM, 32 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type1_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ(gx6bppspr_r)	// sprite ROM readback
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM			// LAN RAM? (Racin' Force has, Open Golf doesn't)
@@ -1211,13 +1211,13 @@ static ADDRESS_MAP_START( gx_type1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type2_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type3_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
@@ -1231,7 +1231,7 @@ static ADDRESS_MAP_START( gx_type3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type4_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
@@ -1313,7 +1313,7 @@ static WRITE16_HANDLER(tms57002_control_word_w)
 }
 
 /* 68000 memory handling */
-static ADDRESS_MAP_START( gxsndmap, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&gx_sndram)
 	AM_RANGE(0x200000, 0x2004ff) AM_READWRITE(dual539_r, dual539_w)
@@ -1324,7 +1324,7 @@ static ADDRESS_MAP_START( gxsndmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gxtmsmap, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( gxtmsmap, AS_DATA, 8 )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -3771,8 +3771,8 @@ static DRIVER_INIT(konamigx)
 			switch (gameDefs[i].special)
 	{
 				case 1:	// LE2 guns
-					memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd44000, 0xd44003, 0, 0, le2_gun_H_r );
-					memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd44004, 0xd44007, 0, 0, le2_gun_V_r );
+					memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd44000, 0xd44003, 0, 0, le2_gun_H_r );
+					memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd44004, 0xd44007, 0, 0, le2_gun_V_r );
 					break;
 
 				case 2:	// tkmmpzdm hack
@@ -3808,7 +3808,7 @@ static DRIVER_INIT(konamigx)
 					break;
 
 				case 7:	// install type 4 Xilinx protection for non-type 3/4 games
-		memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xcc0000, 0xcc0007, 0, 0, type4_prot_w );
+		memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcc0000, 0xcc0007, 0, 0, type4_prot_w );
 					break;
 
 				case 8: // tbyahhoo
@@ -3828,14 +3828,14 @@ static DRIVER_INIT(konamigx)
 	switch (readback)
 	{
 		case BPP5:
-			memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd4a000, 0xd4a00f, 0, 0, gx5bppspr_r);
+			memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd4a000, 0xd4a00f, 0, 0, gx5bppspr_r);
 		break;
 
 		case BPP66:
-			memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd00000, 0xd01fff, 0, 0, K056832_6bpp_rom_long_r);
+			memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd00000, 0xd01fff, 0, 0, K056832_6bpp_rom_long_r);
 
 		case BPP6:
-			memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd4a000, 0xd4a00f, 0, 0, gx6bppspr_r);
+			memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd4a000, 0xd4a00f, 0, 0, gx6bppspr_r);
 		break;
 	}
 

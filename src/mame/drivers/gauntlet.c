@@ -144,7 +144,7 @@ static void update_interrupts(running_machine *machine)
 
 static void scanline_update(screen_device &screen, int scanline)
 {
-	address_space *space = screen.machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen.machine->device("audiocpu")->memory().space(AS_PROGRAM);
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
@@ -302,7 +302,7 @@ static WRITE8_HANDLER( mixer_w )
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x037fff) AM_MIRROR(0x280000) AM_ROM
 	AM_RANGE(0x038000, 0x03ffff) AM_MIRROR(0x280000) AM_ROM	/* slapstic maps here */
@@ -343,7 +343,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_WRITE(atarigen_6502_sound_w)

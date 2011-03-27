@@ -298,7 +298,7 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 			image->message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			return IMAGE_INIT_FAIL;
 		}
-		image->device().machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM)->write_byte(j, data);
+		image->device().machine->device("maincpu")->memory().space(AS_PROGRAM)->write_byte(j, data);
 	}
 
 	return IMAGE_INIT_PASS;

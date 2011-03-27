@@ -112,7 +112,7 @@ static WRITE16_HANDLER( yunsun16_sound_bank_w )
 	}
 }
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
@@ -157,7 +157,7 @@ number 0 on each voice. That sample is 00000-00000.
 static DRIVER_INIT( magicbub )
 {
 //  remove_mem_write16_handler (0, 0x800180, 0x800181 );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x800188, 0x800189, 0, 0, magicbub_sound_command_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x800188, 0x800189, 0, 0, magicbub_sound_command_w);
 }
 
 /***************************************************************************
@@ -168,12 +168,12 @@ static DRIVER_INIT( magicbub )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w )
 	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r )						// From Main CPU

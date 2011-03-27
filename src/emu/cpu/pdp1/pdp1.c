@@ -947,15 +947,15 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_INT_MIN_CYCLES:					info->i = 5;	/* 5us cycle time */	break;
 	case CPUINFO_INT_MAX_CYCLES:					info->i = 31;	/* we emulate individual 5us cycle, but MUL/DIV have longer timings */	break;
 
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 18;	/*16+2 ignored bits to make double word address*/	break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-	case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-	case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-	case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:	info->i = 32;					break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM: info->i = 18;	/*16+2 ignored bits to make double word address*/	break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM: info->i = 0;					break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_DATA:	info->i = 0;					break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_DATA:	info->i = 0;					break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_DATA:	info->i = 0;					break;
+	case DEVINFO_INT_DATABUS_WIDTH + AS_IO:		info->i = 0;					break;
+	case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:		info->i = 0;					break;
+	case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:		info->i = 0;					break;
 
 	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
 	case CPUINFO_INT_PC:							info->i = PC;							break;

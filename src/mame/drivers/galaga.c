@@ -888,7 +888,7 @@ static MACHINE_START( galaga )
 
 static void bosco_latch_reset(running_machine *machine)
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -914,7 +914,7 @@ static MACHINE_RESET( battles )
 
 
 /* the same memory map is used by all three CPUs; all RAM areas are shared */
-static ADDRESS_MAP_START( bosco_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( bosco_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP			/* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w)
@@ -936,7 +936,7 @@ static ADDRESS_MAP_START( bosco_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( galaga_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( galaga_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP			/* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w)
@@ -953,7 +953,7 @@ static ADDRESS_MAP_START( galaga_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( xevious_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( xevious_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP			/* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w)
@@ -974,7 +974,7 @@ static ADDRESS_MAP_START( xevious_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( digdug_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( digdug_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP			/* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", pacman_sound_w)
 	AM_RANGE(0x6820, 0x6827) AM_WRITE(bosco_latch_w)						/* misc latches */
@@ -994,12 +994,12 @@ ADDRESS_MAP_END
 
 
 /* bootleg 4th CPU replacing the 5xXX chips */
-static ADDRESS_MAP_START( galaga_mem4, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( galaga_mem4, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battles_mem4, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( battles_mem4, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x4003) AM_READ(battles_input_port_r)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(battles_CPU4_coin_w)
@@ -1009,7 +1009,7 @@ static ADDRESS_MAP_START( battles_mem4, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dzigzag_mem4, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( dzigzag_mem4, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_READONLY	// dip switches? bits 0 & 1 used
@@ -3212,7 +3212,7 @@ static DRIVER_INIT (gatsbee)
 	DRIVER_INIT_CALL(galaga);
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1000, 0x1000, 0, 0, gatsbee_bank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1000, 0x1000, 0, 0, gatsbee_bank_w);
 }
 
 
@@ -3253,8 +3253,8 @@ static DRIVER_INIT( xevios )
 static DRIVER_INIT( battles )
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, battles_customio_data0_r, battles_customio_data0_w );
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7100, 0x7100, 0, 0, battles_customio0_r, battles_customio0_w );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7000, 0x700f, 0, 0, battles_customio_data0_r, battles_customio_data0_w );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7100, 0x7100, 0, 0, battles_customio0_r, battles_customio0_w );
 
 	DRIVER_INIT_CALL(xevious);
 }

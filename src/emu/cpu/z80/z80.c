@@ -3860,12 +3860,12 @@ CPU_GET_INFO( z80 )
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 2;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 16;							break;
 
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:			info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:			info->i = 0;							break;
-		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 8;							break;
-		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:				info->i = 16;							break;
-		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:				info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:			info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_PROGRAM:			info->i = 0;							break;
+		case DEVINFO_INT_DATABUS_WIDTH + AS_IO:				info->i = 8;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_IO:				info->i = 16;							break;
+		case DEVINFO_INT_ADDRBUS_SHIFT + AS_IO:				info->i = 0;							break;
 
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = z80->nmi_state;				break;
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = z80->irq_state;				break;

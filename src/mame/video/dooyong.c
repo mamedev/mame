@@ -933,14 +933,14 @@ VIDEO_START( popbingo )
 
 SCREEN_EOF( dooyong )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }
 
 SCREEN_EOF( rshark )
 {
-	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }

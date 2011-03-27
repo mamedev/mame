@@ -199,7 +199,7 @@ static WRITE16_DEVICE_HANDLER( gp9001_spram_w )
 	COMBINE_DATA(&vdp->sp.vram16[offset]);
 }
 
-static ADDRESS_MAP_START( gp9001vdp_map, 0, 16 )
+static ADDRESS_MAP_START( gp9001vdp_map, AS_0, 16 )
 	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_bg_tmap_r, gp9001_bg_tmap_w)
 	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_fg_tmap_r, gp9001_fg_tmap_w)
 	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_top_tmap_r, gp9001_top_tmap_w)
@@ -237,7 +237,7 @@ bool gp9001vdp_device_config::device_validity_check(emu_options &options, const 
 	return error;
 }
 
-const address_space_config *gp9001vdp_device_config::memory_space_config(int spacenum) const
+const address_space_config *gp9001vdp_device_config::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == 0) ? &m_space_config : NULL;
 }

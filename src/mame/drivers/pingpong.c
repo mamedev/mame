@@ -89,7 +89,7 @@ static INTERRUPT_GEN( pingpong_interrupt )
 	}
 }
 
-static ADDRESS_MAP_START( pingpong_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_MEMBER(pingpong_state, colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_MEMBER(pingpong_state, videoram)
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( pingpong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
@@ -591,18 +591,18 @@ static DRIVER_INIT( cashquiz )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4000, 0x4000, 0, 0, cashquiz_question_bank_high_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x4000, 0, 0, cashquiz_question_bank_high_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
 
 	// 8 independents banks for questions
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5000, 0x50ff, 0, 0, "bank1");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5100, 0x51ff, 0, 0, "bank2");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5200, 0x52ff, 0, 0, "bank3");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5300, 0x53ff, 0, 0, "bank4");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5400, 0x54ff, 0, 0, "bank5");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5500, 0x55ff, 0, 0, "bank6");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5600, 0x56ff, 0, 0, "bank7");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5700, 0x57ff, 0, 0, "bank8");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x50ff, 0, 0, "bank1");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5100, 0x51ff, 0, 0, "bank2");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5200, 0x52ff, 0, 0, "bank3");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5300, 0x53ff, 0, 0, "bank4");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5400, 0x54ff, 0, 0, "bank5");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5500, 0x55ff, 0, 0, "bank6");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5600, 0x56ff, 0, 0, "bank7");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5700, 0x57ff, 0, 0, "bank8");
 
 	// setup default banks
 	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x100*0 );

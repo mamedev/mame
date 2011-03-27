@@ -74,7 +74,7 @@ static PALETTE_INIT( bsktball )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* Zero Page RAM */
 	AM_RANGE(0x0800, 0x0800) AM_READ(bsktball_in0_r)

@@ -1464,7 +1464,7 @@ static SCREEN_UPDATE( addersc2 )
 
 // memory map for scorpion2 board video addon /////////////////////////////
 
-static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)		// vfd status register
@@ -2718,7 +2718,7 @@ static MACHINE_RESET( dm01_init )
 }
 
 
-static ADDRESS_MAP_START( sc2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc2_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
@@ -2767,7 +2767,7 @@ ADDRESS_MAP_END
 
 
 /* memory map for scorpion3 board */
-static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc3_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
@@ -2816,7 +2816,7 @@ ADDRESS_MAP_END
 
 
 /* memory map for scorpion2 board + dm01 dot matrix board */
-static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap_sc2_dm01, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_dm01_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)

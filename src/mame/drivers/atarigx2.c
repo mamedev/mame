@@ -1149,7 +1149,7 @@ static READ32_HANDLER( atarigx2_protection_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
@@ -2246,7 +2246,7 @@ static DRIVER_INIT( rrreveng )
 
 	state->playfield_base = 0x000;
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
 }
 
 

@@ -62,7 +62,7 @@ SCREEN_UPDATE( hotstuff )
 	return 0;
 }
 
-static ADDRESS_MAP_START( hotstuff_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM

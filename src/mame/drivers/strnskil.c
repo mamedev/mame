@@ -77,7 +77,7 @@ static WRITE8_HANDLER( protection_w )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( strnskil_map1, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( strnskil_map1, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( strnskil_map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd80a, 0xd80b) AM_WRITEONLY AM_BASE_MEMBER(strnskil_state, xscroll)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( strnskil_map2, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( strnskil_map2, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_MEMBER(strnskil_state, spriteram, spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( strnskil_map2, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
 //  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(mcu_portk_r)
 //  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READWRITE(mcu_portr0_r, mcu_portr0_w)
 ADDRESS_MAP_END
@@ -507,16 +507,16 @@ static DRIVER_INIT( pettanp )
 //  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
 
 	/* Fujitsu MB8841 4-Bit MCU */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd806, 0xd806, 0, 0, pettanp_protection_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd80d, 0xd80d, 0, 0, protection_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd806, 0xd806, 0, 0, pettanp_protection_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd80d, 0xd80d, 0, 0, protection_w);
 
 }
 
 static DRIVER_INIT( banbam )
 {
 	/* Fujitsu MB8841 4-Bit MCU */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd806, 0xd806, 0, 0, banbam_protection_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd80d, 0xd80d, 0, 0, protection_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd806, 0xd806, 0, 0, banbam_protection_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd80d, 0xd80d, 0, 0, protection_w);
 }
 
 GAME( 1984, strnskil, 0,        strnskil, strnskil, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )

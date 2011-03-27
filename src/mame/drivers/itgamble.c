@@ -85,7 +85,7 @@ static SCREEN_UPDATE( itgamble )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( itgamble_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( itgamble_map, AS_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0xffffff) AM_ROM
 ADDRESS_MAP_END

@@ -124,7 +124,7 @@ static WRITE8_HANDLER(output_w)
 	// written in "Output Test" in test mode
 }
 
-static ADDRESS_MAP_START( sgx_mem , ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x000000, 0x0fffff) AM_ROM
 	AM_RANGE( 0x110000, 0x1edfff) AM_NOP
 	AM_RANGE( 0x1ee800, 0x1effff) AM_NOP
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( sgx_mem , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_READWRITE(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgx_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sgx_io , AS_IO, 8)
 	AM_RANGE( 0x00, 0x03) AM_READWRITE( sgx_vdc_r, sgx_vdc_w )
 ADDRESS_MAP_END
 

@@ -212,21 +212,21 @@ static COP400_INTERFACE( draco_cop_intf )
 
 // Destroyer
 
-static ADDRESS_MAP_START( destryer_map, ADDRESS_SPACE_PROGRAM, 8, cidelsa_state )
+static ADDRESS_MAP_START( destryer_map, AS_PROGRAM, 8, cidelsa_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, char_ram_r, char_ram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( destryera_map, ADDRESS_SPACE_PROGRAM, 8, cidelsa_state )
+static ADDRESS_MAP_START( destryera_map, AS_PROGRAM, 8, cidelsa_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, char_ram_r, char_ram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( destryer_io_map, ADDRESS_SPACE_IO, 8, cidelsa_state )
+static ADDRESS_MAP_START( destryer_io_map, AS_IO, 8, cidelsa_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(destryer_out1_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
 	AM_RANGE(0x03, 0x07) AM_WRITE(cdp1869_w)
@@ -234,14 +234,14 @@ ADDRESS_MAP_END
 
 // Altair
 
-static ADDRESS_MAP_START( altair_map, ADDRESS_SPACE_PROGRAM, 8, cidelsa_state )
+static ADDRESS_MAP_START( altair_map, AS_PROGRAM, 8, cidelsa_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, char_ram_r, char_ram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( altair_io_map, ADDRESS_SPACE_IO, 8, cidelsa_state )
+static ADDRESS_MAP_START( altair_io_map, AS_IO, 8, cidelsa_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("ic23", cdp1852_data_r) AM_DEVWRITE_LEGACY("ic26", cdp1852_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ic24", cdp1852_data_r)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY("ic25", cdp1852_data_r)
@@ -250,25 +250,25 @@ ADDRESS_MAP_END
 
 // Draco
 
-static ADDRESS_MAP_START( draco_map, ADDRESS_SPACE_PROGRAM, 8, cidelsa_state )
+static ADDRESS_MAP_START( draco_map, AS_PROGRAM, 8, cidelsa_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, char_ram_r, char_ram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_device, page_ram_r, page_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( draco_io_map, ADDRESS_SPACE_IO, 8, cidelsa_state )
+static ADDRESS_MAP_START( draco_io_map, AS_IO, 8, cidelsa_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("ic29", cdp1852_data_r) AM_DEVWRITE_LEGACY("ic32", cdp1852_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ic30", cdp1852_data_r)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY("ic31", cdp1852_data_r)
 	AM_RANGE(0x03, 0x07) AM_WRITE(cdp1869_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( draco_sound_map, ADDRESS_SPACE_PROGRAM, 8, cidelsa_state )
+static ADDRESS_MAP_START( draco_sound_map, AS_PROGRAM, 8, cidelsa_state )
 	AM_RANGE(0x000, 0x3ff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( draco_sound_io_map, ADDRESS_SPACE_IO, 8, cidelsa_state )
+static ADDRESS_MAP_START( draco_sound_io_map, AS_IO, 8, cidelsa_state )
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(draco_sound_bankswitch_w)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_WRITE(draco_sound_g_w)
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(draco_sound_ay8910_r, draco_sound_ay8910_w)

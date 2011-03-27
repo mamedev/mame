@@ -156,7 +156,7 @@ static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 }
 
 
-static ADDRESS_MAP_START( overdriv_master_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM					/* work RAM */
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( overdriv_master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq5_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( overdriv_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /* work RAM */
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( overdriv_slave_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x220000, 0x221fff) AM_READNOP	// K053250 #1 gfx ROM read (LSB)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( overdriv_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( overdriv_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x0201) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x0400, 0x042f) AM_DEVREADWRITE("k053260_1", k053260_r, k053260_w)
 	AM_RANGE(0x0600, 0x062f) AM_DEVREADWRITE("k053260_2", k053260_r, k053260_w)

@@ -435,7 +435,7 @@ static const eeprom_interface eeprom_interface_93C46_pacslot =
                                 Dangun Feveron
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dfeveron_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
@@ -460,7 +460,7 @@ ADDRESS_MAP_END
                                 Dodonpachi
 ***************************************************************************/
 
-static ADDRESS_MAP_START( ddonpach_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( ddonpach_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
@@ -511,7 +511,7 @@ WRITE16_HANDLER( donpachi_videoregs_w )
 }
 #endif
 
-static ADDRESS_MAP_START( donpachi_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, vram_1)				// Layer 1
@@ -537,7 +537,7 @@ ADDRESS_MAP_END
                                     Esprade
 ***************************************************************************/
 
-static ADDRESS_MAP_START( esprade_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( esprade_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
@@ -562,7 +562,7 @@ ADDRESS_MAP_END
                                     Gaia Crusaders
 ***************************************************************************/
 
-static ADDRESS_MAP_START( gaia_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
@@ -592,7 +592,7 @@ ADDRESS_MAP_END
                                     Guwange
 ***************************************************************************/
 
-static ADDRESS_MAP_START( guwange_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM																	// RAM
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)												// IRQ Cause
@@ -619,7 +619,7 @@ ADDRESS_MAP_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hotdogst_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( hotdogst_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM																	// RAM
 /**/AM_RANGE(0x408000, 0x408fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, paletteram, paletteram_size)	// Palette
@@ -711,7 +711,7 @@ static CUSTOM_INPUT( korokoro_hopper_r )
 }
 
 
-static ADDRESS_MAP_START( korokoro_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, vram_0)					// Layer 0
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_BASE_MEMBER(cave_state, vctrl_0)							// Layer 0 Control
@@ -729,7 +729,7 @@ static ADDRESS_MAP_START( korokoro_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM																		// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crusherm_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, vram_0)					// Layer 0
 	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_BASE_MEMBER(cave_state, vctrl_0)							// Layer 0 Control
@@ -750,7 +750,7 @@ ADDRESS_MAP_END
                                 Mazinger Z
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mazinger_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
 /**/AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, spriteram, spriteram_size)		// Sprites
@@ -775,7 +775,7 @@ ADDRESS_MAP_END
                                 Metamoqester
 ***************************************************************************/
 
-static ADDRESS_MAP_START( metmqstr_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM																	// ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM																	// ROM
@@ -832,7 +832,7 @@ static WRITE16_HANDLER( pwrinst2_vctrl_1_w )	{ cave_state *state = space->machin
 static WRITE16_HANDLER( pwrinst2_vctrl_2_w )	{ cave_state *state = space->machine->driver_data<cave_state>(); vctrl_w(state->vctrl_2, offset, data, mem_mask); }
 static WRITE16_HANDLER( pwrinst2_vctrl_3_w )	{ cave_state *state = space->machine->driver_data<cave_state>(); vctrl_w(state->vctrl_3, offset, data, mem_mask); }
 
-static ADDRESS_MAP_START( pwrinst2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM																		// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// RAM
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")														// Inputs
@@ -868,7 +868,7 @@ static READ16_HANDLER( sailormn_input0_r )
 	return input_port_read(space->machine, "IN0");
 }
 
-static ADDRESS_MAP_START( sailormn_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
 	AM_RANGE(0x110000, 0x110001) AM_RAM																	// (agallet)
@@ -944,7 +944,7 @@ static CUSTOM_INPUT( tjumpman_hopper_r )
 	return (state->hopper && !(field->port->machine->primary_screen->frame_number() % 10)) ? 0 : 1;
 }
 
-static ADDRESS_MAP_START( tjumpman_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")												// RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, spriteram, spriteram_size)		// Sprites
@@ -985,7 +985,7 @@ static WRITE16_HANDLER( pacslot_leds_w )
 //  popmessage("led %04X", data);
 }
 
-static ADDRESS_MAP_START( pacslot_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")												// RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, spriteram, spriteram_size)		// Sprites
@@ -1008,7 +1008,7 @@ ADDRESS_MAP_END
                                     Uo Poko
 ***************************************************************************/
 
-static ADDRESS_MAP_START( uopoko_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( uopoko_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
@@ -1035,12 +1035,12 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( oki_map, 0, 8 )
+static ADDRESS_MAP_START( oki_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank3")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, 0, 8 )
+static ADDRESS_MAP_START( oki2_map, AS_0, 8 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank5")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
@@ -1066,13 +1066,13 @@ static WRITE8_HANDLER( hotdogst_okibank_w )
 	memory_set_bank(space->machine, "bank4", bank2);
 }
 
-static ADDRESS_MAP_START( hotdogst_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( hotdogst_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM					// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")	// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM					// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotdogst_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hotdogst_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w)					// ROM bank
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)						// From Main CPU
@@ -1095,14 +1095,14 @@ static WRITE8_HANDLER( mazinger_rombank_w )
 	memory_set_bank(space->machine, "bank2", data & 0x07);
 }
 
-static ADDRESS_MAP_START( mazinger_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mazinger_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM					// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")	// ROM (Banked)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					// RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM					// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazinger_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mazinger_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mazinger_rombank_w)	// ROM bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w)		// To Main CPU
@@ -1142,13 +1142,13 @@ static WRITE8_HANDLER( metmqstr_okibank1_w )
 	memory_set_bank(space->machine, "bank6", bank2);
 }
 
-static ADDRESS_MAP_START( metmqstr_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( metmqstr_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM					// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")	// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM					// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( metmqstr_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( metmqstr_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(metmqstr_rombank_w)					// Rom Bank
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r)							// Communication
@@ -1174,13 +1174,13 @@ static WRITE8_HANDLER( pwrinst2_rombank_w )
 	memory_set_bank(space->machine, "bank1", data & 0x07);
 }
 
-static ADDRESS_MAP_START( pwrinst2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pwrinst2_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM					// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM					// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pwrinst2_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pwrinst2_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)	// M6295
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)	//
@@ -1234,14 +1234,14 @@ static WRITE8_HANDLER( sailormn_okibank1_w )
 	memory_set_bank(space->machine, "bank6", bank2);
 }
 
-static ADDRESS_MAP_START( sailormn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sailormn_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM										// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						// ROM (Banked)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(mirror_ram_r, mirror_ram_w) AM_BASE_MEMBER(cave_state, mirror_ram)	// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(mirror_ram_r, mirror_ram_w)	// Mirrored RAM (agallet)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailormn_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sailormn_sound_portmap, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sailormn_rombank_w)						// Rom Bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w)							// To Main CPU
@@ -2165,7 +2165,7 @@ static MACHINE_CONFIG_START( hotdogst, cave_state )
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -2273,7 +2273,7 @@ static MACHINE_CONFIG_START( mazinger, cave_state )
 	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -2326,12 +2326,12 @@ static MACHINE_CONFIG_START( metmqstr, cave_state )
 	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 
 	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -2502,12 +2502,12 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 
 	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
 MACHINE_CONFIG_END
 
 

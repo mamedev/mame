@@ -259,7 +259,7 @@ static READ32_HANDLER(stadhr96_prot_146_r)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( decomlc_map, ADDRESS_SPACE_PROGRAM, 32 )
+static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_BASE_MEMBER(deco_mlc_state, mlc_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020000f) AM_READNOP AM_MIRROR(0xff000000)/* IRQ control? */
@@ -745,7 +745,7 @@ static DRIVER_INIT( avengrgs )
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x32dc);
 
 	state->mainCpuIsArm = 0;
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
 	descramble_sound(machine);
 }
 

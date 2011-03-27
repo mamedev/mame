@@ -602,13 +602,13 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( ampoker2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ampoker2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_BASE_MEMBER(ampoker2_state, videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0f) AM_WRITENOP				/* inexistent in the real hardware */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")

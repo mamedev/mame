@@ -212,7 +212,7 @@ static WRITE16_HANDLER( galpanic_bgvideoram_mirror_w )
 	}
 }
 
-static ADDRESS_MAP_START( galpanic_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
@@ -247,7 +247,7 @@ static READ8_DEVICE_HANDLER( comad_okim6295_r )
 	return retvalue;
 }
 
-static ADDRESS_MAP_START( comad_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)	/* + work RAM */
@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( comad_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)	/* newfant */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fantsia2_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)	/* + work RAM */
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( fantsia2_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( galhustl_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
     AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)
@@ -310,7 +310,7 @@ READ16_HANDLER( zipzap_random_read )
 }
 #endif
 
-static ADDRESS_MAP_START( zipzap_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)
@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( zipzap_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM		// main ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( supmodel_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(galpanic_state, fgvideoram) AM_SIZE_MEMBER(galpanic_state, fgvideoram_size)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM_WRITE(galpanic_bgvideoram_w) AM_BASE_MEMBER(galpanic_state, bgvideoram)

@@ -269,7 +269,7 @@ static INTERRUPT_GEN( gaplus_interrupt_1 )
 }
 
 
-static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE_MEMBER(gaplus_state, videoram)		/* tilemap RAM (shared with CPU #2) */
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE_MEMBER(gaplus_state, spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)										/* shared RAM with CPU #3 */
@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM																				/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gaplusa_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( gaplusa_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w) AM_BASE_MEMBER(gaplus_state, videoram)		/* tilemap RAM (shared with CPU #2) */
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE_MEMBER(gaplus_state, spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)													/* shared RAM with CPU #3 */
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( gaplusa_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM																				/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(gaplus_videoram_r, gaplus_videoram_w)		/* tilemap RAM (shared with CPU #1) */
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w)	/* shared RAM with CPU #1 */
 //  AM_RANGE(0x500f, 0x500f) AM_WRITENOP                                            /* ??? written 256 times on startup */
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM													/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu3_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)						/* watchdog? */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(gaplus_irq_3_ctrl_w)											/* interrupt enable/disable */

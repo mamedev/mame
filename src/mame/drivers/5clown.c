@@ -716,7 +716,7 @@ static WRITE8_HANDLER( snd_a02_w )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( fclown_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fclown_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -791,7 +791,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( fcaudio_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( fcaudio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(snd_800_w)
 	AM_RANGE(0x0a02, 0x0a02) AM_WRITE(snd_a02_w)

@@ -213,7 +213,7 @@ static READ16_HANDLER( shared_ram_r )
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( dassault_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( dassault_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(dassault_state, shared_ram) /* Shared ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dassault_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(buffer_spriteram16_w)
@@ -257,7 +257,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)
@@ -865,7 +865,7 @@ static DRIVER_INIT( dassault )
 	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
 }
 
 static DRIVER_INIT( thndzone )
@@ -885,7 +885,7 @@ static DRIVER_INIT( thndzone )
 	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
 }
 
 /**********************************************************************************/

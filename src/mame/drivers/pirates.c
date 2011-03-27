@@ -162,7 +162,7 @@ static CUSTOM_INPUT( prot_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pirates_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( pirates_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // main ram
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("INPUTS")
@@ -461,7 +461,7 @@ static DRIVER_INIT( genix )
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x109e98, 0x109e9b, 0, 0, genix_prot_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x109e98, 0x109e9b, 0, 0, genix_prot_r );
 }
 
 

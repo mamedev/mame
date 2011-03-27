@@ -730,11 +730,11 @@ GFXDECODE_END
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( peplus_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( peplus_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE_MEMBER(peplus_state, program_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8 )
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_SHARE("cmos")
 

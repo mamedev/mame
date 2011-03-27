@@ -80,12 +80,12 @@ static WRITE8_HANDLER( color_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( prg_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_MEMBER(tgtpanic_state, ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(color_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

@@ -49,7 +49,7 @@ static SCREEN_UPDATE(buster)
 	return 0;
 }
 
-static ADDRESS_MAP_START( mainmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE_MEMBER(buster_state, rom)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(buster_state, vram)

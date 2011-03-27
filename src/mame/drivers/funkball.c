@@ -84,11 +84,11 @@ static SCREEN_UPDATE(funkball)
 	return 0;
 }
 
-static ADDRESS_MAP_START(funkball_map, ADDRESS_SPACE_PROGRAM, 32)
+static ADDRESS_MAP_START(funkball_map, AS_PROGRAM, 32)
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(funkball_io, ADDRESS_SPACE_IO, 32)
+static ADDRESS_MAP_START(funkball_io, AS_IO, 32)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( funkball )

@@ -80,7 +80,7 @@ static WRITE8_HANDLER( k052109_051960_w )
 
 /********************************************/
 
-static ADDRESS_MAP_START( crimfght_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1")					/* banked RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM												/* RAM */
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( crimfght_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crimfght_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM 821l01.h4 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */
@@ -410,12 +410,12 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	/* bit 5 = select work RAM or palette */
 	if (lines & 0x20)
 	{
-		memory_install_read_bank(device->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank3");
-		memory_install_write8_handler(device->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_install_read_bank(device->memory().space(AS_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank3");
+		memory_install_write8_handler(device->memory().space(AS_PROGRAM), 0x0000, 0x03ff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(device->machine, "bank3", device->machine->generic.paletteram.v);
 	}
 	else
-		memory_install_readwrite_bank(device->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");								/* RAM */
+		memory_install_readwrite_bank(device->memory().space(AS_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank1");								/* RAM */
 
 	/* bit 6 = enable char ROM reading through the video RAM */
 	k052109_set_rmrd_line(state->k052109, (lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);

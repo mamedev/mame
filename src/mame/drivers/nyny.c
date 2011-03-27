@@ -214,7 +214,7 @@ static WRITE8_DEVICE_HANDLER( pia_2_port_b_w )
 	state->star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0, data & 0xe0);
+	audio_2_command_w(state->maincpu->memory().space(AS_PROGRAM), 0, data & 0xe0);
 }
 
 
@@ -538,7 +538,7 @@ static WRITE8_HANDLER( nyny_pia_1_2_w )
 }
 
 
-static ADDRESS_MAP_START( nyny_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(nyny_state, videoram1)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(nyny_state, colorram1)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(nyny_state, videoram2)
@@ -556,7 +556,7 @@ static ADDRESS_MAP_START( nyny_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nyny_audio_1_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( nyny_audio_1_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nyny_audio_2_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( nyny_audio_2_map, AS_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
