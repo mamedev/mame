@@ -283,7 +283,7 @@ static void add_feature(software_list *swlist, char *feature_name, char *feature
 
 /*-------------------------------------------------
  add_info (same as add_feature, but its target
- is softinfo->other_info)
+ is softinfo->shared_info)
  -------------------------------------------------*/
 
 static void add_info(software_list *swlist, char *feature_name, char *feature_value)
@@ -301,9 +301,9 @@ static void add_info(software_list *swlist, char *feature_name, char *feature_va
 		new_entry->value = feature_value ? feature_value : feature_name;
 
 		/* Add new feature to end of feature list */
-		if ( info->other_info )
+		if ( info->shared_info )
 		{
-			feature_list *list = info->other_info;
+			feature_list *list = info->shared_info;
 			while ( list->next != NULL )
 			{
 				list = list->next;
@@ -312,7 +312,7 @@ static void add_info(software_list *swlist, char *feature_name, char *feature_va
 		}
 		else
 		{
-			info->other_info = new_entry;
+			info->shared_info = new_entry;
 		}
 	}
 	else
@@ -445,15 +445,15 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					elem->partdata = (software_part *)pool_malloc_lib(swlist->pool, swlist->part_entries * sizeof(software_part) );
 					if ( !elem->partdata )
 						return;
-					elem->other_info = (feature_list *)pool_malloc_lib(swlist->pool, sizeof(feature_list) );
-					if ( !elem->other_info )
+					elem->shared_info = (feature_list *)pool_malloc_lib(swlist->pool, sizeof(feature_list) );
+					if ( !elem->shared_info )
 						return;
 					else
 					{
-						elem->other_info->next = (feature_list *)pool_malloc_lib(swlist->pool, sizeof(feature_list) );
-						elem->other_info->next = NULL;
-						elem->other_info->name = NULL;
-						elem->other_info->value = NULL;
+						elem->shared_info->next = (feature_list *)pool_malloc_lib(swlist->pool, sizeof(feature_list) );
+						elem->shared_info->next = NULL;
+						elem->shared_info->name = NULL;
+						elem->shared_info->value = NULL;
 					}
 
 					/* Handle the supported flag */
@@ -498,7 +498,12 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				text_dest = (char **) &swlist->softinfo->year;
 			else if (!strcmp(tagname, "publisher"))
 				text_dest = (char **) &swlist->softinfo->publisher;
-			else if ( !strcmp(tagname, "info") )
+			else if (!strcmp(tagname, "info"))
+			{
+				// the "info" field (containing info about actual developers, etc.) is not currently stored.
+				// full support will be added, but for the moment frontend have to get this info from the xml directly
+			}
+			else if (!strcmp(tagname, "sharedfeat"))
 			{
 				const char *str_feature_name = NULL;
 				const char *str_feature_value = NULL;
@@ -858,10 +863,10 @@ static void end_handler(void *data, const char *name)
 			break;
 
 		case POS_PART:
-			/* Add other_info inherited from the software_info level, if any */
-			if ( swlist->softinfo && swlist->softinfo->other_info )
+			/* Add shared_info inherited from the software_info level, if any */
+			if ( swlist->softinfo && swlist->softinfo->shared_info )
 			{
-				feature_list *list = swlist->softinfo->other_info;
+				feature_list *list = swlist->softinfo->shared_info;
 
 				while( list->next )
 				{

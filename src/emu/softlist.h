@@ -35,21 +35,20 @@ struct software_part
 };
 
 
-/* The software info struct holds basic software information. Additional,
-   optional information like local software names, release dates, serial
-   numbers, etc can be maintained and stored in external recources.
-*/
+/* The software info struct holds basic software information. */
 struct software_info
 {
 	const char *shortname;
 	const char *longname;
 	const char *parentname;
-	const char *year;			/* Copyright year on title screen, actual release dates can be tracked in external resources */
+	const char *year;			// Copyright year on title screen, actual release dates can be tracked in external resources
 	const char *publisher;
-	feature_list *other_info;
+	feature_list *other_info;	// Here we store info like developer, serial #, etc. which belong to the software entry as a whole
+	feature_list *shared_info;	// Here we store info like TV standard compatibility, or add-on requirements, etc. which get inherited 
+								// by each part of this software entry (after loading these are stored in partdata->featurelist)
 	UINT32 supported;
 	software_part *partdata;
-	struct software_info *next;	/* Used internally */
+	struct software_info *next;	// Used internally
 };
 
 

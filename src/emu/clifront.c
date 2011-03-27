@@ -826,13 +826,26 @@ static void info_listsoftware(emu_options &options, const char *gamename)
 				"\t<!ELEMENT softwarelist (software+)>\n"
 				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n"
-				"\t\t<!ELEMENT software (description, year?, publisher, part*)>\n"
+				"\t\t<!ELEMENT software (description, year?, publisher, info*, sharedfeat*, part*)>\n"
 				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n"
 				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n"
 				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n"
 				"\t\t\t<!ELEMENT description (#PCDATA)>\n"
 				"\t\t\t<!ELEMENT year (#PCDATA)>\n"
 				"\t\t\t<!ELEMENT publisher (#PCDATA)>\n"
+				// we still do not store the info strings internally, so there is no output here
+				// TODO: add parsing info in softlist.c and then add output here!
+				"\t\t\t<!ELEMENT info EMPTY>\n"
+				"\t\t\t\t<!ATTLIST info name CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ATTLIST info value CDATA #IMPLIED>\n"
+				// shared features get stored in the part->feature below and are output there
+				// this means that we don't output any <sharedfeat> and that -lsoft output will 
+				// be different from the list in hash/ when the list uses sharedfeat. But this 
+				// is by design: sharedfeat is only available to simplify the life to list creators, 
+				// to e.g. avoid manually adding the same feature to each disk of a 9 floppies game!
+				"\t\t\t<!ELEMENT sharedfeat EMPTY>\n"
+				"\t\t\t\t<!ATTLIST sharedfeat name CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ATTLIST sharedfeat value CDATA #IMPLIED>\n"
 				"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n"
 				"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n"
 				"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n"
@@ -862,7 +875,7 @@ static void info_listsoftware(emu_options &options, const char *gamename)
 				"\t\t\t\t\t\t<!ATTLIST disk sha1 CDATA #IMPLIED>\n"
 				"\t\t\t\t\t\t<!ATTLIST disk status (baddump|nodump|good) \"good\">\n"
 				"\t\t\t\t\t\t<!ATTLIST disk writeable (yes|no) \"no\">\n"
-				// we still do not store the dipswitch values in softlist, so there is no output here
+				// we still do not store the dipswitch values internally, so there is no output here
 				// TODO: add parsing dipsw in softlist.c and then add output here!
 				"\t\t\t\t<!ELEMENT dipswitch (dipvalue*)>\n"
 				"\t\t\t\t\t<!ATTLIST dipswitch name CDATA #REQUIRED>\n"

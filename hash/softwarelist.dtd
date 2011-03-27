@@ -1,13 +1,19 @@
 <!ELEMENT softwarelist (software+)>
 	<!ATTLIST softwarelist name CDATA #REQUIRED>
 	<!ATTLIST softwarelist description CDATA #IMPLIED>
-	<!ELEMENT software (description, year?, publisher, part*)>
+	<!ELEMENT software (description, year?, publisher, info*, sharedfeat*, part*)>
 		<!ATTLIST software name CDATA #REQUIRED>
 		<!ATTLIST software cloneof CDATA #IMPLIED>
 		<!ATTLIST software supported (yes|partial|no) "yes">
 		<!ELEMENT description (#PCDATA)>
 		<!ELEMENT year (#PCDATA)>
 		<!ELEMENT publisher (#PCDATA)>
+		<!ELEMENT info EMPTY>
+			<!ATTLIST info name CDATA #REQUIRED>
+			<!ATTLIST info value CDATA #IMPLIED>
+		<!ELEMENT sharedfeat EMPTY>
+			<!ATTLIST sharedfeat name CDATA #REQUIRED>
+			<!ATTLIST sharedfeat value CDATA #IMPLIED>
 		<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>
 			<!ATTLIST part name CDATA #REQUIRED>
 			<!ATTLIST part interface CDATA #REQUIRED>

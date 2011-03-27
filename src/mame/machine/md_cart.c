@@ -1831,6 +1831,45 @@ static int megadrive_load_nonlist(device_image_interface &image)
 	return IMAGE_INIT_PASS;
 }
 
+static void megadrive_check_compat_list(device_image_interface &image)
+{
+	const char *compatibility = image.get_feature("compatibility");
+	const char *chips = image.get_feature("addon");
+	int md_region = megadrive_region_export + (megadrive_region_pal << 1);
+
+	if (chips)
+	{
+		if(!strcmp(chips, "SVP") && (image.device().machine->device<cpu_device>("svp") == NULL))
+		{
+			mame_printf_warning("This software requires emulation of the SVP CPU to work.\n");
+			mame_printf_warning("It might not work in the system you are using.\n");
+		}
+	}
+
+	if (compatibility)
+	{
+		if(!strcmp(compatibility, "PAL") && (md_region != 3))
+		{
+			mame_printf_warning("This software requires a PAL console to work.\n");
+			mame_printf_warning("It might not work in the system you are using.\n");
+		}
+		if(!strcmp(compatibility, "NTSC-J") && (md_region != 0))
+		{
+			mame_printf_warning("This software requires a JPN console to work.\n");
+			mame_printf_warning("It might not work in the system you are using.\n");
+		}
+		if(!strcmp(compatibility, "NTSC-U") && (md_region != 1))
+		{
+			mame_printf_warning("This software requires a USA console to work.\n");
+			mame_printf_warning("It might not work in the system you are using.\n");
+		}
+		if(!strcmp(compatibility, "EUR-JPN") && (md_region != 0 && md_region != 3))
+		{
+			mame_printf_warning("This software requires a PAL or a JPN console to work.\n");
+			mame_printf_warning("It might not work in the system you are using.\n");
+		}
+	}
+}
 
 /*************************************
  *  Loading a cart image from softlist
@@ -1850,6 +1889,8 @@ static int megadrive_load_list(device_image_interface &image)
 		state->md_cart.type = SEGA_STD;
 	else
 		state->md_cart.type = md_get_pcb_id(pcb_name);
+
+	megadrive_check_compat_list(image);
 
 	memcpy(&ROM[VIRGIN_COPY_GEN], &ROM[0x000000], MAX_MD_CART_SIZE);  /* store a copy of data */
 
