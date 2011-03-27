@@ -444,7 +444,7 @@ static DRIVER_INIT( iqblock )
 	machine->generic.paletteram2.u8       = rom + 0x12800;
 	state->fgvideoram = rom + 0x16800;
 	state->bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe26, 0xfe26, FUNC(iqblock_prot_w));
 	state->video_type=1;
 }
 
@@ -467,7 +467,7 @@ static DRIVER_INIT( grndtour )
 	machine->generic.paletteram2.u8       = rom + 0x12800;
 	state->fgvideoram = rom + 0x16800;
 	state->bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe39, 0xfe39, FUNC(grndtour_prot_w));
 	state->video_type=0;
 }
 

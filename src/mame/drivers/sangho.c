@@ -66,20 +66,20 @@ static void pzlestar_map_banks(running_machine *machine)
 	switch(slot_select)
 	{
 		case 0:
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
-			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank5");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank5");
 			memory_set_bankptr(machine, "bank1", state->ram);
 			memory_set_bankptr(machine, "bank5", state->ram);
 			break;
 		case 2:
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x3fff);
 			memory_set_bankptr(machine, "bank1", machine->region("user1")->base()+ 0x10000);
 			break;
 		case 1:
 		case 3:
-			memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0);
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x0000, 0x3fff);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x3fff);
 			break;
 	}
 
@@ -88,24 +88,24 @@ static void pzlestar_map_banks(running_machine *machine)
 	switch(slot_select)
 	{
 		case 0:
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
-			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank6");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x4000, 0x7fff, "bank6");
 			memory_set_bankptr(machine, "bank2", state->ram + 0x4000);
 			memory_set_bankptr(machine, "bank6", state->ram + 0x4000);
 			break;
 		case 2:
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x4000, 0x7fff);
 			memory_set_bankptr(machine, "bank2", machine->region("user1")->base()+ 0x18000);
 			break;
 		case 3:
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x4000, 0x7fff);
 			memory_set_bankptr(machine, "bank2", machine->region("user1")->base()+ 0x20000 + (state->pzlestar_rom_bank*0x8000) + 0x4000);
 			break;
 		case 1:
-			memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0);
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x4000, 0x7fff);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x4000, 0x7fff);
 			break;
 	}
 
@@ -114,20 +114,20 @@ static void pzlestar_map_banks(running_machine *machine)
 	switch(slot_select)
 	{
 		case 0:
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank3");
-			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank7");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank3");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x8000, 0xbfff, "bank7");
 			memory_set_bankptr(machine, "bank3", state->ram + 0x8000);
 			memory_set_bankptr(machine, "bank7", state->ram + 0x8000);
 			break;
 		case 3:
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank3");
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank3");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0xbfff);
 			memory_set_bankptr(machine, "bank3", machine->region("user1")->base()+ 0x20000 + (state->pzlestar_rom_bank*0x8000));
 			break;
 		case 1:
 		case 2:
-			memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0);
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x8000, 0xbfff);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0xbfff);
 			break;
 	}
 
@@ -136,16 +136,16 @@ static void pzlestar_map_banks(running_machine *machine)
 	switch(slot_select)
 	{
 		case 0:
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xffff, 0, 0, "bank4");
-			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xffff, 0, 0, "bank8");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xffff, "bank4");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0xc000, 0xffff, "bank8");
 			memory_set_bankptr(machine, "bank4", state->ram + 0xc000);
 			memory_set_bankptr(machine, "bank8", state->ram + 0xc000);
 			break;
 		case 1:
 		case 2:
 		case 3:
-			memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xffff, 0, 0);
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xffff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0xc000, 0xffff);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xc000, 0xffff);
 			break;
 	}
 
@@ -190,25 +190,25 @@ static void sexyboom_map_bank(running_machine *machine, int bank)
 		{
 			// ram
 			memory_set_bankptr(machine, read_bank_name, &state->ram[(banknum & 0x7f) * 0x4000]);
-			memory_install_write_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0, write_bank_name );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(bank*0x4000, (bank+1)*0x4000 - 1, write_bank_name );
 			memory_set_bankptr(machine, write_bank_name, &state->ram[(banknum & 0x7f) * 0x4000]);
 		}
 		else
 		{
 			// rom 0
 			memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x4000*banknum);
-			memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 		}
 	}
 	else if (banktype == 0x82)
 	{
 		memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x20000+banknum*0x4000);
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else if (banktype == 0x80)
 	{
 		memory_set_bankptr(machine, read_bank_name, machine->region("user1")->base()+0x120000+banknum*0x4000);
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), bank*0x4000, (bank+1)*0x4000 - 1, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else
 	{

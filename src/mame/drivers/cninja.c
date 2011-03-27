@@ -2032,13 +2032,13 @@ static void cninja_patch( running_machine *machine )
 
 static DRIVER_INIT( cninja )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1bc0a8, 0x1bc0a9, FUNC(cninja_sound_w));
 	cninja_patch(machine);
 }
 
 static DRIVER_INIT( stoneage )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1bc0a8, 0x1bc0a9, FUNC(stoneage_sound_w));
 }
 
 static DRIVER_INIT( mutantf )

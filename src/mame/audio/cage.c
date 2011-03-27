@@ -172,7 +172,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	timer[1] = machine->device<timer_device>("cage_timer1");
 
 	if (speedup)
-		speedup_ram = memory_install_write32_handler(cage_cpu->memory().space(AS_PROGRAM), speedup, speedup, 0, 0, speedup_w);
+		speedup_ram = cage_cpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(speedup, speedup, FUNC(speedup_w));
 
 	for (chan = 0; chan < DAC_BUFFER_CHANNELS; chan++)
 	{

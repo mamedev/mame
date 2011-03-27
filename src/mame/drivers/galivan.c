@@ -1043,20 +1043,20 @@ static WRITE8_HANDLER( youmab_84_w )
 
 static DRIVER_INIT( youmab )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x7fff, 0, 0, "bank3");
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x82, 0x82, FUNC(youmab_extra_bank_w)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x7fff, "bank3");
 	memory_set_bankptr(machine,  "bank3", machine->region("maincpu")->base());
 
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank2");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank2");
 	memory_configure_bank(machine, "bank2", 0, 2, machine->region("user2")->base(), 0x4000);
 	memory_set_bank(machine, "bank2", 0);
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x81, 0x81, FUNC(youmab_81_w)); // ?? often, alternating values
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x84, 0x84, FUNC(youmab_84_w)); // ?? often, sequence..
 
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd800, 0xd81f, 0, 0); // scrolling isn't here..
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xd800, 0xd81f); // scrolling isn't here..
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x8a, 0x8a, 0, 0, youmab_8a_r); // ???
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x8a, 0x8a, FUNC(youmab_8a_r)); // ???
 
 }
 

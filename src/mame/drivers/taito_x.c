@@ -1324,7 +1324,7 @@ ROM_END
 
 static DRIVER_INIT( kyustrkr )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x900000, 0x90000f, 0, 0, kyustrkr_input_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x900000, 0x90000f, FUNC(kyustrkr_input_w));
 }
 
 

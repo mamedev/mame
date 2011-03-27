@@ -1030,7 +1030,7 @@ static DRIVER_INIT(ppking)
 		}
 	}
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf6a3,0xf6a3,0,0, f6a3_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf6a3,0xf6a3,FUNC(f6a3_r) );
 }
 
 

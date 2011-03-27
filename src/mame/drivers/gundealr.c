@@ -579,7 +579,7 @@ static DRIVER_INIT( yamyam )
 {
 	gundealr_state *state = machine->driver_data<gundealr_state>();
 	state->input_ports_hack = 1;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xe000, 0, 0, yamyam_protection_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xe000, FUNC(yamyam_protection_w));
 }
 
 

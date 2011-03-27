@@ -798,11 +798,11 @@ static WRITE8_HANDLER( analog_select_w )
 static DRIVER_INIT( bradley )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_ram(space, 0x400, 0x7ff, 0, 0, NULL);
-	memory_install_read_port(space, 0x1808, 0x1808, 0, 0, "1808");
-	memory_install_read_port(space, 0x1809, 0x1809, 0, 0, "1809");
-	memory_install_read8_handler(space, 0x180a, 0x180a, 0, 0, analog_data_r);
-	memory_install_write8_handler(space, 0x1848, 0x1850, 0, 0, analog_select_w);
+	space->install_ram(0x400, 0x7ff);
+	space->install_read_port(0x1808, 0x1808, "1808");
+	space->install_read_port(0x1809, 0x1809, "1809");
+	space->install_legacy_read_handler(0x180a, 0x180a, FUNC(analog_data_r));
+	space->install_legacy_write_handler(0x1848, 0x1850, FUNC(analog_select_w));
 }
 
 

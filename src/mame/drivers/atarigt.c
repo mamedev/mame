@@ -1282,7 +1282,7 @@ static DRIVER_INIT( tmek )
 	state->protection_w = tmek_protection_w;
 
 	/* temp hack */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd72000, 0xd75fff, 0, 0, tmek_pf_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd72000, 0xd75fff, FUNC(tmek_pf_w));
 }
 
 

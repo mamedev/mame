@@ -3108,7 +3108,7 @@ static DRIVER_INIT( kyros )
 static DRIVER_INIT( jongbou )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0c0000, 0x0c0001, 0, 0, jongbou_inputs_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0c0000, 0x0c0001, FUNC(jongbou_inputs_r));
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x00ff;
 	state->coin_id = 0x23 | (0x24 << 8);

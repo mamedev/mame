@@ -2634,25 +2634,25 @@ ROM_END
 
 static DRIVER_INIT( grmatch )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
-	memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01e0, 0x01ff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0160, 0x0160, FUNC(grmatch_palette_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0180, 0x0180, FUNC(grmatch_xscroll_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x01e0, 0x01ff);
 }
 
 
 static DRIVER_INIT( slikshot )
 {
-	memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0180, 0x0180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x0180, 0x0180, FUNC(slikshot_z80_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x01cf, 0x01cf, FUNC(slikshot_z80_control_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01cf, 0x01cf, FUNC(slikshot_z80_control_w));
 }
 
 
 static DRIVER_INIT( sstrike )
 {
-	memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1180, 0x1180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1180, 0x1180, FUNC(slikshot_z80_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x11cf, 0x11cf, FUNC(slikshot_z80_control_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x11cf, 0x11cf, FUNC(slikshot_z80_control_w));
 }
 
 
@@ -2691,15 +2691,15 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
-	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
-	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
-	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
-	memory_install_read_port (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0161, 0x0161, "161");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0162, 0x0162, "162");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0163, 0x0163, "163");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0164, 0x0164, "164");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0165, 0x0165, "165");
 
 	/* different banking mechanism (disable the old one) */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01a0, 0x01a0, FUNC(rimrockn_bank_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c0, 0x01df, FUNC(itech8_blitter_w));
 }
 
 

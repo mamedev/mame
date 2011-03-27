@@ -1022,11 +1022,11 @@ static void mcu_init( running_machine *machine )
 	state->pending_command = 0;
 	state->mcu_data = 0;
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20008a, 0x20008b, FUNC(twrldc94_mcu_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20008a, 0x20008b, FUNC(twrldc94_mcu_r));
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20008e, 0x20008f, FUNC(twrldc94_prot_reg_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20008e, 0x20008f, FUNC(twrldc94_prot_reg_r));
 }
 
 static DRIVER_INIT( twrldc94 )
@@ -1049,8 +1049,8 @@ static DRIVER_INIT( vgoalsoc )
 	state->gametype = 3;
 	mcu_init( machine );
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200090, 0x200091, 0, 0, vbl_toggle_w); // vblank toggle
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200090, 0x200091, 0, 0, vbl_toggle_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x200090, 0x200091, FUNC(vbl_toggle_w)); // vblank toggle
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200090, 0x200091, FUNC(vbl_toggle_r));
 }
 
 /*** GAME DRIVERS ************************************************************/

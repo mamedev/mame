@@ -868,7 +868,7 @@ static DRIVER_INIT(witch)
 	UINT8 *ROM = (UINT8 *)machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000+UNBANKED_SIZE]);
 
-	memory_install_read8_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7000, 0x700f, FUNC(prot_read_700x));
 	state->bank = -1;
 }
 

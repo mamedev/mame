@@ -1035,7 +1035,7 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	/* install the speedup handler */
 	dcs.polling_offset = polling_offset;
 	if (polling_offset)
-		dcs_polling_base = memory_install_readwrite16_handler(dcs.cpu->space(AS_DATA), polling_offset, polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);
+		dcs_polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(polling_offset, polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
 
 	/* allocate a watchdog timer for HLE transfers */
 	transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
@@ -1126,31 +1126,31 @@ static void sdrc_remap_memory(running_machine *machine)
 	/* if SRAM disabled, clean it out */
 	if (SDRC_SM_EN == 0)
 	{
-		memory_unmap_readwrite(dcs.program, 0x0800, 0x3fff, 0, 0);
-		memory_unmap_readwrite(dcs.data, 0x0800, 0x37ff, 0, 0);
+		dcs.program->unmap_readwrite(0x0800, 0x3fff);
+		dcs.data->unmap_readwrite(0x0800, 0x37ff);
 	}
 
 	/* otherwise, map the SRAM */
 	else
 	{
 		/* first start with a clean program map */
-		memory_install_ram(dcs.program, 0x0800, 0x3fff, 0, 0, dcs_sram + 0x4800);
+		dcs.program->install_ram(0x0800, 0x3fff, dcs_sram + 0x4800);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
 		if (SDRC_SM_BK == 0)
 		{
-			memory_install_ram(dcs.data, 0x0800, 0x17ff, 0, 0, dcs_sram + 0x0000);
-			memory_install_ram(dcs.data, 0x1800, 0x27ff, 0, 0, dcs_sram + 0x1000);
-			memory_install_ram(dcs.data, 0x2800, 0x37ff, 0, 0, dcs_sram + 0x2000);
+			dcs.data->install_ram(0x0800, 0x17ff, dcs_sram + 0x0000);
+			dcs.data->install_ram(0x1800, 0x27ff, dcs_sram + 0x1000);
+			dcs.data->install_ram(0x2800, 0x37ff, dcs_sram + 0x2000);
 		}
 
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
-			memory_unmap_readwrite(dcs.data, 0x0800, 0x17ff, 0, 0);
-			memory_install_ram(dcs.data, 0x1800, 0x27ff, 0, 0, dcs_sram + 0x3000);
-			memory_install_ram(dcs.data, 0x2800, 0x37ff, 0, 0, dcs_sram + 0x2000);
+			dcs.data->unmap_readwrite(0x0800, 0x17ff);
+			dcs.data->install_ram(0x1800, 0x27ff, dcs_sram + 0x3000);
+			dcs.data->install_ram(0x2800, 0x37ff, dcs_sram + 0x2000);
 		}
 	}
 
@@ -1159,14 +1159,14 @@ static void sdrc_remap_memory(running_machine *machine)
 	{
 		int baseaddr = (SDRC_ROM_ST == 0) ? 0x0000 : (SDRC_ROM_ST == 1) ? 0x3000 : 0x3400;
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
-		memory_install_read_bank(dcs.data, baseaddr, baseaddr + pagesize - 1, 0, 0, "rompage");
+		dcs.data->install_read_bank(baseaddr, baseaddr + pagesize - 1, "rompage");
 	}
 
 	/* map the DRAM page as bank 26 */
 	if (SDRC_DM_ST != 0)
 	{
 		int baseaddr = (SDRC_DM_ST == 1) ? 0x0000 : (SDRC_DM_ST == 2) ? 0x3000 : 0x3400;
-		memory_install_readwrite_bank(dcs.data, baseaddr, baseaddr + 0x3ff, 0, 0, "drampage");
+		dcs.data->install_readwrite_bank(baseaddr, baseaddr + 0x3ff, "drampage");
 	}
 
 	/* update the bank pointers */
@@ -1174,7 +1174,7 @@ static void sdrc_remap_memory(running_machine *machine)
 
 	/* reinstall the polling hotspot */
 	if (dcs.polling_offset)
-		dcs_polling_base = memory_install_readwrite16_handler(dcs.cpu->space(AS_DATA), dcs.polling_offset, dcs.polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);
+		dcs_polling_base = dcs.cpu->space(AS_DATA)->install_legacy_readwrite_handler(dcs.polling_offset, dcs.polling_offset, FUNC(dcs_polling_r), FUNC(dcs_polling_w));
 }
 
 

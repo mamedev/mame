@@ -1319,8 +1319,8 @@ static DRIVER_INIT( elim2 )
 
 	/* configure sound */
 	state->has_usb = FALSE;
-	memory_install_write8_handler(iospace, 0x3e, 0x3e, 0, 0, elim1_sh_w);
-	memory_install_write8_handler(iospace, 0x3f, 0x3f, 0, 0, elim2_sh_w);
+	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(elim1_sh_w));
+	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(elim2_sh_w));
 }
 
 
@@ -1334,12 +1334,12 @@ static DRIVER_INIT( elim4 )
 
 	/* configure sound */
 	state->has_usb = FALSE;
-	memory_install_write8_handler(iospace, 0x3e, 0x3e, 0, 0, elim1_sh_w);
-	memory_install_write8_handler(iospace, 0x3f, 0x3f, 0, 0, elim2_sh_w);
+	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(elim1_sh_w));
+	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(elim2_sh_w));
 
 	/* configure inputs */
-	memory_install_write8_handler(iospace, 0xf8, 0xf8, 0, 0, spinner_select_w);
-	memory_install_read8_handler(iospace, 0xfc, 0xfc, 0, 0, elim4_input_r);
+	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
+	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(elim4_input_r));
 }
 
 
@@ -1353,10 +1353,10 @@ static DRIVER_INIT( spacfury )
 
 	/* configure sound */
 	state->has_usb = FALSE;
-	memory_install_write8_handler(iospace, 0x38, 0x38, 0, 0, sega_speech_data_w);
-	memory_install_write8_handler(iospace, 0x3b, 0x3b, 0, 0, sega_speech_control_w);
-	memory_install_write8_handler(iospace, 0x3e, 0x3e, 0, 0, spacfury1_sh_w);
-	memory_install_write8_handler(iospace, 0x3f, 0x3f, 0, 0, spacfury2_sh_w);
+	iospace->install_legacy_write_handler(0x38, 0x38, FUNC(sega_speech_data_w));
+	iospace->install_legacy_write_handler(0x3b, 0x3b, FUNC(sega_speech_control_w));
+	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(spacfury1_sh_w));
+	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(spacfury2_sh_w));
 }
 
 
@@ -1371,15 +1371,15 @@ static DRIVER_INIT( zektor )
 
 	/* configure sound */
 	state->has_usb = FALSE;
-	memory_install_write8_handler(iospace, 0x38, 0x38, 0, 0, sega_speech_data_w);
-	memory_install_write8_handler(iospace, 0x3b, 0x3b, 0, 0, sega_speech_control_w);
-	memory_install_write8_device_handler(iospace, ay, 0x3c, 0x3d, 0, 0, ay8910_address_data_w);
-	memory_install_write8_handler(iospace, 0x3e, 0x3e, 0, 0, zektor1_sh_w);
-	memory_install_write8_handler(iospace, 0x3f, 0x3f, 0, 0, zektor2_sh_w);
+	iospace->install_legacy_write_handler(0x38, 0x38, FUNC(sega_speech_data_w));
+	iospace->install_legacy_write_handler(0x3b, 0x3b, FUNC(sega_speech_control_w));
+	iospace->install_legacy_write_handler(*ay, 0x3c, 0x3d, FUNC(ay8910_address_data_w));
+	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(zektor1_sh_w));
+	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(zektor2_sh_w));
 
 	/* configure inputs */
-	memory_install_write8_handler(iospace, 0xf8, 0xf8, 0, 0, spinner_select_w);
-	memory_install_read8_handler(iospace, 0xfc, 0xfc, 0, 0, spinner_input_r);
+	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
+	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(spinner_input_r));
 }
 
 
@@ -1394,12 +1394,12 @@ static DRIVER_INIT( tacscan )
 
 	/* configure sound */
 	state->has_usb = TRUE;
-	memory_install_readwrite8_handler(iospace, 0x3f, 0x3f, 0, 0, sega_usb_status_r, sega_usb_data_w);
-	memory_install_readwrite8_handler(pgmspace, 0xd000, 0xdfff, 0, 0, sega_usb_ram_r, usb_ram_w);
+	iospace->install_legacy_readwrite_handler(0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	pgmspace->install_legacy_readwrite_handler(0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
 
 	/* configure inputs */
-	memory_install_write8_handler(iospace, 0xf8, 0xf8, 0, 0, spinner_select_w);
-	memory_install_read8_handler(iospace, 0xfc, 0xfc, 0, 0, spinner_input_r);
+	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
+	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(spinner_input_r));
 }
 
 
@@ -1414,15 +1414,15 @@ static DRIVER_INIT( startrek )
 
 	/* configure sound */
 	state->has_usb = TRUE;
-	memory_install_write8_handler(iospace, 0x38, 0x38, 0, 0, sega_speech_data_w);
-	memory_install_write8_handler(iospace, 0x3b, 0x3b, 0, 0, sega_speech_control_w);
+	iospace->install_legacy_write_handler(0x38, 0x38, FUNC(sega_speech_data_w));
+	iospace->install_legacy_write_handler(0x3b, 0x3b, FUNC(sega_speech_control_w));
 
-	memory_install_readwrite8_handler(iospace, 0x3f, 0x3f, 0, 0, sega_usb_status_r, sega_usb_data_w);
-	memory_install_readwrite8_handler(pgmspace, 0xd000, 0xdfff, 0, 0, sega_usb_ram_r, usb_ram_w);
+	iospace->install_legacy_readwrite_handler(0x3f, 0x3f, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
+	pgmspace->install_legacy_readwrite_handler(0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
 
 	/* configure inputs */
-	memory_install_write8_handler(iospace, 0xf8, 0xf8, 0, 0, spinner_select_w);
-	memory_install_read8_handler(iospace, 0xfc, 0xfc, 0, 0, spinner_input_r);
+	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
+	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(spinner_input_r));
 }
 
 

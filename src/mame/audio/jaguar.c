@@ -262,7 +262,7 @@ void cojag_sound_init(running_machine *machine)
 	}
 
 #if ENABLE_SPEEDUP_HACKS
-	memory_install_write32_handler(machine->device("audiocpu")->memory().space(AS_PROGRAM), 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
+	machine->device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf1a100, 0xf1a103, FUNC(dsp_flags_w));
 #endif
 }
 

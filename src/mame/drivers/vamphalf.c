@@ -1822,7 +1822,7 @@ static READ16_HANDLER( mrdig_speedup_r )
 static DRIVER_INIT( vamphalf )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0004a840, 0x0004a843, 0, 0, vamphalf_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0004a840, 0x0004a843, FUNC(vamphalf_speedup_r) );
 
 	state->palshift = 0;
 	state->flip_bit = 0x80;
@@ -1831,7 +1831,7 @@ static DRIVER_INIT( vamphalf )
 static DRIVER_INIT( vamphafk )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0004a6d0, 0x0004a6d3, 0, 0, vamphafk_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0004a6d0, 0x0004a6d3, FUNC(vamphafk_speedup_r) );
 
 	state->palshift = 0;
 	state->flip_bit = 0x80;
@@ -1840,7 +1840,7 @@ static DRIVER_INIT( vamphafk )
 static DRIVER_INIT( misncrft )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00072eb4, 0x00072eb7, 0, 0, misncrft_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00072eb4, 0x00072eb7, FUNC(misncrft_speedup_r) );
 
 	state->palshift = 0;
 	state->flip_bit = 1;
@@ -1849,7 +1849,7 @@ static DRIVER_INIT( misncrft )
 static DRIVER_INIT( coolmini )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000d2e80, 0x000d2e83, 0, 0, coolmini_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x000d2e80, 0x000d2e83, FUNC(coolmini_speedup_r) );
 
 	state->palshift = 0;
 	state->flip_bit = 1;
@@ -1858,7 +1858,7 @@ static DRIVER_INIT( coolmini )
 static DRIVER_INIT( suplup )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0011605c, 0x0011605f, 0, 0, suplup_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0011605c, 0x0011605f, FUNC(suplup_speedup_r) );
 
 	state->palshift = 8;
 	/* no flipscreen */
@@ -1867,7 +1867,7 @@ static DRIVER_INIT( suplup )
 static DRIVER_INIT( luplup )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00115e84, 0x00115e87, 0, 0, luplup_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00115e84, 0x00115e87, FUNC(luplup_speedup_r) );
 
 	state->palshift = 8;
 	/* no flipscreen */
@@ -1876,7 +1876,7 @@ static DRIVER_INIT( luplup )
 static DRIVER_INIT( luplup29 )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00113f08, 0x00113f0b, 0, 0, luplup29_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00113f08, 0x00113f0b, FUNC(luplup29_speedup_r) );
 
 	state->palshift = 8;
 	/* no flipscreen */
@@ -1885,7 +1885,7 @@ static DRIVER_INIT( luplup29 )
 static DRIVER_INIT( puzlbang )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00113ecc, 0x00113ecf, 0, 0, puzlbang_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00113ecc, 0x00113ecf, FUNC(puzlbang_speedup_r) );
 
 	state->palshift = 8;
 	/* no flipscreen */
@@ -1894,7 +1894,7 @@ static DRIVER_INIT( puzlbang )
 static DRIVER_INIT( wyvernwg )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00b56fc, 0x00b56ff, 0, 0, wyvernwg_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00b56fc, 0x00b56ff, FUNC(wyvernwg_speedup_r) );
 
 	state->palshift = 0;
 	state->flip_bit = 1;
@@ -1909,7 +1909,7 @@ static DRIVER_INIT( finalgdr )
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
 	state->finalgdr_backupram_bank = 1;
 	state->finalgdr_backupram = auto_alloc_array(machine, UINT8, 0x80*0x100);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x005e874, 0x005e877, 0, 0, finalgdr_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x005e874, 0x005e877, FUNC(finalgdr_speedup_r) );
 	machine->device<nvram_device>("nvram")->set_base(state->finalgdr_backupram, 0x80*0x100);
 
 	state->palshift = 0;
@@ -1926,7 +1926,7 @@ static DRIVER_INIT( mrkicker )
 	// backup ram isn't used
 	state->finalgdr_backupram_bank = 1;
 	state->finalgdr_backupram = auto_alloc_array(machine, UINT8, 0x80*0x100);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00701a4, 0x00701a7, 0, 0, mrkicker_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00701a4, 0x00701a7, FUNC(mrkicker_speedup_r) );
 	machine->device<nvram_device>("nvram")->set_base(state->finalgdr_backupram, 0x80*0x100);
 
 	state->palshift = 0;
@@ -1940,7 +1940,7 @@ static DRIVER_INIT( mrkicker )
 static DRIVER_INIT( dquizgo2 )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00cde70, 0x00cde73, 0, 0, dquizgo2_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00cde70, 0x00cde73, FUNC(dquizgo2_speedup_r) );
 
 	state->palshift = 0;
 	state->flip_bit = 1;
@@ -1949,7 +1949,7 @@ static DRIVER_INIT( dquizgo2 )
 static DRIVER_INIT( aoh )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x028a09c, 0x028a09f, 0, 0, aoh_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x028a09c, 0x028a09f, FUNC(aoh_speedup_r) );
 
 	state->palshift = 0;
 	/* no flipscreen */
@@ -1958,8 +1958,8 @@ static DRIVER_INIT( aoh )
 static DRIVER_INIT( jmpbreak )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00906fc, 0x00906ff, 0, 0, jmpbreak_speedup_r );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe0000000, 0xe0000003, 0, 0, jmpbreak_flipscreen_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00906fc, 0x00906ff, FUNC(jmpbreak_speedup_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe0000000, 0xe0000003, FUNC(jmpbreak_flipscreen_w) );
 
 	state->palshift = 0;
 }
@@ -1967,8 +1967,8 @@ static DRIVER_INIT( jmpbreak )
 static DRIVER_INIT( mrdig )
 {
 	vamphalf_state *state = machine->driver_data<vamphalf_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00a99c, 0x00a99f, 0, 0, mrdig_speedup_r );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe0000000, 0xe0000003, 0, 0, jmpbreak_flipscreen_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00a99c, 0x00a99f, FUNC(mrdig_speedup_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe0000000, 0xe0000003, FUNC(jmpbreak_flipscreen_w) );
 
 	state->palshift = 0;
 }

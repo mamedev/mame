@@ -3737,8 +3737,8 @@ static DRIVER_INIT( bubsympb )
 		}
 	}
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4a001c, 0x4a001f, FUNC(bubsympb_oki_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4a001c, 0x4a001f, FUNC(bubsympb_oki_w) );
 }
 
 

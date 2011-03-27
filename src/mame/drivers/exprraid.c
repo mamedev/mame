@@ -778,13 +778,13 @@ static DRIVER_INIT( exprraid )
 
 static DRIVER_INIT( wexpressb )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3800, 0x3800, FUNC(vblank_r));
 	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpressb2 )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFC0, 0xFFC0, FUNC(vblank_r));
 	exprraid_gfx_expand(machine);
 }
 

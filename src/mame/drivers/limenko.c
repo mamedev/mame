@@ -1041,7 +1041,7 @@ static READ32_HANDLER( spotty_speedup_r )
 static DRIVER_INIT( dynabomb )
 {
 	limenko_state *state = machine->driver_data<limenko_state>();
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe2784, 0xe2787, FUNC(dynabomb_speedup_r) );
 
 	state->spriteram_bit = 1;
 }
@@ -1049,7 +1049,7 @@ static DRIVER_INIT( dynabomb )
 static DRIVER_INIT( legendoh )
 {
 	limenko_state *state = machine->driver_data<limenko_state>();
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x32ab0, 0x32ab3, FUNC(legendoh_speedup_r) );
 
 	state->spriteram_bit = 1;
 }
@@ -1057,7 +1057,7 @@ static DRIVER_INIT( legendoh )
 static DRIVER_INIT( sb2003 )
 {
 	limenko_state *state = machine->driver_data<limenko_state>();
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x135800, 0x135803, FUNC(sb2003_speedup_r) );
 
 	state->spriteram_bit = 1;
 }
@@ -1078,7 +1078,7 @@ static DRIVER_INIT( spotty )
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6626c, 0x6626f, FUNC(spotty_speedup_r) );
 
 	state->spriteram_bit = 1;
 }

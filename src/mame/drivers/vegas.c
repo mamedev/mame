@@ -1559,7 +1559,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < state->dynamic_count; addr++)
-		memory_unmap_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
 
 	/* the build the list of stuff */
 	state->dynamic_count = 0;
@@ -1682,7 +1682,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
 
 		if (dynamic[addr].mread == NOP_HANDLER)
-			memory_nop_read(machine->device("maincpu")->memory().space(AS_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_read(dynamic[addr].start, dynamic[addr].end);
 		else if (dynamic[addr].mread != NULL)
 			space->install_legacy_read_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].rdname);
 		if (dynamic[addr].mwrite != NULL)

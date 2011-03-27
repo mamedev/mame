@@ -170,15 +170,15 @@ static void vendetta_video_banking( running_machine *machine, int select )
 
 	if (select & 1)
 	{
-		memory_install_read_bank(space, state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, 0, 0, "bank4" );
-		memory_install_write8_handler(space, state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w );
-		memory_install_readwrite8_device_handler(space, state->k053246, state->video_banking_base + 0x0000, state->video_banking_base + 0x0fff, 0, 0, k053247_r, k053247_w );
+		space->install_read_bank(state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, "bank4" );
+		space->install_legacy_write_handler(state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w) );
+		space->install_legacy_readwrite_handler(*state->k053246, state->video_banking_base + 0x0000, state->video_banking_base + 0x0fff, FUNC(k053247_r), FUNC(k053247_w) );
 		memory_set_bankptr(machine, "bank4", machine->generic.paletteram.v);
 	}
 	else
 	{
-		memory_install_readwrite8_handler(space, state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, 0, 0, vendetta_K052109_r, vendetta_K052109_w );
-		memory_install_readwrite8_device_handler(space, state->k052109, state->video_banking_base + 0x0000, state->video_banking_base + 0x0fff, 0, 0, k052109_r, k052109_w );
+		space->install_legacy_readwrite_handler(state->video_banking_base + 0x2000, state->video_banking_base + 0x2fff, FUNC(vendetta_K052109_r), FUNC(vendetta_K052109_w) );
+		space->install_legacy_readwrite_handler(*state->k052109, state->video_banking_base + 0x0000, state->video_banking_base + 0x0fff, FUNC(k052109_r), FUNC(k052109_w) );
 	}
 }
 

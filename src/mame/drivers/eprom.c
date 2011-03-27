@@ -730,8 +730,8 @@ static DRIVER_INIT( eprom )
 	atarijsa_init(machine, "260010", 0x0002);
 
 	/* install CPU synchronization handlers */
-	state->sync_data = memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
-	state->sync_data = memory_install_readwrite16_handler(machine->device("extra")->memory().space(AS_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
+	state->sync_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x16cc00, 0x16cc01, FUNC(sync_r), FUNC(sync_w));
+	state->sync_data = machine->device("extra")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x16cc00, 0x16cc01, FUNC(sync_r), FUNC(sync_w));
 }
 
 

@@ -340,6 +340,6 @@ DRIVER_INIT( mhavocrv )
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */
-	memory_install_write8_handler(machine->device("gamma")->memory().space(AS_PROGRAM), 0x5800, 0x5800, 0, 0, mhavocrv_speech_data_w);
-	memory_install_write8_handler(machine->device("gamma")->memory().space(AS_PROGRAM), 0x5900, 0x5900, 0, 0, mhavocrv_speech_strobe_w);
+	machine->device("gamma")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5800, 0x5800, FUNC(mhavocrv_speech_data_w));
+	machine->device("gamma")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5900, 0x5900, FUNC(mhavocrv_speech_strobe_w));
 }

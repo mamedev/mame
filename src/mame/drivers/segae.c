@@ -367,23 +367,23 @@ static void init_ports_systeme(running_machine *machine)
 	device_t *sn1 = machine->device("sn1");
 	device_t *sn2 = machine->device("sn2");
 
-	memory_install_write8_device_handler(io, sn2, 0x7b, 0x7b, 0, 0, sn76496_w);
-	memory_install_write8_device_handler(io, sn1, 0x7e, 0x7f, 0, 0, sn76496_w);
-	memory_install_read8_handler        (io, 0x7e, 0x7e, 0, 0, sms_vcounter_r);
+	io->install_legacy_write_handler(*sn2, 0x7b, 0x7b, FUNC(sn76496_w));
+	io->install_legacy_write_handler(*sn1, 0x7e, 0x7f, FUNC(sn76496_w));
+	io->install_legacy_read_handler        (0x7e, 0x7e, FUNC(sms_vcounter_r));
 
-	memory_install_readwrite8_handler(io, 0xba, 0xba, 0, 0, sms_vdp_data_r, sms_vdp_data_w);
-	memory_install_readwrite8_handler(io, 0xbb, 0xbb, 0, 0, sms_vdp_ctrl_r, sms_vdp_ctrl_w);
+	io->install_legacy_readwrite_handler(0xba, 0xba, FUNC(sms_vdp_data_r), FUNC(sms_vdp_data_w));
+	io->install_legacy_readwrite_handler(0xbb, 0xbb, FUNC(sms_vdp_ctrl_r), FUNC(sms_vdp_ctrl_w));
 
-	memory_install_readwrite8_handler(io, 0xbe, 0xbe, 0, 0, sms_vdp_2_data_r, sms_vdp_2_data_w);
-	memory_install_readwrite8_handler(io, 0xbf, 0xbf, 0, 0, sms_vdp_2_ctrl_r, sms_vdp_2_ctrl_w);
+	io->install_legacy_readwrite_handler(0xbe, 0xbe, FUNC(sms_vdp_2_data_r), FUNC(sms_vdp_2_data_w));
+	io->install_legacy_readwrite_handler(0xbf, 0xbf, FUNC(sms_vdp_2_ctrl_r), FUNC(sms_vdp_2_ctrl_w));
 
-	memory_install_read_port     (io, 0xe0, 0xe0, 0, 0, "e0");
-	memory_install_read_port     (io, 0xe1, 0xe1, 0, 0, "e1");
-	memory_install_read_port     (io, 0xe2, 0xe2, 0, 0, "e2");
-	memory_install_read_port     (io, 0xf2, 0xf2, 0, 0, "f2");
-	memory_install_read_port     (io, 0xf3, 0xf3, 0, 0, "f3");
+	io->install_read_port     (0xe0, 0xe0, "e0");
+	io->install_read_port     (0xe1, 0xe1, "e1");
+	io->install_read_port     (0xe2, 0xe2, "e2");
+	io->install_read_port     (0xf2, 0xf2, "f2");
+	io->install_read_port     (0xf3, 0xf3, "f3");
 
-	memory_install_write8_handler    (io, 0xf7, 0xf7, 0, 0, systeme_bank_w );
+	io->install_legacy_write_handler    (0xf7, 0xf7, FUNC(systeme_bank_w) );
 }
 
 
@@ -393,10 +393,10 @@ static void init_systeme_map(running_machine *machine)
 	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xbfff, FUNC(segasyse_videoram_w));
 
 	/* main ram area */
-	sms_mainram = (UINT8 *)memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xffff, 0, 0, NULL);
+	sms_mainram = (UINT8 *)machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xc000, 0xffff);
 	memset(sms_mainram,0x00,0x4000);
 
 	init_ports_systeme(machine);
@@ -964,8 +964,8 @@ static DRIVER_INIT( ridleofp )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0xf8, 0xf8, 0, 0, segae_ridleofp_port_f8_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0xfa, 0xfa, 0, 0, segae_ridleofp_port_fa_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(segae_ridleofp_port_f8_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xfa, 0xfa, FUNC(segae_ridleofp_port_fa_w));
 }
 
 
@@ -973,8 +973,8 @@ static DRIVER_INIT( hangonjr )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0xf8, 0xf8, 0, 0, segae_hangonjr_port_f8_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0xfa, 0xfa, 0, 0, segae_hangonjr_port_fa_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0xf8, 0xf8, FUNC(segae_hangonjr_port_f8_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xfa, 0xfa, FUNC(segae_hangonjr_port_fa_w));
 }
 
 static DRIVER_INIT( opaopa )

@@ -1460,7 +1460,7 @@ static DRIVER_INIT( 39in1 )
 	state->eeprom = machine->device<eeprom_device>("eeprom");
 
 	address_space *space = machine->device<pxa255_device>("maincpu")->space(AS_PROGRAM);
-	memory_install_read32_handler (space, 0xa0151648, 0xa015164b, 0, 0, prot_cheater_r);
+	space->install_legacy_read_handler (0xa0151648, 0xa015164b, FUNC(prot_cheater_r));
 }
 
 static ADDRESS_MAP_START( 39in1_map, AS_PROGRAM, 32 )

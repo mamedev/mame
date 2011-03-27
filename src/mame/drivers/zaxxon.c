@@ -1512,15 +1512,15 @@ static DRIVER_INIT( razmataz )
 	nprinces_decode(machine, "maincpu");
 
 	/* additional input ports are wired */
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc004, 0xc004, 0, 0x18f3, "SW04");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc008, 0xc008, 0, 0x18f3, "SW08");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc004, 0xc004, 0, 0x18f3, "SW04");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc008, 0xc008, 0, 0x18f3, "SW08");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc80a, 0xc80a, 0, 0, razmataz_counter_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc80a, 0xc80a, FUNC(razmataz_counter_r));
 
 	/* connect the universal sound board */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 
 	/* additional state saving */
 	state->save_item(NAME(state->razmataz_dial_pos));
@@ -1533,7 +1533,7 @@ static DRIVER_INIT( ixion )
 	szaxxon_decode(machine, "maincpu");
 
 	/* connect the universal sound board */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
 }
 
 

@@ -906,7 +906,7 @@ public:
 		UINT8 buffer[16];
 		for (int index = 0; index < 16; index++)
 			buffer[index ^ ((_Endian == ENDIANNESS_NATIVE) ? 0 : (data_width()/8 - 1))] = index * 0x11;
-		install_ram(0x00, 0x0f, 0x0f, 0, ROW_READWRITE, buffer);
+		install_ram_generic(0x00, 0x0f, 0x0f, 0, ROW_READWRITE, buffer);
 		printf("\n\naddress_space(%d, %s, %s)\n", NATIVE_BITS, (_Endian == ENDIANNESS_LITTLE) ? "little" : "big", _Large ? "large" : "small");
 
 		// walk through the first 8 addresses
@@ -2052,15 +2052,15 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			// fall through to the RAM case otherwise
 
 		case AMH_RAM:
-			install_ram(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, readorwrite);
+			install_ram_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, readorwrite, NULL);
 			break;
 
 		case AMH_NOP:
-			unmap(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, readorwrite, true);
+			unmap_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, readorwrite, true);
 			break;
 
 		case AMH_UNMAP:
-			unmap(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, readorwrite, false);
+			unmap_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, readorwrite, false);
 			break;
 
 		case AMH_DRIVER_DELEGATE:
@@ -2139,13 +2139,13 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			break;
 
 		case AMH_PORT:
-			install_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
+			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
 							(readorwrite == ROW_READ) ? data.m_tag : NULL,
 							(readorwrite == ROW_WRITE) ? data.m_tag : NULL);
 			break;
 
 		case AMH_BANK:
-			install_bank(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
+			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror,
 							(readorwrite == ROW_READ) ? data.m_tag : NULL,
 							(readorwrite == ROW_WRITE) ? data.m_tag : NULL);
 			break;
@@ -2409,7 +2409,7 @@ void address_space::dump_map(FILE *file, read_or_write readorwrite)
 //  unmap - unmap a section of address space
 //-------------------------------------------------
 
-void address_space::unmap(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, bool quiet)
+void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, bool quiet)
 {
 	VPRINTF(("address_space::unmap(%s-%s mask=%s mirror=%s, %s, %s)\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
@@ -2428,13 +2428,13 @@ void address_space::unmap(offs_t addrstart, offs_t addrend, offs_t addrmask, off
 
 
 //-------------------------------------------------
-//  install_port - install a new I/O port handler
-//  into this address space
+//  install_readwrite_port - install a new I/O port 
+//  handler into this address space
 //-------------------------------------------------
 
-void address_space::install_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
+void address_space::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
-	VPRINTF(("address_space::install_port(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
+	VPRINTF(("address_space::install_readwrite_port(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 (rtag != NULL) ? rtag : "(none)", (wtag != NULL) ? wtag : "(none)"));
@@ -2470,13 +2470,13 @@ void address_space::install_port(offs_t addrstart, offs_t addrend, offs_t addrma
 
 
 //-------------------------------------------------
-//  install_bank - install a range as mapping to
-//  a particular bank
+//  install_bank_generic - install a range as 
+//  mapping to a particular bank
 //-------------------------------------------------
 
-void address_space::install_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
+void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
-	VPRINTF(("address_space::install_bank(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
+	VPRINTF(("address_space::install_readwrite_bank(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 (rtag != NULL) ? rtag : "(none)", (wtag != NULL) ? wtag : "(none)"));
@@ -2501,15 +2501,15 @@ void address_space::install_bank(offs_t addrstart, offs_t addrend, offs_t addrma
 
 
 //-------------------------------------------------
-//  install_ram - install a simple fixed RAM
-//  region into the given address space
+//  install_ram_generic - install a simple fixed 
+//  RAM region into the given address space
 //-------------------------------------------------
 
-void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
+void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
 	memory_private *memdata = m_machine.memory_data;
 
-	VPRINTF(("address_space::install_ram(%s-%s mask=%s mirror=%s, %s, %p)\n",
+	VPRINTF(("address_space::install_ram_generic(%s-%s mask=%s mirror=%s, %s, %p)\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 (readorwrite == ROW_READ) ? "read" : (readorwrite == ROW_WRITE) ? "write" : (readorwrite == ROW_READWRITE) ? "read/write" : "??",
@@ -2538,7 +2538,7 @@ void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrma
 		if (bank.base() == NULL && memdata->initialized)
 		{
 			if (m_machine.phase() >= MACHINE_PHASE_RESET)
-				fatalerror("Attempted to call memory_install_ram() after initialization time without a baseptr!");
+				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!");
 			memory_block &block = memdata->blocklist.append(*auto_alloc(&m_machine, memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
 			bank.set_base(block.data());
 		}
@@ -2567,7 +2567,7 @@ void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrma
 		if (bank.base() == NULL && memdata->initialized)
 		{
 			if (m_machine.phase() >= MACHINE_PHASE_RESET)
-				fatalerror("Attempted to call memory_install_ram() after initialization time without a baseptr!");
+				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!");
 			memory_block &block = memdata->blocklist.append(*auto_alloc(&m_machine, memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
 			bank.set_base(block.data());
 		}

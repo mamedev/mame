@@ -170,14 +170,14 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 	if ((data & 0x07) == 0)
 	{
 		via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
-		memory_install_write8_handler(space, 0xc600, 0xc7ff, 0, 0, watchdog_reset_w);
-		memory_install_write8_handler(space, 0xc800, 0xc9ff, 0, 0, beezer_map_w);
-		memory_install_read8_handler(space, 0xca00, 0xcbff, 0, 0, beezer_line_r);
+		space->install_legacy_write_handler(0xc600, 0xc7ff, FUNC(watchdog_reset_w));
+		space->install_legacy_write_handler(0xc800, 0xc9ff, FUNC(beezer_map_w));
+		space->install_legacy_read_handler(0xca00, 0xcbff, FUNC(beezer_line_r));
 		space->install_readwrite_handler(0xce00, 0xcfff, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
 	}
 	else
 	{
 		UINT8 *rom = space->machine->region("maincpu")->base() + 0x10000;
-		memory_install_ram(space, 0xc000, 0xcfff, 0, 0, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
+		space->install_ram(0xc000, 0xcfff, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}
 }

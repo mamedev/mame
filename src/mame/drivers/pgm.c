@@ -4443,8 +4443,8 @@ static DRIVER_INIT( orlegend )
 	pgm_state *state = machine->driver_data<pgm_state>();
 	pgm_basic_init(machine);
 
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r, pgm_asic3_w);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xC0400e, 0xC0400f, FUNC(pgm_asic3_r), FUNC(pgm_asic3_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xC04000, 0xC04001, FUNC(pgm_asic3_reg_w));
 
 	state->asic3_reg = 0;
 	state->asic3_latch[0] = 0;
@@ -4477,7 +4477,7 @@ static void drgwld2_common_init(running_machine *machine)
     select and after failing in the 2nd stage (probably there are other checks
     out there).
     */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd80000, 0xd80003, 0, 0, dw2_d80000_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd80000, 0xd80003, FUNC(dw2_d80000_r));
 }
 
 static DRIVER_INIT( drgw2 )
@@ -4710,8 +4710,8 @@ static DRIVER_INIT( ddp2 )
 
 	// should actually be kov2-like, but keep this simulation for now just to demonstrate it.  It will need the internal ARM rom to work properly.
 	ddp2_protram = auto_alloc_array(machine, UINT16, 0x10000);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd00000, 0xd0ffff, 0, 0, ddp2_protram_r, ddp2_protram_w);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd10000, 0xd10001, 0, 0, ddp2_asic27_0xd10000_r, ddp2_asic27_0xd10000_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd00000, 0xd0ffff, FUNC(ddp2_protram_r), FUNC(ddp2_protram_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd10000, 0xd10001, FUNC(ddp2_asic27_0xd10000_r), FUNC(ddp2_asic27_0xd10000_w));
 
 }
 
@@ -5112,7 +5112,7 @@ static DRIVER_INIT( killbld )
 	pgm_basic_init(machine);
 	pgm_killbld_decrypt(machine);
 
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_igs025_prot_r, killbld_igs025_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd40000, 0xd40003, FUNC(killbld_igs025_prot_r), FUNC(killbld_igs025_prot_w));
 
 	state->kb_cmd = 0;
 	state->kb_reg = 0;
@@ -5278,7 +5278,7 @@ static DRIVER_INIT( drgw3 )
         }
     }
 */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xDA5610, 0xDA5613, 0, 0, drgw3_igs025_prot_r, drgw3_igs025_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xDA5610, 0xDA5613, FUNC(drgw3_igs025_prot_r), FUNC(drgw3_igs025_prot_w));
 
 	pgm_dw3_decrypt(machine);
 }
@@ -5295,11 +5295,11 @@ static DRIVER_INIT( puzzli2 )
 	pgm_basic_init(machine);
 	kovsh_latch_init(machine);
 
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x500000, 0x500003, 0, 0, asic28_r, asic28_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500003, FUNC(asic28_r), FUNC(asic28_w));
 
 	/* 0x4f0000 - ? is actually ram shared with the protection device,
       the protection device provides the region code */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4fffff, FUNC(sango_protram_r));
 
 	pgm_puzzli2_decrypt(machine);
 
@@ -5531,8 +5531,8 @@ static DRIVER_INIT( olds )
 	pgm_state *state = machine->driver_data<pgm_state>();
 	pgm_basic_init(machine);
 
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xdcb400, 0xdcb403, 0, 0, olds_r, olds_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8178f4, 0x8178f5, 0, 0, olds_prot_swap_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdcb400, 0xdcb403, FUNC(olds_r), FUNC(olds_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8178f4, 0x8178f5, FUNC(olds_prot_swap_r));
 
 	state->kb_cmd = 0;
 	state->kb_reg = 0;
@@ -5796,17 +5796,17 @@ static READ16_HANDLER( ddp3_asic_r )
 
 void install_asic27a_ddp3(running_machine* machine)
 {
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x500000, 0x500005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
 }
 
 void install_asic27a_ket(running_machine* machine)
 {
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
 }
 
 void install_asic27a_espgal(running_machine* machine)
 {
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
 }
 
 

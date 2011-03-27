@@ -4010,14 +4010,14 @@ static DRIVER_INIT( arescue )
 {
 	segas32_state *state = machine->driver_data<segas32_state>();
 	segas32_common_init(machine, analog_custom_io_r, analog_custom_io_w);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa00007, 0, 0, arescue_dsp_r, arescue_dsp_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa00007, FUNC(arescue_dsp_r), FUNC(arescue_dsp_w));
 
 	state->dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x810000, 0x810fff, FUNC(dual_pcb_comms_r), FUNC(dual_pcb_comms_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x818000, 0x818003, FUNC(dual_pcb_masterslave));
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x810000, 0x810001, 0, 0, arescue_handshake_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x810000, 0x810001, FUNC(arescue_handshake_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x81000e, 0x81000f, FUNC(arescue_slavebusy_r));
 
 	state->sw1_output = arescue_sw1_output;
 }
@@ -4028,8 +4028,8 @@ static DRIVER_INIT( arabfgt )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	/* install protection handlers */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00100, 0xa0011f, 0, 0, arf_wakeup_protection_r);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa00fff, 0, 0, arabfgt_protection_r, arabfgt_protection_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa00100, 0xa0011f, FUNC(arf_wakeup_protection_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa00fff, FUNC(arabfgt_protection_r), FUNC(arabfgt_protection_w));
 }
 
 
@@ -4040,8 +4040,8 @@ static DRIVER_INIT( brival )
 
 	/* install protection handlers */
 	state->system32_protram = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20ba00, 0x20ba07, 0, 0, brival_protection_r);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa00fff, 0, 0, brival_protection_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20ba00, 0x20ba07, FUNC(brival_protection_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa00000, 0xa00fff, FUNC(brival_protection_w));
 }
 
 
@@ -4051,7 +4051,7 @@ static DRIVER_INIT( darkedge )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	/* install protection handlers */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, darkedge_protection_r, darkedge_protection_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa7ffff, FUNC(darkedge_protection_r), FUNC(darkedge_protection_w));
 	state->system32_prot_vblank = darkedge_fd1149_vblank;
 }
 
@@ -4060,7 +4060,7 @@ static DRIVER_INIT( dbzvrvs )
 	segas32_common_init(machine, NULL, NULL);
 
 	/* install protection handlers */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa7ffff, 0, 0, dbzvrvs_protection_r, dbzvrvs_protection_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa7ffff, FUNC(dbzvrvs_protection_r), FUNC(dbzvrvs_protection_w));
 }
 
 static WRITE16_HANDLER( f1en_comms_echo_w )
@@ -4076,10 +4076,10 @@ static DRIVER_INIT( f1en )
 	segas32_common_init(machine, analog_custom_io_r, analog_custom_io_w);
 
 	state->dual_pcb_comms = auto_alloc_array(machine, UINT16, 0x1000/2);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x810000, 0x810fff, 0, 0, dual_pcb_comms_r, dual_pcb_comms_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x810000, 0x810fff, FUNC(dual_pcb_comms_r), FUNC(dual_pcb_comms_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x818000, 0x818003, FUNC(dual_pcb_masterslave));
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x810048, 0x810049, FUNC(f1en_comms_echo_w));
 
 	state->sw1_output = radm_sw1_output;
 }
@@ -4098,7 +4098,7 @@ static DRIVER_INIT( ga2 )
 	segas32_common_init(machine, extra_custom_io_r, NULL);
 
 	decrypt_ga2_protrom(machine);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa00000, 0xa00fff, 0, 0, ga2_dpram_r, ga2_dpram_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa00000, 0xa00fff, FUNC(ga2_dpram_r), FUNC(ga2_dpram_w));
 }
 
 
@@ -4165,7 +4165,7 @@ static DRIVER_INIT( scross )
 	segas32_state *state = machine->driver_data<segas32_state>();
 	multipcm_device *multipcm = machine->device<multipcm_device>("sega");
 	segas32_common_init(machine, analog_custom_io_r, analog_custom_io_w);
-	memory_install_write8_device_handler(machine->device("soundcpu")->memory().space(AS_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
+	machine->device("soundcpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*multipcm, 0xb0, 0xbf, FUNC(scross_bank_w));
 
 	state->sw1_output = scross_sw1_output;
 	state->sw2_output = scross_sw2_output;
@@ -4183,7 +4183,7 @@ static DRIVER_INIT( sonic )
 	segas32_common_init(machine, sonic_custom_io_r, sonic_custom_io_w);
 
 	/* install protection handlers */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20E5C4, 0x20E5C5, 0, 0, sonic_level_load_protection);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20E5C4, 0x20E5C5, FUNC(sonic_level_load_protection));
 }
 
 
@@ -4208,7 +4208,7 @@ static DRIVER_INIT( svf )
 static DRIVER_INIT( jleague )
 {
 	segas32_common_init(machine, NULL, NULL);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x20F700, 0x20F705, 0, 0, jleague_protection_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x20F700, 0x20F705, FUNC(jleague_protection_w));
 }
 
 

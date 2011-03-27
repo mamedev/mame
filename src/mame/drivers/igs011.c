@@ -967,13 +967,13 @@ static WRITE16_HANDLER( igs011_prot_addr_w )
 	UINT8 *rom = space->machine->region("maincpu")->base();
 
 	// Plug previous address range with ROM access
-	memory_install_rom(sp, state->prot1_addr + 0, state->prot1_addr + 9, 0, 0, rom + state->prot1_addr);
+	sp->install_rom(state->prot1_addr + 0, state->prot1_addr + 9, rom + state->prot1_addr);
 
 	state->prot1_addr = (data << 4) ^ 0x8340;
 
 	// Add protection memory range
-	memory_install_write16_handler(sp, state->prot1_addr + 0, state->prot1_addr + 7, 0, 0, igs011_prot1_w);
-	memory_install_read16_handler (sp, state->prot1_addr + 8, state->prot1_addr + 9, 0, 0, igs011_prot1_r);
+	sp->install_legacy_write_handler(state->prot1_addr + 0, state->prot1_addr + 7, FUNC(igs011_prot1_w));
+	sp->install_legacy_read_handler (state->prot1_addr + 8, state->prot1_addr + 9, FUNC(igs011_prot1_r));
 }
 /*
 static READ16_HANDLER( igs011_prot_fake_r )
@@ -1800,7 +1800,7 @@ static DRIVER_INIT( drgnwrldv21 )
 	drgnwrld_type2_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd4c0, 0xd4ff, 0, 0, drgnwrldv21_igs011_prot2_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4c0, 0xd4ff, FUNC(drgnwrldv21_igs011_prot2_r));
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -1940,7 +1940,7 @@ static DRIVER_INIT( dbc )
 
 	dbc_decrypt(machine);
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x10600, 0x107ff, 0, 0, dbc_igs011_prot2_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10600, 0x107ff, FUNC(dbc_igs011_prot2_r));
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -1969,7 +1969,7 @@ static DRIVER_INIT( ryukobou )
 
 	ryukobou_decrypt(machine);
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x10600, 0x107ff, 0, 0, ryukobou_igs011_prot2_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10600, 0x107ff, FUNC(ryukobou_igs011_prot2_r));
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)

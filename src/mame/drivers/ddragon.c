@@ -285,9 +285,9 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 
 	memory_set_bank(space->machine, "bank1", newbank);
 	if (newbank == 4 && oldbank != 4)
-		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
+		space->install_legacy_readwrite_handler(0x4000, 0x7fff, FUNC(darktowr_mcu_bank_r), FUNC(darktowr_mcu_bank_w));
 	else if (newbank != 4 && oldbank == 4)
-		memory_install_readwrite_bank(space, 0x4000, 0x7fff, 0, 0, "bank1");
+		space->install_readwrite_bank(0x4000, 0x7fff, "bank1");
 }
 
 
@@ -2021,7 +2021,7 @@ static DRIVER_INIT( darktowr )
 	state->sound_irq = M6809_IRQ_LINE;
 	state->ym_irq = M6809_FIRQ_LINE;
 	state->technos_video_hw = 0;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3808, 0x3808, 0, 0, darktowr_bankswitch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3808, 0x3808, FUNC(darktowr_bankswitch_w));
 }
 
 
@@ -2034,7 +2034,7 @@ static DRIVER_INIT( toffy )
 	state->sound_irq = M6809_IRQ_LINE;
 	state->ym_irq = M6809_FIRQ_LINE;
 	state->technos_video_hw = 0;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3808, 0x3808, FUNC(toffy_bankswitch_w));
 
 	/* the program rom has a simple bitswap encryption */
 	rom = machine->region("maincpu")->base();

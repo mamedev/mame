@@ -2832,10 +2832,10 @@ static DRIVER_INIT (mating)
 	device_t *device = machine->device("oki");
 
 	/* The Mating Game has an extra 256kB RAM on the program card */
-	memory_install_ram(space, 0x600000, 0x63ffff, 0, 0, NULL);
+	space->install_ram(0x600000, 0x63ffff);
 
 	/* There is also an OKIM6376 present on the program card */
-	memory_install_readwrite16_device_handler(space, device, 0xffa040, 0xffa0ff, 0, 0, oki_r, oki_w );
+	space->install_legacy_readwrite_handler(*device, 0xffa040, 0xffa0ff, FUNC(oki_r), FUNC(oki_w) );
 
 	state->current_chr_table = mating_data;
 }

@@ -766,12 +766,12 @@ ROM_END
 
 static DRIVER_INIT( tigeroad )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, tigeroad_soundcmd_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(tigeroad_soundcmd_w));
 }
 
 static DRIVER_INIT( f1dream )
 {
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, f1dream_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(f1dream_control_w));
 }
 
 

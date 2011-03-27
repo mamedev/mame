@@ -1426,14 +1426,14 @@ static DRIVER_INIT( atlantol )
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypt);
 
-	memory_install_write8_handler(space, 0x0800, 0x0800, 0, 0, atlantol_gfxbank_w);
-	memory_nop_write(space, 0x1000, 0x1000, 0, 0);
+	space->install_legacy_write_handler(0x0800, 0x0800, FUNC(atlantol_gfxbank_w));
+	space->nop_write(0x1000, 0x1000);
 
 	/* unmapped areas read as ROM */
-	memory_install_read_bank(space, 0x0000, 0x11ff, 0, 0, "bank10");
-	memory_install_read_bank(space, 0x1380, 0x17ff, 0, 0, "bank11");
-	memory_install_read_bank(space, 0x2000, 0x27ff, 0, 0, "bank12");
-	memory_install_read_bank(space, 0x4000, 0x5fff, 0, 0, "bank13");
+	space->install_read_bank(0x0000, 0x11ff, "bank10");
+	space->install_read_bank(0x1380, 0x17ff, "bank11");
+	space->install_read_bank(0x2000, 0x27ff, "bank12");
+	space->install_read_bank(0x4000, 0x5fff, "bank13");
 	memory_set_bankptr(machine, "bank10", &rom[0x0000]);
 	memory_set_bankptr(machine, "bank11", &rom[0x1380]);
 	memory_set_bankptr(machine, "bank12", &rom[0x2000]);

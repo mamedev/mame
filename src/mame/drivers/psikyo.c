@@ -1842,10 +1842,10 @@ static DRIVER_INIT( sngkace )
 	}
 
 	/* input ports */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc0000b, 0, 0, sngkace_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(sngkace_input_r));
 
 	/* sound latch */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(psikyo_soundlatch_w));
 
 	state->ka302c_banking = 0; // SH201B doesn't have any gfx banking
 
@@ -1895,13 +1895,13 @@ static DRIVER_INIT( tengai )
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(s1945_input_r));
 
 	/* sound latch */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
 
 	/* protection */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00004, 0xc0000b, FUNC(s1945_mcu_w));
 
 	s1945_mcu_init(machine);
 	state->s1945_mcu_table = 0;
@@ -1918,10 +1918,10 @@ static DRIVER_INIT( gunbird )
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(gunbird_input_r));
 
 	/* sound latch */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(psikyo_soundlatch_w));
 
 	state->ka302c_banking = 1;
 
@@ -1936,13 +1936,13 @@ static DRIVER_INIT( s1945 )
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(s1945_input_r));
 
 	/* sound latch */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00004, 0xc0000b, FUNC(s1945_mcu_w));
 
 	s1945_mcu_init(machine);
 	state->s1945_mcu_table = s1945_table;
@@ -1959,13 +1959,13 @@ static DRIVER_INIT( s1945a )
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(s1945_input_r));
 
 	/* sound latch */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00004, 0xc0000b, FUNC(s1945_mcu_w));
 
 	s1945_mcu_init(machine);
 	state->s1945_mcu_table = s1945a_table;
@@ -1982,13 +1982,13 @@ static DRIVER_INIT( s1945j )
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports*/
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(s1945_input_r));
 
 	/* sound latch */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00004, 0xc0000b, FUNC(s1945_mcu_w));
 
 	s1945_mcu_init(machine);
 	state->s1945_mcu_table = s1945j_table;
@@ -2005,10 +2005,10 @@ static DRIVER_INIT( s1945jn )
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(gunbird_input_r));
 
 	/* sound latch */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
 
 	state->ka302c_banking = 1;
 
@@ -2022,10 +2022,10 @@ static DRIVER_INIT( s1945bl )
 	psikyo_state *state = machine->driver_data<psikyo_state>();
 
 	/* input ports */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(gunbird_input_r));
 
 	/* sound latch */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
 
 	state->ka302c_banking = 1;
 

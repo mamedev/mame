@@ -540,7 +540,7 @@ static READ16_HANDLER( sub_cpu_spin_r )
 static DRIVER_INIT( raiden )
 {
 #ifdef SYNC_HACK
-	memory_install_read16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4008, 0x4009, FUNC(sub_cpu_spin_r));
 #endif
 }
 

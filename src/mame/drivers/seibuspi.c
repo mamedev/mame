@@ -1826,9 +1826,9 @@ static MACHINE_RESET( spi )
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
 	device_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00000680, 0x00000683, 0, 0, sound_fifo_r);
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000680, 0x00000683, FUNC(sound_fifo_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000688, 0x0000068b, FUNC(z80_prg_fifo_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000068c, 0x0000068f, FUNC(z80_enable_w));
 
 	memory_set_bankptr(machine, "bank4", state->z80_rom);
 	memory_set_bankptr(machine, "bank5", state->z80_rom);
@@ -1911,8 +1911,8 @@ static MACHINE_RESET( sxx2f )
 
 	memcpy(state->z80_rom, rom, 0x40000);
 
-	memory_install_write32_device_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), machine->device("eeprom"), 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00000680, 0x00000683, 0, 0, sb_coin_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*machine->device("eeprom"), 0x0000068c, 0x0000068f, FUNC(eeprom_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00000680, 0x00000683, FUNC(sb_coin_r));
 
 	device_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 
@@ -2098,28 +2098,28 @@ static void init_spi(running_machine *machine)
 
 static DRIVER_INIT( rdft )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00298d0, 0x00298d3, 0, 0, rdft_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00298d0, 0x00298d3, FUNC(rdft_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( senkyu )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0018cb4, 0x0018cb7, 0, 0, senkyu_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018cb4, 0x0018cb7, FUNC(senkyu_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( senkyua )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0018c9c, 0x0018c9f, 0, 0, senkyua_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018c9c, 0x0018c9f, FUNC(senkyua_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( batlball )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0018db4, 0x0018db7, 0, 0, batlball_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0018db4, 0x0018db7, FUNC(batlball_speedup_r) );
 
 	init_spi(machine);
 }
@@ -2127,21 +2127,21 @@ static DRIVER_INIT( batlball )
 static DRIVER_INIT( ejanhs )
 {
 //  idle skip doesn't work properly?
-//  memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x002d224, 0x002d227, 0, 0, ejanhs_speedup_r );
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x002d224, 0x002d227, FUNC(ejanhs_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( viprp1 )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x001e2e0, 0x001e2e3, 0, 0, viprp1_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001e2e0, 0x001e2e3, FUNC(viprp1_speedup_r) );
 
 	init_spi(machine);
 }
 
 static DRIVER_INIT( viprp1o )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x001d49c, 0x001d49f, 0, 0, viprp1o_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001d49c, 0x001d49f, FUNC(viprp1o_speedup_r) );
 
 	init_spi(machine);
 }
@@ -2154,12 +2154,12 @@ static void init_rf2(running_machine *machine)
 	state->flash[0] = machine->device<intel_e28f008sa_device>("flash0");
 	state->flash[1] = machine->device<intel_e28f008sa_device>("flash1");
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0282AC, 0x0282AF, FUNC(rf2_speedup_r) );
 	seibuspi_rise10_text_decrypt(machine->region("gfx1")->base());
 	seibuspi_rise10_bg_decrypt(machine->region("gfx2")->base(), machine->region("gfx2")->bytes());
 	seibuspi_rise10_sprite_decrypt(machine->region("gfx3")->base(), 0x600000);
 
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x560, 0x563, FUNC(sprite_dma_start_w));
 }
 
 static DRIVER_INIT( rdft2 )
@@ -2179,12 +2179,12 @@ static void init_rfjet(running_machine *machine)
 	state->flash[0] = machine->device<intel_e28f008sa_device>("flash0");
 	state->flash[1] = machine->device<intel_e28f008sa_device>("flash1");
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x002894c, 0x002894f, FUNC(rfjet_speedup_r) );
 	seibuspi_rise11_text_decrypt(machine->region("gfx1")->base());
 	seibuspi_rise11_bg_decrypt(machine->region("gfx2")->base(), machine->region("gfx2")->bytes());
 	seibuspi_rise11_sprite_decrypt_rfjet(machine->region("gfx3")->base(), 0x800000);
 
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x560, 0x563, FUNC(sprite_dma_start_w));
 }
 
 static DRIVER_INIT( rfjet )

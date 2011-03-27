@@ -1575,7 +1575,7 @@ static DRIVER_INIT( xenophob )
 	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* install control port handler */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, xenophobe_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(xenophobe_control_w));
 }
 
 
@@ -1588,9 +1588,9 @@ static DRIVER_INIT( spyhunt2 )
 	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* analog port handling is a bit tricky */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, spyhunt2_control_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0d0000, 0x0dffff, 0, 0, spyhunt2_port_0_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0e0000, 0x0effff, 0, 0, spyhunt2_port_1_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(spyhunt2_control_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0d0000, 0x0dffff, FUNC(spyhunt2_port_0_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0e0000, 0x0effff, FUNC(spyhunt2_port_1_r));
 }
 
 
@@ -1605,10 +1605,10 @@ static DRIVER_INIT( blasted )
 	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, blasted_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(blasted_control_w));
 
 	/* 6840 is mapped to the lower 8 bits */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0a0000, 0x0a000f, 0, 0, mcr68_6840_lower_r, mcr68_6840_lower_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0a0000, 0x0a000f, FUNC(mcr68_6840_lower_r), FUNC(mcr68_6840_lower_w));
 }
 
 static DRIVER_INIT( intlaser )
@@ -1620,7 +1620,7 @@ static DRIVER_INIT( intlaser )
 	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, blasted_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(blasted_control_w));
 
 }
 
@@ -1635,13 +1635,13 @@ static DRIVER_INIT( archrivl )
 	state->timing_factor = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10) * (256 + 16);
 
 	/* handle control writes */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0c0000, 0x0cffff, 0, 0, archrivl_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0cffff, FUNC(archrivl_control_w));
 
 	/* 49-way joystick handling is a bit tricky */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0e0000, 0x0effff, 0, 0, archrivl_port_1_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0e0000, 0x0effff, FUNC(archrivl_port_1_r));
 
 	/* 6840 is mapped to the lower 8 bits */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0a0000, 0x0a000f, 0, 0, mcr68_6840_lower_r, mcr68_6840_lower_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0a0000, 0x0a000f, FUNC(mcr68_6840_lower_r), FUNC(mcr68_6840_lower_w));
 }
 
 

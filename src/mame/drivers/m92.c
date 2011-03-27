@@ -2155,7 +2155,7 @@ static DRIVER_INIT( majtitl2 )
 	init_m92(machine, 1);
 
 	/* This game has an eprom on the game board */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0000, 0xf3fff, FUNC(m92_eeprom_r), FUNC(m92_eeprom_w));
 
 	state->game_kludge = 2;
 }
@@ -2178,7 +2178,7 @@ static DRIVER_INIT( lethalth )
 	state->irq_vectorbase = 0x20;
 
 	/* NOP out the bankswitcher */
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_IO), 0x20, 0x21, 0, 0);
+	machine->device("maincpu")->memory().space(AS_IO)->nop_write(0x20, 0x21);
 }
 
 static DRIVER_INIT( nbbatman )

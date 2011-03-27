@@ -1899,8 +1899,8 @@ static DRIVER_INIT( gekisou )
 	unpack_region(machine, "gfx3");
 
 	// install special handlers for unknown device (protection?)
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x580000, 0x580001, FUNC(gekisou_unknown_0_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5a0000, 0x5a0001, FUNC(gekisou_unknown_1_w));
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1913,7 +1913,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region(machine, "gfx3");
 
 #if HVOLTAGE_DEBUG
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x000038, 0x000039, FUNC(hvoltage_debug_r));
 #endif
 }
 

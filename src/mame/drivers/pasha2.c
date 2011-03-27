@@ -471,7 +471,7 @@ static READ16_HANDLER( pasha2_speedup_r )
 
 static DRIVER_INIT( pasha2 )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x95744, 0x95747, FUNC(pasha2_speedup_r) );
 
 	memory_set_bankptr(machine, "bank1", machine->region("user2")->base());
 }

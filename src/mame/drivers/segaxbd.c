@@ -2822,7 +2822,7 @@ static DRIVER_INIT( aburner2 )
 
 	state->road_priority = 0;
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x140006, 0x140007, 0, 0x00fff0, FUNC(aburner2_iochip_0_D_w));
 }
 
 
@@ -2844,14 +2844,14 @@ static DRIVER_INIT( loffire )
 	state->adc_reverse[1] = state->adc_reverse[3] = 1;
 
 	/* install extra synchronization on core shared memory */
-	state->loffire_sync = memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
+	state->loffire_sync = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x29c000, 0x29c011, FUNC(loffire_sync0_w));
 }
 
 
 static DRIVER_INIT( smgp )
 {
 	xboard_generic_init(machine);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2f0000, 0x2f3fff, FUNC(smgp_excs_r), FUNC(smgp_excs_w));
 }
 
 

@@ -1255,7 +1255,7 @@ static void install_speedups(running_machine *machine, const speedup_entry *entr
 	state->speedup_count = count;
 
 	for (i = 0; i < count; i++)
-		memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(entries[i].offset, entries[i].offset + 3, FUNC(speedup_handlers[i]));
 
 #ifdef MAME_DEBUG
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, report_speedups);

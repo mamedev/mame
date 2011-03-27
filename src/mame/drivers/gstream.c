@@ -634,7 +634,7 @@ static READ32_HANDLER( gstream_speedup_r )
 
 static DRIVER_INIT( gstream )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd1ee0, 0xd1ee3, FUNC(gstream_speedup_r) );
 }
 
 

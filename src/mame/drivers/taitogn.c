@@ -567,16 +567,16 @@ static void install_handlers(running_machine *machine, int mode)
 	address_space *a = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	if(mode == 0) {
 		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
-		memory_install_readwrite32_handler(a, 0x1f000000, 0x1f1fffff, 0, 0, flash_subbios_r, flash_subbios_w);
-		memory_install_readwrite32_handler(a, 0x1f200000, 0x1f2fffff, 0, 0, rf5c296_mem_r, rf5c296_mem_w);
-		memory_install_readwrite32_handler(a, 0x1f300000, 0x1f37ffff, 0, 0, flash_mn102_r, flash_mn102_w);
-		memory_nop_readwrite(a, 0x1f380000, 0x1f5fffff, 0, 0);
+		a->install_legacy_readwrite_handler(0x1f000000, 0x1f1fffff, FUNC(flash_subbios_r), FUNC(flash_subbios_w));
+		a->install_legacy_readwrite_handler(0x1f200000, 0x1f2fffff, FUNC(rf5c296_mem_r), FUNC(rf5c296_mem_w));
+		a->install_legacy_readwrite_handler(0x1f300000, 0x1f37ffff, FUNC(flash_mn102_r), FUNC(flash_mn102_w));
+		a->nop_readwrite(0x1f380000, 0x1f5fffff);
 
 	} else {
 		// Mode 1 has access to the 3 samples flashes
-		memory_install_readwrite32_handler(a, 0x1f000000, 0x1f1fffff, 0, 0, flash_s1_r, flash_s1_w);
-		memory_install_readwrite32_handler(a, 0x1f200000, 0x1f3fffff, 0, 0, flash_s2_r, flash_s2_w);
-		memory_install_readwrite32_handler(a, 0x1f400000, 0x1f5fffff, 0, 0, flash_s3_r, flash_s3_w);
+		a->install_legacy_readwrite_handler(0x1f000000, 0x1f1fffff, FUNC(flash_s1_r), FUNC(flash_s1_w));
+		a->install_legacy_readwrite_handler(0x1f200000, 0x1f3fffff, FUNC(flash_s2_r), FUNC(flash_s2_w));
+		a->install_legacy_readwrite_handler(0x1f400000, 0x1f5fffff, FUNC(flash_s3_r), FUNC(flash_s3_w));
 	}
 }
 
@@ -894,7 +894,7 @@ static DRIVER_INIT( coh3002t )
 static DRIVER_INIT( coh3002t_mp )
 {
 	DRIVER_INIT_CALL(coh3002t);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1fa10100, 0x1fa10103, 0, 0, gnet_mahjong_panel_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1fa10100, 0x1fa10103, FUNC(gnet_mahjong_panel_r) );
 }
 
 static MACHINE_RESET( coh3002t )

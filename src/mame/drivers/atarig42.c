@@ -801,7 +801,7 @@ static DRIVER_INIT( roadriot )
 	state->playfield_base = 0x400;
 
 	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
-	state->sloop_base = memory_install_readwrite16_handler(main, 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_r, roadriot_sloop_data_w);
+	state->sloop_base = main->install_legacy_readwrite_handler(0x000000, 0x07ffff, FUNC(roadriot_sloop_data_r), FUNC(roadriot_sloop_data_w));
 	main->set_direct_update_handler(direct_update_delegate_create_static(atarig42_sloop_direct_handler, *machine));
 
 	asic65_config(machine, ASIC65_ROMBASED);
@@ -840,7 +840,7 @@ static DRIVER_INIT( guardian )
 	*(UINT16 *)&machine->region("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
-	state->sloop_base = memory_install_readwrite16_handler(main, 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
+	state->sloop_base = main->install_legacy_readwrite_handler(0x000000, 0x07ffff, FUNC(guardians_sloop_data_r), FUNC(guardians_sloop_data_w));
 	main->set_direct_update_handler(direct_update_delegate_create_static(atarig42_sloop_direct_handler, *machine));
 
 	asic65_config(machine, ASIC65_GUARDIANS);

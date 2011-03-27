@@ -865,7 +865,7 @@ static DRIVER_INIT( dassault )
 	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3f8000, 0x3f8001, FUNC(dassault_main_skip));
 }
 
 static DRIVER_INIT( thndzone )
@@ -885,7 +885,7 @@ static DRIVER_INIT( thndzone )
 	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3f8000, 0x3f8001, FUNC(thndzone_main_skip));
 }
 
 /**********************************************************************************/

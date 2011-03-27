@@ -524,10 +524,10 @@ static DRIVER_INIT( esb )
 	space->set_direct_update_handler(direct_update_delegate_create_static(esb_setdirect, *machine));
 
 	/* install read/write handlers for it */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0x9fff, FUNC(esb_slapstic_r), FUNC(esb_slapstic_w));
 
 	/* install additional banking */
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xffff, 0, 0, "bank2");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xffff, "bank2");
 
 	/* prepare the matrix processor */
 	state->is_esb = 1;

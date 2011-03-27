@@ -437,7 +437,7 @@ static READ32_HANDLER( bballoon_speedup_r )
 
 static MACHINE_RESET( bballoon )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4d000010, 0x4d000013, 0, 0, bballoon_speedup_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4d000010, 0x4d000013, FUNC(bballoon_speedup_r));
 	s3c2410 = machine->device("s3c2410");
 }
 

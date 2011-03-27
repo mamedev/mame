@@ -464,16 +464,16 @@ DRIVER_INIT( mktunit )
 	init_tunit_generic(machine, SOUND_ADPCM);
 
 	/* protection */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1b00000, 0x1b6ffff, 0, 0, mk_prot_r, mk_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b00000, 0x1b6ffff, FUNC(mk_prot_r), FUNC(mk_prot_w));
 
 	/* sound chip protection (hidden RAM) */
-	memory_install_ram(machine->device("adpcm")->memory().space(AS_PROGRAM), 0xfb9c, 0xfbc6, 0, 0, NULL);
+	machine->device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfb9c, 0xfbc6);
 }
 
 DRIVER_INIT( mkturbo )
 {
 	/* protection */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfffff400, 0xfffff40f, 0, 0, mkturbo_prot_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfffff400, 0xfffff40f, FUNC(mkturbo_prot_r));
 
 	DRIVER_INIT_CALL(mktunit);
 }
@@ -488,20 +488,20 @@ static void init_nbajam_common(running_machine *machine, int te_protection)
 	if (!te_protection)
 	{
 		nbajam_prot_table = nbajam_prot_values;
-		memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1b14020, 0x1b2503f, 0, 0, nbajam_prot_r, nbajam_prot_w);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b14020, 0x1b2503f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
 	}
 	else
 	{
 		nbajam_prot_table = nbajamte_prot_values;
-		memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1b15f40, 0x1b37f5f, 0, 0, nbajam_prot_r, nbajam_prot_w);
-		memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1b95f40, 0x1bb7f5f, 0, 0, nbajam_prot_r, nbajam_prot_w);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b15f40, 0x1b37f5f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b95f40, 0x1bb7f5f, FUNC(nbajam_prot_r), FUNC(nbajam_prot_w));
 	}
 
 	/* sound chip protection (hidden RAM) */
 	if (!te_protection)
-		memory_install_ram(machine->device("adpcm")->memory().space(AS_PROGRAM), 0xfbaa, 0xfbd4, 0, 0, NULL);
+		machine->device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfbaa, 0xfbd4);
 	else
-		memory_install_ram(machine->device("adpcm")->memory().space(AS_PROGRAM), 0xfbec, 0xfc16, 0, 0, NULL);
+		machine->device("adpcm")->memory().space(AS_PROGRAM)->install_ram(0xfbec, 0xfc16);
 }
 
 DRIVER_INIT( nbajam )
@@ -520,19 +520,19 @@ DRIVER_INIT( jdreddp )
 	init_tunit_generic(machine, SOUND_ADPCM_LARGE);
 
 	/* looks like the watchdog needs to be disabled */
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d81060, 0x01d8107f, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x01d81060, 0x01d8107f);
 
 	/* protection */
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1b00000, 0x1bfffff, 0, 0, jdredd_prot_r, jdredd_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x1b00000, 0x1bfffff, FUNC(jdredd_prot_r), FUNC(jdredd_prot_w));
 
 	/* sound chip protection (hidden RAM) */
-	memory_install_read_bank(machine->device("adpcm")->memory().space(AS_PROGRAM), 0xfbcf, 0xfbf9, 0, 0, "bank7");
-	memory_install_write_bank(machine->device("adpcm")->memory().space(AS_PROGRAM), 0xfbcf, 0xfbf9, 0, 0, "bank9");
+	machine->device("adpcm")->memory().space(AS_PROGRAM)->install_read_bank(0xfbcf, 0xfbf9, "bank7");
+	machine->device("adpcm")->memory().space(AS_PROGRAM)->install_write_bank(0xfbcf, 0xfbf9, "bank9");
 	memory_set_bankptr(machine, "bank9", auto_alloc_array(machine, UINT8, 0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS
 	/* how about the final levels? */
-	jdredd_hack = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xFFBA7FF0, 0xFFBA7FFf, 0, 0, jdredd_hack_r);
+	jdredd_hack = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFBA7FF0, 0xFFBA7FFf, FUNC(jdredd_hack_r));
 #endif
 }
 
@@ -553,13 +553,13 @@ DRIVER_INIT( mk2 )
 	midtunit_gfx_rom_large = 1;
 
 	/* protection */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00f20c60, 0x00f20c7f, 0, 0, mk2_prot_w);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00f42820, 0x00f4283f, 0, 0, mk2_prot_w);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a190e0, 0x01a190ff, 0, 0, mk2_prot_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a191c0, 0x01a191df, 0, 0, mk2_prot_shift_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a3d0c0, 0x01a3d0ff, 0, 0, mk2_prot_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d9d1e0, 0x01d9d1ff, 0, 0, mk2_prot_const_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01def920, 0x01def93f, 0, 0, mk2_prot_const_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00f20c60, 0x00f20c7f, FUNC(mk2_prot_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00f42820, 0x00f4283f, FUNC(mk2_prot_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a190e0, 0x01a190ff, FUNC(mk2_prot_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a191c0, 0x01a191df, FUNC(mk2_prot_shift_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01a3d0c0, 0x01a3d0ff, FUNC(mk2_prot_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01d9d1e0, 0x01d9d1ff, FUNC(mk2_prot_const_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01def920, 0x01def93f, FUNC(mk2_prot_const_r));
 }
 
 

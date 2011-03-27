@@ -1178,9 +1178,9 @@ static DRIVER_INIT( backfirt )
 	state->video_type = 2;
 
 	/* no MSM */
-	memory_nop_write(machine->device("soundcpu")->memory().space(AS_PROGRAM), 0xc000, 0xc000, 0, 0);
-	memory_nop_write(machine->device("soundcpu")->memory().space(AS_PROGRAM), 0xd000, 0xd000, 0, 0);
-	memory_nop_write(machine->device("soundcpu")->memory().space(AS_PROGRAM), 0xe000, 0xe000, 0, 0);
+	machine->device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xc000, 0xc000);
+	machine->device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xd000, 0xd000);
+	machine->device("soundcpu")->memory().space(AS_PROGRAM)->nop_write(0xe000, 0xe000);
 }
 
 

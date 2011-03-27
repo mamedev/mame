@@ -1446,10 +1446,10 @@ ROM_END
 
 static void arkanoid_bootleg_init( running_machine *machine )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf000, 0xf000, 0, 0, arkanoid_bootleg_f000_r );
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf002, 0xf002, 0, 0, arkanoid_bootleg_f002_r );
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd018, 0xd018, 0, 0, arkanoid_bootleg_d018_w );
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd008, 0xd008, 0, 0, arkanoid_bootleg_d008_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf000, 0xf000, FUNC(arkanoid_bootleg_f000_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf002, 0xf002, FUNC(arkanoid_bootleg_f002_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd018, 0xd018, FUNC(arkanoid_bootleg_d018_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd008, 0xd008, FUNC(arkanoid_bootleg_d008_r) );
 }
 
 static DRIVER_INIT( arkangc )
@@ -1541,7 +1541,7 @@ static DRIVER_INIT( tetrsark )
 		ROM[x] = ROM[x] ^ 0x94;
 	}
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd008, 0xd008, 0, 0, tetrsark_d008_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xd008, 0xd008, FUNC(tetrsark_d008_w) );
 }
 
 

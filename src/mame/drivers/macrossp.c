@@ -792,13 +792,13 @@ static WRITE32_HANDLER( quizmoon_speedup_w )
 
 static DRIVER_INIT( macrossp )
 {
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf10158, 0xf1015b, FUNC(macrossp_speedup_w) );
 }
 
 static DRIVER_INIT( quizmoon )
 {
 #ifdef UNUSED_FUNCTION
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf00020, 0xf00023, FUNC(quizmoon_speedup_w) );
 #endif
 }
 

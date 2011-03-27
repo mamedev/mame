@@ -2240,13 +2240,13 @@ static DRIVER_INIT( grobda )
        the DAC might be built-in after all.
       */
 	device_t *dac = machine->device("dac");
-	memory_install_write8_device_handler(machine->device("sub")->memory().space(AS_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*dac, 0x0002, 0x0002, FUNC(grobda_DAC_w) );
 }
 
 static DRIVER_INIT( digdug2 )
 {
 	/* appears to not use the watchdog */
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x8000, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x8000, 0x8000);
 }
 
 

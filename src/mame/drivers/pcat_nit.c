@@ -140,8 +140,8 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 	if ( data & 0x40 )
 	{
 		// rom bank
-		memory_install_read_bank(space, 0x000d8000, 0x000dffff, 0, 0, "rombank" );
-		memory_unmap_write(space, 0x000d8000, 0x000dffff, 0, 0);
+		space->install_read_bank(0x000d8000, 0x000dffff, "rombank" );
+		space->unmap_write(0x000d8000, 0x000dffff);
 
 		if ( data & 0x80 )
 		{
@@ -155,9 +155,9 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 	else
 	{
 		// nvram bank
-		memory_unmap_readwrite(space, 0x000d8000, 0x000dffff, 0, 0);
+		space->unmap_readwrite(0x000d8000, 0x000dffff);
 
-		memory_install_readwrite_bank(space, 0x000d8000, 0x000d9fff, 0, 0, "nvrambank" );
+		space->install_readwrite_bank(0x000d8000, 0x000d9fff, "nvrambank" );
 
 		memory_set_bankptr(space->machine, "nvrambank", state->banked_nvram);
 

@@ -1064,7 +1064,7 @@ static READ8_HANDLER( rtriv_question_r )
 static DRIVER_INIT( rtriv )
 {
 	// Set-up the weirdest questions read ever done
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x4fff, 0, 0, rtriv_question_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x4fff, FUNC(rtriv_question_r));
 }
 
 

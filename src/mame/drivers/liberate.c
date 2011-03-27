@@ -71,9 +71,9 @@ static WRITE8_HANDLER( deco16_bank_w )
 	state->bank = data;
 
 	if (state->bank)
-		memory_install_read8_handler(state->maincpu->memory().space(AS_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
+		state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8000, 0x800f, FUNC(deco16_io_r));
 	else
-		memory_install_read_bank(state->maincpu->memory().space(AS_PROGRAM), 0x8000, 0x800f, 0, 0, "bank1");
+		state->maincpu->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x800f, "bank1");
 }
 
 static READ8_HANDLER( prosoccr_bank_r )
@@ -181,9 +181,9 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 	state->bank = data & 1;
 
 	if (state->bank)
-		memory_install_read8_handler(state->maincpu->memory().space(AS_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
+		state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8000, 0x800f, FUNC(deco16_io_r));
 	else
-		memory_install_read8_handler(state->maincpu->memory().space(AS_PROGRAM), 0x8000, 0x800f, 0, 0, prosoccr_charram_r);
+		state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8000, 0x800f, FUNC(prosoccr_charram_r));
 
 }
 
@@ -1385,7 +1385,7 @@ static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
 
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xa000, 0, 0, "IN0");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xa000, 0xa000, "IN0");
 }
 
 static DRIVER_INIT( liberate )

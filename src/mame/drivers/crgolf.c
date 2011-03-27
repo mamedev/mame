@@ -600,7 +600,7 @@ ROM_END
 static DRIVER_INIT( crgolfhi )
 {
 	device_t *msm = machine->device("msm");
-	memory_install_write8_device_handler(machine->device("audiocpu")->memory().space(AS_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	machine->device("audiocpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*msm, 0xa000, 0xa003, FUNC(crgolfhi_sample_w));
 }
 
 

@@ -496,7 +496,7 @@ void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int ch
 		slapstic_init(device->machine, chipnum);
 
 		/* install the memory handlers */
-		state->slapstic = memory_install_readwrite16_handler(device->memory().space(AS_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
+		state->slapstic = device->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(base, base + 0x7fff, 0, mirror, FUNC(atarigen_slapstic_r), FUNC(atarigen_slapstic_w));
 
 		/* allocate memory for a copy of bank 0 */
 		state->slapstic_bank0 = auto_alloc_array(device->machine, UINT8, 0x2000);

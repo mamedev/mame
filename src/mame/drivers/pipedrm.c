@@ -882,14 +882,14 @@ static DRIVER_INIT( pipedrm )
 	/* sprite RAM lives at the end of palette RAM */
 	state->spriteram = &machine->generic.paletteram.u8[0xc00];
 	state->spriteram_size = 0x400;
-	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcc00, 0xcfff, 0, 0, state->spriteram);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xcc00, 0xcfff, state->spriteram);
 }
 
 
 static DRIVER_INIT( hatris )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x20, 0x20, 0, 0, sound_command_nonmi_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x21, 0x21, 0, 0, fromance_gfxreg_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, FUNC(sound_command_nonmi_w));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x21, 0x21, FUNC(fromance_gfxreg_w));
 }
 
 

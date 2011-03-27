@@ -514,7 +514,7 @@ DRIVER_INIT( drtoppel )
 	state->mcu_type = MCU_DRTOPPEL;
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf800, 0xfbff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xf800, 0xfbff);
 }
 
 DRIVER_INIT( chukatai )
@@ -528,7 +528,7 @@ DRIVER_INIT( tnzs )
 	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
 }
 
 DRIVER_INIT( tnzsb )
@@ -537,7 +537,7 @@ DRIVER_INIT( tnzsb )
 	state->mcu_type = MCU_NONE_TNZSB;
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xef10, 0xef10, FUNC(tnzs_sync_kludge_w));
 }
 
 DRIVER_INIT( kabukiz )
@@ -555,9 +555,9 @@ DRIVER_INIT( insectx )
 	state->mcu_type = MCU_NONE_INSECTX;
 
 	/* this game has no mcu, replace the handler with plain input port handlers */
-	memory_install_read_port(machine->device("sub")->memory().space(AS_PROGRAM), 0xc000, 0xc000, 0, 0, "IN0" );
-	memory_install_read_port(machine->device("sub")->memory().space(AS_PROGRAM), 0xc001, 0xc001, 0, 0, "IN1" );
-	memory_install_read_port(machine->device("sub")->memory().space(AS_PROGRAM), 0xc002, 0xc002, 0, 0, "IN2" );
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc000, 0xc000, "IN0" );
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc001, 0xc001, "IN1" );
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_read_port(0xc002, 0xc002, "IN2" );
 }
 
 DRIVER_INIT( kageki )
@@ -673,9 +673,9 @@ static STATE_POSTLOAD( tnzs_postload )
 	memory_set_bank(machine, "bank2", state->bank2);
 
 	if (state->bank1 <= 1)
-		memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank1");
+		space->install_write_bank(0x8000, 0xbfff, "bank1");
 	else
-		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
+		space->unmap_write(0x8000, 0xbfff);
 }
 
 MACHINE_START( tnzs )
@@ -756,9 +756,9 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 	memory_set_bank(space->machine, "bank1", state->bank1);
 
 	if (state->bank1 <= 1)
-		memory_install_write_bank(space, 0x8000, 0xbfff, 0, 0, "bank1");
+		space->install_write_bank(0x8000, 0xbfff, "bank1");
 	else
-		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
+		space->unmap_write(0x8000, 0xbfff);
 }
 
 WRITE8_HANDLER( tnzs_bankswitch1_w )

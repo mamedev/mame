@@ -789,8 +789,8 @@ static DRIVER_INIT( jchan )
 	jchan_state *state = machine->driver_data<jchan_state>();
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 	// install these here, putting them in the memory map causes issues
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x403ffe, 0x403fff, 0, 0, main2sub_cmd_w );
-	memory_install_write16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x403ffe, 0x403fff, FUNC(main2sub_cmd_w) );
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x400000, 0x400001, FUNC(sub2main_cmd_w) );
 
 
 	memset(state->mcu_com, 0, 4 * sizeof( UINT16 ) );

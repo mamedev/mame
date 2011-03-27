@@ -484,7 +484,7 @@ static DRIVER_INIT( pbactio3 )
 	pbaction_decode(machine, "maincpu");
 
 	/* install a protection (?) workaround */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc000, 0xc000, FUNC(pbactio3_prot_kludge_r) );
 }
 
 static DRIVER_INIT( pbactio4 )

@@ -3791,9 +3791,9 @@ static void init_multisync(running_machine *machine, int compact_inputs)
 	/* install handlers for the compact driving games' inputs */
 	if (compact_inputs)
 	{
-		memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x400000, 0x400001, 0, 0, hdc68k_wheel_r);
-		memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x408000, 0x408001, 0, 0, hdc68k_wheel_edge_reset_w);
-		memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xa80000, 0xafffff, 0, 0, hdc68k_port1_r);
+		state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x400000, 0x400001, FUNC(hdc68k_wheel_r));
+		state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x408000, 0x408001, FUNC(hdc68k_wheel_edge_reset_w));
+		state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa80000, 0xafffff, FUNC(hdc68k_port1_r));
 	}
 }
 
@@ -3804,18 +3804,18 @@ static void init_adsp(running_machine *machine)
 	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* install ADSP program RAM */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x800000, 0x807fff, 0, 0, hd68k_adsp_program_r, hd68k_adsp_program_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x800000, 0x807fff, FUNC(hd68k_adsp_program_r), FUNC(hd68k_adsp_program_w));
 
 	/* install ADSP data RAM */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x808000, 0x80bfff, 0, 0, hd68k_adsp_data_r, hd68k_adsp_data_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x808000, 0x80bfff, FUNC(hd68k_adsp_data_r), FUNC(hd68k_adsp_data_w));
 
 	/* install ADSP serial buffer RAM */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x810000, 0x813fff, 0, 0, hd68k_adsp_buffer_r, hd68k_adsp_buffer_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x810000, 0x813fff, FUNC(hd68k_adsp_buffer_r), FUNC(hd68k_adsp_buffer_w));
 
 	/* install ADSP control locations */
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x818000, 0x81801f, 0, 0, hd68k_adsp_control_w);
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x818060, 0x81807f, 0, 0, hd68k_adsp_irq_clear_w);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x838000, 0x83ffff, 0, 0, hd68k_adsp_irq_state_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x818000, 0x81801f, FUNC(hd68k_adsp_control_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x818060, 0x81807f, FUNC(hd68k_adsp_irq_clear_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x838000, 0x83ffff, FUNC(hd68k_adsp_irq_state_r));
 }
 
 
@@ -3825,21 +3825,21 @@ static void init_ds3(running_machine *machine)
 	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* install ADSP program RAM */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x800000, 0x807fff, 0, 0, hd68k_ds3_program_r, hd68k_ds3_program_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x800000, 0x807fff, FUNC(hd68k_ds3_program_r), FUNC(hd68k_ds3_program_w));
 
 	/* install ADSP data RAM */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x808000, 0x80bfff, 0, 0, hd68k_adsp_data_r, hd68k_adsp_data_w);
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x80c000, 0x80dfff, 0, 0, hdds3_special_r, hdds3_special_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x808000, 0x80bfff, FUNC(hd68k_adsp_data_r), FUNC(hd68k_adsp_data_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x80c000, 0x80dfff, FUNC(hdds3_special_r), FUNC(hdds3_special_w));
 
 	/* install ADSP control locations */
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x820000, 0x8207ff, 0, 0, hd68k_ds3_gdata_r);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x820800, 0x820fff, 0, 0, hd68k_ds3_girq_state_r);
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x820000, 0x8207ff, 0, 0, hd68k_ds3_gdata_w);
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x821000, 0x8217ff, 0, 0, hd68k_adsp_irq_clear_w);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x822000, 0x8227ff, 0, 0, hd68k_ds3_sdata_r);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x822800, 0x822fff, 0, 0, hd68k_ds3_sirq_state_r);
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x822000, 0x8227ff, 0, 0, hd68k_ds3_sdata_w);
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x823800, 0x823fff, 0, 0, hd68k_ds3_control_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x820000, 0x8207ff, FUNC(hd68k_ds3_gdata_r));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x820800, 0x820fff, FUNC(hd68k_ds3_girq_state_r));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x820000, 0x8207ff, FUNC(hd68k_ds3_gdata_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x821000, 0x8217ff, FUNC(hd68k_adsp_irq_clear_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x822000, 0x8227ff, FUNC(hd68k_ds3_sdata_r));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x822800, 0x822fff, FUNC(hd68k_ds3_sirq_state_r));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x822000, 0x8227ff, FUNC(hd68k_ds3_sdata_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x823800, 0x823fff, FUNC(hd68k_ds3_control_w));
 
 	/* if we have a sound DSP, boot it */
 	if (state->ds4cpu1 != NULL)
@@ -3924,26 +3924,26 @@ static void init_dsk(running_machine *machine)
 	UINT8 *usr3 = machine->region("user3")->base();
 
 	/* install ASIC61 */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x85c000, 0x85c7ff, 0, 0, hd68k_dsk_dsp32_r, hd68k_dsk_dsp32_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x85c000, 0x85c7ff, FUNC(hd68k_dsk_dsp32_r), FUNC(hd68k_dsk_dsp32_w));
 
 	/* install control registers */
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x85c800, 0x85c81f, 0, 0, hd68k_dsk_control_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x85c800, 0x85c81f, FUNC(hd68k_dsk_control_w));
 
 	/* install extra RAM */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x900000, 0x90ffff, 0, 0, hd68k_dsk_ram_r, hd68k_dsk_ram_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x900000, 0x90ffff, FUNC(hd68k_dsk_ram_r), FUNC(hd68k_dsk_ram_w));
 	state->dsk_ram = (UINT16 *)(usr3 + 0x40000);
 
 	/* install extra ZRAM */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x910000, 0x910fff, 0, 0, hd68k_dsk_zram_r, hd68k_dsk_zram_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x910000, 0x910fff, FUNC(hd68k_dsk_zram_r), FUNC(hd68k_dsk_zram_w));
 	state->dsk_zram = (UINT16 *)(usr3 + 0x50000);
 
 	/* install ASIC65 */
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x914000, 0x917fff, 0, 0, asic65_data_w);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x914000, 0x917fff, 0, 0, asic65_r);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x918000, 0x91bfff, 0, 0, asic65_io_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x914000, 0x917fff, FUNC(asic65_data_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x914000, 0x917fff, FUNC(asic65_r));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x918000, 0x91bfff, FUNC(asic65_io_r));
 
 	/* install extra ROM */
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x940000, 0x9fffff, 0, 0, hd68k_dsk_small_rom_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x940000, 0x9fffff, FUNC(hd68k_dsk_small_rom_r));
 	state->dsk_rom = (UINT16 *)(usr3 + 0x00000);
 
 	/* set up the ASIC65 */
@@ -3958,22 +3958,22 @@ static void init_dsk2(running_machine *machine)
 	UINT8 *usr3 = machine->region("user3")->base();
 
 	/* install ASIC65 */
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x824000, 0x824003, 0, 0, asic65_data_w);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x824000, 0x824003, 0, 0, asic65_r);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x825000, 0x825001, 0, 0, asic65_io_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x824000, 0x824003, FUNC(asic65_data_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x824000, 0x824003, FUNC(asic65_r));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x825000, 0x825001, FUNC(asic65_io_r));
 
 	/* install ASIC61 */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x827000, 0x8277ff, 0, 0, hd68k_dsk_dsp32_r, hd68k_dsk_dsp32_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x827000, 0x8277ff, FUNC(hd68k_dsk_dsp32_r), FUNC(hd68k_dsk_dsp32_w));
 
 	/* install control registers */
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x827800, 0x82781f, 0, 0, hd68k_dsk_control_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x827800, 0x82781f, FUNC(hd68k_dsk_control_w));
 
 	/* install extra RAM */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x880000, 0x8bffff, 0, 0, hd68k_dsk_ram_r, hd68k_dsk_ram_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x880000, 0x8bffff, FUNC(hd68k_dsk_ram_r), FUNC(hd68k_dsk_ram_w));
 	state->dsk_ram = (UINT16 *)(usr3 + 0x100000);
 
 	/* install extra ROM */
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x900000, 0x9fffff, 0, 0, hd68k_dsk_rom_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x900000, 0x9fffff, FUNC(hd68k_dsk_rom_r));
 	state->dsk_rom = (UINT16 *)(usr3 + 0x000000);
 
 	/* set up the ASIC65 */
@@ -3987,15 +3987,15 @@ static void init_dspcom(running_machine *machine)
 	harddriv_state *state = machine->driver_data<harddriv_state>();
 
 	/* install ASIC65 */
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x900000, 0x900003, 0, 0, asic65_data_w);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x900000, 0x900003, 0, 0, asic65_r);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x901000, 0x910001, 0, 0, asic65_io_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x900000, 0x900003, FUNC(asic65_data_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x900000, 0x900003, FUNC(asic65_r));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x901000, 0x910001, FUNC(asic65_io_r));
 
 	/* set up the ASIC65 */
 	asic65_config(machine, ASIC65_STEELTAL);
 
 	/* install DSPCOM control */
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x904000, 0x90401f, 0, 0, hddspcom_control_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x904000, 0x90401f, FUNC(hddspcom_control_w));
 }
 
 
@@ -4007,9 +4007,9 @@ static void init_driver_sound(running_machine *machine)
 	hdsnd_init(machine);
 
 	/* install sound handlers */
-	memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x840000, 0x840001, 0, 0, hd68k_snd_data_r, hd68k_snd_data_w);
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x844000, 0x844001, 0, 0, hd68k_snd_status_r);
-	memory_install_write16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x84c000, 0x84c001, 0, 0, hd68k_snd_reset_w);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x840000, 0x840001, FUNC(hd68k_snd_data_r), FUNC(hd68k_snd_data_w));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x844000, 0x844001, FUNC(hd68k_snd_status_r));
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x84c000, 0x84c001, FUNC(hd68k_snd_reset_w));
 }
 
 
@@ -4031,18 +4031,18 @@ static DRIVER_INIT( harddriv )
 	init_driver_sound(machine);
 
 	/* set up gsp speedup handler */
-	state->gsp_speedup_addr[0] = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff9fc00, 0xfff9fc0f, 0, 0, hdgsp_speedup1_w);
-	state->gsp_speedup_addr[1] = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfffcfc00, 0xfffcfc0f, 0, 0, hdgsp_speedup2_w);
-	memory_install_read16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff9fc00, 0xfff9fc0f, 0, 0, hdgsp_speedup_r);
+	state->gsp_speedup_addr[0] = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff9fc00, 0xfff9fc0f, FUNC(hdgsp_speedup1_w));
+	state->gsp_speedup_addr[1] = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfffcfc00, 0xfffcfc0f, FUNC(hdgsp_speedup2_w));
+	state->gsp->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfff9fc00, 0xfff9fc0f, FUNC(hdgsp_speedup_r));
 	state->gsp_speedup_pc = 0xffc00f10;
 
 	/* set up msp speedup handler */
-	state->msp_speedup_addr = memory_install_write16_handler(state->msp->memory().space(AS_PROGRAM), 0x00751b00, 0x00751b0f, 0, 0, hdmsp_speedup_w);
-	memory_install_read16_handler(state->msp->memory().space(AS_PROGRAM), 0x00751b00, 0x00751b0f, 0, 0, hdmsp_speedup_r);
+	state->msp_speedup_addr = state->msp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00751b00, 0x00751b0f, FUNC(hdmsp_speedup_w));
+	state->msp->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00751b00, 0x00751b0f, FUNC(hdmsp_speedup_r));
 	state->msp_speedup_pc = 0x00723b00;
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
 }
 
 
@@ -4056,18 +4056,18 @@ static DRIVER_INIT( harddrivc )
 	init_driver_sound(machine);
 
 	/* set up gsp speedup handler */
-	state->gsp_speedup_addr[0] = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff9fc00, 0xfff9fc0f, 0, 0, hdgsp_speedup1_w);
-	state->gsp_speedup_addr[1] = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfffcfc00, 0xfffcfc0f, 0, 0, hdgsp_speedup2_w);
-	memory_install_read16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff9fc00, 0xfff9fc0f, 0, 0, hdgsp_speedup_r);
+	state->gsp_speedup_addr[0] = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff9fc00, 0xfff9fc0f, FUNC(hdgsp_speedup1_w));
+	state->gsp_speedup_addr[1] = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfffcfc00, 0xfffcfc0f, FUNC(hdgsp_speedup2_w));
+	state->gsp->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfff9fc00, 0xfff9fc0f, FUNC(hdgsp_speedup_r));
 	state->gsp_speedup_pc = 0xfff40ff0;
 
 	/* set up msp speedup handler */
-	state->msp_speedup_addr = memory_install_write16_handler(state->msp->memory().space(AS_PROGRAM), 0x00751b00, 0x00751b0f, 0, 0, hdmsp_speedup_w);
-	memory_install_read16_handler(state->msp->memory().space(AS_PROGRAM), 0x00751b00, 0x00751b0f, 0, 0, hdmsp_speedup_r);
+	state->msp_speedup_addr = state->msp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00751b00, 0x00751b0f, FUNC(hdmsp_speedup_w));
+	state->msp->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00751b00, 0x00751b0f, FUNC(hdmsp_speedup_r));
 	state->msp_speedup_pc = 0x00723b00;
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
 }
 
 
@@ -4081,13 +4081,13 @@ static DRIVER_INIT( stunrun )
 	atarijsa_init(machine, "IN0", 0x0020);
 
 	/* set up gsp speedup handler */
-	state->gsp_speedup_addr[0] = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff9fc00, 0xfff9fc0f, 0, 0, hdgsp_speedup1_w);
-	state->gsp_speedup_addr[1] = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfffcfc00, 0xfffcfc0f, 0, 0, hdgsp_speedup2_w);
-	memory_install_read16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff9fc00, 0xfff9fc0f, 0, 0, hdgsp_speedup_r);
+	state->gsp_speedup_addr[0] = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff9fc00, 0xfff9fc0f, FUNC(hdgsp_speedup1_w));
+	state->gsp_speedup_addr[1] = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfffcfc00, 0xfffcfc0f, FUNC(hdgsp_speedup2_w));
+	state->gsp->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfff9fc00, 0xfff9fc0f, FUNC(hdgsp_speedup_r));
 	state->gsp_speedup_pc = 0xfff41070;
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
 }
 
 
@@ -4103,14 +4103,14 @@ static DRIVER_INIT( racedriv )
 
 	/* set up the slapstic */
 	slapstic_init(machine, 117);
-	state->m68k_slapstic_base = memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xe0000, 0xfffff, 0, 0, rd68k_slapstic_r, rd68k_slapstic_w);
+	state->m68k_slapstic_base = state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe0000, 0xfffff, FUNC(rd68k_slapstic_r), FUNC(rd68k_slapstic_w));
 
 	/* synchronization */
-	state->rddsp32_sync[0] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x613c00, 0x613c03, 0, 0, rddsp32_sync0_w);
-	state->rddsp32_sync[1] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x613e00, 0x613e03, 0, 0, rddsp32_sync1_w);
+	state->rddsp32_sync[0] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x613c00, 0x613c03, FUNC(rddsp32_sync0_w));
+	state->rddsp32_sync[1] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x613e00, 0x613e03, FUNC(rddsp32_sync1_w));
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
 }
 
 
@@ -4126,22 +4126,22 @@ static void racedrivc_init_common(running_machine *machine, offs_t gsp_protectio
 
 	/* set up the slapstic */
 	slapstic_init(machine, 117);
-	state->m68k_slapstic_base = memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xe0000, 0xfffff, 0, 0, rd68k_slapstic_r, rd68k_slapstic_w);
+	state->m68k_slapstic_base = state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe0000, 0xfffff, FUNC(rd68k_slapstic_r), FUNC(rd68k_slapstic_w));
 
 	/* synchronization */
-	state->rddsp32_sync[0] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x613c00, 0x613c03, 0, 0, rddsp32_sync0_w);
-	state->rddsp32_sync[1] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x613e00, 0x613e03, 0, 0, rddsp32_sync1_w);
+	state->rddsp32_sync[0] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x613c00, 0x613c03, FUNC(rddsp32_sync0_w));
+	state->rddsp32_sync[1] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x613e00, 0x613e03, FUNC(rddsp32_sync1_w));
 
 	/* set up protection hacks */
-	state->gsp_protection = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), gsp_protection, gsp_protection + 0x0f, 0, 0, hdgsp_protection_w);
+	state->gsp_protection = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(gsp_protection, gsp_protection + 0x0f, FUNC(hdgsp_protection_w));
 
 	/* set up gsp speedup handler */
-	state->gsp_speedup_addr[0] = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff76f60, 0xfff76f6f, 0, 0, rdgsp_speedup1_w);
-	memory_install_read16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff76f60, 0xfff76f6f, 0, 0, rdgsp_speedup1_r);
+	state->gsp_speedup_addr[0] = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff76f60, 0xfff76f6f, FUNC(rdgsp_speedup1_w));
+	state->gsp->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfff76f60, 0xfff76f6f, FUNC(rdgsp_speedup1_r));
 	state->gsp_speedup_pc = 0xfff43a00;
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
 }
 
 static DRIVER_INIT( racedrivc ) { racedrivc_init_common(machine, 0xfff95cd0); }
@@ -4166,34 +4166,34 @@ static void steeltal_init_common(running_machine *machine, offs_t ds3_transfer_p
 	init_dspcom(machine);
 	atarijsa_init(machine, "IN0", 0x0020);
 
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x908000, 0x908001, 0, 0, steeltal_dummy_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x908000, 0x908001, FUNC(steeltal_dummy_r));
 
 	/* set up the SLOOP */
 	if (!proto_sloop)
 	{
-		state->m68k_slapstic_base = memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xe0000, 0xfffff, 0, 0, st68k_sloop_r, st68k_sloop_w);
-		state->m68k_sloop_alt_base = memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0x4e000, 0x4ffff, 0, 0, st68k_sloop_alt_r);
+		state->m68k_slapstic_base = state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe0000, 0xfffff, FUNC(st68k_sloop_r), FUNC(st68k_sloop_w));
+		state->m68k_sloop_alt_base = state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4e000, 0x4ffff, FUNC(st68k_sloop_alt_r));
 	}
 	else
-		state->m68k_slapstic_base = memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xe0000, 0xfffff, 0, 0, st68k_protosloop_r, st68k_protosloop_w);
+		state->m68k_slapstic_base = state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe0000, 0xfffff, FUNC(st68k_protosloop_r), FUNC(st68k_protosloop_w));
 
 	/* synchronization */
 	state->stmsp_sync[0] = &state->msp_ram[TOWORD(0x80010)];
-	memory_install_write16_handler(state->msp->memory().space(AS_PROGRAM), 0x80010, 0x8007f, 0, 0, stmsp_sync0_w);
+	state->msp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x80010, 0x8007f, FUNC(stmsp_sync0_w));
 	state->stmsp_sync[1] = &state->msp_ram[TOWORD(0x99680)];
-	memory_install_write16_handler(state->msp->memory().space(AS_PROGRAM), 0x99680, 0x9968f, 0, 0, stmsp_sync1_w);
+	state->msp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x99680, 0x9968f, FUNC(stmsp_sync1_w));
 	state->stmsp_sync[2] = &state->msp_ram[TOWORD(0x99d30)];
-	memory_install_write16_handler(state->msp->memory().space(AS_PROGRAM), 0x99d30, 0x99d4f, 0, 0, stmsp_sync2_w);
+	state->msp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x99d30, 0x99d4f, FUNC(stmsp_sync2_w));
 
 	/* set up protection hacks */
-	state->gsp_protection = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff965d0, 0xfff965df, 0, 0, hdgsp_protection_w);
+	state->gsp_protection = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff965d0, 0xfff965df, FUNC(hdgsp_protection_w));
 
 	/* set up msp speedup handlers */
-	memory_install_read16_handler(state->msp->memory().space(AS_PROGRAM), 0x80020, 0x8002f, 0, 0, stmsp_speedup_r);
+	state->msp->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80020, 0x8002f, FUNC(stmsp_speedup_r));
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1f99, 0x1f99, 0, 0, hdds3_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1f99, 0x1f99, FUNC(hdds3_speedup_r));
 	state->ds3_speedup_addr = &state->adsp_data_memory[0x1f99];
 	state->ds3_speedup_pc = 0xff;
 	state->ds3_transfer_pc = ds3_transfer_pc;
@@ -4216,20 +4216,20 @@ static DRIVER_INIT( strtdriv )
 
 	/* set up the slapstic */
 	slapstic_init(machine, 117);
-	state->m68k_slapstic_base = memory_install_readwrite16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xe0000, 0xfffff, 0, 0, rd68k_slapstic_r, rd68k_slapstic_w);
+	state->m68k_slapstic_base = state->maincpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe0000, 0xfffff, FUNC(rd68k_slapstic_r), FUNC(rd68k_slapstic_w));
 
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xa80000, 0xafffff, 0, 0, hda68k_port1_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa80000, 0xafffff, FUNC(hda68k_port1_r));
 
 	/* synchronization */
-	state->rddsp32_sync[0] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x613c00, 0x613c03, 0, 0, rddsp32_sync0_w);
-	state->rddsp32_sync[1] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x613e00, 0x613e03, 0, 0, rddsp32_sync1_w);
+	state->rddsp32_sync[0] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x613c00, 0x613c03, FUNC(rddsp32_sync0_w));
+	state->rddsp32_sync[1] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x613e00, 0x613e03, FUNC(rddsp32_sync1_w));
 
 	/* set up protection hacks */
-	state->gsp_protection = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff960a0, 0xfff960af, 0, 0, hdgsp_protection_w);
+	state->gsp_protection = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff960a0, 0xfff960af, FUNC(hdgsp_protection_w));
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1f99, 0x1f99, 0, 0, hdds3_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1f99, 0x1f99, FUNC(hdds3_speedup_r));
 	state->ds3_speedup_addr = &state->adsp_data_memory[0x1f99];
 	state->ds3_speedup_pc = 0xff;
 	state->ds3_transfer_pc = 0x43672;
@@ -4245,18 +4245,18 @@ static DRIVER_INIT( hdrivair )
 	init_ds3(machine);
 	init_dsk2(machine);
 
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xa80000, 0xafffff, 0, 0, hda68k_port1_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa80000, 0xafffff, FUNC(hda68k_port1_r));
 
 	/* synchronization */
-	state->rddsp32_sync[0] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x21fe00, 0x21fe03, 0, 0, rddsp32_sync0_w);
-	state->rddsp32_sync[1] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x21ff00, 0x21ff03, 0, 0, rddsp32_sync1_w);
+	state->rddsp32_sync[0] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x21fe00, 0x21fe03, FUNC(rddsp32_sync0_w));
+	state->rddsp32_sync[1] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x21ff00, 0x21ff03, FUNC(rddsp32_sync1_w));
 
 	/* set up protection hacks */
-	state->gsp_protection = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff943f0, 0xfff943ff, 0, 0, hdgsp_protection_w);
+	state->gsp_protection = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff943f0, 0xfff943ff, FUNC(hdgsp_protection_w));
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1f99, 0x1f99, 0, 0, hdds3_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1f99, 0x1f99, FUNC(hdds3_speedup_r));
 	state->ds3_speedup_addr = &state->adsp_data_memory[0x1f99];
 	state->ds3_speedup_pc = 0x2da;
 	state->ds3_transfer_pc = 0x407b8;
@@ -4272,18 +4272,18 @@ static DRIVER_INIT( hdrivairp )
 	init_ds3(machine);
 	init_dsk2(machine);
 
-	memory_install_read16_handler(state->maincpu->memory().space(AS_PROGRAM), 0xa80000, 0xafffff, 0, 0, hda68k_port1_r);
+	state->maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa80000, 0xafffff, FUNC(hda68k_port1_r));
 
 	/* synchronization */
-	state->rddsp32_sync[0] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x21fe00, 0x21fe03, 0, 0, rddsp32_sync0_w);
-	state->rddsp32_sync[1] = memory_install_write32_handler(state->dsp32->memory().space(AS_PROGRAM), 0x21ff00, 0x21ff03, 0, 0, rddsp32_sync1_w);
+	state->rddsp32_sync[0] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x21fe00, 0x21fe03, FUNC(rddsp32_sync0_w));
+	state->rddsp32_sync[1] = state->dsp32->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x21ff00, 0x21ff03, FUNC(rddsp32_sync1_w));
 
 	/* set up protection hacks */
-	state->gsp_protection = memory_install_write16_handler(state->gsp->memory().space(AS_PROGRAM), 0xfff916c0, 0xfff916cf, 0, 0, hdgsp_protection_w);
+	state->gsp_protection = state->gsp->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfff916c0, 0xfff916cf, FUNC(hdgsp_protection_w));
 
 	/* set up adsp speedup handlers */
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
-	memory_install_read16_handler(state->adsp->memory().space(AS_DATA), 0x1f9a, 0x1f9a, 0, 0, hdds3_speedup_r);
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1fff, 0x1fff, FUNC(hdadsp_speedup_r));
+	state->adsp->memory().space(AS_DATA)->install_legacy_read_handler(0x1f9a, 0x1f9a, FUNC(hdds3_speedup_r));
 	state->ds3_speedup_addr = &state->adsp_data_memory[0x1f9a];
 	state->ds3_speedup_pc = 0x2d9;
 	state->ds3_transfer_pc = 0X407da;

@@ -591,18 +591,18 @@ static DRIVER_INIT( cashquiz )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x4000, 0, 0, cashquiz_question_bank_high_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4001, 0x4001, 0, 0, cashquiz_question_bank_low_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4000, 0x4000, FUNC(cashquiz_question_bank_high_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4001, 0x4001, FUNC(cashquiz_question_bank_low_w));
 
 	// 8 independents banks for questions
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x50ff, 0, 0, "bank1");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5100, 0x51ff, 0, 0, "bank2");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5200, 0x52ff, 0, 0, "bank3");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5300, 0x53ff, 0, 0, "bank4");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5400, 0x54ff, 0, 0, "bank5");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5500, 0x55ff, 0, 0, "bank6");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5600, 0x56ff, 0, 0, "bank7");
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5700, 0x57ff, 0, 0, "bank8");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x50ff, "bank1");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5100, 0x51ff, "bank2");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5200, 0x52ff, "bank3");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5300, 0x53ff, "bank4");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5400, 0x54ff, "bank5");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5500, 0x55ff, "bank6");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5600, 0x56ff, "bank7");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5700, 0x57ff, "bank8");
 
 	// setup default banks
 	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x100*0 );

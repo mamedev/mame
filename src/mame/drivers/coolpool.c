@@ -1200,7 +1200,7 @@ static DRIVER_INIT( amerdart )
 
 static DRIVER_INIT( coolpool )
 {
-	memory_install_read16_handler(machine->device("dsp")->memory().space(AS_IO), 0x07, 0x07, 0, 0, coolpool_input_r);
+	machine->device("dsp")->memory().space(AS_IO)->install_legacy_read_handler(0x07, 0x07, FUNC(coolpool_input_r));
 
 	register_state_save(machine);
 }

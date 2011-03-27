@@ -1600,7 +1600,7 @@ static void init_crusnusa_common(running_machine *machine, offs_t speedup)
 	state->adc_shift = 24;
 
 	/* speedups */
-	state->generic_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), speedup, speedup + 1, 0, 0, generic_speedup_r);
+	state->generic_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(speedup, speedup + 1, FUNC(generic_speedup_r));
 }
 static DRIVER_INIT( crusnusa ) { init_crusnusa_common(machine, 0xc93e); }
 static DRIVER_INIT( crusnu40 ) { init_crusnusa_common(machine, 0xc957); }
@@ -1614,21 +1614,21 @@ static void init_crusnwld_common(running_machine *machine, offs_t speedup)
 	state->adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x994000, 0x994000, FUNC(crusnwld_control_w));
 
 	/* valid values are 450 or 460 */
 	midway_serial_pic_init(machine, 450);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x991030, 0x991030, FUNC(offroadc_serial_status_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x996000, 0x996000, FUNC(offroadc_serial_data_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x996000, 0x996000, FUNC(offroadc_serial_data_w));
 
 	/* install strange protection device */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9d0000, 0x9d1fff, FUNC(bit_data_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x9d0000, 0x9d0000, FUNC(bit_reset_w));
 
 	/* speedups */
 	if (speedup)
-		state->generic_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), speedup, speedup + 1, 0, 0, generic_speedup_r);
+		state->generic_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(speedup, speedup + 1, FUNC(generic_speedup_r));
 }
 static DRIVER_INIT( crusnwld ) { init_crusnwld_common(machine, 0xd4c0); }
 #if 0
@@ -1643,15 +1643,15 @@ static DRIVER_INIT( offroadc )
 	state->adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x994000, 0x994000, FUNC(crusnwld_control_w));
 
 	/* valid values are 230 or 234 */
 	midway_serial_pic2_init(machine, 230, 94);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x991030, 0x991030, FUNC(offroadc_serial_status_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x996000, 0x996000, FUNC(offroadc_serial_data_r), FUNC(offroadc_serial_data_w));
 
 	/* speedups */
-	state->generic_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
+	state->generic_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x195aa, 0x195aa, FUNC(generic_speedup_r));
 }
 
 
@@ -1677,7 +1677,7 @@ static DRIVER_INIT( wargods )
 	midway_serial_pic2_set_default_nvram(default_nvram);
 
 	/* speedups */
-	state->generic_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
+	state->generic_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2f4c, 0x2f4c, FUNC(generic_speedup_r));
 }
 
 

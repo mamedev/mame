@@ -2821,22 +2821,22 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			memory_unmap_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00400000, 0x007fffff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_readwrite(0x00400000, 0x007fffff);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
 			device = machine->device("ethernet");
-			memory_install_readwrite32_device_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), device, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, 0x16c00000, 0x16c0001f, FUNC(widget_r), FUNC(widget_w));
 			break;
 
 		case FLAGSTAFF_CONFIG:
 			/* set up the analog inputs */
-			memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x14000000, 0x14000003, FUNC(analog_port_r), FUNC(analog_port_w));
 
 			/* set up the ethernet controller */
 			device = machine->device("ethernet");
-			memory_install_readwrite32_device_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), device, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, 0x16c00000, 0x16c0003f, FUNC(ethernet_r), FUNC(ethernet_w));
 			break;
 	}
 }
@@ -2965,7 +2965,7 @@ static DRIVER_INIT( carnevil )
 	init_common(machine, MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
 
 	/* set up the gun */
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x16800000, 0x1680001f, FUNC(carnevil_gun_r), FUNC(carnevil_gun_w));
 
 	/* speedups */
 	mips3drc_add_hotspot(machine->device("maincpu"), 0x8015176C, 0x3C03801A, 250);		/* confirmed */

@@ -915,12 +915,12 @@ static DRIVER_INIT( namcos11 )
 	namcos11_state *state = machine->driver_data<namcos11_state>();
 	int n_game;
 
-	memory_install_readwrite16_handler(machine->device("c76")->memory().space(AS_PROGRAM), 0x82, 0x83, 0, 0, c76_speedup_r, c76_speedup_w);
+	machine->device("c76")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(c76_speedup_r), FUNC(c76_speedup_w));
 
 	if( strcmp( machine->gamedrv->name, "pocketrc" ) == 0 )
 	{
-		memory_install_read8_handler(machine->device("c76")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC0_L, 0, 0, pocketrc_steer_r);
-		memory_install_read8_handler(machine->device("c76")->memory().space(AS_IO), M37710_ADC1_L, M37710_ADC1_L, 0, 0, pocketrc_gas_r);
+		machine->device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC0_L, FUNC(pocketrc_steer_r));
+		machine->device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC1_L, M37710_ADC1_L, FUNC(pocketrc_gas_r));
 	}
 
 	psx_driver_init(machine);
@@ -932,7 +932,7 @@ static DRIVER_INIT( namcos11 )
 		{
 			if( namcos11_config_table[ n_game ].keycus_r != NULL )
 			{
-				memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1fa20000, 0x1fa2ffff, 0, 0, namcos11_config_table[ n_game ].keycus_r );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(namcos11_config_table[ n_game ].keycus_r) );
 			}
 			if( namcos11_config_table[ n_game ].n_daughterboard != 0 )
 			{
@@ -940,14 +940,14 @@ static DRIVER_INIT( namcos11 )
 				UINT32 len = machine->region( "user2" )->bytes();
 				UINT8 *rgn = machine->region( "user2" )->base();
 
-				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f000000, 0x1f0fffff, 0, 0, "bank1" );
-				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f100000, 0x1f1fffff, 0, 0, "bank2" );
-				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f200000, 0x1f2fffff, 0, 0, "bank3" );
-				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f300000, 0x1f3fffff, 0, 0, "bank4" );
-				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f400000, 0x1f4fffff, 0, 0, "bank5" );
-				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f500000, 0x1f5fffff, 0, 0, "bank6" );
-				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f600000, 0x1f6fffff, 0, 0, "bank7" );
-				memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f700000, 0x1f7fffff, 0, 0, "bank8" );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f000000, 0x1f0fffff, "bank1" );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f100000, 0x1f1fffff, "bank2" );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f200000, 0x1f2fffff, "bank3" );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f300000, 0x1f3fffff, "bank4" );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f400000, 0x1f4fffff, "bank5" );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f500000, 0x1f5fffff, "bank6" );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f600000, 0x1f6fffff, "bank7" );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f700000, 0x1f7fffff, "bank8" );
 
 				for( bank = 0; bank < 8; bank++ )
 				{
@@ -957,20 +957,20 @@ static DRIVER_INIT( namcos11 )
 
 				if( namcos11_config_table[ n_game ].n_daughterboard == 32 )
 				{
-					memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, bankswitch_rom32_w );
+					machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1fa10020, 0x1fa1002f, FUNC(bankswitch_rom32_w) );
 				}
 				if( namcos11_config_table[ n_game ].n_daughterboard == 64 )
 				{
 					state->m_n_bankoffset = 0;
-					memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
-					memory_nop_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0 );
-					memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, bankswitch_rom64_w );
+					machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f080000, 0x1f080003, FUNC(bankswitch_rom64_upper_w) );
+					machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x1fa10020, 0x1fa1002f);
+					machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1fa10020, 0x1fa1002f, FUNC(bankswitch_rom64_w) );
 					state->save_item( NAME(state->m_n_bankoffset) );
 				}
 			}
 			else
 			{
-				memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0 );
+				machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x1fa10020, 0x1fa1002f);
 			}
 			break;
 		}
@@ -979,8 +979,8 @@ static DRIVER_INIT( namcos11 )
 
 	if( strcmp( machine->gamedrv->name, "ptblank2a" ) == 0 )
 	{
-		memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, lightgun_w );
-		memory_install_read32_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, lightgun_r );
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(lightgun_w) );
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(lightgun_r) );
 	}
 }
 

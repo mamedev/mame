@@ -47,31 +47,31 @@ DEVICE_START( s3c2410 )
 {
 	address_space *space = device->machine->device( "maincpu")->memory().space( AS_PROGRAM);
 	DEVICE_START_CALL(s3c24xx);
-	memory_install_readwrite32_device_handler( space, device, 0x48000000, 0x4800003b, 0, 0, s3c24xx_memcon_r, s3c24xx_memcon_w);
-	memory_install_readwrite32_device_handler( space, device, 0x49000000, 0x4900005b, 0, 0, s3c24xx_usb_host_r, s3c24xx_usb_host_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4a000000, 0x4a00001f, 0, 0, s3c24xx_irq_r, s3c24xx_irq_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4b000000, 0x4b000023, 0, 0, s3c24xx_dma_0_r, s3c24xx_dma_0_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4b000040, 0x4b000063, 0, 0, s3c24xx_dma_1_r, s3c24xx_dma_1_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4b000080, 0x4b0000a3, 0, 0, s3c24xx_dma_2_r, s3c24xx_dma_2_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4b0000c0, 0x4b0000e3, 0, 0, s3c24xx_dma_3_r, s3c24xx_dma_3_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4c000000, 0x4c000017, 0, 0, s3c24xx_clkpow_r, s3c24xx_clkpow_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4d000000, 0x4d000063, 0, 0, s3c2410_lcd_r, s3c24xx_lcd_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4d000400, 0x4d0007ff, 0, 0, s3c24xx_lcd_palette_r, s3c24xx_lcd_palette_w);
-	memory_install_readwrite32_device_handler( space, device, 0x4e000000, 0x4e000017, 0, 0, s3c24xx_nand_r, s3c24xx_nand_w);
-	memory_install_readwrite32_device_handler( space, device, 0x50000000, 0x5000002b, 0, 0, s3c24xx_uart_0_r, s3c24xx_uart_0_w);
-	memory_install_readwrite32_device_handler( space, device, 0x50004000, 0x5000402b, 0, 0, s3c24xx_uart_1_r, s3c24xx_uart_1_w);
-	memory_install_readwrite32_device_handler( space, device, 0x50008000, 0x5000802b, 0, 0, s3c24xx_uart_2_r, s3c24xx_uart_2_w);
-	memory_install_readwrite32_device_handler( space, device, 0x51000000, 0x51000043, 0, 0, s3c24xx_pwm_r, s3c24xx_pwm_w);
-	memory_install_readwrite32_device_handler( space, device, 0x52000140, 0x5200026f, 0, 0, s3c24xx_usb_device_r, s3c24xx_usb_device_w);
-	memory_install_readwrite32_device_handler( space, device, 0x53000000, 0x5300000b, 0, 0, s3c24xx_wdt_r, s3c24xx_wdt_w);
-	memory_install_readwrite32_device_handler( space, device, 0x54000000, 0x5400000f, 0, 0, s3c24xx_iic_r, s3c24xx_iic_w);
-	memory_install_readwrite32_device_handler( space, device, 0x55000000, 0x55000013, 0, 0, s3c24xx_iis_r, s3c24xx_iis_w);
-	memory_install_readwrite32_device_handler( space, device, 0x56000000, 0x560000bf, 0, 0, s3c24xx_gpio_r, s3c24xx_gpio_w);
-	memory_install_readwrite32_device_handler( space, device, 0x57000040, 0x5700008b, 0, 0, s3c24xx_rtc_r, s3c24xx_rtc_w);
-	memory_install_readwrite32_device_handler( space, device, 0x58000000, 0x58000013, 0, 0, s3c24xx_adc_r, s3c24xx_adc_w);
-	memory_install_readwrite32_device_handler( space, device, 0x59000000, 0x59000017, 0, 0, s3c24xx_spi_0_r, s3c24xx_spi_0_w);
-	memory_install_readwrite32_device_handler( space, device, 0x59000020, 0x59000037, 0, 0, s3c24xx_spi_1_r, s3c24xx_spi_1_w);
-	memory_install_readwrite32_device_handler( space, device, 0x5a000000, 0x5a000043, 0, 0, s3c24xx_sdi_r, s3c24xx_sdi_w);
+	space->install_legacy_readwrite_handler( *device, 0x48000000, 0x4800003b, FUNC(s3c24xx_memcon_r), FUNC(s3c24xx_memcon_w));
+	space->install_legacy_readwrite_handler( *device, 0x49000000, 0x4900005b, FUNC(s3c24xx_usb_host_r), FUNC(s3c24xx_usb_host_w));
+	space->install_legacy_readwrite_handler( *device, 0x4a000000, 0x4a00001f, FUNC(s3c24xx_irq_r), FUNC(s3c24xx_irq_w));
+	space->install_legacy_readwrite_handler( *device, 0x4b000000, 0x4b000023, FUNC(s3c24xx_dma_0_r), FUNC(s3c24xx_dma_0_w));
+	space->install_legacy_readwrite_handler( *device, 0x4b000040, 0x4b000063, FUNC(s3c24xx_dma_1_r), FUNC(s3c24xx_dma_1_w));
+	space->install_legacy_readwrite_handler( *device, 0x4b000080, 0x4b0000a3, FUNC(s3c24xx_dma_2_r), FUNC(s3c24xx_dma_2_w));
+	space->install_legacy_readwrite_handler( *device, 0x4b0000c0, 0x4b0000e3, FUNC(s3c24xx_dma_3_r), FUNC(s3c24xx_dma_3_w));
+	space->install_legacy_readwrite_handler( *device, 0x4c000000, 0x4c000017, FUNC(s3c24xx_clkpow_r), FUNC(s3c24xx_clkpow_w));
+	space->install_legacy_readwrite_handler( *device, 0x4d000000, 0x4d000063, FUNC(s3c2410_lcd_r), FUNC(s3c24xx_lcd_w));
+	space->install_legacy_readwrite_handler( *device, 0x4d000400, 0x4d0007ff, FUNC(s3c24xx_lcd_palette_r), FUNC(s3c24xx_lcd_palette_w));
+	space->install_legacy_readwrite_handler( *device, 0x4e000000, 0x4e000017, FUNC(s3c24xx_nand_r), FUNC(s3c24xx_nand_w));
+	space->install_legacy_readwrite_handler( *device, 0x50000000, 0x5000002b, FUNC(s3c24xx_uart_0_r), FUNC(s3c24xx_uart_0_w));
+	space->install_legacy_readwrite_handler( *device, 0x50004000, 0x5000402b, FUNC(s3c24xx_uart_1_r), FUNC(s3c24xx_uart_1_w));
+	space->install_legacy_readwrite_handler( *device, 0x50008000, 0x5000802b, FUNC(s3c24xx_uart_2_r), FUNC(s3c24xx_uart_2_w));
+	space->install_legacy_readwrite_handler( *device, 0x51000000, 0x51000043, FUNC(s3c24xx_pwm_r), FUNC(s3c24xx_pwm_w));
+	space->install_legacy_readwrite_handler( *device, 0x52000140, 0x5200026f, FUNC(s3c24xx_usb_device_r), FUNC(s3c24xx_usb_device_w));
+	space->install_legacy_readwrite_handler( *device, 0x53000000, 0x5300000b, FUNC(s3c24xx_wdt_r), FUNC(s3c24xx_wdt_w));
+	space->install_legacy_readwrite_handler( *device, 0x54000000, 0x5400000f, FUNC(s3c24xx_iic_r), FUNC(s3c24xx_iic_w));
+	space->install_legacy_readwrite_handler( *device, 0x55000000, 0x55000013, FUNC(s3c24xx_iis_r), FUNC(s3c24xx_iis_w));
+	space->install_legacy_readwrite_handler( *device, 0x56000000, 0x560000bf, FUNC(s3c24xx_gpio_r), FUNC(s3c24xx_gpio_w));
+	space->install_legacy_readwrite_handler( *device, 0x57000040, 0x5700008b, FUNC(s3c24xx_rtc_r), FUNC(s3c24xx_rtc_w));
+	space->install_legacy_readwrite_handler( *device, 0x58000000, 0x58000013, FUNC(s3c24xx_adc_r), FUNC(s3c24xx_adc_w));
+	space->install_legacy_readwrite_handler( *device, 0x59000000, 0x59000017, FUNC(s3c24xx_spi_0_r), FUNC(s3c24xx_spi_0_w));
+	space->install_legacy_readwrite_handler( *device, 0x59000020, 0x59000037, FUNC(s3c24xx_spi_1_r), FUNC(s3c24xx_spi_1_w));
+	space->install_legacy_readwrite_handler( *device, 0x5a000000, 0x5a000043, FUNC(s3c24xx_sdi_r), FUNC(s3c24xx_sdi_w));
 }
 
 DEVICE_GET_INFO( s3c2410 )

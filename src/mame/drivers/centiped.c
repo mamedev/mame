@@ -1987,8 +1987,8 @@ static DRIVER_INIT( caterplr )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *device = machine->device("pokey");
-	memory_install_readwrite8_device_handler(space, device, 0x1000, 0x100f, 0, 0, caterplr_AY8910_r, caterplr_AY8910_w);
-	memory_install_read8_device_handler(space, device, 0x1780, 0x1780, 0, 0, caterplr_rand_r);
+	space->install_legacy_readwrite_handler(*device, 0x1000, 0x100f, FUNC(caterplr_AY8910_r), FUNC(caterplr_AY8910_w));
+	space->install_legacy_read_handler(*device, 0x1780, 0x1780, FUNC(caterplr_rand_r));
 }
 
 
@@ -1996,8 +1996,8 @@ static DRIVER_INIT( magworm )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 	device_t *device = machine->device("pokey");
-	memory_install_write8_device_handler(space, device, 0x1001, 0x1001, 0, 0, ay8910_address_w);
-	memory_install_readwrite8_device_handler(space, device, 0x1003, 0x1003, 0, 0, ay8910_r, ay8910_data_w);
+	space->install_legacy_write_handler(*device, 0x1001, 0x1001, FUNC(ay8910_address_w));
+	space->install_legacy_readwrite_handler(*device, 0x1003, 0x1003, FUNC(ay8910_r), FUNC(ay8910_data_w));
 }
 
 

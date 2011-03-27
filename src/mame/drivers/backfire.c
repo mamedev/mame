@@ -685,7 +685,7 @@ static DRIVER_INIT( backfire )
 	deco156_decrypt(machine);
 	machine->device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0170018, 0x017001b, FUNC(backfire_speedup_r) );
 }
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", GAME_SUPPORTS_SAVE )

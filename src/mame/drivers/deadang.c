@@ -403,8 +403,8 @@ static DRIVER_INIT( ghunter )
 	seibu_sound_decrypt(machine, "audiocpu", 0x2000);
 	seibu_adpcm_decrypt(machine, "adpcm");
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80000, 0x80001, 0, 0, ghunter_trackball_low_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb0000, 0xb0001, 0, 0, ghunter_trackball_high_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80000, 0x80001, FUNC(ghunter_trackball_low_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb0000, 0xb0001, FUNC(ghunter_trackball_high_r));
 }
 
 /* Game Drivers */

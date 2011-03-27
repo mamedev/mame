@@ -977,9 +977,9 @@ static DRIVER_INIT( lkage )
 static DRIVER_INIT( lkageb )
 {
 	lkage_state *state = machine->driver_data<lkage_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf087, 0xf087, 0, 0, fake_status_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf062, 0xf062, FUNC(fake_mcu_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf087, 0xf087, FUNC(fake_status_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf062, 0xf062, FUNC(fake_mcu_w) );
 	state->sprite_dx=0;
 }
 

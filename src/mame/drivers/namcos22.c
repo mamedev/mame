@@ -5777,19 +5777,19 @@ static READ16_HANDLER( mcuc74_speedup_r )
 
 static void install_c74_speedup(running_machine *machine)
 {
-	memory_install_readwrite16_handler(machine->device("mcu")->memory().space(AS_PROGRAM), 0x80, 0x81, 0, 0, mcuc74_speedup_r, mcu_speedup_w);
+	machine->device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x80, 0x81, FUNC(mcuc74_speedup_r), FUNC(mcu_speedup_w));
 }
 
 static void install_130_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.30 MCU BIOS
-	memory_install_readwrite16_handler(machine->device("mcu")->memory().space(AS_PROGRAM), 0x82, 0x83, 0, 0, mcu130_speedup_r, mcu_speedup_w);
+	machine->device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu130_speedup_r), FUNC(mcu_speedup_w));
 }
 
 static void install_141_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.41 MCU BIOS
-	memory_install_readwrite16_handler(machine->device("mcu")->memory().space(AS_PROGRAM), 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
+	machine->device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu141_speedup_r), FUNC(mcu_speedup_w));
 }
 
 static void namcos22_init( running_machine *machine, enum namcos22_gametype game_type )
@@ -5808,7 +5808,7 @@ static DRIVER_INIT( alpiner )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_RACER);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 
 	install_130_speedup(machine);
 }
@@ -5817,7 +5817,7 @@ static DRIVER_INIT( alpiner2 )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_RACER_2);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 
 	install_130_speedup(machine);
 }
@@ -5826,7 +5826,7 @@ static DRIVER_INIT( alpinesa )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_SURFER);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
 
 	install_141_speedup(machine);
 }
@@ -5835,7 +5835,7 @@ static DRIVER_INIT( airco22 )
 {
 	namcos22s_init(machine, NAMCOS22_AIR_COMBAT22);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(airco22_mcu_adc_r));
 }
 
 static DRIVER_INIT( propcycl )
@@ -5859,7 +5859,7 @@ static DRIVER_INIT( propcycl )
 
 	namcos22s_init(machine, NAMCOS22_PROP_CYCLE);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(propcycle_mcu_adc_r));
 
 	install_141_speedup(machine);
 }
@@ -5945,7 +5945,7 @@ static DRIVER_INIT( cybrcyc )
 
 	namcos22s_init(machine, NAMCOS22_CYBER_CYCLES);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
 
 	install_130_speedup(machine);
 }
@@ -5961,21 +5961,21 @@ static DRIVER_INIT( tokyowar )
 {
 	namcos22s_init(machine, NAMCOS22_TOKYO_WARS);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, tokyowar_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(tokyowar_mcu_adc_r));
 }
 
 static DRIVER_INIT( aquajet )
 {
 	namcos22s_init(machine, NAMCOS22_AQUA_JET);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(aquajet_mcu_adc_r));
 }
 
 static DRIVER_INIT( dirtdash )
 {
 	namcos22s_init(machine, NAMCOS22_DIRT_DASH);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
+	machine->device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(aquajet_mcu_adc_r));
 }
 
 /************************************************************************************/

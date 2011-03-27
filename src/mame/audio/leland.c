@@ -1511,12 +1511,12 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			temp = (state->i80186.mem.peripheral & 0xffc0) << 4;
 			if (state->i80186.mem.middle_size & 0x0040)
 			{
-				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(AS_PROGRAM), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
+				state->i80186.cpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, temp, temp + 0x2ff, FUNC(peripheral_r), FUNC(peripheral_w));
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(AS_IO), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
+				state->i80186.cpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*device, temp, temp + 0x2ff, FUNC(peripheral_r), FUNC(peripheral_w));
 			}
 
 			/* we need to do this at a time when the 80186 context is swapped in */
@@ -1582,12 +1582,12 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			temp = (data & 0x0fff) << 8;
 			if (data & 0x1000)
 			{
-				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(AS_PROGRAM), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
+				state->i80186.cpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*device, temp, temp + 0xff, FUNC(i80186_internal_port_r), FUNC(i80186_internal_port_w));
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(AS_IO), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
+				state->i80186.cpu->memory().space(AS_IO)->install_legacy_readwrite_handler(*device, temp, temp + 0xff, FUNC(i80186_internal_port_r), FUNC(i80186_internal_port_w));
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;

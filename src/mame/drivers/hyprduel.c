@@ -812,10 +812,10 @@ static DRIVER_INIT( hyprduel )
 	state->int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc0040e, 0xc00411, 0, 0, hyprduel_cpusync_trigger1_w);
-	memory_install_read16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger1_r);
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00408, 0xc00409, 0, 0, hyprduel_cpusync_trigger2_w);
-	memory_install_read16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0xfff34c, 0xfff34d, 0, 0, hyprduel_cpusync_trigger2_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc0040e, 0xc00411, FUNC(hyprduel_cpusync_trigger1_w));
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00408, 0xc00409, FUNC(hyprduel_cpusync_trigger1_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00408, 0xc00409, FUNC(hyprduel_cpusync_trigger2_w));
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfff34c, 0xfff34d, FUNC(hyprduel_cpusync_trigger2_r));
 }
 
 static DRIVER_INIT( magerror )

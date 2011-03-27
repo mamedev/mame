@@ -1333,7 +1333,7 @@ ROM_END
 static DRIVER_INIT( gyrodine )
 {
 	/* add watchdog */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xe000, 0, 0, watchdog_reset_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xe000, FUNC(watchdog_reset_w));
 }
 
 
@@ -1342,10 +1342,10 @@ static DRIVER_INIT( srdmissn )
 	kyugo_state *state = machine->driver_data<kyugo_state>();
 
 	/* shared RAM is mapped at 0xe000 as well  */
-	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xe000, 0xe7ff, 0, 0, state->shared_ram);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0xe000, 0xe7ff, state->shared_ram);
 
 	/* extra RAM on sub CPU  */
-	memory_install_ram(machine->device("sub")->memory().space(AS_PROGRAM), 0x8800, 0x8fff, 0, 0, NULL);
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_ram(0x8800, 0x8fff);
 }
 
 

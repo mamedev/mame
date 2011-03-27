@@ -2216,9 +2216,9 @@ static void init_lights(running_machine *machine, write32_space_func out1, write
 	if(!out2) out1 = lamp_output2_w;
 	if(!out3) out1 = lamp_output3_w;
 
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7d000804, 0x7d000807, 0, 0, out1);
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7d000320, 0x7d000323, 0, 0, out2);
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7d000324, 0x7d000327, 0, 0, out3);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000804, 0x7d000807, FUNC(out1));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000320, 0x7d000323, FUNC(out2));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x7d000324, 0x7d000327, FUNC(out3));
 }
 
 static void init_firebeat(running_machine *machine)

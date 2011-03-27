@@ -9107,7 +9107,7 @@ static DRIVER_INIT( rongrong )
        version of the game might be a bootleg with the protection
        patched. (both sets need this)
      */
-	memory_nop_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60d4, 0x60d4, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x60d4, 0x60d4);
 }
 
 /***************************************************************************

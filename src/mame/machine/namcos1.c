@@ -685,12 +685,12 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 	if (!handler->bank_handler_r)
 	{
 		if (state->active_bank[banknum].bank_handler_r)
-			memory_install_read_bank(space, bankstart, bankstart + 0x1fff, 0, 0, banktags[banknum]);
+			space->install_read_bank(bankstart, bankstart + 0x1fff, banktags[banknum]);
 	}
 	else
 	{
 		if (!state->active_bank[banknum].bank_handler_r)
-			memory_install_read8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_r[banknum]);
+			space->install_legacy_read_handler(bankstart, bankstart + 0x1fff, FUNC(io_bank_handler_r[banknum]));
 	}
 
 	/* write handlers (except for the 0xe000-0xffff range) */
@@ -699,12 +699,12 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 		if (!handler->bank_handler_w)
 		{
 			if (state->active_bank[banknum].bank_handler_w)
-				memory_install_write_bank(space, bankstart, bankstart + 0x1fff, 0, 0, banktags[banknum]);
+				space->install_write_bank(bankstart, bankstart + 0x1fff, banktags[banknum]);
 		}
 		else
 		{
 			if (!state->active_bank[banknum].bank_handler_r)
-				memory_install_write8_handler(space, bankstart, bankstart + 0x1fff, 0, 0, io_bank_handler_w[banknum]);
+				space->install_legacy_write_handler(bankstart, bankstart + 0x1fff, FUNC(io_bank_handler_w[banknum]));
 		}
 	}
 
@@ -1216,7 +1216,7 @@ DRIVER_INIT( tankfrc4 )
 	};
 	namcos1_driver_init(machine, &tankfrce_specific);
 
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
+	machine->device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
 }
 
 /*******************************************************************************
@@ -1307,7 +1307,7 @@ static READ8_HANDLER( quester_paddle_r )
 DRIVER_INIT( quester )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_PROGRAM), 0x1400, 0x1401, 0, 0, quester_paddle_r);
+	machine->device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(quester_paddle_r));
 }
 
 
@@ -1396,7 +1396,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 DRIVER_INIT( berabohm )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_PROGRAM), 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
+	machine->device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(berabohm_buttons_r));
 }
 
 
@@ -1466,5 +1466,5 @@ static READ8_HANDLER( faceoff_inputs_r )
 DRIVER_INIT( faceoff )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(machine->device("mcu")->memory().space(AS_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
+	machine->device("mcu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1400, 0x1401, FUNC(faceoff_inputs_r));
 }

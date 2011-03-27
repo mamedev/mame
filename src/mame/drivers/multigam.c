@@ -542,7 +542,7 @@ static void multigam_init_mmc3(running_machine *machine, UINT8 *prg_base, int pr
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x4000), 0x4000);
 	memcpy(&dst[0xc000], prg_base + (prg_size - 0x4000), 0x4000);
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(multigam3_mmc3_rom_switch_w) );
 
 	state->multigam3_mmc3_banks[0] = 0x1e;
 	state->multigam3_mmc3_banks[1] = 0x1f;
@@ -589,7 +589,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 	}
 	else
 	{
-		memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
+		space->install_legacy_write_handler(0x8000, 0xffff, FUNC(multigm3_mapper2_w) );
 		memory_set_bankptr(space->machine, "bank10", space->machine->region("maincpu")->base() + 0x6000);
 	}
 
@@ -653,7 +653,7 @@ static void multigam_init_mapper02(running_machine *machine, UINT8* prg_base, in
 	multigam_state *state = machine->driver_data<multigam_state>();
 	UINT8* mem = machine->region("maincpu")->base();
 	memcpy(mem + 0x8000, prg_base + prg_size - 0x8000, 0x8000);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mapper02_rom_switch_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(multigam3_mapper02_rom_switch_w) );
 
 	state->mapper02_prg_base = prg_base;
 	state->mapper02_prg_size = prg_size;
@@ -810,7 +810,7 @@ static void multigam_init_mmc1(running_machine *machine, UINT8 *prg_base, int pr
 
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x8000), 0x8000);
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
 
 	state->mmc1_reg_write_enable = 1;
 	state->mmc1_rom_mask = (prg_size / 0x4000) - 1;
@@ -856,8 +856,8 @@ static void supergm3_set_bank(running_machine *machine)
 		state->supergm3_chr_bank == 0x40 )
 	{
 		// VRAM
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
-		memory_install_write_bank(ppu->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
+		ppu->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
 		memory_set_bankptr(machine, "bank1", state->vram);
 
 		if (state->supergm3_chr_bank == 0x40)
@@ -865,15 +865,15 @@ static void supergm3_set_bank(running_machine *machine)
 	}
 	else
 	{
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
-		memory_install_read_bank(ppu->memory().space(AS_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
-		memory_unmap_write(ppu->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0);
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x03ff, "bank2");
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0400, 0x07ff, "bank3");
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0800, 0x0bff, "bank4");
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x0c00, 0x0fff, "bank5");
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x1000, 0x13ff, "bank6");
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x1400, 0x17ff, "bank7");
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x1800, 0x1bff, "bank8");
+		ppu->memory().space(AS_PROGRAM)->install_read_bank(0x1c00, 0x1fff, "bank9");
+		ppu->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x1fff);
 
 		set_videorom_bank(machine, 0, 8, 0, 8);
 	}
@@ -1127,8 +1127,8 @@ static MACHINE_START( multigam )
 	state->nt_page[2] = state->nt_ram + 0x800;
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(multigam_nt_r), FUNC(multigam_nt_w));
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
 	memory_set_bankptr(machine, "bank1", machine->region("gfx1")->base());
 }
 
@@ -1141,16 +1141,16 @@ static MACHINE_START( multigm3 )
 	state->nt_page[2] = state->nt_ram + 0x800;
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(multigam_nt_r), FUNC(multigam_nt_w));
 
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x03ff, "bank2");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0400, 0x07ff, "bank3");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0800, 0x0bff, "bank4");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0c00, 0x0fff, "bank5");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x1000, 0x13ff, "bank6");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x1400, 0x17ff, "bank7");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x1800, 0x1bff, "bank8");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x1c00, 0x1fff, "bank9");
 
 	set_videorom_bank(machine, 0, 8, 0, 8);
 };
@@ -1164,7 +1164,7 @@ static MACHINE_START( supergm3 )
 	state->nt_page[2] = state->nt_ram + 0x800;
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(multigam_nt_r), FUNC(multigam_nt_w));
 
 	state->vram = auto_alloc_array(machine, UINT8, 0x2000);
 	state->multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);

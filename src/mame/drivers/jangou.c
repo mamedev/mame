@@ -1360,7 +1360,7 @@ static READ8_HANDLER( jngolady_rng_r )
 
 static DRIVER_INIT( jngolady )
 {
-	memory_install_read8_handler(machine->device("nsc")->memory().space(AS_PROGRAM), 0x08, 0x08, 0, 0, jngolady_rng_r );
+	machine->device("nsc")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x08, 0x08, FUNC(jngolady_rng_r) );
 }
 
 static DRIVER_INIT (luckygrl)

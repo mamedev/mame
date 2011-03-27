@@ -50,7 +50,7 @@ static void mem_map_banks(running_machine *machine)
 	{
 		case 0:
 		{
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
 			memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base());
 			break;
 		};
@@ -58,7 +58,7 @@ static void mem_map_banks(running_machine *machine)
 		case 2:
 		case 3:
 		{
-			memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x0000, 0x3fff);
 			break;
 		}
 	}
@@ -69,16 +69,16 @@ static void mem_map_banks(running_machine *machine)
 	{
 		case 0:
 		{
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x5fff, 0, 0, "bank21" );
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank22" );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
 			memory_set_bankptr(machine, "bank21", machine->region("maincpu")->base() + 0x4000);
 			memory_set_bankptr(machine, "bank22", machine->region("maincpu")->base() + 0x4000 + 0x2000);
 			break;
 		}
 		case 1:
 		{
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x5fff, 0, 0, "bank21" );
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000, 0x7fff, 0, 0, "bank22" );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
 			memory_set_bankptr(machine, "bank21", machine->region("game")->base() + state->mem_banks[0]*0x2000);
 			memory_set_bankptr(machine, "bank22", machine->region("game")->base() + state->mem_banks[1]*0x2000);
 			break;
@@ -86,7 +86,7 @@ static void mem_map_banks(running_machine *machine)
 		case 2:
 		case 3:
 		{
-			memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x4000, 0x7fff);
 			break;
 		}
 	}
@@ -97,8 +97,8 @@ static void mem_map_banks(running_machine *machine)
 	{
 		case 1:
 		{
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0x9fff, 0, 0, "bank31" );
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa000, 0xbfff, 0, 0, "bank32" );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x9fff, "bank31" );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xbfff, "bank32" );
 			memory_set_bankptr(machine, "bank31", machine->region("game")->base() + state->mem_banks[2]*0x2000);
 			memory_set_bankptr(machine, "bank32", machine->region("game")->base() + state->mem_banks[3]*0x2000);
 			break;
@@ -107,7 +107,7 @@ static void mem_map_banks(running_machine *machine)
 		case 2:
 		case 3:
 		{
-			memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xbfff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x8000, 0xbfff);
 			break;
 		}
 	}
@@ -121,12 +121,12 @@ static void mem_map_banks(running_machine *machine)
 		case 1:
 		case 2:
 		{
-			memory_unmap_read(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xffff, 0, 0);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0xc000, 0xffff);
 			break;
 		}
 		case 3:
 		{
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xffff, 0, 0, "bank4" );
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xffff, "bank4" );
 			memory_set_bankptr(machine, "bank4", state->main_mem);
 			break;
 		}

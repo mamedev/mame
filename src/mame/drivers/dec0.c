@@ -423,30 +423,30 @@ void slyspy_set_protection_map(running_machine* machine, int type)
 	deco_bac06_device *tilegen1 = (deco_bac06_device*)space->machine->device<deco_bac06_device>("tilegen1");
 	deco_bac06_device *tilegen2 = (deco_bac06_device*)space->machine->device<deco_bac06_device>("tilegen2");
 
-	memory_install_write16_handler( space,  0x240000, 0x24ffff, 0, 0,  unmapped_w);
+	space->install_legacy_write_handler( 0x240000, 0x24ffff, FUNC(unmapped_w));
 
-	memory_install_write16_handler( space,  0x24a000, 0x24a001, 0, 0,  slyspy_state_w);
-	memory_install_read16_handler( space,  0x244000, 0x244001, 0, 0,  slyspy_state_r);
+	space->install_legacy_write_handler( 0x24a000, 0x24a001, FUNC(slyspy_state_w));
+	space->install_legacy_read_handler( 0x244000, 0x244001, FUNC(slyspy_state_r));
 
 	switch (type)
 	{
 
 		case 0:
-			memory_install_write16_device_handler( space,   tilegen2, 0x240000, 0x240007, 0, 0,  deco_bac06_pf_control_0_w);
-			memory_install_write16_device_handler( space,   tilegen2, 0x240010, 0x240017, 0, 0,  deco_bac06_pf_control_1_w);
+			space->install_legacy_write_handler( *tilegen2, 0x240000, 0x240007, FUNC(deco_bac06_pf_control_0_w));
+			space->install_legacy_write_handler( *tilegen2, 0x240010, 0x240017, FUNC(deco_bac06_pf_control_1_w));
 
-			memory_install_write16_device_handler( space, tilegen2, 0x242000, 0x24207f, 0, 0,  deco_bac06_pf_colscroll_w);
-			memory_install_write16_device_handler( space, tilegen2, 0x242400, 0x2427ff, 0, 0,  deco_bac06_pf_rowscroll_w);
+			space->install_legacy_write_handler( *tilegen2, 0x242000, 0x24207f, FUNC(deco_bac06_pf_colscroll_w));
+			space->install_legacy_write_handler( *tilegen2, 0x242400, 0x2427ff, FUNC(deco_bac06_pf_rowscroll_w));
 			
-			memory_install_write16_device_handler( space, tilegen2, 0x246000, 0x247fff, 0, 0,  deco_bac06_pf_data_w);
+			space->install_legacy_write_handler( *tilegen2, 0x246000, 0x247fff, FUNC(deco_bac06_pf_data_w));
 
-			memory_install_write16_device_handler(  space,    tilegen1, 0x248000, 0x280007, 0, 0,  deco_bac06_pf_control_0_w);
-			memory_install_write16_device_handler(  space,    tilegen1, 0x248010, 0x280017, 0, 0,  deco_bac06_pf_control_1_w);
+			space->install_legacy_write_handler( *tilegen1, 0x248000, 0x280007, FUNC(deco_bac06_pf_control_0_w));
+			space->install_legacy_write_handler( *tilegen1, 0x248010, 0x280017, FUNC(deco_bac06_pf_control_1_w));
 
-			memory_install_write16_device_handler( space, tilegen1, 0x24c000, 0x24c07f, 0, 0,  deco_bac06_pf_colscroll_w);
-			memory_install_write16_device_handler( space, tilegen1, 0x24c400, 0x24c7ff, 0, 0,  deco_bac06_pf_rowscroll_w);
+			space->install_legacy_write_handler( *tilegen1, 0x24c000, 0x24c07f, FUNC(deco_bac06_pf_colscroll_w));
+			space->install_legacy_write_handler( *tilegen1, 0x24c400, 0x24c7ff, FUNC(deco_bac06_pf_rowscroll_w));
 
-			memory_install_write16_device_handler( space, tilegen1, 0x24e000, 0x24ffff, 0, 0,  deco_bac06_pf_data_w);
+			space->install_legacy_write_handler( *tilegen1, 0x24e000, 0x24ffff, FUNC(deco_bac06_pf_data_w));
 
 			break;
 	
@@ -454,26 +454,26 @@ void slyspy_set_protection_map(running_machine* machine, int type)
 			// 0x240000 - 0x241fff not mapped
 			// 0x242000 - 0x243fff not mapped
 			// 0x246000 - 0x247fff not mapped
-			memory_install_write16_device_handler( space, tilegen1, 0x248000, 0x249fff, 0, 0,  deco_bac06_pf_data_w);
-			memory_install_write16_device_handler( space, tilegen2, 0x24c000, 0x24dfff, 0, 0,  deco_bac06_pf_data_w);
+			space->install_legacy_write_handler( *tilegen1, 0x248000, 0x249fff, FUNC(deco_bac06_pf_data_w));
+			space->install_legacy_write_handler( *tilegen2, 0x24c000, 0x24dfff, FUNC(deco_bac06_pf_data_w));
 			// 0x24e000 - 0x24ffff not mapped
 			break;
 
 		case 2:
-			memory_install_write16_device_handler( space, tilegen2, 0x240000, 0x241fff, 0, 0,  deco_bac06_pf_data_w);
-			memory_install_write16_device_handler( space, tilegen1, 0x242000, 0x243fff, 0, 0,  deco_bac06_pf_data_w);
+			space->install_legacy_write_handler( *tilegen2, 0x240000, 0x241fff, FUNC(deco_bac06_pf_data_w));
+			space->install_legacy_write_handler( *tilegen1, 0x242000, 0x243fff, FUNC(deco_bac06_pf_data_w));
 			// 0x242000 - 0x243fff not mapped
 			// 0x246000 - 0x247fff not mapped
 			// 0x248000 - 0x249fff not mapped
 			// 0x24c000 - 0x24dfff not mapped
-			memory_install_write16_device_handler( space, tilegen1, 0x24e000, 0x24ffff, 0, 0,  deco_bac06_pf_data_w);
+			space->install_legacy_write_handler( *tilegen1, 0x24e000, 0x24ffff, FUNC(deco_bac06_pf_data_w));
 			break;
 
 		case 3:
-			memory_install_write16_device_handler( space, tilegen1, 0x240000, 0x241fff, 0, 0,  deco_bac06_pf_data_w);
+			space->install_legacy_write_handler( *tilegen1, 0x240000, 0x241fff, FUNC(deco_bac06_pf_data_w));
 			// 0x242000 - 0x243fff not mapped
 			// 0x246000 - 0x247fff not mapped
-			memory_install_write16_device_handler( space, tilegen2, 0x248000, 0x249fff, 0, 0,  deco_bac06_pf_data_w);
+			space->install_legacy_write_handler( *tilegen2, 0x248000, 0x249fff, FUNC(deco_bac06_pf_data_w));
 			// 0x24c000 - 0x24dfff not mapped
 			// 0x24e000 - 0x24ffff not mapped
 			break;
@@ -2922,10 +2922,10 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 
 static DRIVER_INIT( midresb )
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00180000, 0x0018000f, 0, 0,  dec0_controls_r );
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x001a0000, 0x001a000f, 0, 0,  dec0_rotary_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00180000, 0x0018000f, FUNC(dec0_controls_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001a0000, 0x001a000f, FUNC(dec0_rotary_r) );
 
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00180014, 0x00180015, 0, 0, midres_sound_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00180014, 0x00180015, FUNC(midres_sound_w) );
 }
 
 /******************************************************************************/

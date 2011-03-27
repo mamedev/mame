@@ -8112,7 +8112,7 @@ static DRIVER_INIT( kf2k3pcb )
 	neo_pcm2_swap(machine, 5);
 	state->fixed_layer_bank_type = 2;
 	install_pvc_protection(machine);
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc00000, 0xc7ffff, 0, 0, "bios" );  // 512k bios
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc00000, 0xc7ffff, "bios" );  // 512k bios
 }
 
 static DRIVER_INIT( kof2003 )
@@ -8188,18 +8188,18 @@ static DRIVER_INIT( jockeygp )
 	kof2000_neogeo_gfx_decrypt(machine, 0xac);
 
 	/* install some extra RAM */
-	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200000, 0x201fff, 0, 0, NULL);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x200000, 0x201fff);
 
-//  memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x280000, 0x280001, 0, 0, "IN5");
-//  memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2c0000, 0x2c0001, 0, 0, "IN6");
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x280000, 0x280001, "IN5");
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2c0000, 0x2c0001, "IN6");
 }
 
 static DRIVER_INIT( vliner )
 {
-	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200000, 0x201fff, 0, 0, NULL);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x200000, 0x201fff);
 
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x280000, 0x280001, 0, 0, "IN5");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2c0000, 0x2c0001, 0, 0, "IN6");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x280000, 0x280001, "IN5");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2c0000, 0x2c0001, "IN6");
 
 	DRIVER_INIT_CALL(neogeo);
 }
@@ -8207,7 +8207,7 @@ static DRIVER_INIT( vliner )
 static DRIVER_INIT( kog )
 {
 	/* overlay cartridge ROM */
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0ffffe, 0x0fffff, 0, 0, "JUMPER");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x0ffffe, 0x0fffff, "JUMPER");
 
 	kog_px_decrypt(machine);
 	neogeo_bootleg_sx_decrypt(machine, 1);

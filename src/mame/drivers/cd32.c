@@ -60,10 +60,10 @@ static WRITE32_HANDLER( aga_overlay_w )
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write_bank(space, 0x000000, 0x1fffff, 0, 0, "bank1");
+			space->install_write_bank(0x000000, 0x1fffff, "bank1");
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			memory_unmap_write(space, 0x000000, 0x1fffff, 0, 0);
+			space->unmap_write(0x000000, 0x1fffff);
 	}
 }
 

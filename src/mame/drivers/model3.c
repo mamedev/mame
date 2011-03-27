@@ -5187,35 +5187,35 @@ static DRIVER_INIT( model3_10 )
 {
 	interleave_vroms(machine);
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc0000000, 0xc00000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc0000000, 0xc00000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, "bank1" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc105_addr_r), FUNC(mpc105_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc105_data_r), FUNC(mpc105_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc105_reg_r), FUNC(mpc105_reg_w) );
 }
 
 static DRIVER_INIT( model3_15 )
 {
 	interleave_vroms(machine);
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, "bank1" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc105_addr_r), FUNC(mpc105_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc105_data_r), FUNC(mpc105_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc105_reg_r), FUNC(mpc105_reg_w) );
 }
 
 static DRIVER_INIT( model3_20 )
 {
 	interleave_vroms(machine);
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, "bank1" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc2000000, 0xc20000ff, 0, 0, real3d_dma_r, real3d_dma_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc2000000, 0xc20000ff, FUNC(real3d_dma_r), FUNC(real3d_dma_w) );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfec00000, 0xfedfffff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfee00000, 0xfeffffff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc106_reg_r), FUNC(mpc106_reg_w) );
 }
 
 static DRIVER_INIT( lostwsga )
@@ -5224,7 +5224,7 @@ static DRIVER_INIT( lostwsga )
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: there's an M68K device at 0xC0000000 - FF, maybe lightgun controls ? */
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc1000000, 0xc10000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
 	rom[0x7374f0/4] = 0x38840004;		/* This seems to be an actual bug in the original code */
 }
@@ -5235,7 +5235,7 @@ static DRIVER_INIT( scud )
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
 	rom[(0x71275c^4)/4] = 0x60000000;
 	rom[(0x71277c^4)/4] = 0x60000000;
@@ -5247,7 +5247,7 @@ static DRIVER_INIT( scudp )
 
 	DRIVER_INIT_CALL(model3_15);
 	/* TODO: network device at 0xC0000000 - FF */
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc1000000, 0xc10000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
 	rom[(0x713724^4)/4] = 0x60000000;
 	rom[(0x713744^4)/4] = 0x60000000;
@@ -5263,7 +5263,7 @@ static DRIVER_INIT( lemans24 )
 	UINT32 *rom = (UINT32*)machine->region("user1")->base();
 	DRIVER_INIT_CALL(model3_15);
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc1000000, 0xc10000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc1000000, 0xc10000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
 	rom[(0x73fe38^4)/4] = 0x38840004;		/* This seems to be an actual bug in the original code */
 
@@ -5294,15 +5294,15 @@ static DRIVER_INIT( vs215 )
 	rom[(0x70e710^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, "bank1" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfec00000, 0xfedfffff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfee00000, 0xfeffffff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc106_reg_r), FUNC(mpc106_reg_w) );
 }
 
 static DRIVER_INIT( vs29815 )
@@ -5313,15 +5313,15 @@ static DRIVER_INIT( vs29815 )
 	rom[(0x60290c^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, "bank1" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfec00000, 0xfedfffff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfee00000, 0xfeffffff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc106_reg_r), FUNC(mpc106_reg_w) );
 }
 
 static DRIVER_INIT( bass )
@@ -5332,27 +5332,27 @@ static DRIVER_INIT( bass )
 	rom[(0x7999c8^4)/4] = 0x60000000;
 
 	interleave_vroms(machine);
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, "bank1" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfec00000, 0xfedfffff, 0, 0, mpc106_addr_r, mpc106_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfee00000, 0xfeffffff, 0, 0, mpc106_data_r, mpc106_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc106_reg_r, mpc106_reg_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfec00000, 0xfedfffff, FUNC(mpc106_addr_r), FUNC(mpc106_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfee00000, 0xfeffffff, FUNC(mpc106_data_r), FUNC(mpc106_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc106_reg_r), FUNC(mpc106_reg_w) );
 }
 
 static DRIVER_INIT( getbass )
 {
 	interleave_vroms(machine);
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xff000000, 0xff7fffff, 0, 0, "bank1" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf9000000, 0xf90000ff, 0, 0, scsi_r, scsi_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf9000000, 0xf90000ff, FUNC(scsi_r), FUNC(scsi_w) );
 
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0800cf8, 0xf0800cff, 0, 0, mpc105_addr_r, mpc105_addr_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0c00cf8, 0xf0c00cff, 0, 0, mpc105_data_r, mpc105_data_w );
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf8fff000, 0xf8fff0ff, 0, 0, mpc105_reg_r, mpc105_reg_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0800cf8, 0xf0800cff, FUNC(mpc105_addr_r), FUNC(mpc105_addr_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf0c00cf8, 0xf0c00cff, FUNC(mpc105_data_r), FUNC(mpc105_data_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xf8fff000, 0xf8fff0ff, FUNC(mpc105_reg_r), FUNC(mpc105_reg_w) );
 }
 
 static DRIVER_INIT( vs2 )
@@ -5423,7 +5423,7 @@ static DRIVER_INIT( harley )
 	DRIVER_INIT_CALL(model3_20);
 
 	state->network_ram = auto_alloc_array_clear(machine, UINT64, 0x10000);
-	memory_install_readwrite64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc0000000, 0xc00fffff, 0, 0, network_r, network_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc0000000, 0xc00fffff, FUNC(network_r), FUNC(network_w) );
 
 	rom[(0x50e8d4^4)/4] = 0x60000000;
 	rom[(0x50e8f4^4)/4] = 0x60000000;
@@ -5491,8 +5491,8 @@ static DRIVER_INIT( daytona2 )
 	UINT32 *rom = (UINT32*)machine->region("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	memory_install_write64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc3000000, 0xc37fffff, 0, 0, "bank2" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc3800000, 0xc3800007, FUNC(daytona2_rombank_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
 	//rom[(0x68468c^4)/4] = 0x60000000;
 	rom[(0x6063c4^4)/4] = 0x60000000;
@@ -5505,8 +5505,8 @@ static DRIVER_INIT( dayto2pe )
 	UINT32 *rom = (UINT32*)machine->region("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
-	memory_install_write64_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc3800000, 0xc3800007, 0, 0, daytona2_rombank_w );
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc3000000, 0xc37fffff, 0, 0, "bank2" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc3800000, 0xc3800007, FUNC(daytona2_rombank_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc3000000, 0xc37fffff, "bank2" );
 
 	rom[(0x606784^4)/4] = 0x60000000;
 	rom[(0x69a3fc^4)/4] = 0x60000000;		// jump to encrypted code

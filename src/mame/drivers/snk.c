@@ -6253,7 +6253,7 @@ ROM_END
 static DRIVER_INIT( countryc )
 {
 	// replace coin counter with trackball select
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc300, 0xc300, 0, 0, countryc_trackball_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc300, 0xc300, FUNC(countryc_trackball_w));
 }
 
 

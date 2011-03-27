@@ -431,12 +431,12 @@ static WRITE8_HANDLER( profpac_banksw_w )
 	profpac_bank = data;
 
 	/* set the main banking */
-	memory_install_read_bank(space, 0x4000, 0xbfff, 0, 0, "bank1");
+	space->install_read_bank(0x4000, 0xbfff, "bank1");
 	memory_set_bankptr(space->machine, "bank1", space->machine->region("user1")->base() + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
-		memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
+		space->install_legacy_read_handler(0x4000, 0x7fff, FUNC(profpac_videoram_r));
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
 	if ((data & 0x80) && space->machine->region("user2")->base() != NULL)
@@ -447,11 +447,11 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
 		{
-			memory_install_read_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
+			space->install_read_bank(0x4000, 0x7fff, "bank2");
 			memory_set_bankptr(space->machine, "bank2", space->machine->region("user2")->base() + 0x4000 * bank);
 		}
 		else
-			memory_unmap_read(space, 0x4000, 0x7fff, 0, 0);
+			space->unmap_read(0x4000, 0x7fff);
 	}
 }
 
@@ -1729,48 +1729,48 @@ ROM_END
 static DRIVER_INIT( seawolf2 )
 {
 	astrocade_video_config = 0x00;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x40, 0x40, 0, 0xff18, seawolf2_sound_1_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x41, 0x41, 0, 0xff18, seawolf2_sound_2_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x42, 0x43, 0, 0xff18, seawolf2_lamps_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x40, 0x40, 0, 0xff18, FUNC(seawolf2_sound_1_w));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x41, 0x41, 0, 0xff18, FUNC(seawolf2_sound_2_w));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x42, 0x43, 0, 0xff18, FUNC(seawolf2_lamps_w));
 }
 
 
 static DRIVER_INIT( ebases )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x20, 0x20, 0, 0xff07, ebases_coin_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x28, 0x28, 0, 0xff07, ebases_trackball_select_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x20, 0x20, 0, 0xff07, FUNC(ebases_coin_w));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x28, 0x28, 0, 0xff07, FUNC(ebases_trackball_select_w));
 }
 
 
 static DRIVER_INIT( spacezap )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_MONITOR_BW;
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x13, 0x13, 0x03ff, 0xff00, spacezap_io_r);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x13, 0x13, 0x03ff, 0xff00, FUNC(spacezap_io_r));
 }
 
 
 static DRIVER_INIT( wow )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x15, 0x15, 0x0fff, 0xff00, wow_io_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x17, 0x17, 0xffff, 0xff00, wow_speech_r);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(wow_io_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(wow_speech_r));
 }
 
 
 static DRIVER_INIT( gorf )
 {
 	astrocade_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x15, 0x15, 0x0fff, 0xff00, gorf_io_1_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x16, 0x16, 0x0fff, 0xff00, gorf_io_2_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x17, 0x17, 0xffff, 0xff00, gorf_speech_r);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(gorf_io_1_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x16, 0x16, 0x0fff, 0xff00, FUNC(gorf_io_2_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x17, 0x17, 0xffff, 0xff00, FUNC(gorf_speech_r));
 }
 
 
 static DRIVER_INIT( robby )
 {
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x15, 0x15, 0x0fff, 0xff00, robby_io_r);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x15, 0x15, 0x0fff, 0xff00, FUNC(robby_io_r));
 }
 
 
@@ -1779,8 +1779,8 @@ static DRIVER_INIT( profpac )
 	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	astrocade_video_config = AC_SOUND_PRESENT;
-	memory_install_read8_handler(iospace, 0x14, 0x14, 0x0fff, 0xff00, profpac_io_1_r);
-	memory_install_read8_handler(iospace, 0x15, 0x15, 0x77ff, 0xff00, profpac_io_2_r);
+	iospace->install_legacy_read_handler(0x14, 0x14, 0x0fff, 0xff00, FUNC(profpac_io_1_r));
+	iospace->install_legacy_read_handler(0x15, 0x15, 0x77ff, 0xff00, FUNC(profpac_io_2_r));
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
@@ -1793,10 +1793,10 @@ static DRIVER_INIT( demndrgn )
 	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	astrocade_video_config = 0x00;
-	memory_install_read8_handler(iospace, 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
-	memory_install_read_port(iospace, 0x1c, 0x1c, 0x0000, 0xff00, "FIREX");
-	memory_install_read_port(iospace, 0x1d, 0x1d, 0x0000, 0xff00, "FIREY");
-	memory_install_write8_handler(iospace, 0x97, 0x97, 0x0000, 0xff00, demndrgn_sound_w);
+	iospace->install_legacy_read_handler(0x14, 0x14, 0x1fff, 0xff00, FUNC(demndrgn_io_r));
+	iospace->install_read_port(0x1c, 0x1c, 0x0000, 0xff00, "FIREX");
+	iospace->install_read_port(0x1d, 0x1d, 0x0000, 0xff00, "FIREY");
+	iospace->install_legacy_write_handler(0x97, 0x97, 0x0000, 0xff00, FUNC(demndrgn_sound_w));
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);
@@ -1809,15 +1809,15 @@ static DRIVER_INIT( tenpindx )
 	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
 
 	astrocade_video_config = 0x00;
-	memory_install_read_port(iospace, 0x60, 0x60, 0x0000, 0xff00, "P60");
-	memory_install_read_port(iospace, 0x61, 0x61, 0x0000, 0xff00, "P61");
-	memory_install_read_port(iospace, 0x62, 0x62, 0x0000, 0xff00, "P62");
-	memory_install_read_port(iospace, 0x63, 0x63, 0x0000, 0xff00, "P63");
-	memory_install_read_port(iospace, 0x64, 0x64, 0x0000, 0xff00, "P64");
-	memory_install_write8_handler(iospace, 0x65, 0x66, 0x0000, 0xff00, tenpindx_lamp_w);
-	memory_install_write8_handler(iospace, 0x67, 0x67, 0x0000, 0xff00, tenpindx_counter_w);
-	memory_install_write8_handler(iospace, 0x68, 0x68, 0x0000, 0xff00, tenpindx_lights_w);
-	memory_install_write8_handler(iospace, 0x97, 0x97, 0x0000, 0xff00, tenpindx_sound_w);
+	iospace->install_read_port(0x60, 0x60, 0x0000, 0xff00, "P60");
+	iospace->install_read_port(0x61, 0x61, 0x0000, 0xff00, "P61");
+	iospace->install_read_port(0x62, 0x62, 0x0000, 0xff00, "P62");
+	iospace->install_read_port(0x63, 0x63, 0x0000, 0xff00, "P63");
+	iospace->install_read_port(0x64, 0x64, 0x0000, 0xff00, "P64");
+	iospace->install_legacy_write_handler(0x65, 0x66, 0x0000, 0xff00, FUNC(tenpindx_lamp_w));
+	iospace->install_legacy_write_handler(0x67, 0x67, 0x0000, 0xff00, FUNC(tenpindx_counter_w));
+	iospace->install_legacy_write_handler(0x68, 0x68, 0x0000, 0xff00, FUNC(tenpindx_lights_w));
+	iospace->install_legacy_write_handler(0x97, 0x97, 0x0000, 0xff00, FUNC(tenpindx_sound_w));
 
 	/* reset banking */
 	profpac_banksw_w(iospace, 0, 0);

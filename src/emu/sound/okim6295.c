@@ -258,7 +258,7 @@ void okim6295_device::set_bank_base(offs_t base)
 	if (!m_bank_installed && base != 0)
 	{
 		// override our memory map with a bank
-		memory_install_read_bank(space(), 0x00000, 0x3ffff, 0, 0, tag());
+		space()->install_read_bank(0x00000, 0x3ffff, tag());
 		m_bank_installed = true;
 	}
 

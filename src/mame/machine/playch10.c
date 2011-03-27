@@ -57,8 +57,8 @@ MACHINE_START( pc10 )
 	/* move to individual boards as documentation of actual boards allows */
 	state->nt_ram = auto_alloc_array(machine, UINT8, 0x1000);
 
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(pc10_chr_r), FUNC(pc10_chr_w));
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(pc10_nt_r), FUNC(pc10_nt_w));
 
 	if (NULL != state->vram)
 		set_videoram_bank(machine, 0, 8, 0, 8);
@@ -81,8 +81,8 @@ MACHINE_START( playch10_hboard )
 
 	state->vram = auto_alloc_array(machine, UINT8, 0x2000);
 
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0, 0x1fff, 0, 0, pc10_chr_r, pc10_chr_w);
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0x2000, 0x3eff, 0, 0, pc10_nt_r, pc10_nt_w);
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0, 0x1fff, FUNC(pc10_chr_r), FUNC(pc10_chr_w));
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(pc10_nt_r), FUNC(pc10_nt_w));
 }
 
 /*************************************
@@ -610,7 +610,7 @@ DRIVER_INIT( pcaboard )
 {
 	playch10_state *state = machine->driver_data<playch10_state>();
 	/* switches vrom with writes to the $803e-$8041 area */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0x8fff, 0, 0, aboard_vrom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0x8fff, FUNC(aboard_vrom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -643,7 +643,7 @@ DRIVER_INIT( pcbboard )
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* Roms are banked at $8000 to $bfff */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, bboard_rom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(bboard_rom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -669,7 +669,7 @@ DRIVER_INIT( pccboard )
 {
 	playch10_state *state = machine->driver_data<playch10_state>();
 	/* switches vrom with writes to $6000 */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x6000, 0x6000, 0, 0, cboard_vrom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0x6000, FUNC(cboard_vrom_switch_w) );
 
 	/* we have no vram, make sure switching games doesn't point to an old allocation */
 	state->vram = NULL;
@@ -693,7 +693,7 @@ DRIVER_INIT( pcdboard )
 	state->mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
 
 
 	/* common init */
@@ -710,7 +710,7 @@ DRIVER_INIT( pcdboard_2 )
 {
 	playch10_state *state = machine->driver_data<playch10_state>();
 	/* extra ram at $6000-$7fff */
-	memory_install_ram(machine->device("cart")->memory().space(AS_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	/* common init */
 	DRIVER_INIT_CALL(pcdboard);
@@ -809,13 +809,13 @@ DRIVER_INIT( pceboard )
 	memcpy(&prg[0x08000], &prg[0x28000], 0x8000);
 
 	/* basically a mapper 9 on a nes */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, eboard_rom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(eboard_rom_switch_w) );
 
 	/* ppu_latch callback */
 	ppu2c0x_set_latch(machine->device("ppu"), mapper9_latch);
 
 	/* nvram at $6000-$6fff */
-	memory_install_ram(machine->device("cart")->memory().space(AS_PROGRAM), 0x6000, 0x6fff, 0, 0, NULL );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -839,7 +839,7 @@ DRIVER_INIT( pcfboard )
 	state->mmc1_rom_mask = 0x07;
 
 	/* MMC mapper at writes to $8000-$ffff */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -851,7 +851,7 @@ DRIVER_INIT( pcfboard_2 )
 {
 	playch10_state *state = machine->driver_data<playch10_state>();
 	/* extra ram at $6000-$6fff */
-	memory_install_ram(machine->device("cart")->memory().space(AS_PROGRAM), 0x6000, 0x6fff, 0, 0, NULL );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x6fff);
 
 	state->vram = NULL;
 
@@ -1024,10 +1024,10 @@ DRIVER_INIT( pcgboard )
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
 	/* MMC3 mapper at writes to $8000-$ffff */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, gboard_rom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(gboard_rom_switch_w) );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_ram(machine->device("cart")->memory().space(AS_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	state->gboard_banks[0] = 0x1e;
 	state->gboard_banks[1] = 0x1f;
@@ -1077,7 +1077,7 @@ DRIVER_INIT( pciboard )
 	memcpy(&prg[0x08000], &prg[0x10000], 0x8000);
 
 	/* Roms are banked at $8000 to $bfff */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, iboard_rom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(iboard_rom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);
@@ -1146,10 +1146,10 @@ DRIVER_INIT( pchboard )
 	memcpy(&prg[0x0c000], &prg[0x4c000], 0x4000);
 
 	/* Roms are banked at $8000 to $bfff */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, hboard_rom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(hboard_rom_switch_w) );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_ram(machine->device("cart")->memory().space(AS_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	state->gboard_banks[0] = 0x1e;
 	state->gboard_banks[1] = 0x1f;
@@ -1177,10 +1177,10 @@ DRIVER_INIT( pckboard )
 	state->mmc1_rom_mask = 0x0f;
 
 	/* extra ram at $6000-$7fff */
-	memory_install_ram(machine->device("cart")->memory().space(AS_PROGRAM), 0x6000, 0x7fff, 0, 0, NULL );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_ram(0x6000, 0x7fff);
 
 	/* Roms are banked at $8000 to $bfff */
-	memory_install_write8_handler(machine->device("cart")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+	machine->device("cart")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x8000, 0xffff, FUNC(mmc1_rom_switch_w) );
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);

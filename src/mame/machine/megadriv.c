@@ -2561,7 +2561,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
-			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, space->machine->region("gamecart")->base() + 0x100);
+			space->install_rom(0x0000100, 0x03fffff, space->machine->region("gamecart")->base() + 0x100);
 		}
 		else
 		{
@@ -2569,7 +2569,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
-			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, space->machine->region("maincpu")->base()+0x100);
+			space->install_rom(0x0000100, 0x03fffff, space->machine->region("maincpu")->base()+0x100);
 		}
 
 		if((a15106_reg & 4) == 0) // clears the FIFO state
@@ -2861,29 +2861,29 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			memory_install_rom(space, 0x0880000, 0x08fffff, 0, 0, space->machine->region("gamecart")->base()); // 'fixed' 512kb rom bank
+			space->install_rom(0x0880000, 0x08fffff, space->machine->region("gamecart")->base()); // 'fixed' 512kb rom bank
 
-			memory_install_read_bank(space, 0x0900000, 0x09fffff, 0, 0, "bank12"); // 'bankable' 1024kb rom bank
+			space->install_read_bank(0x0900000, 0x09fffff, "bank12"); // 'bankable' 1024kb rom bank
 			memory_set_bankptr(space->machine,  "bank12", space->machine->region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 
-			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, space->machine->region("32x_68k_bios")->base());
+			space->install_rom(0x0000000, 0x03fffff, space->machine->region("32x_68k_bios")->base());
 
 			/* VDP area */
-			memory_install_readwrite16_handler(space, 0x0a15180, 0x0a1518b, 0, 0, _32x_common_vdp_regs_r, _32x_common_vdp_regs_w); // common / shared VDP regs
-			memory_install_readwrite16_handler(space, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
-			memory_install_readwrite16_handler(space, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
-			memory_install_readwrite16_handler(space, 0x0860000, 0x087ffff, 0, 0, _32x_68k_dram_overwrite_r, _32x_68k_dram_overwrite_w); // access to 'display ram' (framebuffer)
+			space->install_legacy_readwrite_handler(0x0a15180, 0x0a1518b, FUNC(_32x_common_vdp_regs_r), FUNC(_32x_common_vdp_regs_w)); // common / shared VDP regs
+			space->install_legacy_readwrite_handler(0x0a15200, 0x0a153ff, FUNC(_32x_68k_palette_r), FUNC(_32x_68k_palette_w)); // access to 'palette' xRRRRRGGGGGBBBBB
+			space->install_legacy_readwrite_handler(0x0840000, 0x085ffff, FUNC(_32x_68k_dram_r), FUNC(_32x_68k_dram_w)); // access to 'display ram' (framebuffer)
+			space->install_legacy_readwrite_handler(0x0860000, 0x087ffff, FUNC(_32x_68k_dram_overwrite_r), FUNC(_32x_68k_dram_overwrite_w)); // access to 'display ram' (framebuffer)
 
 
 
-			memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
+			space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 		}
 		else
 		{
 			_32x_adapter_enabled = 0;
 
-			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, space->machine->region("gamecart")->base());
-			memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
+			space->install_rom(0x0000000, 0x03fffff, space->machine->region("gamecart")->base());
+			space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 		}
 	}
 
@@ -6003,36 +6003,36 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_4meg_prgbank = 0;
 
 
-	memory_unmap_readwrite        (space, 0x020000,0x3fffff,0,0);
+	space->unmap_readwrite        (0x020000,0x3fffff);
 
-//  memory_install_read_bank(space, 0x0020000, 0x003ffff, 0, 0, "scd_4m_prgbank");
+//  space->install_read_bank(0x0020000, 0x003ffff, "scd_4m_prgbank");
 //  memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
-	memory_install_read16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_r );
-	memory_install_write16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_w );
+	space->install_legacy_read_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_r) );
+	space->install_legacy_write_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_w) );
 	segacd_wordram_mapped = 1;
 
 
-	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0x200000, 0x23ffff, 0, 0, segacd_main_dataram_part1_r, segacd_main_dataram_part1_w); // RAM shared with sub
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x200000, 0x23ffff, FUNC(segacd_main_dataram_part1_r), FUNC(segacd_main_dataram_part1_w)); // RAM shared with sub
 
-	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12000, 0xa12001, 0, 0, scd_a12000_halt_reset_r, scd_a12000_halt_reset_w); // sub-cpu control
-	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
-	//memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12004, 0xa12005, 0, 0, segacd_cdc_mode_address_r, segacd_cdc_mode_address_w);
-	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12006, 0xa12007, 0, 0, scd_a12006_hint_register_r, scd_a12006_hint_register_w); // where HINT points on main CPU
-	//memory_install_read16_handler     (space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12008, 0xa12009, 0, 0, cdc_data_main_r);
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12000, 0xa12001, FUNC(scd_a12000_halt_reset_r), FUNC(scd_a12000_halt_reset_w)); // sub-cpu control
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12002, 0xa12003, FUNC(scd_a12002_memory_mode_r), FUNC(scd_a12002_memory_mode_w)); // memory mode / write protect
+	//space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12004, 0xa12005, FUNC(segacd_cdc_mode_address_r), FUNC(segacd_cdc_mode_address_w));
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12006, 0xa12007, FUNC(scd_a12006_hint_register_r), FUNC(scd_a12006_hint_register_w)); // where HINT points on main CPU
+	//space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0xa12008, 0xa12009, FUNC(cdc_data_main_r));
 
 
-	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa1200c, 0xa1200d, 0, 0, segacd_stopwatch_timer_r, segacd_stopwatch_timer_w); // starblad
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200c, 0xa1200d, FUNC(segacd_stopwatch_timer_r), FUNC(segacd_stopwatch_timer_w)); // starblad
 
-	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa1200e, 0xa1200f, 0, 0, segacd_comms_flags_r, segacd_comms_flags_maincpu_w); // communication flags block
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1200e, 0xa1200f, FUNC(segacd_comms_flags_r), FUNC(segacd_comms_flags_maincpu_w)); // communication flags block
 
-	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12010, 0xa1201f, 0, 0, segacd_comms_main_part1_r, segacd_comms_main_part1_w);
-	memory_install_readwrite16_handler(space->machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa12020, 0xa1202f, 0, 0, segacd_comms_main_part2_r, segacd_comms_main_part2_w);
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12010, 0xa1201f, FUNC(segacd_comms_main_part1_r), FUNC(segacd_comms_main_part1_w));
+	space->machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa12020, 0xa1202f, FUNC(segacd_comms_main_part2_r), FUNC(segacd_comms_main_part2_w));
 
 
 
 	device_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
 
-	memory_install_read16_handler (space, 0x0000070, 0x0000073, 0, 0, scd_hint_vector_r );
+	space->install_legacy_read_handler (0x0000070, 0x0000073, FUNC(scd_hint_vector_r) );
 
 	segacd_gfx_conversion_timer = machine->scheduler().timer_alloc(FUNC(segacd_gfx_conversion_timer_callback));
 	segacd_gfx_conversion_timer->adjust(attotime::never);
@@ -7167,13 +7167,13 @@ static void svp_init(running_machine *machine)
 
 	/* SVP stuff */
 	state->dram = auto_alloc_array(machine, UINT8, 0x20000);
-	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x300000, 0x31ffff, 0, 0, state->dram);
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x300000, 0x31ffff, state->dram);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15000, 0xa150ff, FUNC(svp_68k_io_r), FUNC(svp_68k_io_w));
 	// "cell arrange" 1 and 2
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x390000, 0x39ffff, FUNC(svp_68k_cell1_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3a0000, 0x3affff, FUNC(svp_68k_cell2_r));
 
-	memory_install_read16_handler(machine->device("svp")->memory().space(AS_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
+	machine->device("svp")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x438, 0x438, FUNC(svp_speedup_r));
 
 	state->iram = auto_alloc_array(machine, UINT8, 0x800);
 	memory_set_bankptr(machine,  "bank3", state->iram);
@@ -10046,27 +10046,27 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const
 	device_t *ym = machine->device("ymsnd");
 
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
+	machine->device(tag)->memory().space(AS_IO)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_port_r), FUNC(z80_unmapped_port_w));
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x0000, 0xffff, FUNC(z80_unmapped_r), FUNC(z80_unmapped_w));
 
 
-	memory_install_readwrite_bank(machine->device(tag)->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
 
-	memory_install_ram(machine->device(tag)->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, genz80.z80_prgram);
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_ram(0x0000, 0x1fff, genz80.z80_prgram);
 
 
 	// not allowed??
-//  memory_install_readwrite_bank(machine->device(tag)->memory().space(AS_PROGRAM), 0x2000, 0x3fff, 0, 0, "bank1");
+//  machine->device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x2000, 0x3fff, "bank1");
 
-	memory_install_readwrite8_device_handler(machine->device(tag)->memory().space(AS_PROGRAM), ym, 0x4000, 0x4003, 0, 0, ym2612_r, ym2612_w);
-	memory_install_write8_handler    (machine->device(tag)->memory().space(AS_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_write8_handler    (machine->device(tag)->memory().space(AS_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_read8_handler     (machine->device(tag)->memory().space(AS_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
-	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_PROGRAM), 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
-	memory_install_readwrite8_handler(machine->device(tag)->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6000, 0x6000, FUNC(megadriv_z80_z80_bank_w));
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6001, 0x6001, FUNC(megadriv_z80_z80_bank_w));
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_read_handler     (0x6100, 0x7eff, FUNC(megadriv_z80_unmapped_read));
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x7f00, 0x7fff, FUNC(megadriv_z80_vdp_read), FUNC(megadriv_z80_vdp_write));
+	machine->device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(z80_read_68k_banked_data), FUNC(z80_write_68k_banked_data));
 }
 
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
@@ -10096,24 +10096,24 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		memory_install_rom(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000000, 0x03fffff, 0, 0, machine->region("gamecart")->base());
-		memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_rom(0x0000000, 0x03fffff, machine->region("gamecart")->base());
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 	};
 
 
 	a15100_reg = 0x0000;
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15108, 0xa15113, 0, 0, _32x_dreq_common_r, _32x_dreq_common_w); // dreq src / dst / length /fifo
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15100, 0xa15101, FUNC(_32x_68k_a15100_r), FUNC(_32x_68k_a15100_w)); // framebuffer control regs
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15102, 0xa15103, FUNC(_32x_68k_a15102_r), FUNC(_32x_68k_a15102_w)); // send irq to sh2
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15104, 0xa15105, FUNC(_32x_68k_a15104_r), FUNC(_32x_68k_a15104_w)); // 68k BANK rom set
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15106, 0xa15107, FUNC(_32x_68k_a15106_r), FUNC(_32x_68k_a15106_w)); // dreq stuff
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15108, 0xa15113, FUNC(_32x_dreq_common_r), FUNC(_32x_dreq_common_w)); // dreq src / dst / length /fifo
 
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa1511a, 0xa1511b, 0, 0, _32x_68k_a1511a_r, _32x_68k_a1511a_w); // SEGA TV
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa1511a, 0xa1511b, FUNC(_32x_68k_a1511a_r), FUNC(_32x_68k_a1511a_w)); // SEGA TV
 
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa15130, 0xa1513f, 0, 0, _32x_pwm_r, _32x_68k_pwm_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15120, 0xa1512f, FUNC(_32x_68k_commsram_r), FUNC(_32x_68k_commsram_w)); // comms reg 0-7
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xa15130, 0xa1513f, FUNC(_32x_pwm_r), FUNC(_32x_68k_pwm_w));
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0a130ec, 0x0a130ef, FUNC(_32x_68k_MARS_r)); // system ID
 
 
 	/* Interrupts are masked / disabled at first */

@@ -4598,8 +4598,8 @@ static DRIVER_INIT( bjtwin )
 static READ16_HANDLER( vandykeb_r ) { return 0x0000; }
 static DRIVER_INIT (vandykeb)
 {
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x08000e, 0x08000f, 0, 0, vandykeb_r );
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x08001e, 0x08001f, 0, 0 );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x08000e, 0x08000f, FUNC(vandykeb_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x08001e, 0x08001f);
 }
 
 

@@ -2246,7 +2246,7 @@ static DRIVER_INIT( rrreveng )
 
 	state->playfield_base = 0x000;
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xca0fc0, 0xca0fc3, FUNC(rrreveng_prot_r));
 }
 
 

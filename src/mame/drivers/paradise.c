@@ -1050,14 +1050,14 @@ static DRIVER_INIT (tgtball)
 {
 	paradise_state *state = machine->driver_data<paradise_state>();
 	state->sprite_inc = 4;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x2001, 0x2001, 0, 0, tgtball_flipscreen_w );
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2001, 0x2001, FUNC(tgtball_flipscreen_w) );
 }
 
 static DRIVER_INIT (torus)
 {
 	paradise_state *state = machine->driver_data<paradise_state>();
 	state->sprite_inc = 4;
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x2070, 0x2070, 0, 0, torus_coin_counter_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2070, 0x2070, FUNC(torus_coin_counter_w));
 }
 
 

@@ -603,7 +603,7 @@ static DRIVER_INIT( 1943b )
 	DRIVER_INIT_CALL( 1943 );
 	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
 	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc007, 0xc007, 0, 0, _1943b_c007_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc007, 0xc007, FUNC(_1943b_c007_r));
 
 }
 

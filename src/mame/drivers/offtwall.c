@@ -497,9 +497,9 @@ static DRIVER_INIT( offtwall )
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->spritecache_count = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
-	state->bankswitch_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x037ec2, 0x037f39, 0, 0, bankswitch_r);
-	state->unknown_verify_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3fdf1e, 0x3fdf1f, 0, 0, unknown_verify_r);
+	state->spritecache_count = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
+	state->bankswitch_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037ec2, 0x037f39, FUNC(bankswitch_r));
+	state->unknown_verify_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf1e, 0x3fdf1f, FUNC(unknown_verify_r));
 }
 
 
@@ -510,9 +510,9 @@ static DRIVER_INIT( offtwalc )
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
-	state->spritecache_count = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3fde42, 0x3fde43, 0, 0, spritecache_count_r);
-	state->bankswitch_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x037eca, 0x037f43, 0, 0, bankswitch_r);
-	state->unknown_verify_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3fdf24, 0x3fdf25, 0, 0, unknown_verify_r);
+	state->spritecache_count = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fde42, 0x3fde43, FUNC(spritecache_count_r));
+	state->bankswitch_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x037eca, 0x037f43, FUNC(bankswitch_r));
+	state->unknown_verify_base = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3fdf24, 0x3fdf25, FUNC(unknown_verify_r));
 }
 
 

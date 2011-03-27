@@ -1270,7 +1270,7 @@ static DRIVER_INIT( mjgtaste )
 {
 	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x03000000, 0x03000003, 0, 0, mjgtaste_input_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x03000000, 0x03000003, FUNC(mjgtaste_input_r));
 }
 
 

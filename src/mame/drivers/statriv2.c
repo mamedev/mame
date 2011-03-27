@@ -1127,7 +1127,7 @@ static WRITE8_HANDLER( laserdisc_io_w )
 static DRIVER_INIT( laserdisc )
 {
 	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
-	memory_install_readwrite8_handler(iospace, 0x28, 0x2b, 0, 0, laserdisc_io_r, laserdisc_io_w);
+	iospace->install_legacy_readwrite_handler(0x28, 0x2b, FUNC(laserdisc_io_r), FUNC(laserdisc_io_w));
 }
 
 

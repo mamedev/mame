@@ -417,7 +417,7 @@ static READ32_HANDLER( main_cycle_r )
 static DRIVER_INIT( gunbustr )
 {
 	/* Speedup handler */
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x203acc, 0x203acf, 0, 0, main_cycle_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x203acc, 0x203acf, FUNC(main_cycle_r));
 }
 
 GAME( 1992, gunbustr, 0,      gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )

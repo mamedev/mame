@@ -531,14 +531,14 @@ void defender_install_io_space(address_space *space)
 	device_t *pia_1 = space->machine->device("pia_1");
 
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	memory_install_write_bank    (space, 0xc000, 0xc00f, 0, 0x03e0, "bank4");
-	memory_install_write8_handler    (space, 0xc010, 0xc01f, 0, 0x03e0, defender_video_control_w);
-	memory_install_write8_handler    (space, 0xc3ff, 0xc3ff, 0, 0,      williams_watchdog_reset_w);
-	memory_install_read_bank(space, 0xc400, 0xc4ff, 0, 0x0300, "bank3");
-	memory_install_write8_handler(space, 0xc400, 0xc4ff, 0, 0x0300, williams_cmos_w);
-	memory_install_read8_handler     (space, 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
-	memory_install_readwrite8_device_handler(space, pia_1, 0xcc00, 0xcc03, 0, 0x03e0, pia6821_r, pia6821_w);
-	memory_install_readwrite8_device_handler(space, pia_0, 0xcc04, 0xcc07, 0, 0x03e0, pia6821_r, pia6821_w);
+	space->install_write_bank    (0xc000, 0xc00f, 0, 0x03e0, "bank4");
+	space->install_legacy_write_handler    (0xc010, 0xc01f, 0, 0x03e0, FUNC(defender_video_control_w));
+	space->install_legacy_write_handler    (0xc3ff, 0xc3ff, FUNC(williams_watchdog_reset_w));
+	space->install_read_bank(0xc400, 0xc4ff, 0, 0x0300, "bank3");
+	space->install_legacy_write_handler(0xc400, 0xc4ff, 0, 0x0300, FUNC(williams_cmos_w));
+	space->install_legacy_read_handler     (0xc800, 0xcbff, 0, 0x03e0, FUNC(williams_video_counter_r));
+	space->install_legacy_readwrite_handler(*pia_1, 0xcc00, 0xcc03, 0, 0x03e0, FUNC(pia6821_r), FUNC(pia6821_w));
+	space->install_legacy_readwrite_handler(*pia_0, 0xcc04, 0xcc07, 0, 0x03e0, FUNC(pia6821_r), FUNC(pia6821_w));
 	memory_set_bankptr(space->machine, "bank3", space->machine->driver_data<williams_state>()->m_nvram);
 	memory_set_bankptr(space->machine, "bank4", space->machine->generic.paletteram.v);
 }
@@ -2729,7 +2729,7 @@ static DRIVER_INIT( mayday )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* install a handler to catch protection checks */
-	state->mayday_protection = memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa190, 0xa191, 0, 0, mayday_protection_r);
+	state->mayday_protection = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa190, 0xa191, FUNC(mayday_protection_r));
 }
 
 
@@ -2767,7 +2767,7 @@ static DRIVER_INIT( bubbles )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* bubbles has a full 8-bit-wide CMOS */
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcc00, 0xcfff, 0, 0, bubbles_cmos_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xcc00, 0xcfff, FUNC(bubbles_cmos_w));
 }
 
 
@@ -2814,13 +2814,13 @@ static DRIVER_INIT( spdball )
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
 
 	/* add a third PIA */
-	memory_install_readwrite8_device_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), pia_3, 0xc808, 0xc80b, 0, 0, pia6821_r, pia6821_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*pia_3, 0xc808, 0xc80b, FUNC(pia6821_r), FUNC(pia6821_w));
 
 	/* install extra input handlers */
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xc800, 0, 0, "AN0");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc801, 0xc801, 0, 0, "AN1");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc802, 0xc802, 0, 0, "AN2");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc803, 0xc803, 0, 0, "AN3");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc800, 0xc800, "AN0");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc801, 0xc801, "AN1");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc802, 0xc802, "AN2");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0xc803, 0xc803, "AN3");
 }
 
 
@@ -2828,7 +2828,7 @@ static DRIVER_INIT( alienar )
 {
 	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcbff, 0xcbff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xcbff, 0xcbff);
 }
 
 
@@ -2836,7 +2836,7 @@ static DRIVER_INIT( alienaru )
 {
 	williams_state *state = machine->driver_data<williams_state>();
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_SC01, 0xc000);
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcbff, 0xcbff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xcbff, 0xcbff);
 }
 
 

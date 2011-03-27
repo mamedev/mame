@@ -616,12 +616,12 @@ static READ8_HANDLER( cyclej_r )
 
 static DRIVER_INIT( actfancr )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cycle_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1f0026, 0x1f0027, FUNC(cycle_r));
 }
 
 static DRIVER_INIT( actfancrj )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1f0026, 0x1f0027, FUNC(cyclej_r));
 }
 
 

@@ -303,9 +303,9 @@ void exidy440_bank_select(running_machine *machine, UINT8 bank)
 	if (state->showdown_bank_data[0] != NULL)
 	{
 		if (bank == 0 && state->bank != 0)
-			memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0, showdown_bank0_r);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x7fff, FUNC(showdown_bank0_r));
 		else if (bank != 0 && state->bank == 0)
-			memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank1");
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank1");
 	}
 
 	/* select the bank and update the bank pointer */
@@ -1938,7 +1938,7 @@ static DRIVER_INIT( claypign )
 {
 	DRIVER_INIT_CALL(exidy440);
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2ec0, 0x2ec3, 0, 0, claypign_protection_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2ec0, 0x2ec3, FUNC(claypign_protection_r));
 }
 
 
@@ -1948,11 +1948,11 @@ static DRIVER_INIT( topsecex )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2ec6, 0x2ec6, 0, 0, "AN0");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2ec7, 0x2ec7, 0, 0, "IN4");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2ec5, 0x2ec5, FUNC(topsecex_input_port_5_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec6, 0x2ec6, "AN0");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	state->topsecex_yscroll = memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
+	state->topsecex_yscroll = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2ec1, 0x2ec1, FUNC(topsecex_yscroll_w));
 }
 
 

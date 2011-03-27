@@ -147,7 +147,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	/* install POKEY memory handlers */
 	if (pokey != NULL)
-		memory_install_readwrite8_device_handler(jsacpu->memory().space(AS_PROGRAM), pokey, 0x2c00, 0x2c0f, 0, 0, pokey_r, pokey_w);
+		jsacpu->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*pokey, 0x2c00, 0x2c0f, FUNC(pokey_r), FUNC(pokey_w));
 
 	init_save_state(machine);
 	atarijsa_reset();

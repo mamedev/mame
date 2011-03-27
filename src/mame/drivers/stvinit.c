@@ -308,7 +308,7 @@ DRIVER_INIT( astrass )
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x60011b8);
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x605b9da);
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x06000770, 0x06000773, 0, 0, astrass_hack_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x06000770, 0x06000773, FUNC(astrass_hack_r) );
 
 	install_astrass_protection(machine);
 

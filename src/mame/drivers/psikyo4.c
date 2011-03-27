@@ -1072,7 +1072,7 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 	set_hotgmck_pcm_bank(machine, 0);
 	set_hotgmck_pcm_bank(machine, 1);
 
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5800008, 0x580000b, FUNC(hotgmck_pcm_bank_w) );
 	machine->state().register_postload(hotgmck_pcm_bank_postload, (void *)0);
 	machine->state().register_postload(hotgmck_pcm_bank_postload, (void *)1);
 }
@@ -1086,17 +1086,17 @@ static DRIVER_INIT( hotgmck )
 
 static DRIVER_INIT( loderndf )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderndf_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000020, 0x6000023, FUNC(loderndf_speedup_r) );
 }
 
 static DRIVER_INIT( loderdfa )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderdfa_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6000020, 0x6000023, FUNC(loderdfa_speedup_r) );
 }
 
 static DRIVER_INIT( hotdebut )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x600001c, 0x600001f, 0, 0, hotdebut_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x600001c, 0x600001f, FUNC(hotdebut_speedup_r) );
 }
 
 

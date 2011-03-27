@@ -8012,7 +8012,7 @@ static DRIVER_INIT ( pzloop2 )
 
 	state->save_item(NAME(state->readpaddle));
 
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
 }
 
 static READ16_HANDLER( gigamn2_dummyqsound_r )
@@ -8039,7 +8039,7 @@ static DRIVER_INIT( gigamn2 )
 	state->gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
 	state->save_pointer(NAME(state->gigamn2_dummyqsound_ram), 0x20000 / 2);
 
-	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigamn2_dummyqsound_r), FUNC(gigamn2_dummyqsound_w)); // no qsound..
 	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
 }

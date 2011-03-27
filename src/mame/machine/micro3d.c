@@ -650,8 +650,8 @@ DRIVER_INIT( botssa )
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Required to pass the hardware version check */
-	memory_install_read16_handler(space, 0x140000, 0x140001, 0, 0, botssa_140000_r );
-	memory_install_read16_handler(space, 0x180000, 0x180001, 0, 0, botssa_180000_r );
+	space->install_legacy_read_handler(0x140000, 0x140001, FUNC(botssa_140000_r) );
+	space->install_legacy_read_handler(0x180000, 0x180001, FUNC(botssa_180000_r) );
 
 	DRIVER_INIT_CALL(micro3d);
 }

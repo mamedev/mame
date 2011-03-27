@@ -2359,10 +2359,10 @@ DRIVER_INIT ( stv )
 	sh2drc_set_options(machine->device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
-	memory_install_write32_handler(machine->device("slave")->memory().space(AS_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
-	memory_install_write32_handler(machine->device("slave")->memory().space(AS_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
+	machine->device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc44, 0x60ffc47, FUNC(w60ffc44_write) );
+	machine->device("slave")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x60ffc48, 0x60ffc4b, FUNC(w60ffc48_write) );
 
     smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  smpc_ram[0x33] = input_port_read(machine, "FAKE");

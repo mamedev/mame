@@ -553,7 +553,7 @@ static DRIVER_INIT(kinstb)
 	}
 
 	state->shared_ram = auto_alloc_array(machine, INT8, 0x100);
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x781000, 0x7810ff, FUNC(sharedram_r), FUNC(sharedram_w));
 
 	DRIVER_INIT_CALL(snes_hirom);
 }
@@ -595,7 +595,7 @@ static DRIVER_INIT( ffight2b )
 	rom[0x7ffc] = 0x54;
 
 	state->ffight2b_coins = 0;
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7eadce, 0x7eadce, FUNC(ffight2b_coin_r));
 
 	DRIVER_INIT_CALL(snes);
 }
@@ -654,15 +654,15 @@ static DRIVER_INIT( sblast2b )
 	dst[0xfffd] = 0x7a;
 
 	/*  protection checks */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x75bd37, 0x75bd37, 0, 0, sb2b_75bd37_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6a6000, 0x6a6fff, 0, 0, sb2b_6a6xxx_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x75bd37, 0x75bd37, FUNC(sb2b_75bd37_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x6a6000, 0x6a6fff, FUNC(sb2b_6a6xxx_r));
 
 	/* extra inputs */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770071, 0x770071, 0, 0, sb2b_770071_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770079, 0x770079, 0, 0, sb2b_770079_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770071, 0x770071, FUNC(sb2b_770071_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770079, 0x770079, FUNC(sb2b_770079_r));
 
 	/* handler to read boot code */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x007000, 0x007fff, 0, 0, sb2b_7xxx_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x007000, 0x007fff, FUNC(sb2b_7xxx_r));
 
 	DRIVER_INIT_CALL(snes_hirom);
 }
@@ -685,9 +685,9 @@ static DRIVER_INIT( iron )
 	}
 
 	/* extra inputs */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770071, 0x770071, 0, 0, iron_770071_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770073, 0x770073, 0, 0, iron_770073_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770079, 0x770079, 0, 0, iron_770079_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770071, 0x770071, FUNC(iron_770071_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770073, 0x770073, FUNC(iron_770073_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770079, 0x770079, FUNC(iron_770079_r));
 
 	DRIVER_INIT_CALL(snes);
 }
@@ -730,8 +730,8 @@ static DRIVER_INIT( denseib )
 	rom[0xfffd] = 0xf7;
 
 	/* extra inputs */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770071, 0x770071, 0, 0, denseib_770071_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x770079, 0x770079, 0, 0, denseib_770079_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770071, 0x770071, FUNC(denseib_770071_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770079, 0x770079, FUNC(denseib_770079_r));
 
 	DRIVER_INIT_CALL(snes_hirom);
 }

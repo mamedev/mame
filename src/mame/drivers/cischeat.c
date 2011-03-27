@@ -2554,7 +2554,7 @@ ROM_END
 
 static DRIVER_INIT( wildplt )
 {
-	memory_install_read16_handler(machine->device("cpu1")->memory().space(AS_PROGRAM), 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
+	machine->device("cpu1")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x080000, 0x087fff, FUNC(wildplt_vregs_r) );
 
 	DRIVER_INIT_CALL(f1gpstar);
 }

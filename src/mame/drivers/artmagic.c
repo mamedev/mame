@@ -1172,7 +1172,7 @@ static DRIVER_INIT( ultennis )
 	state->protection_handler = ultennis_protection;
 
 	/* additional (protection?) hack */
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x300000, 0x300001, 0, 0, ultennis_hack_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x300000, 0x300001, FUNC(ultennis_hack_r));
 }
 
 

@@ -798,7 +798,7 @@ ROM_END
 
 static DRIVER_INIT( airbustr )
 {
-	memory_install_read8_handler(machine->device("master")->memory().space(AS_PROGRAM), 0xe000, 0xefff, 0, 0, devram_r); // protection device lives here
+	machine->device("master")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe000, 0xefff, FUNC(devram_r)); // protection device lives here
 }
 
 

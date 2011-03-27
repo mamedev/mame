@@ -2394,8 +2394,8 @@ static READ16_HANDLER( suchipi_mcu_r )
 static DRIVER_INIT( urashima )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, urashima_mcu_r );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80012, 0x80013, 0, 0, urashima_mcu_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(urashima_mcu_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x80012, 0x80013, FUNC(urashima_mcu_w) );
 
 	state->mcu_prg = 0x12;
 }
@@ -2403,8 +2403,8 @@ static DRIVER_INIT( urashima )
 static DRIVER_INIT( daireika )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, daireika_mcu_r );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80012, 0x80013, 0, 0, daireika_mcu_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(daireika_mcu_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x80012, 0x80013, FUNC(daireika_mcu_w) );
 
 	state->mcu_prg = 0x11;
 }
@@ -2412,8 +2412,8 @@ static DRIVER_INIT( daireika )
 static DRIVER_INIT( mjzoomin )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
-	memory_install_write16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(mjzoomin_mcu_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x80012, 0x80013, FUNC(mjzoomin_mcu_w) );
 
 	state->mcu_prg = 0x13;
 }
@@ -2421,7 +2421,7 @@ static DRIVER_INIT( mjzoomin )
 static DRIVER_INIT( kakumei )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(kakumei_mcu_r) );
 
 	state->mcu_prg = 0x21;
 }
@@ -2429,7 +2429,7 @@ static DRIVER_INIT( kakumei )
 static DRIVER_INIT( kakumei2 )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(kakumei_mcu_r) );
 
 	state->mcu_prg = 0x22;
 }
@@ -2437,7 +2437,7 @@ static DRIVER_INIT( kakumei2 )
 static DRIVER_INIT( suchipi )
 {
 	jalmah_state *state = machine->driver_data<jalmah_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(suchipi_mcu_r) );
 
 	state->mcu_prg = 0x23;
 }

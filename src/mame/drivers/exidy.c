@@ -1439,7 +1439,7 @@ static DRIVER_INIT( phantoma )
 	state->color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf800, 0xffff, 0, 0, "bank1");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xf800, 0xffff, "bank1");
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0xf800);
 }
 

@@ -5332,8 +5332,8 @@ static void maketrax_rom_decode(running_machine *machine)
 static DRIVER_INIT( maketrax )
 {
 	/* set up protection handlers */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5080, 0x50bf, 0, 0, maketrax_special_port2_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x50c0, 0x50ff, 0, 0, maketrax_special_port3_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x5080, 0x50bf, FUNC(maketrax_special_port2_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x50c0, 0x50ff, FUNC(maketrax_special_port3_r));
 
 	maketrax_rom_decode(machine);
 }
@@ -5364,8 +5364,8 @@ static void korosuke_rom_decode(running_machine *machine)
 static DRIVER_INIT( korosuke )
 {
 	/* set up protection handlers */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5080, 0x5080, 0, 0, korosuke_special_port2_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x50c0, 0x50ff, 0, 0, korosuke_special_port3_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x5080, 0x5080, FUNC(korosuke_special_port2_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x50c0, 0x50ff, FUNC(korosuke_special_port3_r));
 
 	korosuke_rom_decode(machine);
 }
@@ -5707,10 +5707,10 @@ static READ8_HANDLER( cannonbp_protection_r )
 static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
-	memory_install_ram(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4800, 0x4bff, 0, 0, NULL);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x4800, 0x4bff);
 
 	/* protection? */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3000, 0x3fff, FUNC(cannonbp_protection_r));
 }
 
 

@@ -183,7 +183,7 @@ static MACHINE_START( kangaroo_mcu )
 	kangaroo_state *state = machine->driver_data<kangaroo_state>();
 
 	MACHINE_START_CALL(kangaroo);
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xef00, 0xefff, FUNC(mcu_sim_r), FUNC(mcu_sim_w));
 	state->save_item(NAME(state->clock));
 }
 

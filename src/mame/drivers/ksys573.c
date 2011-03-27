@@ -1472,7 +1472,7 @@ static WRITE32_HANDLER( ge765pwbba_w )
 static DRIVER_INIT( ge765pwbba )
 {
 	DRIVER_INIT_CALL(konami573);
-	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(ge765pwbba_r), FUNC(ge765pwbba_w) );
 }
 
 /*
@@ -1584,7 +1584,7 @@ static void gx700pwfbf_init( running_machine *machine, void (*output_callback_fu
 
 	state->gx700pwfbf_output_callback = output_callback_func;
 
-	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gx700pwbf_io_r), FUNC(gx700pwbf_io_w) );
 
 	state->save_item( NAME(state->gx700pwbf_output_data) );
 }
@@ -1825,7 +1825,7 @@ static DRIVER_INIT( gtrfrks )
 {
 	DRIVER_INIT_CALL(konami573);
 
-	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f600000, 0x1f6000ff, FUNC(gtrfrks_io_r), FUNC(gtrfrks_io_w) );
 }
 
 /* GX894 digital i/o */
@@ -2140,7 +2140,7 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 
 	state->gx894pwbba_output_callback = output_callback_func;
 
-	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r, gx894pwbba_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gx894pwbba_r), FUNC(gx894pwbba_w) );
 
 	state->gx894_ram_write_offset = 0;
 	state->gx894_ram_read_offset = 0;
@@ -2167,7 +2167,7 @@ static DRIVER_INIT( gtrfrkdigital )
 
 	gx894pwbba_init( machine, NULL );
 
-	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f600000, 0x1f6000ff, FUNC(gtrfrks_io_r), FUNC(gtrfrks_io_w) );
 }
 
 /* ddr solo */
@@ -2460,7 +2460,7 @@ static DRIVER_INIT( dmx )
 
 	gx894pwbba_init( machine, dmx_output_callback );
 
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, dmx_io_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f600000, 0x1f6000ff, FUNC(dmx_io_w) );
 }
 
 /* salary man champ */
@@ -2620,7 +2620,7 @@ static DRIVER_INIT( mamboagg )
 
 	gx894pwbba_init( machine, mamboagg_output_callback );
 
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, mamboagg_io_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f600000, 0x1f6000ff, FUNC(mamboagg_io_w) );
 }
 
 
@@ -2941,7 +2941,7 @@ static READ32_HANDLER( gunmania_r )
 static DRIVER_INIT( gunmania )
 {
 	DRIVER_INIT_CALL(konami573);
-	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gunmania_r, gunmania_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gunmania_r), FUNC(gunmania_w) );
 }
 
 /* ADC0834 Interface */

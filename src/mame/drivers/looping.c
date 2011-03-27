@@ -899,7 +899,7 @@ static DRIVER_INIT( looping )
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7000, 0x7007, 0, 0, protection_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7000, 0x7007, FUNC(protection_r));
 }
 
 

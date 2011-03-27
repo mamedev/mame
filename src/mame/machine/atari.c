@@ -105,13 +105,13 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 	if ( new_mmu & 0x80 )
 	{
 		logerror("%s MMU SELFTEST RAM\n", machine->gamedrv->name);
-		memory_nop_readwrite(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(0x5000, 0x57ff);
 	}
 	else
 	{
 		logerror("%s MMU SELFTEST ROM\n", machine->gamedrv->name);
-		memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0, "bank2");
-		memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x57ff, 0, 0);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x57ff, "bank2");
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x5000, 0x57ff);
 		memory_set_bankptr(machine, "bank2", machine->region("maincpu")->base() + 0x5000);
 	}
 }

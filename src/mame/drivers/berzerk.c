@@ -1210,8 +1210,8 @@ ROM_END
 static DRIVER_INIT( moonwarp )
 {
 	address_space *io = machine->device("maincpu")->memory().space(AS_IO);
-	memory_install_read8_handler (io, 0x48, 0x48, 0, 0, moonwarp_p1_r);
-	memory_install_read8_handler (io, 0x4a, 0x4a, 0, 0, moonwarp_p2_r);
+	io->install_legacy_read_handler (0x48, 0x48, FUNC(moonwarp_p1_r));
+	io->install_legacy_read_handler (0x4a, 0x4a, FUNC(moonwarp_p2_r));
 }
 
 /*************************************

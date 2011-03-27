@@ -1460,35 +1460,35 @@ static DRIVER_INIT( speedfrk )
 {
 	cinemat_state *state = machine->driver_data<cinemat_state>();
 	state->gear = 0xe;
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x00, 0x03, 0, 0, speedfrk_wheel_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x06, 0, 0, speedfrk_gear_r);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x03, FUNC(speedfrk_wheel_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x06, FUNC(speedfrk_gear_r));
 }
 
 
 static DRIVER_INIT( sundance )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x00, 0x0f, 0, 0, sundance_inputs_r);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x0f, FUNC(sundance_inputs_r));
 }
 
 
 static DRIVER_INIT( tailg )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x07, 0x07, 0, 0, mux_select_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x07, 0x07, FUNC(mux_select_w));
 }
 
 
 static DRIVER_INIT( boxingb )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x0c, 0x0f, 0, 0, boxingb_dial_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x07, 0x07, 0, 0, mux_select_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0c, 0x0f, FUNC(boxingb_dial_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x07, 0x07, FUNC(mux_select_w));
 }
 
 
 static DRIVER_INIT( qb3 )
 {
 	cinemat_state *state = machine->driver_data<cinemat_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x0f, 0x0f, 0, 0, qb3_frame_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x00, 0x00, 0, 0, qb3_ram_bank_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0f, 0x0f, FUNC(qb3_frame_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x00, 0x00, FUNC(qb3_ram_bank_w));
 
 	memory_configure_bank(machine, "bank1", 0, 4, state->rambase, 0x100*2);
 }

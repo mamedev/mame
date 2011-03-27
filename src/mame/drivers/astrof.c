@@ -1308,8 +1308,8 @@ static DRIVER_INIT( abattle )
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(abattle_coin_prot_r));
 }
 
 
@@ -1322,8 +1322,8 @@ static DRIVER_INIT( afire )
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa004, 0xa004, 0, 0, afire_coin_prot_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(afire_coin_prot_r));
 }
 
 
@@ -1336,8 +1336,8 @@ static DRIVER_INIT( sstarbtl )
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa003, 0xa003, FUNC(shoot_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xa004, 0xa004, FUNC(abattle_coin_prot_r));
 }
 
 

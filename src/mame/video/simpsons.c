@@ -101,17 +101,17 @@ void simpsons_video_banking( running_machine *machine, int bank )
 
 	if (bank & 1)
 	{
-		memory_install_read_bank(space, 0x0000, 0x0fff, 0, 0, "bank5");
-		memory_install_write8_handler(space, 0x0000, 0x0fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		space->install_read_bank(0x0000, 0x0fff, "bank5");
+		space->install_legacy_write_handler(0x0000, 0x0fff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w));
 		memory_set_bankptr(machine, "bank5", machine->generic.paletteram.v);
 	}
 	else
-		memory_install_readwrite8_device_handler(space, state->k052109, 0x0000, 0x0fff, 0, 0, k052109_r, k052109_w);
+		space->install_legacy_readwrite_handler(*state->k052109, 0x0000, 0x0fff, FUNC(k052109_r), FUNC(k052109_w));
 
 	if (bank & 2)
-		memory_install_readwrite8_handler(space, 0x2000, 0x3fff, 0, 0, simpsons_k053247_r, simpsons_k053247_w);
+		space->install_legacy_readwrite_handler(0x2000, 0x3fff, FUNC(simpsons_k053247_r), FUNC(simpsons_k053247_w));
 	else
-		memory_install_readwrite8_handler(space, 0x2000, 0x3fff, 0, 0, simpsons_k052109_r, simpsons_k052109_w);
+		space->install_legacy_readwrite_handler(0x2000, 0x3fff, FUNC(simpsons_k052109_r), FUNC(simpsons_k052109_w));
 }
 
 

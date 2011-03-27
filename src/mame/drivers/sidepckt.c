@@ -379,14 +379,14 @@ ROM_END
 
 static DRIVER_INIT( sidepckt )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3018, 0x3018, 0, 0, sidepckt_i8751_w  );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3014, 0x3014, FUNC(sidepckt_i8751_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3018, 0x3018, FUNC(sidepckt_i8751_w)  );
 }
 
 static DRIVER_INIT( sidepctj )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3018, 0x3018, 0, 0, sidepctj_i8751_w  );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3014, 0x3014, FUNC(sidepckt_i8751_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x3018, 0x3018, FUNC(sidepctj_i8751_w)  );
 }
 
 

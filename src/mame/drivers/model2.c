@@ -4995,7 +4995,7 @@ ROM_END
 static DRIVER_INIT( genprot )
 {
 	model2_state *state = machine->driver_data<model2_state>();
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
 	state->protstate = state->protpos = 0;
 }
 
@@ -5004,7 +5004,7 @@ static DRIVER_INIT( pltkids )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
 	state->protstate = state->protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5016,7 +5016,7 @@ static DRIVER_INIT( zerogun )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
 	state->protstate = state->protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5025,7 +5025,7 @@ static DRIVER_INIT( zerogun )
 
 static DRIVER_INIT( daytonam )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x240000, 0x24ffff, 0, 0, maxx_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x240000, 0x24ffff, FUNC(maxx_r) );
 }
 
 /* very crude support for let the game set itself into stand-alone mode */
@@ -5061,8 +5061,8 @@ static DRIVER_INIT( sgt24h )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01a10000, 0x01a1ffff, FUNC(jaleco_network_r), FUNC(jaleco_network_w));
 
 	state->protstate = state->protpos = 0;
 
@@ -5072,7 +5072,7 @@ static DRIVER_INIT( sgt24h )
 
 static DRIVER_INIT( overrev )
 {
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01a10000, 0x01a1ffff, FUNC(jaleco_network_r), FUNC(jaleco_network_w));
 
 	//TODO: cache patch?
 }
@@ -5083,7 +5083,7 @@ static DRIVER_INIT( doa )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x01d80000, 0x01dfffff, FUNC(model2_prot_r), FUNC(model2_prot_w));
 	state->protstate = state->protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;
@@ -5092,12 +5092,12 @@ static DRIVER_INIT( doa )
 
 static DRIVER_INIT( rchase2 )
 {
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, rchase2_devices_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c00008, 0x01c0000b, FUNC(rchase2_devices_w));
 }
 
 static DRIVER_INIT( srallyc )
 {
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, srallyc_devices_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c00008, 0x01c0000b, FUNC(srallyc_devices_w));
 }
 
 

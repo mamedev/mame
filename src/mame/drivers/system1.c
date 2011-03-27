@@ -4546,11 +4546,11 @@ static DRIVER_INIT( dakkochn )
 
 	mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4);
 
-//  memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
-//  memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
-//  memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+//  machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(dakkochn_port_00_r));
+//  machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x03, 0x03, FUNC(dakkochn_port_03_r));
+//  machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x04, FUNC(dakkochn_port_04_r));
 
-//  memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+//  machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x15, 0x15, FUNC(dakkochn_port_15_w));
 }
 
 
@@ -4616,11 +4616,11 @@ static DRIVER_INIT( nob )
 	/* hack to fix incorrect JMP at start, which should obviously be to $0080 */
 	/* patching the ROM causes errors in the self-test */
 	/* in real-life, it could be some behavior dependent upon M1 */
-	memory_install_read8_handler(space, 0x0001, 0x0001, 0x0000, 0x0000, nob_start_r);
+	space->install_legacy_read_handler(0x0001, 0x0001, FUNC(nob_start_r));
 
 	/* install MCU communications */
-	memory_install_readwrite8_handler(iospace, 0x18, 0x18, 0x00, 0x00, nob_maincpu_latch_r, nob_maincpu_latch_w);
-	memory_install_read8_handler(iospace, 0x1c, 0x1c, 0x00, 0x00, nob_mcu_status_r);
+	iospace->install_legacy_readwrite_handler(0x18, 0x18, 0x00, 0x00, FUNC(nob_maincpu_latch_r), FUNC(nob_maincpu_latch_w));
+	iospace->install_legacy_read_handler(0x1c, 0x1c, FUNC(nob_mcu_status_r));
 }
 
 static DRIVER_INIT( nobb )
@@ -4647,10 +4647,10 @@ static DRIVER_INIT( nobb )
 
 	DRIVER_INIT_CALL(bank44);
 
-	memory_install_read8_handler(iospace, 0x1c, 0x1c, 0x00, 0x00, nobb_inport1c_r);
-	memory_install_read8_handler(iospace, 0x22, 0x22, 0x00, 0x00, nobb_inport22_r);
-	memory_install_read8_handler(iospace, 0x23, 0x23, 0x00, 0x00, nobb_inport23_r);
-	memory_install_write8_handler(iospace, 0x24, 0x24, 0x00, 0x00, nobb_outport24_w);
+	iospace->install_legacy_read_handler(0x1c, 0x1c, FUNC(nobb_inport1c_r));
+	iospace->install_legacy_read_handler(0x22, 0x22, FUNC(nobb_inport22_r));
+	iospace->install_legacy_read_handler(0x23, 0x23, FUNC(nobb_inport23_r));
+	iospace->install_legacy_write_handler(0x24, 0x24, FUNC(nobb_outport24_w));
 }
 
 
@@ -4685,10 +4685,10 @@ static DRIVER_INIT( choplift )
 static DRIVER_INIT( shtngmst )
 {
 	address_space *iospace = machine->device("maincpu")->memory().space(AS_IO);
-	memory_install_read_port(iospace, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
-	memory_install_read_port(iospace, 0x18, 0x18, 0x00, 0x03, "18");
-	memory_install_read_port(iospace, 0x1c, 0x1c, 0x00, 0x02, "GUNX");
-	memory_install_read_port(iospace, 0x1d, 0x1d, 0x00, 0x02, "GUNY");
+	iospace->install_read_port(0x12, 0x12, 0x00, 0x00, "TRIGGER");
+	iospace->install_read_port(0x18, 0x18, 0x00, 0x03, "18");
+	iospace->install_read_port(0x1c, 0x1c, 0x00, 0x02, "GUNX");
+	iospace->install_read_port(0x1d, 0x1d, 0x00, 0x02, "GUNY");
 	DRIVER_INIT_CALL(bank0c);
 }
 

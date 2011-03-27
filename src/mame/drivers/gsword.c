@@ -917,7 +917,7 @@ static DRIVER_INIT( gsword )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4004, 0x4005, FUNC(gsword_hack_r));
 #endif
 }
 
@@ -932,7 +932,7 @@ static DRIVER_INIT( gsword2 )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4004, 0x4005, FUNC(gsword_hack_r));
 #endif
 }
 

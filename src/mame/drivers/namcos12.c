@@ -1293,8 +1293,8 @@ static READ32_HANDLER( system11gun_r )
 
 static void system11gun_install( running_machine *machine )
 {
-	memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
-	memory_install_read32_handler (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(system11gun_w) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(system11gun_r) );
 }
 
 static WRITE32_HANDLER( kcoff_w )
@@ -1377,9 +1377,9 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "tektagtc" ) == 0 )
 	{
 		state->has_tektagt_dma = 1;
-		memory_install_readwrite32_handler(space, 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_r, tektagt_protection_1_w );
-		memory_install_readwrite32_handler(space, 0x1fb80000, 0x1fb80003, 0, 0, tektagt_protection_2_r, tektagt_protection_2_w );
-		memory_install_read32_handler(space, 0x1f700000, 0x1f700003, 0, 0, tektagt_protection_3_r );
+		space->install_legacy_readwrite_handler(0x1fb00000, 0x1fb00003, FUNC(tektagt_protection_1_r), FUNC(tektagt_protection_1_w) );
+		space->install_legacy_readwrite_handler(0x1fb80000, 0x1fb80003, FUNC(tektagt_protection_2_r), FUNC(tektagt_protection_2_w) );
+		space->install_legacy_read_handler(0x1f700000, 0x1f700003, FUNC(tektagt_protection_3_r) );
 	}
 
 	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
@@ -1402,9 +1402,9 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
-		memory_install_read_bank (space, 0x1fc20280, 0x1fc2028b, 0, 0, "bank2" );
-		memory_install_write32_handler(space, 0x1f008000, 0x1f008003, 0, 0, kcon_w );
-		memory_install_write32_handler(space, 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
+		space->install_read_bank (0x1fc20280, 0x1fc2028b, "bank2" );
+		space->install_legacy_write_handler(0x1f008000, 0x1f008003, FUNC(kcon_w) );
+		space->install_legacy_write_handler(0x1f018000, 0x1f018003, FUNC(kcoff_w) );
 
 		memset( state->kcram, 0, sizeof( state->kcram ) );
 		memory_set_bankptr( space->machine, "bank2", state->kcram );

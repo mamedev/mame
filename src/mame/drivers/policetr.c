@@ -679,14 +679,14 @@ ROM_END
 static DRIVER_INIT( policetr )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	state->speedup_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
 	state->speedup_pc = 0x1fc028ac;
 }
 
 static DRIVER_INIT( plctr13b )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	state->speedup_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00000fc8, 0x00000fcb, FUNC(speedup_w));
 	state->speedup_pc = 0x1fc028bc;
 }
 
@@ -694,14 +694,14 @@ static DRIVER_INIT( plctr13b )
 static DRIVER_INIT( sshooter )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	state->speedup_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
 	state->speedup_pc = 0x1fc03470;
 }
 
 static DRIVER_INIT( sshoot12 )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	state->speedup_data = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00018fd8, 0x00018fdb, FUNC(speedup_w));
 	state->speedup_pc = 0x1fc033e0;
 }
 

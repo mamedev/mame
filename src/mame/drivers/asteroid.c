@@ -921,14 +921,14 @@ ROM_END
 
 static DRIVER_INIT( asteroidb )
 {
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x2000, 0, 0, "IN0");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2003, 0x2003, 0, 0, "HS");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2000, 0x2000, "IN0");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2003, 0x2003, "HS");
 }
 
 
 static DRIVER_INIT( asterock )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x2007, 0, 0, asterock_IN0_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2000, 0x2007, FUNC(asterock_IN0_r));
 }
 
 

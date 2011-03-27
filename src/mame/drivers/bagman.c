@@ -934,7 +934,7 @@ static DRIVER_INIT( bagman )
 
 	/* Unmap video enable register, not available on earlier hardware revision(s)
        Bagman is supposed to have glitches during screen transitions */
-	memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa003, 0xa003, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0xa003, 0xa003);
 	*state->video_enable = 1;
 }
 

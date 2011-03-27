@@ -2898,7 +2898,7 @@ static DRIVER_INIT( evilston )
 {
 	UINT8 *ROM = machine->region("audiocpu")->base();
 	ROM[0x72] = 0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa7fe, 0xa7fe, FUNC(evilston_snd_w));
 }
 
 

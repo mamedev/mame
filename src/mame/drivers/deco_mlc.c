@@ -745,7 +745,7 @@ static DRIVER_INIT( avengrgs )
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x32dc);
 
 	state->mainCpuIsArm = 0;
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01089a0, 0x01089a3, FUNC(avengrgs_speedup_r) );
 	descramble_sound(machine);
 }
 

@@ -1541,16 +1541,16 @@ static void mcr_common_init(running_machine *machine, int sound_board)
 static DRIVER_INIT( demoderm )
 {
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x01, 0x01, 0, 0, demoderm_ip1_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x02, 0x02, 0, 0, demoderm_ip2_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, demoderm_op6_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x01, 0x01, FUNC(demoderm_ip1_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x02, 0x02, FUNC(demoderm_ip2_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(demoderm_op6_w));
 }
 
 
 static DRIVER_INIT( sarge )
 {
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, turbocs_data_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(turbocs_data_w));
 }
 
 
@@ -1558,10 +1558,10 @@ static DRIVER_INIT( maxrpm )
 {
 	mcr3_state *state = machine->driver_data<mcr3_state>();
 	mcr_common_init(machine, MCR_TURBO_CHIP_SQUEAK);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x01, 0x01, 0, 0, maxrpm_ip1_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x02, 0x02, 0, 0, maxrpm_ip2_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x05, 0x05, 0, 0, maxrpm_op5_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, maxrpm_op6_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x01, 0x01, FUNC(maxrpm_ip1_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x02, 0x02, FUNC(maxrpm_ip2_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x05, 0x05, FUNC(maxrpm_op5_w));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(maxrpm_op6_w));
 
 	state_save_register_global(machine, state->maxrpm_adc_control);
 	state_save_register_global(machine, state->maxrpm_adc_select);
@@ -1574,26 +1574,26 @@ static DRIVER_INIT( maxrpm )
 static DRIVER_INIT( rampage )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x04, 0, 0, rampage_ip4_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, rampage_op6_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x04, 0x04, FUNC(rampage_ip4_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(rampage_op6_w));
 }
 
 
 static DRIVER_INIT( powerdrv )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x02, 0x02, 0, 0, powerdrv_ip2_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x05, 0x05, 0, 0, powerdrv_op5_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, powerdrv_op6_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x02, 0x02, FUNC(powerdrv_ip2_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x05, 0x05, FUNC(powerdrv_op5_w));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(powerdrv_op6_w));
 }
 
 
 static DRIVER_INIT( stargrds )
 {
 	mcr_common_init(machine, MCR_SOUNDS_GOOD);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x00, 0x00, 0, 0, stargrds_ip0_r);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x05, 0x05, 0, 0, stargrds_op5_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_IO), 0x06, 0x06, 0, 0, stargrds_op6_w);
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(stargrds_ip0_r));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x05, 0x05, FUNC(stargrds_op5_w));
+	machine->device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x06, FUNC(stargrds_op6_w));
 }
 
 
@@ -1635,7 +1635,7 @@ static DRIVER_INIT( turbotag )
 	machine->device<cpu_device>("csdcpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 
 	/* kludge for bad ROM read */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0b53, 0x0b53, 0, 0, turbotag_kludge_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0b53, 0x0b53, FUNC(turbotag_kludge_r));
 }
 
 

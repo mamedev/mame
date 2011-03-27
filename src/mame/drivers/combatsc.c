@@ -251,13 +251,13 @@ static WRITE8_HANDLER( combatscb_bankselect_w )
 		if (data == 0x1f)
 		{
 			memory_set_bank(space->machine, "bank1", 8 + (data & 1));
-			memory_install_write8_handler(space, 0x4000, 0x7fff, 0, 0, combatscb_io_w);
-			memory_install_read8_handler(space, 0x4400, 0x4403, 0, 0, combatscb_io_r);/* IO RAM & Video Registers */
+			space->install_legacy_write_handler(0x4000, 0x7fff, FUNC(combatscb_io_w));
+			space->install_legacy_read_handler(0x4400, 0x4403, FUNC(combatscb_io_r));/* IO RAM & Video Registers */
 		}
 		else
 		{
-			memory_install_read_bank(space, 0x4000, 0x7fff, 0, 0, "bank1");	/* banked ROM */
-			memory_unmap_write(space, 0x4000, 0x7fff, 0, 0);	/* banked ROM */
+			space->install_read_bank(0x4000, 0x7fff, "bank1");	/* banked ROM */
+			space->unmap_write(0x4000, 0x7fff);	/* banked ROM */
 		}
 	}
 }
@@ -995,7 +995,7 @@ ROM_END
 static DRIVER_INIT( combatsc )
 {
 	/* joystick instead of trackball */
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x0404, 0x0404, "IN1");
 }
 
 

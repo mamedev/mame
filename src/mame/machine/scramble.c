@@ -208,13 +208,13 @@ DRIVER_INIT( scramble_ppi )
 
 static DRIVER_INIT( scobra )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa803, 0xa803, 0, 0, scrambold_background_enable_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa803, 0xa803, FUNC(scrambold_background_enable_w));
 }
 
 #ifdef UNUSED_FUNCTION
 DRIVER_INIT( atlantis )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6803, 0x6803, 0, 0, scrambold_background_enable_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6803, 0x6803, FUNC(scrambold_background_enable_w));
 }
 
 DRIVER_INIT( scramble )
@@ -225,14 +225,14 @@ DRIVER_INIT( scramble )
 
 DRIVER_INIT( stratgyx )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb000, 0xb000, 0, 0, scrambold_background_green_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb002, 0xb002, 0, 0, scrambold_background_blue_w);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb00a, 0xb00a, 0, 0, scrambold_background_red_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb000, 0xb000, FUNC(scrambold_background_green_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb002, 0xb002, FUNC(scrambold_background_blue_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb00a, 0xb00a, FUNC(scrambold_background_red_w));
 }
 
 DRIVER_INIT( tazmani2 )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb002, 0xb002, 0, 0, scrambold_background_enable_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb002, 0xb002, FUNC(scrambold_background_enable_w));
 }
 
 DRIVER_INIT( ckongs )
@@ -242,15 +242,15 @@ DRIVER_INIT( ckongs )
 DRIVER_INIT( mariner )
 {
 	/* extra ROM */
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5800, 0x67ff, 0, 0, "bank1");
-	memory_unmap_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5800, 0x67ff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5800, 0x67ff, "bank1");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x5800, 0x67ff);
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x5800);
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9008, 0x9008, FUNC(mariner_protection_2_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb401, 0xb401, FUNC(mariner_protection_1_r));
 
 	/* ??? (it's NOT a background enable) */
-	/*memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6803, 0x6803, 0, 0);*/
+	/*machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x6803, 0x6803);*/
 }
 
 #ifdef UNUSED_FUNCTION
@@ -328,15 +328,15 @@ DRIVER_INIT( cavelon )
 	UINT8 *ROM = machine->region("maincpu")->base();
 
 	/* banked ROM */
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x00000], 0x10000);
 	cavelon_banksw(machine);
 
 	/* A15 switches memory banks */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, cavelon_banksw_r, cavelon_banksw_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(cavelon_banksw_r), FUNC(cavelon_banksw_w));
 
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x2000, 0x2000, 0, 0);	/* ??? */
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x3800, 0x3801, 0, 0);  /* looks suspicously like
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x2000);	/* ??? */
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x3800, 0x3801);  /* looks suspicously like
                                                                an AY8910, but not sure */
 	state_save_register_global(machine, cavelon_bank);
 }
@@ -345,7 +345,7 @@ DRIVER_INIT( cavelon )
 
 DRIVER_INIT( darkplnt )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb00a, 0xb00a, 0, 0, darkplnt_bullet_color_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb00a, 0xb00a, FUNC(darkplnt_bullet_color_w));
 }
 
 DRIVER_INIT( mimonkey )
@@ -381,17 +381,17 @@ DRIVER_INIT( mimonkey )
 		ctr++;
 	}
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa804, 0xa804, FUNC(scrambold_background_enable_w));
 }
 
 DRIVER_INIT( mimonsco )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa804, 0xa804, 0, 0, scrambold_background_enable_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa804, 0xa804, FUNC(scrambold_background_enable_w));
 }
 
 DRIVER_INIT( mimonscr )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x6804, 0x6804, 0, 0, scrambold_background_enable_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6804, 0x6804, FUNC(scrambold_background_enable_w));
 }
 
 

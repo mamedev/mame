@@ -978,7 +978,7 @@ static DRIVER_INIT( fitfight )
 //  UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
 	fitfight_state *state = machine->driver_data<fitfight_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x700000, 0x700001, 0, 0, fitfight_700000_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(fitfight_700000_r));
 	state->bbprot_kludge = 0;
 }
 
@@ -987,7 +987,7 @@ static DRIVER_INIT( histryma )
 //  UINT16 *mem16 = (UINT16 *)machine->region("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
 	fitfight_state *state = machine->driver_data<fitfight_state>();
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x700000, 0x700001, 0, 0, histryma_700000_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(histryma_700000_r));
 	state->bbprot_kludge = 0;
 }
 

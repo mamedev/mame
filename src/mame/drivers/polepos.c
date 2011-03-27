@@ -1986,15 +1986,15 @@ ROM_END
 static DRIVER_INIT( topracern )
 {
 	/* extra direct mapped inputs read */
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_IO), 0x02, 0x02, 0, 0, "STEER");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_IO), 0x03, 0x03, 0, 0, "IN0");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x04, 0, 0, "DSWA");
+	machine->device("maincpu")->memory().space(AS_IO)->install_read_port(0x02, 0x02, "STEER");
+	machine->device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "IN0");
+	machine->device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSWA");
 }
 
 static DRIVER_INIT( polepos2 )
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	memory_install_read16_handler(machine->device("sub")->memory().space(AS_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
+	machine->device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x5fff, FUNC(polepos2_ic25_r));
 }
 
 

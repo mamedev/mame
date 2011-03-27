@@ -537,8 +537,8 @@ static WRITE32_HANDLER( control_w )
   waitskip.data = DATA;      \
   waitskip.mask = MASK;      \
   resume_trigger= 1000;      \
-  memory_install_read32_handler \
-  (0, AS_PROGRAM, (BASE+START)&~3, (BASE+END)|3, 0, 0, waitskip_r);}
+  space->install_legacy_read_handler \
+  ((BASE+START)&~3, (BASE+END)|3, FUNC(waitskip_r));}
 
 static int suspension_active, resume_trigger;
 #ifdef UNUSED_FUNCTION
@@ -3771,8 +3771,8 @@ static DRIVER_INIT(konamigx)
 			switch (gameDefs[i].special)
 	{
 				case 1:	// LE2 guns
-					memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd44000, 0xd44003, 0, 0, le2_gun_H_r );
-					memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd44004, 0xd44007, 0, 0, le2_gun_V_r );
+					machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd44000, 0xd44003, FUNC(le2_gun_H_r) );
+					machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd44004, 0xd44007, FUNC(le2_gun_V_r) );
 					break;
 
 				case 2:	// tkmmpzdm hack
@@ -3808,7 +3808,7 @@ static DRIVER_INIT(konamigx)
 					break;
 
 				case 7:	// install type 4 Xilinx protection for non-type 3/4 games
-		memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xcc0000, 0xcc0007, 0, 0, type4_prot_w );
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xcc0000, 0xcc0007, FUNC(type4_prot_w) );
 					break;
 
 				case 8: // tbyahhoo
@@ -3828,14 +3828,14 @@ static DRIVER_INIT(konamigx)
 	switch (readback)
 	{
 		case BPP5:
-			memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd4a000, 0xd4a00f, 0, 0, gx5bppspr_r);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4a000, 0xd4a00f, FUNC(gx5bppspr_r));
 		break;
 
 		case BPP66:
-			memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd00000, 0xd01fff, 0, 0, K056832_6bpp_rom_long_r);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd00000, 0xd01fff, FUNC(K056832_6bpp_rom_long_r));
 
 		case BPP6:
-			memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd4a000, 0xd4a00f, 0, 0, gx6bppspr_r);
+			machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4a000, 0xd4a00f, FUNC(gx6bppspr_r));
 		break;
 	}
 

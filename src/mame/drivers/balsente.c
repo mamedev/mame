@@ -2135,47 +2135,47 @@ static DRIVER_INIT( toggle )   { expand_roms(machine, EXPAND_ALL);  config_shoot
 static DRIVER_INIT( nametune )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
+	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
 	expand_roms(machine, EXPAND_NONE | SWAP_HALVES); config_shooter_adc(machine, FALSE, 0 /* noanalog */);
 }
 static DRIVER_INIT( nstocker )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
+	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
 	expand_roms(machine, EXPAND_NONE | SWAP_HALVES); config_shooter_adc(machine, TRUE, 1);
 }
 static DRIVER_INIT( sfootbal )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
+	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
 	expand_roms(machine, EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(machine, FALSE, 0);
 }
 static DRIVER_INIT( spiker )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_readwrite8_handler(space, 0x9f80, 0x9f8f, 0, 0, spiker_expand_r, spiker_expand_w);
-	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
+	space->install_legacy_readwrite_handler(0x9f80, 0x9f8f, FUNC(spiker_expand_r), FUNC(spiker_expand_w));
+	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
 	expand_roms(machine, EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(machine, FALSE, 1);
 }
 static DRIVER_INIT( stompin )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
+	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
 	expand_roms(machine, 0x0c | SWAP_HALVES); config_shooter_adc(machine, FALSE, 32);
 }
 static DRIVER_INIT( rescraid ) { expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( grudge )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_read8_handler(space, 0x9400, 0x9400, 0, 0, grudge_steering_r);
+	space->install_legacy_read_handler(0x9400, 0x9400, FUNC(grudge_steering_r));
 	expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 0);
 }
 static DRIVER_INIT( shrike )
 {
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
-	memory_install_readwrite8_handler(space, 0x9e00, 0x9fff, 0, 0, shrike_shared_6809_r, shrike_shared_6809_w);
-	memory_install_write8_handler(space, 0x9e01, 0x9e01, 0, 0, shrike_sprite_select_w );
-	memory_install_readwrite16_handler(machine->device("68k")->memory().space(AS_PROGRAM), 0x10000, 0x1001f, 0, 0, shrike_io_68k_r, shrike_io_68k_w);
+	space->install_legacy_readwrite_handler(0x9e00, 0x9fff, FUNC(shrike_shared_6809_r), FUNC(shrike_shared_6809_w));
+	space->install_legacy_write_handler(0x9e01, 0x9e01, FUNC(shrike_sprite_select_w) );
+	machine->device("68k")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x10000, 0x1001f, FUNC(shrike_io_68k_r), FUNC(shrike_io_68k_w));
 
 	expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 32);
 }

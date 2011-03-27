@@ -6517,7 +6517,7 @@ ROM_END
 
 static DRIVER_INIT( mjreach )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x10060, 0x10060, FUNC(yarunara_flipscreen_w));
 }
 
 /***************************************************************************

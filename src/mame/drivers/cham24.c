@@ -304,7 +304,7 @@ static MACHINE_START( cham24 )
 	memcpy(&dst[0xc000], &src[0x0f8000], 0x4000);
 
 	/* uses 8K swapping, all ROM!*/
-	memory_install_read_bank(machine->device("ppu")->memory().space(AS_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "bank1");
 	memory_set_bankptr(machine, "bank1", machine->region("gfx1")->base());
 
 	/* need nametable ram, though. I doubt this uses more than 2k, but it starts up configured for 4 */
@@ -315,7 +315,7 @@ static MACHINE_START( cham24 )
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
 	/* and read/write handlers */
-	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(AS_PROGRAM), 0x2000, 0x3eff, 0, 0, nt_r, nt_w);
+	machine->device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nt_r), FUNC(nt_w));
 }
 
 static DRIVER_INIT( cham24 )

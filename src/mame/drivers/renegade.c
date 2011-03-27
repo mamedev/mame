@@ -283,8 +283,8 @@ static DRIVER_INIT( kuniokunb )
 	address_space *space = machine->device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* Remove the MCU handlers */
-	memory_unmap_readwrite(space, 0x3804, 0x3804, 0, 0);
-	memory_unmap_read(space, 0x3805, 0x3805, 0, 0);
+	space->unmap_readwrite(0x3804, 0x3804);
+	space->unmap_read(0x3805, 0x3805);
 }
 
 

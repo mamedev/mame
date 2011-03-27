@@ -1413,7 +1413,7 @@ static DRIVER_INIT( invasn )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x9c0000, 0x9c0000, FUNC(invasn_gun_r), FUNC(invasn_gun_w));
 }
 
 
@@ -1423,8 +1423,8 @@ static DRIVER_INIT( crusnexo )
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
 	memory_configure_bank(machine, "bank1", 0, 3, machine->region("user2")->base(), 0x400000*4);
 
-	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
-	memory_install_write32_handler    (machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x9b0004, 0x9b0007, FUNC(crusnexo_leds_r), FUNC(crusnexo_leds_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x8d0009, 0x8d000a, FUNC(keypad_select_w));
 }
 
 

@@ -2176,7 +2176,7 @@ static DRIVER_INIT( cookrace )
 	btime_state *state = machine->driver_data<btime_state>();
 	decrypt_C10707_cpu(machine, "maincpu");
 
-	memory_install_read_bank(machine->device("audiocpu")->memory().space(AS_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
+	machine->device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0200, 0x0fff, "bank10");
 	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
@@ -2193,9 +2193,9 @@ static DRIVER_INIT( wtennis )
 	btime_state *state = machine->driver_data<btime_state>();
 	decrypt_C10707_cpu(machine, "maincpu");
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc15f, 0xc15f, FUNC(wtennis_reset_hack_r));
 
-	memory_install_read_bank(machine->device("audiocpu")->memory().space(AS_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
+	machine->device("audiocpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0200, 0x0fff, "bank10");
 	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }

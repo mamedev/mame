@@ -1555,7 +1555,7 @@ static DRIVER_INIT( tokiob )
 {
 	DRIVER_INIT_CALL(tokio);
 
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfe00, 0xfe00, FUNC(tokiob_mcu_r) );
 }
 
 static DRIVER_INIT( dland )

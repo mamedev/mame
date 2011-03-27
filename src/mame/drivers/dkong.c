@@ -3040,7 +3040,7 @@ static DRIVER_INIT( drakton )
             {7,1,4,0,3,6,2,5},
     };
 
-    memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
+    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3062,7 +3062,7 @@ static DRIVER_INIT( strtheat )
             {6,3,4,1,0,7,2,5},
     };
 
-    memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
+    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3073,8 +3073,8 @@ static DRIVER_INIT( strtheat )
     drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
     /* custom handlers supporting Joystick or Steering Wheel */
-    memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
-    memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
+    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7c00, 0x7c00, FUNC(strtheat_inputport_0_r));
+    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7c80, 0x7c80, FUNC(strtheat_inputport_1_r));
 }
 
 
@@ -3086,13 +3086,13 @@ static DRIVER_INIT( dkongx )
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
-	memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0000, 0x5fff, 0, 0, "bank1" );
-    memory_install_read_bank(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x8000, 0xffff, 0, 0, "bank2" );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x5fff, "bank1" );
+    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xffff, "bank2" );
 
-	memory_install_write8_handler(space, 0xe000, 0xe000, 0, 0, braze_a15_w);
+	space->install_legacy_write_handler(0xe000, 0xe000, FUNC(braze_a15_w));
 
-	memory_install_read8_device_handler(space, eeprom, 0xc800, 0xc800, 0, 0, braze_eeprom_r);
-	memory_install_write8_device_handler(space, eeprom, 0xc800, 0xc800, 0, 0, braze_eeprom_w);
+	space->install_legacy_read_handler(*eeprom, 0xc800, 0xc800, FUNC(braze_eeprom_r));
+	space->install_legacy_write_handler(*eeprom, 0xc800, 0xc800, FUNC(braze_eeprom_w));
 
 	braze_decrypt_rom(machine, decrypted);
 

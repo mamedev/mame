@@ -55,19 +55,19 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	/* bit 5 = memory bank select */
 	if (data & 0x20)
 	{
-		memory_install_read_bank(space, 0x1800, 0x1fff, 0, 0, "bank5");
-		memory_install_write8_handler(space, 0x1800, 0x1fff, 0, 0, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		space->install_read_bank(0x1800, 0x1fff, "bank5");
+		space->install_legacy_write_handler(0x1800, 0x1fff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w));
 		memory_set_bankptr(space->machine, "bank5", space->machine->generic.paletteram.v);
 
 		if (state->k051316_readroms)
-			memory_install_readwrite8_device_handler(space, state->k051316_1, 0x1000, 0x17ff, 0, 0, k051316_rom_r, k051316_w);	/* 051316 #1 (ROM test) */
+			space->install_legacy_readwrite_handler(*state->k051316_1, 0x1000, 0x17ff, FUNC(k051316_rom_r), FUNC(k051316_w));	/* 051316 #1 (ROM test) */
 		else
-			memory_install_readwrite8_device_handler(space, state->k051316_1, 0x1000, 0x17ff, 0, 0, k051316_r, k051316_w);		/* 051316 #1 */
+			space->install_legacy_readwrite_handler(*state->k051316_1, 0x1000, 0x17ff, FUNC(k051316_r), FUNC(k051316_w));		/* 051316 #1 */
 	}
 	else
 	{
-		memory_install_readwrite_bank(space, 0x1000, 0x17ff, 0, 0, "bank1");				/* RAM */
-		memory_install_readwrite_bank(space, 0x1800, 0x1fff, 0, 0, "bank2");				/* RAM */
+		space->install_readwrite_bank(0x1000, 0x17ff, "bank1");				/* RAM */
+		space->install_readwrite_bank(0x1800, 0x1fff, "bank2");				/* RAM */
 	}
 
 	/* other bits unknown/unused */
@@ -85,9 +85,9 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	state->k051316_readroms = (data & 0x10);
 
 	if (state->k051316_readroms)
-		memory_install_read8_device_handler(space, state->k051316_2, 0x2800, 0x2fff, 0, 0, k051316_rom_r);	/* 051316 (ROM test) */
+		space->install_legacy_read_handler(*state->k051316_2, 0x2800, 0x2fff, FUNC(k051316_rom_r));	/* 051316 (ROM test) */
 	else
-		memory_install_read8_device_handler(space, state->k051316_2, 0x2800, 0x2fff, 0, 0, k051316_r);		/* 051316 */
+		space->install_legacy_read_handler(*state->k051316_2, 0x2800, 0x2fff, FUNC(k051316_r));		/* 051316 */
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */

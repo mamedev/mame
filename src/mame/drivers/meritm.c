@@ -1831,7 +1831,7 @@ static DRIVER_INIT(megat3te)
 
 	ds1204_init(machine, megat3_ds1204_key, megat3_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfff8, 0xffff, FUNC(meritm_ds1644_r), FUNC(meritm_ds1644_w) );
 
 };
 
@@ -1850,7 +1850,7 @@ static DRIVER_INIT(megat4te)
 
 	ds1204_init(machine, 0, megat4te_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfff8, 0xffff, FUNC(meritm_ds1644_r), FUNC(meritm_ds1644_w) );
 
 };
 
@@ -1861,7 +1861,7 @@ static DRIVER_INIT(megat4st)
 
 	ds1204_init(machine, 0, megat4te_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfff8, 0xffff, FUNC(meritm_ds1644_r), FUNC(meritm_ds1644_w) );
 
 };
 
@@ -1881,7 +1881,7 @@ static DRIVER_INIT(megat5t)
 
 	ds1204_init(machine, 0, megat5_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfff8, 0xffff, FUNC(meritm_ds1644_r), FUNC(meritm_ds1644_w) );
 
 }
 

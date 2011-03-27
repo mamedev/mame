@@ -1138,15 +1138,15 @@ static DRIVER_INIT( hidctch2 )
 
 static DRIVER_INIT( hidctch3 )
 {
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfc200000, 0xfc200003, 0, 0); // this generates pens vibration
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xfc200000, 0xfc200003); // this generates pens vibration
 
 	// It is not clear why the first reads are needed too
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfce00000, 0xfce00003, 0, 0, hidctch3_pen1_r);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfce80000, 0xfce80003, 0, 0, hidctch3_pen1_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfce00000, 0xfce00003, FUNC(hidctch3_pen1_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfce80000, 0xfce80003, FUNC(hidctch3_pen1_r));
 
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfcf00000, 0xfcf00003, 0, 0, hidctch3_pen2_r);
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xfcf80000, 0xfcf80003, 0, 0, hidctch3_pen2_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfcf00000, 0xfcf00003, FUNC(hidctch3_pen2_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfcf80000, 0xfcf80003, FUNC(hidctch3_pen2_r));
 
 	init_eolith_speedup(machine);
 }

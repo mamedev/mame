@@ -1414,10 +1414,10 @@ static DRIVER_INIT( striv )
 	}
 
 	// Set-up the weirdest questions read ever done
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xcfff, 0, 0, striv_question_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc000, 0xcfff, FUNC(striv_question_r));
 
 	// Nop out unused sprites writes
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb000, 0xb0ff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xb000, 0xb0ff);
 
 	state->timer_rate = 128;
 }

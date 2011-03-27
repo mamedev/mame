@@ -1187,8 +1187,8 @@ static READ32_HANDLER( coolridr_hack2_r )
 
 static DRIVER_INIT( coolridr )
 {
-//  memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack1_r );
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x60d8894, 0x060d8897, 0, 0, coolridr_hack2_r );
+//  machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d88a4, 0x060d88a7, FUNC(coolridr_hack1_r) );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d8894, 0x060d8897, FUNC(coolridr_hack2_r) );
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders (US)",GAME_NOT_WORKING|GAME_NO_SOUND )

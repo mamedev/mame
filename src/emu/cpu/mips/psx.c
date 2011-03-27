@@ -1256,16 +1256,16 @@ void psxcpu_device::update_scratchpad()
 {
 	if( ( m_biu & BIU_RAM ) == 0 )
 	{
-		memory_install_readwrite32_device_handler( m_program, this, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, psx_berr_w );
+		m_program->install_legacy_readwrite_handler( *this, 0x1f800000, 0x1f8003ff, FUNC(psx_berr_r), FUNC(psx_berr_w) );
 	}
 	else if( ( m_biu & BIU_DS ) == 0 )
 	{
-		memory_install_read32_device_handler( m_program, this, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r );
-		memory_nop_write( m_program, 0x1f800000, 0x1f8003ff, 0, 0 );
+		m_program->install_legacy_read_handler( *this, 0x1f800000, 0x1f8003ff, FUNC(psx_berr_r) );
+		m_program->nop_write( 0x1f800000, 0x1f8003ff);
 	}
 	else
 	{
-		memory_install_ram( m_program, 0x1f800000, 0x1f8003ff, 0, 0, m_dcache );
+		m_program->install_ram( 0x1f800000, 0x1f8003ff, m_dcache );
 	}
 }
 

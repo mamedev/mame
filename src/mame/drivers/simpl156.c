@@ -1074,7 +1074,7 @@ static READ32_HANDLER( joemacr_speedup_r )
 
 static DRIVER_INIT( joemacr )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0201018, 0x020101b, 0, 0, joemacr_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201018, 0x020101b, FUNC(joemacr_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1088,7 +1088,7 @@ static READ32_HANDLER( chainrec_speedup_r )
 
 static DRIVER_INIT( chainrec )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0201018, 0x020101b, 0, 0, chainrec_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201018, 0x020101b, FUNC(chainrec_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1102,7 +1102,7 @@ static READ32_HANDLER( prtytime_speedup_r )
 
 static DRIVER_INIT( prtytime )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201ae0, 0x0201ae3, FUNC(prtytime_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1117,7 +1117,7 @@ static READ32_HANDLER( charlien_speedup_r )
 
 static DRIVER_INIT( charlien )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0201010, 0x0201013, 0, 0, charlien_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201010, 0x0201013, FUNC(charlien_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1131,7 +1131,7 @@ static READ32_HANDLER( osman_speedup_r )
 
 static DRIVER_INIT( osman )
 {
-	memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0201010, 0x0201013, FUNC(osman_speedup_r) );
 	DRIVER_INIT_CALL(simpl156);
 
 }

@@ -1536,10 +1536,10 @@ static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UI
 
 	/* install synchronization hooks for GPU */
 	if (cojag_is_r3000)
-		memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, 0, 0, gpu_jump_w);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, FUNC(gpu_jump_w));
 	else
-		memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, 0, 0, gpu_jump_w);
-	memory_install_read32_handler(machine->device("gpu")->memory().space(AS_PROGRAM), 0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, 0, 0, gpu_jump_r);
+		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, FUNC(gpu_jump_w));
+	machine->device("gpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, FUNC(gpu_jump_r));
 	state->gpu_jump_address = &jaguar_gpu_ram[gpu_jump_offs/4];
 	state->gpu_spin_pc = 0xf03000 + spin_pc;
 
@@ -1555,7 +1555,7 @@ static DRIVER_INIT( area51a )
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	state->main_speedup = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa02030, 0xa02033, 0, 0, area51_main_speedup_w);
+	state->main_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa02030, 0xa02033, FUNC(area51_main_speedup_w));
 #endif
 }
 
@@ -1568,7 +1568,7 @@ static DRIVER_INIT( area51 )
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	state->main_speedup_max_cycles = 120;
-	state->main_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x100062e8, 0x100062eb, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x100062e8, 0x100062eb, FUNC(cojagr3k_main_speedup_r));
 #endif
 }
 
@@ -1583,7 +1583,7 @@ static DRIVER_INIT( maxforce )
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	state->main_speedup_max_cycles = 120;
-	state->main_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x1000865c, 0x1000865f, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1000865c, 0x1000865f, FUNC(cojagr3k_main_speedup_r));
 #endif
 }
 
@@ -1598,7 +1598,7 @@ static DRIVER_INIT( area51mx )
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	state->main_speedup = memory_install_write32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xa19550, 0xa19557, 0, 0, area51mx_main_speedup_w);
+	state->main_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xa19550, 0xa19557, FUNC(area51mx_main_speedup_w));
 #endif
 }
 
@@ -1614,7 +1614,7 @@ static DRIVER_INIT( a51mxr3k )
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	state->main_speedup_max_cycles = 120;
-	state->main_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x10006f0c, 0x10006f0f, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10006f0c, 0x10006f0f, FUNC(cojagr3k_main_speedup_r));
 #endif
 }
 
@@ -1627,7 +1627,7 @@ static DRIVER_INIT( fishfren )
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	state->main_speedup_max_cycles = 200;
-	state->main_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x10021b60, 0x10021b63, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10021b60, 0x10021b63, FUNC(cojagr3k_main_speedup_r));
 #endif
 }
 
@@ -1641,8 +1641,8 @@ static void init_freeze_common(running_machine *machine, offs_t main_speedup_add
 	/* install speedup for main CPU */
 	state->main_speedup_max_cycles = 200;
 	if (main_speedup_addr != 0)
-		state->main_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), main_speedup_addr, main_speedup_addr + 3, 0, 0, cojagr3k_main_speedup_r);
-	state->main_gpu_wait = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x0400d900, 0x0400d900 + 3, 0, 0, main_gpu_wait_r);
+		state->main_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(main_speedup_addr, main_speedup_addr + 3, FUNC(cojagr3k_main_speedup_r));
+	state->main_gpu_wait = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0400d900, 0x0400d900 + 3, FUNC(main_gpu_wait_r));
 #endif
 }
 
@@ -1662,7 +1662,7 @@ static DRIVER_INIT( vcircle )
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	state->main_speedup_max_cycles = 50;
-	state->main_speedup = memory_install_read32_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x12005b34, 0x12005b37, 0, 0, cojagr3k_main_speedup_r);
+	state->main_speedup = machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x12005b34, 0x12005b37, FUNC(cojagr3k_main_speedup_r));
 #endif
 }
 

@@ -1071,13 +1071,13 @@ static DRIVER_INIT( stinger )
 
 static DRIVER_INIT( scion )
 {
-	memory_nop_write(machine->device("audiocpu")->memory().space(AS_PROGRAM), 0x4000, 0x4001, 0, 0);
+	machine->device("audiocpu")->memory().space(AS_PROGRAM)->nop_write(0x4000, 0x4001);
 }
 
 
 static DRIVER_INIT( wiz )
 {
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xd400, 0xd400, 0, 0, wiz_protection_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd400, 0xd400, FUNC(wiz_protection_r));
 }
 
 

@@ -1030,7 +1030,7 @@ static DRIVER_INIT( horekid )
 {
 	terracre_state *state = machine->driver_data<terracre_state>();
 	state->mpProtData = mHoreKidProtData;
-	memory_install_read16_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x44004, 0x44005, 0, 0, horekid_IN2_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x44004, 0x44005, FUNC(horekid_IN2_r));
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */

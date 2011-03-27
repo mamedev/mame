@@ -854,10 +854,10 @@ ROM_END
 static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9000, 0x9000, 0, 0, popflame_protection_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x9090, 0x9090, 0, 0, popflame_protection_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9000, 0x9000, FUNC(popflame_protection_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9090, 0x9090, FUNC(popflame_protection_r));
 
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xb000, 0xb0ff, 0, 0, popflame_protection_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb000, 0xb0ff, FUNC(popflame_protection_w));
 }
 
 
@@ -887,7 +887,7 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 static DRIVER_INIT( trvmstr )
 {
 	/* install questions' handlers  */
-	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc000, 0xc002, FUNC(trvmstr_questions_r), FUNC(trvmstr_questions_w));
 }
 
 

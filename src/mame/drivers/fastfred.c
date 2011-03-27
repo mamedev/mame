@@ -979,8 +979,8 @@ ROM_END
 static DRIVER_INIT( flyboy )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc085, 0xc099, FUNC(flyboy_custom1_io_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc8fb, 0xc900, FUNC(flyboy_custom2_io_r));
 	state->hardware_type = 1;
 }
 
@@ -993,32 +993,32 @@ static DRIVER_INIT( flyboyb )
 static DRIVER_INIT( fastfred )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(fastfred_custom_io_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84b )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(jumpcoas_custom_io_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->hardware_type = 2;
 }
 
 static DRIVER_INIT( boggy84 )
 {
 	fastfred_state *state = machine->driver_data<fastfred_state>();
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0, boggy84_custom_io_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc800, 0xcfff, 0, 0);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc800, 0xcfff, FUNC(boggy84_custom_io_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xc800, 0xcfff);
 	state->hardware_type = 2;
 }
 

@@ -1596,17 +1596,17 @@ static DRIVER_INIT( cosmica )
 
 static DRIVER_INIT( devzone )
 {
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
 }
 
 
 static DRIVER_INIT( nomnlnd )
 {
 	device_t *dac = machine->device("dac");
-	memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
-	memory_nop_write(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4800, 0x4800, 0, 0);
-	memory_install_write8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
-	memory_install_write8_device_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x5000, 0x5001, FUNC(nomnlnd_port_0_1_r));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
+	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*dac, 0x480a, 0x480a, FUNC(dac_w));
 }
 
 static DRIVER_INIT( panic )

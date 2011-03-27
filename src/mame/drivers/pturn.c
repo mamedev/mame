@@ -552,8 +552,8 @@ ROM_END
 static DRIVER_INIT(pturn)
 {
 	/*
-    memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
-    memory_install_read8_handler(machine->device("maincpu")->memory().space(AS_PROGRAM), 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
+    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0dd, 0xc0dd, FUNC(pturn_protection_r));
+    machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc0db, 0xc0db, FUNC(pturn_protection2_r));
     */
 }
 

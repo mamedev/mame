@@ -2210,8 +2210,8 @@ static DRIVER_INIT( mgakuen )
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
 	configure_banks(machine);
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_IO), 0x03, 0x03, 0, 0, "DSW0");
-	memory_install_read_port(machine->device("maincpu")->memory().space(AS_IO), 0x04, 0x04, 0, 0, "DSW1");
+	machine->device("maincpu")->memory().space(AS_IO)->install_read_port(0x03, 0x03, "DSW0");
+	machine->device("maincpu")->memory().space(AS_IO)->install_read_port(0x04, 0x04, "DSW1");
 }
 static DRIVER_INIT( mgakuen2 )
 {

@@ -300,7 +300,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 
 	/* first reset everything back to the beginning */
-	memory_install_readwrite16_handler(space, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
+	space->install_legacy_readwrite_handler(0x000000, 0xffffff, FUNC(segaic16_memory_mapper_lsb_r), FUNC(segaic16_memory_mapper_lsb_w));
 
 	/* loop over the regions */
 	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
@@ -329,18 +329,18 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 
 		/* map it */
 		if (read != NULL)
-			memory_install_read16_handler(space, region_start, region_end, 0, region_mirror, read);
+			space->install_legacy_read_handler(region_start, region_end, 0, region_mirror, FUNC(read));
 		else if (readbank != NULL)
-			memory_install_read_bank(space, region_start, region_end, 0, region_mirror, readbank);
+			space->install_read_bank(region_start, region_end, 0, region_mirror, readbank);
 		else
-			memory_install_read16_handler(space, region_start, region_end, 0, region_mirror, segaic16_open_bus_r);
+			space->install_legacy_read_handler(region_start, region_end, 0, region_mirror, FUNC(segaic16_open_bus_r));
 
 		if (write != NULL)
-			memory_install_write16_handler(space, region_start, region_end, 0, region_mirror, write);
+			space->install_legacy_write_handler(region_start, region_end, 0, region_mirror, FUNC(write));
 		else if (writebank != NULL)
-			memory_install_write_bank(space, region_start, region_end, 0, region_mirror, writebank);
+			space->install_write_bank(region_start, region_end, 0, region_mirror, writebank);
 		else
-			memory_unmap_write(space, region_start, region_end, 0, region_mirror);
+			space->unmap_write(region_start, region_end, 0, region_mirror);
 
 		/* set the bank pointer */
 		if (readbank != NULL)
