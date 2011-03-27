@@ -745,7 +745,7 @@ static int read_rom_data(rom_load_data *romdata, const rom_entry *romp)
 
 	/* make sure the length was an even multiple of the group size */
 	if (numbytes % groupsize != 0)
-		fatalerror("Error in RomModule definition: %s length not an even multiple of group size\n", ROM_GETNAME(romp));
+		mame_printf_warning("Warning in RomModule definition: %s length not an even multiple of group size\n", ROM_GETNAME(romp));
 
 	/* make sure we only fill within the region space */
 	if (ROM_GETOFFSET(romp) + numgroups * groupsize + (numgroups - 1) * skip > romdata->region->bytes())
