@@ -608,6 +608,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(MACHINE)/deco102.o \
 	$(MACHINE)/decocrpt.o \
 	$(MACHINE)/decoprot.o \
+	$(VIDEO)/decbac06.o \
 	$(VIDEO)/deco16ic.o \
 	$(VIDEO)/decocomn.o \
 	$(VIDEO)/decospr.o \
