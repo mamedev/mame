@@ -13,10 +13,10 @@ VIDEO_START( simpl156 )
 	simpl156_state *state = machine->driver_data<simpl156_state>();
 
 	/* allocate the ram as 16-bit (we do it here because the CPU is 32-bit) */
-	state->pf1_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
-	state->pf2_rowscroll = auto_alloc_array(machine, UINT16, 0x800/2);
-	state->spriteram = auto_alloc_array(machine, UINT16, 0x2000/2);
-	machine->generic.paletteram.u16 =  auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->pf1_rowscroll = auto_alloc_array_clear(machine, UINT16, 0x800/2);
+	state->pf2_rowscroll = auto_alloc_array_clear(machine, UINT16, 0x800/2);
+	state->spriteram = auto_alloc_array_clear(machine, UINT16, 0x2000/2);
+	machine->generic.paletteram.u16 =  auto_alloc_array_clear(machine, UINT16, 0x1000/2);
 
 	/* and register the allocated ram so that save states still work */
 	state->save_pointer(NAME(state->pf1_rowscroll), 0x800/2);

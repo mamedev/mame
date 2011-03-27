@@ -8,15 +8,7 @@ public:
 	int automat_msm5205_vclk_toggle;
 	UINT16 *ram;
 	UINT8 *robocop_shared_ram;
-	UINT16 *pf1_rowscroll;
-	UINT16 *pf2_rowscroll;
-	UINT16 *pf3_rowscroll;
-	UINT16 *pf1_colscroll;
-	UINT16 *pf2_colscroll;
-	UINT16 *pf3_colscroll;
-	UINT16 *pf1_data;
-	UINT16 *pf2_data;
-	UINT16 *pf3_data;
+
 	int GAME;
 	int i8751_return;
 	int i8751_command;
@@ -25,25 +17,10 @@ public:
 	int hippodrm_msb;
 	int hippodrm_lsb;
 	UINT8 i8751_ports[4];
-	tilemap_t *pf1_tilemap_0;
-	tilemap_t *pf1_tilemap_1;
-	tilemap_t *pf1_tilemap_2;
-	tilemap_t *pf2_tilemap_0;
-	tilemap_t *pf2_tilemap_1;
-	tilemap_t *pf2_tilemap_2;
-	tilemap_t *pf3_tilemap_0;
-	tilemap_t *pf3_tilemap_1;
-	tilemap_t *pf3_tilemap_2;
-	UINT16 pf1_control_0[4];
-	UINT16 pf1_control_1[4];
-	UINT16 pf2_control_0[4];
-	UINT16 pf2_control_1[4];
-	UINT16 pf3_control_0[4];
-	UINT16 pf3_control_1[4];
+
 	UINT16 *spriteram;
 	UINT16 *buffered_spriteram;
 	UINT16 pri;
-	int buffer[0x20];
 };
 
 
@@ -60,16 +37,6 @@ SCREEN_UPDATE( hippodrm );
 SCREEN_UPDATE( slyspy );
 SCREEN_UPDATE( midres );
 
-
-WRITE16_HANDLER( dec0_pf1_control_0_w );
-WRITE16_HANDLER( dec0_pf1_control_1_w );
-WRITE16_HANDLER( dec0_pf1_data_w );
-WRITE16_HANDLER( dec0_pf2_control_0_w );
-WRITE16_HANDLER( dec0_pf2_control_1_w );
-WRITE16_HANDLER( dec0_pf2_data_w );
-WRITE16_HANDLER( dec0_pf3_control_0_w );
-WRITE16_HANDLER( dec0_pf3_control_1_w );
-WRITE16_HANDLER( dec0_pf3_data_w );
 WRITE16_HANDLER( dec0_priority_w );
 WRITE16_HANDLER( dec0_update_sprites_w );
 
@@ -86,15 +53,6 @@ READ16_HANDLER( dec0_controls_r );
 READ16_HANDLER( dec0_rotary_r );
 READ16_HANDLER( midres_controls_r );
 READ16_HANDLER( slyspy_controls_r );
-READ16_HANDLER( slyspy_protection_r );
-WRITE16_HANDLER( slyspy_state_w );
-READ16_HANDLER( slyspy_state_r );
-WRITE16_HANDLER( slyspy_240000_w );
-WRITE16_HANDLER( slyspy_242000_w );
-WRITE16_HANDLER( slyspy_246000_w );
-WRITE16_HANDLER( slyspy_248000_w );
-WRITE16_HANDLER( slyspy_24c000_w );
-WRITE16_HANDLER( slyspy_24e000_w );
 
 DRIVER_INIT( slyspy );
 DRIVER_INIT( hippodrm );
