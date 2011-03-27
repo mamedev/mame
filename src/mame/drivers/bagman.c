@@ -70,7 +70,7 @@ DIP locations verified for:
 static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 {
 	bagman_state *state = device->machine->driver_data<bagman_state>();
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
 	if (state->ls259_buf[offset] != (data&1) )
@@ -106,7 +106,7 @@ static WRITE8_DEVICE_HANDLER( bagman_interrupt_w )
 {
 	data &= 1;
 	if (!data)
-		cpu_set_input_line(device, 0, CLEAR_LINE);
+		device_set_input_line(device, 0, CLEAR_LINE);
 	cpu_interrupt_enable(device, data);
 }
 
@@ -934,7 +934,7 @@ static DRIVER_INIT( bagman )
 
 	/* Unmap video enable register, not available on earlier hardware revision(s)
        Bagman is supposed to have glitches during screen transitions */
-	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0);
+	memory_unmap_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0);
 	*state->video_enable = 1;
 }
 

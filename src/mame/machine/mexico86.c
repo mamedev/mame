@@ -17,12 +17,12 @@ WRITE8_HANDLER( mexico86_f008_w )
 {
 	mexico86_state *state = space->machine->driver_data<mexico86_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
 
 	if (state->mcu != NULL)
 	{
 		// mexico 86, knight boy
-		cpu_set_input_line(state->mcu, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->mcu, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
@@ -159,8 +159,8 @@ INTERRUPT_GEN( kikikai_interrupt )
 	if (state->mcu_running)
 		mcu_simulate(device->machine);
 
-	cpu_set_input_line_vector(device, 0, state->protection_ram[0]);
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line_vector(device, 0, state->protection_ram[0]);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 
@@ -226,9 +226,9 @@ INTERRUPT_GEN( mexico86_m68705_interrupt )
 {
 	/* I don't know how to handle the interrupt line so I just toggle it every time. */
 	if (cpu_getiloops(device) & 1)
-		cpu_set_input_line(device, 0, CLEAR_LINE);
+		device_set_input_line(device, 0, CLEAR_LINE);
 	else
-		cpu_set_input_line(device, 0, ASSERT_LINE);
+		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
@@ -318,8 +318,8 @@ WRITE8_HANDLER( mexico86_68705_port_b_w )
 
 	if (BIT(state->ddr_b, 5) && BIT(data, 5) && BIT(~state->port_b_out, 5))
 	{
-		cpu_set_input_line_vector(state->maincpu, 0, state->protection_ram[0]);
-		cpu_set_input_line(state->maincpu, 0, HOLD_LINE);        //AT: HOLD_LINE works better in Z80 interrupt mode 1.
+		device_set_input_line_vector(state->maincpu, 0, state->protection_ram[0]);
+		device_set_input_line(state->maincpu, 0, HOLD_LINE);        //AT: HOLD_LINE works better in Z80 interrupt mode 1.
 	}
 
 	if (BIT(state->ddr_b, 6) && BIT(~data, 6) && BIT(state->port_b_out, 6))

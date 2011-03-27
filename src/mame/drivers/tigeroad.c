@@ -766,12 +766,12 @@ ROM_END
 
 static DRIVER_INIT( tigeroad )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, tigeroad_soundcmd_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, tigeroad_soundcmd_w);
 }
 
 static DRIVER_INIT( f1dream )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, f1dream_control_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe4002, 0xfe4003, 0, 0, f1dream_control_w);
 }
 
 

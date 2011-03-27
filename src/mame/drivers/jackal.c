@@ -321,8 +321,8 @@ static INTERRUPT_GEN( jackal_interrupt )
 
 	if (state->irq_enable)
 	{
-		cpu_set_input_line(device, 0, HOLD_LINE);
-		cpu_set_input_line(state->slavecpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(state->slavecpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

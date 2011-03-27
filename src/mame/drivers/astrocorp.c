@@ -503,8 +503,8 @@ static INTERRUPT_GEN( skilldrp_irq )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:	cpu_set_input_line(device, 4, HOLD_LINE);	break;	// sprites, sound, i/o
-		case 1:	cpu_set_input_line(device, 2, HOLD_LINE);	break;	// palette
+		case 0:	device_set_input_line(device, 4, HOLD_LINE);	break;	// sprites, sound, i/o
+		case 1:	device_set_input_line(device, 2, HOLD_LINE);	break;	// palette
 	}
 }
 

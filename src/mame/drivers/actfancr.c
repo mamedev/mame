@@ -58,7 +58,7 @@ static WRITE8_HANDLER( actfancr_sound_w )
 {
 	actfancr_state *state = space->machine->driver_data<actfancr_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -266,7 +266,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int linestate)
 {
 	actfancr_state *state = device->machine->driver_data<actfancr_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
+	device_set_input_line(state->audiocpu, 0, linestate); /* IRQ */
 }
 
 static const ym3812_interface ym3812_config =
@@ -589,7 +589,7 @@ static READ8_HANDLER( cycle_r )
 
 	if (pc == 0xe29a && ret == 0)
 	{
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 		return 1;
 	}
 
@@ -607,7 +607,7 @@ static READ8_HANDLER( cyclej_r )
 
 	if (pc == 0xe2b1 && ret == 0)
 	{
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 		return 1;
 	}
 
@@ -616,12 +616,12 @@ static READ8_HANDLER( cyclej_r )
 
 static DRIVER_INIT( actfancr )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cycle_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cycle_r);
 }
 
 static DRIVER_INIT( actfancrj )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
 }
 
 

@@ -128,7 +128,7 @@ static TIMER_CALLBACK( clock_irq )
 	/* assert the IRQ if not already asserted */
 	if (!state->irq_state)
 	{
-		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 		state->irq_state = 1;
 	}
 
@@ -215,7 +215,7 @@ static WRITE8_HANDLER( irq_ack_w )
 	cloud9_state *state = space->machine->driver_data<cloud9_state>();
 	if (state->irq_state)
 	{
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 		state->irq_state = 0;
 	}
 }

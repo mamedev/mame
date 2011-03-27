@@ -284,31 +284,7 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define CPU_EXPORT_STRING_CALL(name)	CPU_EXPORT_STRING_NAME(name)(device, entry, string)
 
 
-// helpers for accessing common CPU state
-
-// CPU scheduling
-#define cpu_suspend							device_suspend
-#define cpu_resume							device_resume
-
-// synchronization helpers
-#define cpu_yield							device_yield
-#define cpu_spin							device_spin
-#define cpu_spinuntil_trigger				device_spin_until_trigger
-#define cpu_spinuntil_time					device_spin_until_time
-#define cpu_spinuntil_int					device_spin_until_interrupt
-
 // CPU timing
-#define cpu_eat_cycles						device_eat_cycles
-#define cpu_adjust_icount					device_adjust_icount
-
-#define cpu_triggerint						device_triggerint
-#define cpu_set_input_line					device_set_input_line
-#define cpu_set_input_line_vector			device_set_input_line_vector
-#define cpu_set_input_line_and_vector		device_set_input_line_and_vector
-#define cpu_set_irq_callback				device_set_irq_callback
-
-#define cpu_get_address_space				device_get_space
-
 #define cpu_get_reg(cpu, _reg)				device_state(cpu)->state(_reg)
 #define	cpu_get_previouspc(cpu)				((offs_t)device_state(cpu)->state(STATE_GENPCBASE))
 #define	cpu_get_pc(cpu)						((offs_t)device_state(cpu)->state(STATE_GENPC))
@@ -318,12 +294,8 @@ const device_type name = basename##_device_config::static_alloc_device_config
 #define INTERRUPT_GEN(func)		void func(device_t *device)
 
 // helpers for using machine/cputag instead of cpu objects
-#define cputag_get_address_space(mach, tag, spc)						downcast<cpu_device *>((mach)->device(tag))->space(spc)
-#define cputag_get_clock(mach, tag)										(mach)->device(tag)->unscaled_clock()
-#define cputag_set_clock(mach, tag, clock)								(mach)->device(tag)->set_unscaled_clock(clock)
-
-#define cputag_set_input_line(mach, tag, line, state)					downcast<cpu_device *>((mach)->device(tag))->set_input_line(line, state)
-#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	downcast<cpu_device *>((mach)->device(tag))->set_input_line_and_vector(line, state, vec)
+#define cputag_set_input_line(mach, tag, line, state)					device_execute((mach)->device(tag))->set_input_line(line, state)
+#define cputag_set_input_line_and_vector(mach, tag, line, state, vec)	device_execute((mach)->device(tag))->set_input_line_and_vector(line, state, vec)
 
 
 

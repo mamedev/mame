@@ -738,9 +738,9 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( vblank_irq )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, NEC_INPUT_LINE_INTP0, ASSERT_LINE);
+		device_set_input_line(device, NEC_INPUT_LINE_INTP0, ASSERT_LINE);
 	else
-		cpu_set_input_line(device, NEC_INPUT_LINE_INTP0, CLEAR_LINE);
+		device_set_input_line(device, NEC_INPUT_LINE_INTP0, CLEAR_LINE);
 }
 
 static const gfx_layout cb2001_layout =

@@ -222,7 +222,7 @@ static WRITE16_HANDLER( umk3_palette_hack_w )
         without significantly impacting the rest of the system.
     */
 	COMBINE_DATA(&state->umk3_palette[offset]);
-	cpu_adjust_icount(space->cpu, -100);
+	device_adjust_icount(space->cpu, -100);
 /*  printf("in=%04X%04X  out=%04X%04X\n", state->umk3_palette[3], state->umk3_palette[2], state->umk3_palette[1], state->umk3_palette[0]); */
 }
 
@@ -254,14 +254,14 @@ DRIVER_INIT( umk3 )
 {
 	midwunit_state *state = machine->driver_data<midwunit_state>();
 	init_mk3_common(machine);
-	state->umk3_palette = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
+	state->umk3_palette = memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 DRIVER_INIT( umk3r11 )
 {
 	midwunit_state *state = machine->driver_data<midwunit_state>();
 	init_mk3_common(machine);
-	state->umk3_palette = memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
+	state->umk3_palette = memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0106a060, 0x0106a09f, 0, 0, umk3_palette_hack_w);
 }
 
 
@@ -347,7 +347,7 @@ DRIVER_INIT( wwfmania )
 	init_wunit_generic(machine);
 
 	/* enable I/O shuffling */
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01800000, 0x0180000f, 0, 0, wwfmania_io_0_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01800000, 0x0180000f, 0, 0, wwfmania_io_0_w);
 
 	/* serial prefixes 430, 528 */
 	midway_serial_pic_init(machine, 528);

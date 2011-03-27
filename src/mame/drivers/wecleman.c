@@ -1021,9 +1021,9 @@ GFXDECODE_END
 static INTERRUPT_GEN( wecleman_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, 4, HOLD_LINE);	/* once */
+		device_set_input_line(device, 4, HOLD_LINE);	/* once */
 	else
-		cpu_set_input_line(device, 5, HOLD_LINE);	/* to read input ports */
+		device_set_input_line(device, 5, HOLD_LINE);	/* to read input ports */
 }
 
 static MACHINE_RESET( wecleman )

@@ -696,7 +696,7 @@ static void SCSP_UpdateSlotReg(scsp_state *scsp,int s,int r)
 static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	address_space *space = device_get_space(scsp->device->machine->firstcpu, AS_PROGRAM);
+	address_space *space = scsp->device->machine->firstcpu->memory().space(AS_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
@@ -1214,7 +1214,7 @@ static void dma_scsp(address_space *space, scsp_state *scsp)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-		cpu_set_input_line(space->machine->device("audiocpu"),dma_transfer_end,HOLD_LINE);
+		device_set_input_line(space->machine->device("audiocpu"),dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1318,7 +1318,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		scsp->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM), scsp);
+			dma_scsp(device->machine->firstcpu->memory().space(ADDRESS_SPACE_PROGRAM), scsp);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;
@@ -1326,7 +1326,7 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				cpu_set_input_line_and_vector(device->machine->firstcpu, 9, HOLD_LINE , 0x46);
+				device_set_input_line_and_vector(device->machine->firstcpu, 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;

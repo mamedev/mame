@@ -96,7 +96,7 @@ static WRITE16_HANDLER( aquarium_sound_w )
 	aquarium_state *state = space->machine->driver_data<aquarium_state>();
 
 	soundlatch_w(space, 1, data & 0xff);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( aquarium_z80_bank_w )
@@ -331,7 +331,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	aquarium_state *state = device->machine->driver_data<aquarium_state>();
-	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

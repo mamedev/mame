@@ -336,9 +336,9 @@ static TIMER_CALLBACK( setvector_callback )
 	}
 
 	if (state->irqvector & 0x2)		/* YM2151 has precedence */
-		cpu_set_input_line_vector(machine->device("soundcpu"), 0, 0x18);
+		device_set_input_line_vector(machine->device("soundcpu"), 0, 0x18);
 	else if (state->irqvector & 0x1)	/* V30 */
-		cpu_set_input_line_vector(machine->device("soundcpu"), 0, 0x19);
+		device_set_input_line_vector(machine->device("soundcpu"), 0, 0x19);
 
 	if (state->irqvector == 0)	/* no IRQs pending */
 		cputag_set_input_line(machine, "soundcpu", 0, CLEAR_LINE);
@@ -2155,7 +2155,7 @@ static DRIVER_INIT( majtitl2 )
 	init_m92(machine, 1);
 
 	/* This game has an eprom on the game board */
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
 
 	state->game_kludge = 2;
 }
@@ -2178,7 +2178,7 @@ static DRIVER_INIT( lethalth )
 	state->irq_vectorbase = 0x20;
 
 	/* NOP out the bankswitcher */
-	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0);
+	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0);
 }
 
 static DRIVER_INIT( nbbatman )

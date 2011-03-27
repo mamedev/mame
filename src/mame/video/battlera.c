@@ -378,7 +378,7 @@ INTERRUPT_GEN( battlera_interrupt )
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
 	if (state->rcr_enable && (state->current_scanline+56)==state->HuC6270_registers[6]) {
 		device->machine->primary_screen->update_partial(state->current_scanline);
-		cpu_set_input_line(device, 0, HOLD_LINE); /* RCR interrupt */
+		device_set_input_line(device, 0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
@@ -386,7 +386,7 @@ INTERRUPT_GEN( battlera_interrupt )
 		state->bldwolf_vblank=1;
 		device->machine->primary_screen->update_partial(240);
 		if (state->irq_enable)
-			cpu_set_input_line(device, 0, HOLD_LINE); /* VBL */
+			device_set_input_line(device, 0, HOLD_LINE); /* VBL */
 	}
 
 	/* End of vblank */

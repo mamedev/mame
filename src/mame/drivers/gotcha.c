@@ -239,7 +239,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	gotcha_state *state = device->machine->driver_data<gotcha_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate);
+	device_set_input_line(state->audiocpu, 0, linestate);
 }
 
 static const ym2151_interface ym2151_config =

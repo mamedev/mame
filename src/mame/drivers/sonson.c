@@ -63,7 +63,7 @@ static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
 	if (state->last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpu_set_input_line(state->audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
 	state->last_irq = data;

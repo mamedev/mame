@@ -404,7 +404,7 @@ static WRITE8_HANDLER( videomode_w )
 
 	/* bit 6 is connected to the 8751 IRQ */
 	if (i8751 != NULL)
-		cpu_set_input_line(i8751, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(i8751, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* handle any custom banking or other stuff */
 	if (state->videomode_custom != NULL)
@@ -591,8 +591,8 @@ static READ8_HANDLER( mcu_io_r )
 static INTERRUPT_GEN( mcu_irq_assert )
 {
 	/* toggle the INT0 line on the MCU */
-	cpu_set_input_line(device, MCS51_INT0_LINE, ASSERT_LINE);
-	cpu_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
+	device_set_input_line(device, MCS51_INT0_LINE, ASSERT_LINE);
+	device_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* boost interleave to ensure that the MCU can break the Z80 out of a HALT */
 	device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
@@ -606,8 +606,8 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
        VBLANKs without a tick */
 
 	device_t *mcu = timer.machine->device("mcu");
-	cpu_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
-	cpu_set_input_line(mcu, MCS51_T0_LINE, CLEAR_LINE);
+	device_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
+	device_set_input_line(mcu, MCS51_T0_LINE, CLEAR_LINE);
 }
 
 
@@ -631,7 +631,7 @@ static WRITE8_HANDLER( nob_mcu_control_p2_w )
 
 	/* bit 2 is toggled once near the end of an IRQ */
 	if (((state->mcu_control ^ data) & 0x04) && !(data & 0x04))
-		cpu_set_input_line(space->cpu, MCS51_INT0_LINE, CLEAR_LINE);
+		device_set_input_line(space->cpu, MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* bit 3 is toggled once at the start of an IRQ, and again at the end */
 	if (((state->mcu_control ^ data) & 0x08) && !(data & 0x08))
@@ -4546,11 +4546,11 @@ static DRIVER_INIT( dakkochn )
 
 	mc8123_decrypt_rom(machine, "maincpu", "key", "bank1", 4);
 
-//  memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
-//  memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
-//  memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+//  memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
+//  memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
+//  memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
 
-//  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+//  memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
 }
 
 
@@ -4608,8 +4608,8 @@ static READ8_HANDLER( nob_start_r )
 
 static DRIVER_INIT( nob )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 
 	DRIVER_INIT_CALL(bank44);
 
@@ -4640,7 +4640,7 @@ static DRIVER_INIT( nobb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 	UINT8 *ROM2 = machine->region("soundcpu")->base();
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
@@ -4656,7 +4656,7 @@ static DRIVER_INIT( nobb )
 
 static DRIVER_INIT( bootleg )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
@@ -4664,7 +4664,7 @@ static DRIVER_INIT( bootleg )
 
 static DRIVER_INIT( bootsys2 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x20000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 4, machine->region("maincpu")->base() + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
@@ -4684,7 +4684,7 @@ static DRIVER_INIT( choplift )
 
 static DRIVER_INIT( shtngmst )
 {
-	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 	memory_install_read_port(iospace, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
 	memory_install_read_port(iospace, 0x18, 0x18, 0x00, 0x03, "18");
 	memory_install_read_port(iospace, 0x1c, 0x1c, 0x00, 0x02, "GUNX");

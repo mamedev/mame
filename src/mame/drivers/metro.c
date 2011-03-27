@@ -129,7 +129,7 @@ static READ16_HANDLER( metro_irq_cause_r )
 static void update_irq_state( running_machine *machine )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
 	UINT16 irq = metro_irq_cause_r(space, 0, 0xffff) & ~*state->irq_enable;
@@ -145,7 +145,7 @@ static void update_irq_state( running_machine *machine )
 				irq_level[state->irq_levels[i] & 7] = 1;
 
 		for (i = 0; i < 8; i++)
-			cpu_set_input_line(state->maincpu, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
+			device_set_input_line(state->maincpu, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -153,7 +153,7 @@ static void update_irq_state( running_machine *machine )
             then reads the actual source by peeking a register (metro_irq_cause_r) */
 
 		int irq_state = (irq ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(state->maincpu, state->irq_line, irq_state);
+		device_set_input_line(state->maincpu, state->irq_line, irq_state);
 	}
 }
 
@@ -326,7 +326,7 @@ static INTERRUPT_GEN( dokyusei_interrupt )
 static void ymf278b_interrupt( device_t *device, int active )
 {
 	metro_state *state = device->machine->driver_data<metro_state>();
-	cpu_set_input_line(state->maincpu, 2, active);
+	device_set_input_line(state->maincpu, 2, active);
 }
 
 /***************************************************************************
@@ -340,7 +340,7 @@ static void ymf278b_interrupt( device_t *device, int active )
 static int metro_io_callback( device_t *device, int ioline, int state )
 {
 	metro_state *driver_state = device->machine->driver_data<metro_state>();
-	address_space *space = cpu_get_address_space(driver_state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = driver_state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 data = 0;
 
 	switch (ioline)
@@ -364,8 +364,8 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_int(space->cpu);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_spin_until_interrupt(space->cpu);
 		state->busy_sndcpu = 1;
 	}
 }
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 static void metro_sound_irq_handler( device_t *device, int state )
 {
 	metro_state *driver_state = device->machine->driver_data<metro_state>();
-	cpu_set_input_line(driver_state->audiocpu, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(driver_state->audiocpu, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -1694,7 +1694,7 @@ static WRITE16_HANDLER( blzntrnd_sound_w )
 	metro_state *state = space->machine->driver_data<metro_state>();
 
 	soundlatch_w(space, offset, data >> 8);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
@@ -1709,7 +1709,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 static void blzntrnd_irqhandler(device_t *device, int irq)
 {
 	metro_state *state = device->machine->driver_data<metro_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface blzntrnd_ym2610_interface =
@@ -3599,7 +3599,7 @@ static MACHINE_RESET( metro )
 	metro_state *state = machine->driver_data<metro_state>();
 
 	if (state->irq_line == -1)
-		cpu_set_irq_callback(machine->device("maincpu"), metro_irq_callback);
+		device_set_irq_callback(machine->device("maincpu"), metro_irq_callback);
 }
 
 
@@ -4550,7 +4550,7 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 
 		default:
 			// timer
-			cpu_set_input_line(state->maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
+			device_set_input_line(state->maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }
@@ -6023,7 +6023,7 @@ static void metro_common( running_machine *machine )
 static DRIVER_INIT( metro )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	metro_common(machine);
 
@@ -6056,7 +6056,7 @@ static DRIVER_INIT( karatour )
 static DRIVER_INIT( daitorid )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	metro_common(machine);
 

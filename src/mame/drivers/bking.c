@@ -47,7 +47,7 @@ static WRITE8_HANDLER( bking_soundlatch_w )
 
 	soundlatch_w(space, offset, code);
 	if (state->sound_nmi_enable)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( bking3_addr_l_w )

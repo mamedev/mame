@@ -85,7 +85,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin_inserted )
 {
 	skyfox_state *state = field->port->machine->driver_data<skyfox_state>();
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( skyfox )

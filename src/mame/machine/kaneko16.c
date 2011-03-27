@@ -1714,7 +1714,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 
 
 
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8* rom = machine->region("cpu1")->base();
 	UINT8 numregions;
 	UINT16 length;
@@ -2107,7 +2107,7 @@ void calc3_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command;
 	int i;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if ( calc3_mcu_status != (1|2|4|8) )	return;
 

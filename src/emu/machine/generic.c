@@ -568,7 +568,7 @@ static TIMER_CALLBACK( irq_pulse_clear )
 {
 	device_t *device = (device_t *)ptr;
 	int irqline = param;
-	cpu_set_input_line(device, irqline, CLEAR_LINE);
+	device_set_input_line(device, irqline, CLEAR_LINE);
 }
 
 
@@ -581,7 +581,7 @@ static TIMER_CALLBACK( irq_pulse_clear )
 void generic_pulse_irq_line(device_t *device, int irqline)
 {
 	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET);
-	cpu_set_input_line(device, irqline, ASSERT_LINE);
+	device_set_input_line(device, irqline, ASSERT_LINE);
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
@@ -598,7 +598,7 @@ void generic_pulse_irq_line(device_t *device, int irqline)
 void generic_pulse_irq_line_and_vector(device_t *device, int irqline, int vector)
 {
 	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET);
-	cpu_set_input_line_and_vector(device, irqline, ASSERT_LINE, vector);
+	device_set_input_line_and_vector(device, irqline, ASSERT_LINE, vector);
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	attotime target_time = cpudevice->local_time() + cpudevice->cycles_to_attotime(cpudevice->min_cycles());
@@ -663,45 +663,45 @@ READ8_HANDLER( interrupt_enable_r )
     NMI callbacks
 -------------------------------------------------*/
 
-INTERRUPT_GEN( nmi_line_pulse )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); }
-INTERRUPT_GEN( nmi_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); }
+INTERRUPT_GEN( nmi_line_pulse )		{ if (interrupt_enabled(device)) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); }
+INTERRUPT_GEN( nmi_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE); }
 
 
 /*-------------------------------------------------
     IRQn callbacks
 -------------------------------------------------*/
 
-INTERRUPT_GEN( irq0_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 0, HOLD_LINE); }
+INTERRUPT_GEN( irq0_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 0, HOLD_LINE); }
 INTERRUPT_GEN( irq0_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 0); }
-INTERRUPT_GEN( irq0_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 0, ASSERT_LINE); }
+INTERRUPT_GEN( irq0_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 0, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq1_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 1, HOLD_LINE); }
+INTERRUPT_GEN( irq1_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 1, HOLD_LINE); }
 INTERRUPT_GEN( irq1_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 1); }
-INTERRUPT_GEN( irq1_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 1, ASSERT_LINE); }
+INTERRUPT_GEN( irq1_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 1, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq2_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 2, HOLD_LINE); }
+INTERRUPT_GEN( irq2_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 2, HOLD_LINE); }
 INTERRUPT_GEN( irq2_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 2); }
-INTERRUPT_GEN( irq2_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 2, ASSERT_LINE); }
+INTERRUPT_GEN( irq2_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 2, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq3_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 3, HOLD_LINE); }
+INTERRUPT_GEN( irq3_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 3, HOLD_LINE); }
 INTERRUPT_GEN( irq3_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 3); }
-INTERRUPT_GEN( irq3_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 3, ASSERT_LINE); }
+INTERRUPT_GEN( irq3_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 3, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq4_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 4, HOLD_LINE); }
+INTERRUPT_GEN( irq4_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 4, HOLD_LINE); }
 INTERRUPT_GEN( irq4_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 4); }
-INTERRUPT_GEN( irq4_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 4, ASSERT_LINE); }
+INTERRUPT_GEN( irq4_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 4, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq5_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 5, HOLD_LINE); }
+INTERRUPT_GEN( irq5_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 5, HOLD_LINE); }
 INTERRUPT_GEN( irq5_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 5); }
-INTERRUPT_GEN( irq5_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 5, ASSERT_LINE); }
+INTERRUPT_GEN( irq5_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 5, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq6_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 6, HOLD_LINE); }
+INTERRUPT_GEN( irq6_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 6, HOLD_LINE); }
 INTERRUPT_GEN( irq6_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 6); }
-INTERRUPT_GEN( irq6_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 6, ASSERT_LINE); }
+INTERRUPT_GEN( irq6_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 6, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq7_line_hold )		{ if (interrupt_enabled(device)) cpu_set_input_line(device, 7, HOLD_LINE); }
+INTERRUPT_GEN( irq7_line_hold )		{ if (interrupt_enabled(device)) device_set_input_line(device, 7, HOLD_LINE); }
 INTERRUPT_GEN( irq7_line_pulse )	{ if (interrupt_enabled(device)) generic_pulse_irq_line(device, 7); }
-INTERRUPT_GEN( irq7_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input_line(device, 7, ASSERT_LINE); }
+INTERRUPT_GEN( irq7_line_assert )	{ if (interrupt_enabled(device)) device_set_input_line(device, 7, ASSERT_LINE); }
 
 
 

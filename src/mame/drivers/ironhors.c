@@ -28,12 +28,12 @@ static INTERRUPT_GEN( ironhors_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (*state->interrupt_enable & 4)
-			cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
 		if (*state->interrupt_enable & 1)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -41,7 +41,7 @@ static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 {
 	ironhors_state *state = space->machine->driver_data<ironhors_state>();
 
-	cpu_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
@@ -429,12 +429,12 @@ static INTERRUPT_GEN( farwest_interrupt )
 	if (cpu_getiloops(device) &1)
 	{
 		if (*state->interrupt_enable & 4)
-			cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 	else //if (cpu_getiloops() % 2)
 	{
 		if (*state->interrupt_enable & 1)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -442,7 +442,7 @@ static READ8_DEVICE_HANDLER( farwest_soundlatch_r )
 {
 	ironhors_state *state = device->machine->driver_data<ironhors_state>();
 
-	return soundlatch_r(cpu_get_address_space(state->soundcpu, ADDRESS_SPACE_PROGRAM), 0);
+	return soundlatch_r(state->soundcpu->memory().space(ADDRESS_SPACE_PROGRAM), 0);
 }
 
 static const ym2203_interface farwest_ym2203_config =

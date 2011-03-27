@@ -1743,7 +1743,7 @@ static TIMER_DEVICE_CALLBACK( steaser_mcu_sim )
 static INTERRUPT_GEN( steaser_irq )
 {
 	int num=cpu_getiloops(device)+3;
-	cpu_set_input_line(device, num, HOLD_LINE);
+	device_set_input_line(device, num, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( steaser, ilpag )

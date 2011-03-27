@@ -235,7 +235,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 		case 0x380: // sound write
 			soundlatch_w(space, 0, data & 0xff);
 			state->sound_irq |= 0x02;
-			cpu_set_input_line(state->audiocpu, 0, (state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+			device_set_input_line(state->audiocpu, 0, (state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 			return;
 		case 0x384:
 			state->_384_data = data;
@@ -332,7 +332,7 @@ static READ8_HANDLER(irq_latch_r)
 
 	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
 	state->sound_irq &= ~0x02;
-	cpu_set_input_line(state->audiocpu, 0, (state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, (state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	return state->sound_irq;
 }
 
@@ -527,7 +527,7 @@ static void sound_irq( device_t *device, int state )
 		driver_state->sound_irq |= 0x01;
 	else
 		driver_state->sound_irq &= ~0x01;
-	cpu_set_input_line(driver_state->audiocpu, 0, (driver_state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(driver_state->audiocpu, 0, (driver_state->sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

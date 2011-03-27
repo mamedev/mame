@@ -19,7 +19,7 @@
 static void generate_interrupt( running_machine *machine, int state )
 {
 	capbowl_state *driver = machine->driver_data<capbowl_state>();
-	cpu_set_input_line(driver->maincpu, M6809_FIRQ_LINE, state);
+	device_set_input_line(driver->maincpu, M6809_FIRQ_LINE, state);
 }
 
 static const struct tms34061_interface tms34061intf =

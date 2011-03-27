@@ -52,7 +52,7 @@ static INTERRUPT_GEN( galastrm_interrupt )
 {
 	galastrm_state *state = device->machine->driver_data<galastrm_state>();
 	state->frame_counter ^= 1;
-	cpu_set_input_line(device, 5, HOLD_LINE);
+	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( galastrm_interrupt6 )

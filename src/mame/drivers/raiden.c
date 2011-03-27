@@ -239,12 +239,12 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( raiden_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static SCREEN_EOF( raiden )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
 }
 
@@ -527,11 +527,11 @@ static READ16_HANDLER( sub_cpu_spin_r )
 
 	// main set
 	if (pc==0xfcde6 && ret!=0x40)
-		cpu_spin(space->cpu);
+		device_spin(space->cpu);
 
 	// alt sets
 	if (pc==0xfcde8 && ret!=0x40)
-		cpu_spin(space->cpu);
+		device_spin(space->cpu);
 
 	return ret;
 }
@@ -540,7 +540,7 @@ static READ16_HANDLER( sub_cpu_spin_r )
 static DRIVER_INIT( raiden )
 {
 #ifdef SYNC_HACK
-	memory_install_read16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
+	memory_install_read16_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4008, 0x4009, 0, 0, sub_cpu_spin_r);
 #endif
 }
 

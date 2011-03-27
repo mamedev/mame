@@ -957,7 +957,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 		return;
 	}
 
-	cpu_set_input_line(device, intlevel, HOLD_LINE);
+	device_set_input_line(device, intlevel, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )

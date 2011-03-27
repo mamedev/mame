@@ -91,12 +91,12 @@ INTERRUPT_GEN( spdodgeb_interrupt )
 
 	if (iloop > 1 && iloop < 32)
 	{
-		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);
 		device->machine->primary_screen->update_partial(scanline+7);
 	}
 	else if (!iloop)
 	{
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		device->machine->primary_screen->update_partial(256);
 	}
 }

@@ -1074,9 +1074,9 @@ MACHINE_CONFIG_END
 static INTERRUPT_GEN( rshark_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, 5, HOLD_LINE);
+		device_set_input_line(device, 5, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 6, HOLD_LINE);
+		device_set_input_line(device, 6, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( rshark, dooyong_state )

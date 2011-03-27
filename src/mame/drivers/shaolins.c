@@ -18,10 +18,10 @@ static INTERRUPT_GEN( shaolins_interrupt )
 {
 	shaolins_state *state = device->machine->driver_data<shaolins_state>();
 
-	if (cpu_getiloops(device) == 0) cpu_set_input_line(device, 0, HOLD_LINE);
+	if (cpu_getiloops(device) == 0) device_set_input_line(device, 0, HOLD_LINE);
 	else if (cpu_getiloops(device) % 2)
 	{
-		if (state->nmi_enable & 0x02) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->nmi_enable & 0x02) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

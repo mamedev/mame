@@ -97,9 +97,9 @@ static void update_irq_state( running_machine *machine )
 {
 	cave_state *state = machine->driver_data<cave_state>();
 	if (state->vblank_irq || state->sound_irq || state->unknown_irq)
-		cpu_set_input_line(state->maincpu, state->irq_level, ASSERT_LINE);
+		device_set_input_line(state->maincpu, state->irq_level, ASSERT_LINE);
 	else
-		cpu_set_input_line(state->maincpu, state->irq_level, CLEAR_LINE);
+		device_set_input_line(state->maincpu, state->irq_level, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( cave_vblank_end )
@@ -226,8 +226,8 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  state->sound_flag1 = 1;
 //  state->sound_flag2 = 1;
 	soundlatch_word_w(space, offset, data, mem_mask);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	cpu_spinuntil_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */

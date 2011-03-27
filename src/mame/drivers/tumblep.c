@@ -72,7 +72,7 @@ static WRITE16_HANDLER( tumblep_sound_w )
 {
 	tumblep_state *state = space->machine->driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -277,7 +277,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	tumblep_state *driver_state = device->machine->driver_data<tumblep_state>();
-	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

@@ -230,7 +230,7 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 	if (state->last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpu_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->soundcpu, 0, HOLD_LINE, 0xff);
 	}
 
 	state->last_irq = data;
@@ -240,7 +240,7 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
 	junofrst_state *state = space->machine->driver_data<junofrst_state>();
-	cpu_set_input_line(state->i8039, 0, ASSERT_LINE);
+	device_set_input_line(state->i8039, 0, ASSERT_LINE);
 }
 
 
@@ -249,7 +249,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 	junofrst_state *state = space->machine->driver_data<junofrst_state>();
 
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(state->i8039, 0, CLEAR_LINE);
+		device_set_input_line(state->i8039, 0, CLEAR_LINE);
 	state->i8039_status = (data & 0x70) >> 4;
 }
 

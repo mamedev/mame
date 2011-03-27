@@ -63,7 +63,7 @@ static INTERRUPT_GEN( asterix_interrupt )
 	if (!k056832_is_irq_enabled(state->k056832, 0))
 		return;
 
-	cpu_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
+	device_set_input_line(device, 5, HOLD_LINE); /* ??? All irqs have the same vector, and the mask used is 0 or 7 */
 }
 
 static READ8_DEVICE_HANDLER( asterix_sound_r )
@@ -74,21 +74,21 @@ static READ8_DEVICE_HANDLER( asterix_sound_r )
 static TIMER_CALLBACK( nmi_callback )
 {
 	asterix_state *state = machine->driver_data<asterix_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	asterix_state *state = space->machine->driver_data<asterix_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	space->machine->scheduler().timer_set(attotime::from_usec(5), FUNC(nmi_callback));
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
 	asterix_state *state = space->machine->driver_data<asterix_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 // Check the routine at 7f30 in the ead version.

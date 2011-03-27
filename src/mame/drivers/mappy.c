@@ -717,7 +717,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 
 static MACHINE_RESET( superpac )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -727,7 +727,7 @@ static MACHINE_RESET( superpac )
 
 static MACHINE_RESET( phozon )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -737,7 +737,7 @@ static MACHINE_RESET( phozon )
 
 static MACHINE_RESET( mappy )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -2240,13 +2240,13 @@ static DRIVER_INIT( grobda )
        the DAC might be built-in after all.
       */
 	device_t *dac = machine->device("dac");
-	memory_install_write8_device_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
+	memory_install_write8_device_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), dac, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
 }
 
 static DRIVER_INIT( digdug2 )
 {
 	/* appears to not use the watchdog */
-	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0);
+	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x8000, 0, 0);
 }
 
 

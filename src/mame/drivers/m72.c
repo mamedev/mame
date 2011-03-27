@@ -297,7 +297,7 @@ static INTERRUPT_GEN( m72_mcu_int )
 	m72_state *state = device->machine->driver_data<m72_state>();
 	//state->mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
 	state->mcu_snd_cmd_latch = 0x11;// | (machine->rand() & 1); /* 0x10 is special as well - FIXME */
-	cpu_set_input_line(device, 1, ASSERT_LINE);
+	device_set_input_line(device, 1, ASSERT_LINE);
 }
 
 static READ8_HANDLER(m72_mcu_sample_r )
@@ -369,9 +369,9 @@ static READ8_HANDLER( m72_snd_cpu_sample_r )
 INLINE DRIVER_INIT( m72_8751 )
 {
 	m72_state *state = machine->driver_data<m72_state>();
-	address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	address_space *sndio = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_IO);
+	address_space *program = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *io = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
+	address_space *sndio = machine->device("soundcpu")->memory().space(ADDRESS_SPACE_IO);
 	device_t *dac = machine->device("dac");
 
 	state->protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
@@ -453,7 +453,7 @@ static int find_sample(int num)
 
 static INTERRUPT_GEN(fake_nmi)
 {
-	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->memory().space(ADDRESS_SPACE_PROGRAM);
 	int sample = m72_sample_r(space,0);
 	if (sample)
 		m72_sample_w(device->machine->device("dac"),0,sample);
@@ -750,9 +750,9 @@ static void install_protection_handler(running_machine *machine, const UINT8 *co
 	state->protection_ram = auto_alloc_array(machine, UINT16, 0x1000/2);
 	state->protection_code = code;
 	state->protection_crc =  crc;
-	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, "bank1");
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, protection_w);
+	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, "bank1");
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, protection_w);
 	memory_set_bankptr(machine, "bank1", state->protection_ram);
 }
 
@@ -760,28 +760,28 @@ static DRIVER_INIT( bchopper )
 {
 	install_protection_handler(machine, bchopper_code,bchopper_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( mrheli )
 {
 	install_protection_handler(machine, bchopper_code,mrheli_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, bchopper_sample_trigger_w);
 }
 
 static DRIVER_INIT( nspirit )
 {
 	install_protection_handler(machine, nspirit_code,nspirit_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, nspirit_sample_trigger_w);
 }
 
 static DRIVER_INIT( imgfight )
 {
 	install_protection_handler(machine, imgfight_code,imgfight_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, imgfight_sample_trigger_w);
 }
 
 static DRIVER_INIT( loht )
@@ -789,7 +789,7 @@ static DRIVER_INIT( loht )
 	m72_state *state = machine->driver_data<m72_state>();
 	install_protection_handler(machine, loht_code,loht_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(state->videoram2,0,0x4000);
@@ -799,33 +799,33 @@ static DRIVER_INIT( xmultiplm72 )
 {
 	install_protection_handler(machine, xmultiplm72_code,xmultiplm72_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, xmultiplm72_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, xmultiplm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( dbreedm72 )
 {
 	install_protection_handler(machine, dbreedm72_code,dbreedm72_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dbreedm72_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dbreedm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( airduel )
 {
 	install_protection_handler(machine, airduel_code,airduel_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, airduel_sample_trigger_w);
 }
 
 static DRIVER_INIT( dkgenm72 )
 {
 	install_protection_handler(machine, dkgenm72_code,dkgenm72_crc);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, dkgenm72_sample_trigger_w);
 }
 
 static DRIVER_INIT( gallop )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, gallop_sample_trigger_w);
 }
 
 

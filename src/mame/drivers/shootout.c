@@ -409,7 +409,7 @@ ROM_END
 
 static DRIVER_INIT( shootout )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int length = machine->region("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length - 0x8000);
 	UINT8 *rom = machine->region("maincpu")->base();

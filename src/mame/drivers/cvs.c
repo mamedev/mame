@@ -238,7 +238,7 @@ WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 
 static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 {
-	cpu_set_input_line_vector(device, 0, 0x03);
+	device_set_input_line_vector(device, 0, 0x03);
 	generic_pulse_irq_line(device, 0);
 
 	cvs_scroll_stars(device->machine);
@@ -247,9 +247,9 @@ static INTERRUPT_GEN( cvs_main_cpu_interrupt )
 
 static void cvs_slave_cpu_interrupt( device_t *cpu, int state )
 {
-	cpu_set_input_line_vector(cpu, 0, 0x03);
-	//cpu_set_input_line(cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(cpu, 0, state ? HOLD_LINE : CLEAR_LINE);
+	device_set_input_line_vector(cpu, 0, 0x03);
+	//device_set_input_line(cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(cpu, 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 

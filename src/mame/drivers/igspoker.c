@@ -108,10 +108,10 @@ static INTERRUPT_GEN( igs_interrupt )
 {
 	igspoker_state *state = device->machine->driver_data<igspoker_state>();
 	if (cpu_getiloops(device) % 2) {
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	} else {
 		if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

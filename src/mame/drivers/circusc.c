@@ -100,7 +100,7 @@ static READ8_HANDLER( circusc_sh_timer_r )
 static WRITE8_HANDLER( circusc_sh_irqtrigger_w )
 {
 	circusc_state *state = space->machine->driver_data<circusc_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( circusc_coin_counter_w )

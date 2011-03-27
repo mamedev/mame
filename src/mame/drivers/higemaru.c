@@ -20,9 +20,9 @@ Use Player 1 joystick and button, then press START1 to go to next screen.
 static INTERRUPT_GEN( higemaru_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 

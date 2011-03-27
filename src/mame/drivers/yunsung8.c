@@ -455,7 +455,7 @@ static void yunsung8_adpcm_int( device_t *device )
 
 	state->toggle ^= 1;
 	if (state->toggle)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface yunsung8_msm5205_interface =

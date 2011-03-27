@@ -692,7 +692,7 @@ static INTERRUPT_GEN( undrfire_interrupt )
 {
 	undrfire_state *state = device->machine->driver_data<undrfire_state>();
 	state->frame_counter ^= 1;
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static const tc0100scn_interface undrfire_tc0100scn_intf =

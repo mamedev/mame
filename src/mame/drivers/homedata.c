@@ -228,12 +228,12 @@ static INTERRUPT_GEN( homedata_irq )
 {
 	homedata_state *state = device->machine->driver_data<homedata_state>();
 	state->vblank = 1;
-	cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( upd7807_irq )
 {
-	cpu_set_input_line(device, UPD7810_INTF1, HOLD_LINE);
+	device_set_input_line(device, UPD7810_INTF1, HOLD_LINE);
 }
 
 
@@ -324,7 +324,7 @@ static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 {
 	homedata_state *state = space->machine->driver_data<homedata_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -1222,7 +1222,7 @@ static MACHINE_RESET( homedata )
 static MACHINE_RESET( pteacher )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	pteacher_upd7807_portc_w(space, 0, 0xff);
@@ -1239,7 +1239,7 @@ static MACHINE_RESET( pteacher )
 static MACHINE_RESET( reikaids )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_upd7807_portc_w(space, 0, 0xff);
@@ -2032,15 +2032,15 @@ static DRIVER_INIT( jogakuen )
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
        but with just these two addresses swapped. Instead of creating a new
        MachineDriver, I just fix them here. */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
 }
 
 static DRIVER_INIT( mjikaga )
 {
 	/* Mahjong Ikagadesuka is different as well. */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7802, 0x7802, 0, 0, pteacher_snd_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7802, 0x7802, 0, 0, pteacher_snd_r);
+	memory_install_write8_handler(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
 }
 
 static DRIVER_INIT( reikaids )

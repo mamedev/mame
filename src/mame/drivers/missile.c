@@ -470,9 +470,9 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
-		cputag_set_clock(machine, "maincpu", MASTER_CLOCK/16);
+		machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK/16);
 	else
-		cputag_set_clock(machine, "maincpu", MASTER_CLOCK/8);
+		machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK/8);
 
 	/* scanline for the next run */
 	curv ^= 224;
@@ -615,7 +615,7 @@ static void write_vram(address_space *space, offs_t address, UINT8 data)
 		videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
-		cpu_adjust_icount(space->cpu, -1);
+		device_adjust_icount(space->cpu, -1);
 	}
 }
 
@@ -651,7 +651,7 @@ static UINT8 read_vram(address_space *space, offs_t address)
 			result &= ~0x20;
 
 		/* account for the extra clock cycle */
-		cpu_adjust_icount(space->cpu, -1);
+		device_adjust_icount(space->cpu, -1);
 	}
 	return result;
 }

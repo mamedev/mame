@@ -97,7 +97,7 @@ static TIMER_CALLBACK( nmi_callback )
 	buggychl_state *state = machine->driver_data<buggychl_state>();
 
 	if (state->sound_nmi_enable)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->pending_nmi = 1;
 }
@@ -120,7 +120,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		state->pending_nmi = 0;
 	}
 }

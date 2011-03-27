@@ -192,7 +192,7 @@ static WRITE32_HANDLER( coin_w )
 static READ32_HANDLER( vblank_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	cpu_eat_cycles(space->cpu, 100);
+	device_eat_cycles(space->cpu, 100);
 	return input_port_read(space->machine, "VBLANK");
 }
 
@@ -583,7 +583,7 @@ static DRIVER_INIT( xfiles )
 	rom[BYTE4_XOR_BE(0x3aa933)] = 0;
 
 //  protection related ?
-//  memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf0c8b440, 0xf0c8b447, 0, 0);
+//  memory_nop_read(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf0c8b440, 0xf0c8b447, 0, 0);
 
 	state->flash_roms = 2;
 }
@@ -604,7 +604,7 @@ static DRIVER_INIT( kdynastg )
 	rom[BYTE4_XOR_BE(0x3a45c9)] = 0;
 
 //  protection related ?
-//  memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x12341234, 0x12341243, 0, 0);
+//  memory_nop_read(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x12341234, 0x12341243, 0, 0);
 
 	state->flash_roms = 4;
 }

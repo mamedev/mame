@@ -729,7 +729,7 @@ static READ32_HANDLER( avengrgs_speedup_r )
 	UINT32 a=state->mlc_ram[0x89a0/4];
 	UINT32 p=cpu_get_pc(space->cpu);
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) cpu_spinuntil_int(space->cpu);
+	if ((p==0x3234 || p==0x32dc) && (a&1)) device_spin_until_interrupt(space->cpu);
 
 	return a;
 }
@@ -745,7 +745,7 @@ static DRIVER_INIT( avengrgs )
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x32dc);
 
 	state->mainCpuIsArm = 0;
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
 	descramble_sound(machine);
 }
 

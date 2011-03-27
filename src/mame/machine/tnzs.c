@@ -23,7 +23,7 @@ static READ8_HANDLER( mcu_tnzs_r )
 	UINT8 data;
 
 	data = upi41_master_r(state->mcu, offset & 1);
-	cpu_yield(space->cpu);
+	device_yield(space->cpu);
 
 //  logerror("PC %04x: read %02x from mcu $c00%01x\n", cpu_get_previouspc(space->cpu), data, offset);
 
@@ -514,7 +514,7 @@ DRIVER_INIT( drtoppel )
 	state->mcu_type = MCU_DRTOPPEL;
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
-	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf800, 0xfbff, 0, 0);
+	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf800, 0xfbff, 0, 0);
 }
 
 DRIVER_INIT( chukatai )
@@ -528,7 +528,7 @@ DRIVER_INIT( tnzs )
 	tnzs_state *state = machine->driver_data<tnzs_state>();
 	state->mcu_type = MCU_TNZS;
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+//  memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( tnzsb )
@@ -537,7 +537,7 @@ DRIVER_INIT( tnzsb )
 	state->mcu_type = MCU_NONE_TNZSB;
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-//  memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+//  memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( kabukiz )
@@ -555,9 +555,9 @@ DRIVER_INIT( insectx )
 	state->mcu_type = MCU_NONE_INSECTX;
 
 	/* this game has no mcu, replace the handler with plain input port handlers */
-	memory_install_read_port(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, "IN0" );
-	memory_install_read_port(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xc001, 0xc001, 0, 0, "IN1" );
-	memory_install_read_port(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0xc002, 0xc002, 0, 0, "IN2" );
+	memory_install_read_port(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, "IN0" );
+	memory_install_read_port(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc001, 0xc001, 0, 0, "IN1" );
+	memory_install_read_port(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc002, 0xc002, 0, 0, "IN2" );
 }
 
 DRIVER_INIT( kageki )
@@ -630,7 +630,7 @@ INTERRUPT_GEN( arknoid2_interrupt )
 			break;
 	}
 
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 MACHINE_RESET( tnzs )
@@ -667,7 +667,7 @@ MACHINE_RESET( jpopnics )
 static STATE_POSTLOAD( tnzs_postload )
 {
 	tnzs_state *state = machine->driver_data<tnzs_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	memory_set_bank(machine, "bank1", state->bank1);
 	memory_set_bank(machine, "bank2", state->bank2);
@@ -747,9 +747,9 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
-		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
 	state->bank1 = data & 0x07;
@@ -774,7 +774,7 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				if (data & 0x04)
 				{
 					if (state->mcu != NULL && state->mcu->type() == I8742)
-						cpu_set_input_line(state->mcu, INPUT_LINE_RESET, PULSE_LINE);
+						device_set_input_line(state->mcu, INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;

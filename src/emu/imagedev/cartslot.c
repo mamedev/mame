@@ -127,8 +127,8 @@ static int load_cartridge(device_image_interface *image, const rom_entry *romrgn
 		cpu = image->device().machine->device(type);
 		if (cpu!=NULL && cpu->interface(memory))
 		{
-			datawidth = device_memory(cpu)->space_config(AS_PROGRAM)->m_databus_width / 8;
-			littleendian = (device_memory(cpu)->space_config()->m_endianness == ENDIANNESS_LITTLE);
+			datawidth = cpu->memory().space_config(AS_PROGRAM)->m_databus_width / 8;
+			littleendian = (cpu->memory().space_config()->m_endianness == ENDIANNESS_LITTLE);
 		}
 
 		/* swap the endianness if we need to */

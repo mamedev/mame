@@ -233,13 +233,13 @@ DIP locations verified for:
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
 	asuka_state *state = machine->driver_data<asuka_state>();
-	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
+	device_set_input_line(state->maincpu, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cadash_interrupt )
 {
 	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(cadash_interrupt5));
-	cpu_set_input_line(device, 4, HOLD_LINE);  /* interrupt vector 4 */
+	device_set_input_line(device, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
 

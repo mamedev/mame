@@ -184,6 +184,6 @@ READ8_HANDLER( battles_input_port_r )
 
 INTERRUPT_GEN( battles_interrupt_4 )
 {
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 

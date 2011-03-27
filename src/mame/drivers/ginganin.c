@@ -291,7 +291,7 @@ static INTERRUPT_GEN( ginganin_sound_interrupt )
 		if (state->MC6809_CTR > state->S_TEMPO)
 		{
 			state->MC6809_CTR = 0;
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 		}
 		else
 			state->MC6809_CTR++;

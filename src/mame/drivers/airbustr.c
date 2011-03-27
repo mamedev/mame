@@ -264,7 +264,7 @@ static READ8_HANDLER( devram_r )
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
 	airbustr_state *state = space->machine->driver_data<airbustr_state>();
-	cpu_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( master_bankswitch_w )
@@ -316,7 +316,7 @@ static WRITE8_HANDLER( soundcommand_w )
 	airbustr_state *state = space->machine->driver_data<airbustr_state>();
 	soundlatch_w(space, 0, data);
 	state->soundlatch_status = 1;	// soundlatch has been written
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 static WRITE8_HANDLER( soundcommand2_w )
@@ -561,14 +561,14 @@ static INTERRUPT_GEN( master_interrupt )
 {
 	airbustr_state *state = device->machine->driver_data<airbustr_state>();
 	state->master_addr ^= 0x02;
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, state->master_addr);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->master_addr);
 }
 
 static INTERRUPT_GEN( slave_interrupt )
 {
 	airbustr_state *state = device->machine->driver_data<airbustr_state>();
 	state->slave_addr ^= 0x02;
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, state->slave_addr);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->slave_addr);
 }
 
 /* Machine Initialization */
@@ -798,7 +798,7 @@ ROM_END
 
 static DRIVER_INIT( airbustr )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "master", ADDRESS_SPACE_PROGRAM), 0xe000, 0xefff, 0, 0, devram_r); // protection device lives here
+	memory_install_read8_handler(machine->device("master")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe000, 0xefff, 0, 0, devram_r); // protection device lives here
 }
 
 

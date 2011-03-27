@@ -781,7 +781,7 @@ INTERRUPT_GEN( getstar_interrupt )
 {
 	slapfght_state *state = device->machine->driver_data<slapfght_state>();
 	if (state->getstar_sh_intenabled)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #ifdef UNUSED_FUNCTION

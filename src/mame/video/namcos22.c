@@ -2275,7 +2275,7 @@ SCREEN_UPDATE( namcos22s )
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
       {
-         address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+         address_space *space = screen->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
          {
             int i,bank;
@@ -2325,7 +2325,7 @@ SCREEN_UPDATE( namcos22 )
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
       {
-         address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+         address_space *space = screen->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 //         Dump(space, f,0x90000000, 0x90000003, "led?" );
 //         Dump(space, f,0x90010000, 0x90017fff, "cz_ram");

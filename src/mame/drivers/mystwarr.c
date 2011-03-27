@@ -112,15 +112,15 @@ static INTERRUPT_GEN(mystwarr_interrupt)
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
 		break;
 
 		case 1:
-			cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 		break;
 
 		case 2:
-			cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 		break;
 	}
 }
@@ -130,15 +130,15 @@ static INTERRUPT_GEN(metamrph_interrupt)
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 		break;
 
 		case 15:
-			cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 		break;
 
 		case 39:
-			if (K053246_is_IRQ_enabled()) cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
+			if (K053246_is_IRQ_enabled()) device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 		break;
 	}
 }
@@ -151,18 +151,18 @@ static INTERRUPT_GEN(mchamp_interrupt)
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			if (K053246_is_IRQ_enabled()) cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
+			if (K053246_is_IRQ_enabled()) device_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 		break;
 
 		case 1:
-			cpu_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
 		break;
 	}
 }
 
 static INTERRUPT_GEN(ddd_interrupt)
 {
-	cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
+	device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 }
 
 

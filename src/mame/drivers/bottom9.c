@@ -26,7 +26,7 @@ static INTERRUPT_GEN( bottom9_interrupt )
 	bottom9_state *state = device->machine->driver_data<bottom9_state>();
 
 	if (k052109_is_irq_enabled(state->k052109))
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( k052109_051960_r )
@@ -144,14 +144,14 @@ static WRITE8_HANDLER( bottom9_1f90_w )
 static WRITE8_HANDLER( bottom9_sh_irqtrigger_w )
 {
 	bottom9_state *state = space->machine->driver_data<bottom9_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static INTERRUPT_GEN( bottom9_sound_interrupt )
 {
 	bottom9_state *state = device->machine->driver_data<bottom9_state>();
 	if (state->nmienable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )

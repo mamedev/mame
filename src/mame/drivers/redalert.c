@@ -111,9 +111,9 @@ static INTERRUPT_GEN( redalert_vblank_interrupt )
 {
 	if( input_port_read(device->machine, "COIN") )
 		/* the service coin as conntected to the CPU's RDY pin as well */
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
-	cpu_set_input_line(device, M6502_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(device, M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 

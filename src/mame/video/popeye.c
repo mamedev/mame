@@ -283,7 +283,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 {
 	popeye_state *state = machine->driver_data<popeye_state>();
 	int offs;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if (state->lastflip != flip_screen_get(machine))
 	{

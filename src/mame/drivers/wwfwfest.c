@@ -383,7 +383,7 @@ static const ym2151_interface ym2151_config =
 
 static SCREEN_EOF( wwfwfest )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 }

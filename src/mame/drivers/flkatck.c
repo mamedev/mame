@@ -25,7 +25,7 @@ static INTERRUPT_GEN( flkatck_interrupt )
 	flkatck_state *state = device->machine->driver_data<flkatck_state>();
 
 	if (state->irq_enabled)
-		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 			soundlatch_w(space, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+			device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
 			watchdog_reset_w(space, 0, data);

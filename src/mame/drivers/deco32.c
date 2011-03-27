@@ -1739,12 +1739,12 @@ static MACHINE_RESET( deco32 )
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( tattass_snd_interrupt )
 {
-	cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
+	device_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
 

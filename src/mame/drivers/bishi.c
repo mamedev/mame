@@ -118,11 +118,11 @@ static INTERRUPT_GEN(bishi_interrupt)
 		switch (cpu_getiloops(device))
 		{
 			case 0:
-				cpu_set_input_line(device, M68K_IRQ_3, HOLD_LINE);
+				device_set_input_line(device, M68K_IRQ_3, HOLD_LINE);
 				break;
 
 			case 1:
-				cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+				device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 				break;
 		}
 	}
@@ -371,9 +371,9 @@ static void sound_irq_gen(device_t *device, int state)
 {
 	bishi_state *bishi = device->machine->driver_data<bishi_state>();
 	if (state)
-		cpu_set_input_line(bishi->maincpu, M68K_IRQ_1, ASSERT_LINE);
+		device_set_input_line(bishi->maincpu, M68K_IRQ_1, ASSERT_LINE);
 	else
-		cpu_set_input_line(bishi->maincpu, M68K_IRQ_1, CLEAR_LINE);
+		device_set_input_line(bishi->maincpu, M68K_IRQ_1, CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =

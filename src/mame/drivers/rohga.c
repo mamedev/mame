@@ -118,7 +118,7 @@ static READ16_HANDLER( rohga_irq_ack_r )
 {
 	rohga_state *state = space->machine->driver_data<rohga_state>();
 
-	cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 6, CLEAR_LINE);
 	return 0;
 }
 
@@ -128,7 +128,7 @@ static WRITE16_HANDLER( wizdfire_irq_ack_w )
        except when a credit is inserted (writes 6 twice).
        Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
 	rohga_state *state = space->machine->driver_data<rohga_state>();
-	cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 6, CLEAR_LINE);
 }
 
 /**********************************************************************************/
@@ -723,7 +723,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	rohga_state *driver_state = device->machine->driver_data<rohga_state>();
-	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )

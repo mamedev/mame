@@ -59,19 +59,19 @@ static READ8_DEVICE_HANDLER( rollerg_sound_r )
 static WRITE8_HANDLER( soundirq_w )
 {
 	rollerg_state *state = space->machine->driver_data<rollerg_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static TIMER_CALLBACK( nmi_callback )
 {
 	rollerg_state *state = machine->driver_data<rollerg_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	rollerg_state *state = space->machine->driver_data<rollerg_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	space->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 

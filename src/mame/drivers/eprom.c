@@ -148,7 +148,7 @@ static WRITE16_HANDLER( sync_w )
 
 	state->sync_data[offset] = newword;
 	if ((oldword & 0xff00) != (newword & 0xff00))
-		cpu_yield(space->cpu);
+		device_yield(space->cpu);
 }
 
 
@@ -730,8 +730,8 @@ static DRIVER_INIT( eprom )
 	atarijsa_init(machine, "260010", 0x0002);
 
 	/* install CPU synchronization handlers */
-	state->sync_data = memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
-	state->sync_data = memory_install_readwrite16_handler(cputag_get_address_space(machine, "extra", ADDRESS_SPACE_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
+	state->sync_data = memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
+	state->sync_data = memory_install_readwrite16_handler(machine->device("extra")->memory().space(ADDRESS_SPACE_PROGRAM), 0x16cc00, 0x16cc01, 0, 0, sync_r, sync_w);
 }
 
 

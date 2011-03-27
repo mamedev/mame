@@ -23,7 +23,7 @@ INTERRUPT_GEN( twincobr_interrupt )
 	twincobr_state *state = device->machine->driver_data<twincobr_state>();
 	if (state->intenable) {
 		state->intenable = 0;
-		cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+		device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 	}
 }
 
@@ -32,7 +32,7 @@ INTERRUPT_GEN( wardner_interrupt )
 	twincobr_state *state = device->machine->driver_data<twincobr_state>();
 	if (state->intenable) {
 		state->intenable = 0;
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -64,7 +64,7 @@ READ16_HANDLER( twincobr_dsp_r )
 	switch (state->main_ram_seg) {
 		case 0x30000:
 		case 0x40000:
-		case 0x50000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		case 0x50000:	mainspace = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 						input_data = mainspace->read_word(state->main_ram_seg + state->dsp_addr_w);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(space->cpu),state->main_ram_seg + state->dsp_addr_w); break;
@@ -83,7 +83,7 @@ WRITE16_HANDLER( twincobr_dsp_w )
 	switch (state->main_ram_seg) {
 		case 0x30000:	if ((state->dsp_addr_w < 3) && (data == 0)) state->dsp_execute = 1;
 		case 0x40000:
-		case 0x50000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		case 0x50000:	mainspace = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 						mainspace->write_word(state->main_ram_seg + state->dsp_addr_w, data);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(space->cpu),state->main_ram_seg + state->dsp_addr_w); break;
@@ -117,7 +117,7 @@ READ16_HANDLER( wardner_dsp_r )
 	switch (state->main_ram_seg) {
 		case 0x7000:
 		case 0x8000:
-		case 0xa000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		case 0xa000:	mainspace = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 						input_data =  mainspace->read_byte(state->main_ram_seg + (state->dsp_addr_w + 0))
 								   | (mainspace->read_byte(state->main_ram_seg + (state->dsp_addr_w + 1)) << 8);
 						break;
@@ -137,7 +137,7 @@ WRITE16_HANDLER( wardner_dsp_w )
 	switch (state->main_ram_seg) {
 		case 0x7000:	if ((state->dsp_addr_w < 3) && (data == 0)) state->dsp_execute = 1;
 		case 0x8000:
-		case 0xa000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		case 0xa000:	mainspace = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 						mainspace->write_byte(state->main_ram_seg + (state->dsp_addr_w + 0), (data & 0xff));
 						mainspace->write_byte(state->main_ram_seg + (state->dsp_addr_w + 1), ((data >> 8) & 0xff));
 						break;

@@ -49,9 +49,9 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 	state->which = !state->which;
 
 	if (state->which)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( mnchmobl_sound_irq )
@@ -59,7 +59,7 @@ static INTERRUPT_GEN( mnchmobl_sound_irq )
 	munchmo_state *state = device->machine->driver_data<munchmo_state>();
 
 	if (!(state->sound_nmi_enable))
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 	munchmo_state *state = space->machine->driver_data<munchmo_state>();
 
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE );
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_nmi_enable_w )
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( sound_nmi_enable_w )
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
 	munchmo_state *state = space->machine->driver_data<munchmo_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

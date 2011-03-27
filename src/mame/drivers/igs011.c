@@ -963,7 +963,7 @@ static WRITE16_HANDLER( igs011_prot_addr_w )
 
 //  state->prot2 = 0x00;
 
-	address_space *sp = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *sp = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = space->machine->region("maincpu")->base();
 
 	// Plug previous address range with ROM access
@@ -1800,7 +1800,7 @@ static DRIVER_INIT( drgnwrldv21 )
 	drgnwrld_type2_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd4c0, 0xd4ff, 0, 0, drgnwrldv21_igs011_prot2_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd4c0, 0xd4ff, 0, 0, drgnwrldv21_igs011_prot2_r);
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -1940,7 +1940,7 @@ static DRIVER_INIT( dbc )
 
 	dbc_decrypt(machine);
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10600, 0x107ff, 0, 0, dbc_igs011_prot2_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x10600, 0x107ff, 0, 0, dbc_igs011_prot2_r);
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -1969,7 +1969,7 @@ static DRIVER_INIT( ryukobou )
 
 	ryukobou_decrypt(machine);
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10600, 0x107ff, 0, 0, ryukobou_igs011_prot2_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x10600, 0x107ff, 0, 0, ryukobou_igs011_prot2_r);
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
@@ -3593,9 +3593,9 @@ static INTERRUPT_GEN( drgnwrld_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
+		case 0:	device_set_input_line(device, 6, HOLD_LINE);	break;
 		default:
-		case 1:	cpu_set_input_line(device, 5, HOLD_LINE);	break;
+		case 1:	device_set_input_line(device, 5, HOLD_LINE);	break;
 	}
 }
 
@@ -3623,11 +3623,11 @@ static INTERRUPT_GEN( lhb_interrupt )
 
 	switch (cpu_getiloops(device))
 	{
-		case 0:	cpu_set_input_line(device, 3, HOLD_LINE);	break;
-		case 2:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
+		case 0:	device_set_input_line(device, 3, HOLD_LINE);	break;
+		case 2:	device_set_input_line(device, 6, HOLD_LINE);	break;
 		default:
 				// It reads the inputs. Must be called more than once for test mode on boot to work
-				cpu_set_input_line(device, 5, HOLD_LINE);	break;
+				device_set_input_line(device, 5, HOLD_LINE);	break;
 	}
 }
 
@@ -3643,8 +3643,8 @@ static INTERRUPT_GEN( wlcc_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:	cpu_set_input_line(device, 3, HOLD_LINE);	break;
-		case 1:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
+		case 0:	device_set_input_line(device, 3, HOLD_LINE);	break;
+		case 1:	device_set_input_line(device, 6, HOLD_LINE);	break;
 	}
 }
 
@@ -3686,11 +3686,11 @@ static INTERRUPT_GEN( vbowl_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:	cpu_set_input_line(device, 4, HOLD_LINE);	break;
-		case 1:	cpu_set_input_line(device, 5, HOLD_LINE);	break;
-		case 2:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
+		case 0:	device_set_input_line(device, 4, HOLD_LINE);	break;
+		case 1:	device_set_input_line(device, 5, HOLD_LINE);	break;
+		case 2:	device_set_input_line(device, 6, HOLD_LINE);	break;
 		default:
-		case 3:	cpu_set_input_line(device, 3, HOLD_LINE);	break;	// sound
+		case 3:	device_set_input_line(device, 3, HOLD_LINE);	break;	// sound
 	}
 }
 

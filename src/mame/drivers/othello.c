@@ -143,8 +143,8 @@ static WRITE8_HANDLER( unk_8a_w )
     othello_state *state = space->machine->driver_data<othello_state>();
 
     state->n7751_command = (data & 0x07);
-    cpu_set_input_line(state->n7751, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-    //cpu_set_input_line(state->n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+    device_set_input_line(state->n7751, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+    //device_set_input_line(state->n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
     space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
     */
 

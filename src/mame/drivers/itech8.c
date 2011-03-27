@@ -2634,25 +2634,25 @@ ROM_END
 
 static DRIVER_INIT( grmatch )
 {
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
-	memory_unmap_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01e0, 0x01ff, 0, 0);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0160, 0x0160, 0, 0, grmatch_palette_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, grmatch_xscroll_w);
+	memory_unmap_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01e0, 0x01ff, 0, 0);
 }
 
 
 static DRIVER_INIT( slikshot )
 {
-	memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read8_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0180, 0x0180, 0, 0, slikshot_z80_r);
+	memory_install_read8_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
 }
 
 
 static DRIVER_INIT( sstrike )
 {
-	memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1180, 0x1180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read8_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1180, 0x1180, 0, 0, slikshot_z80_r);
+	memory_install_read8_handler (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
 }
 
 
@@ -2691,15 +2691,15 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	memory_install_read_port (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
-	memory_install_read_port (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
-	memory_install_read_port (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
-	memory_install_read_port (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
-	memory_install_read_port (cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
+	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0161, 0x0161, 0, 0, "161");
+	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0162, 0x0162, 0, 0, "162");
+	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0163, 0x0163, 0, 0, "163");
+	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0164, 0x0164, 0, 0, "164");
+	memory_install_read_port (machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0165, 0x0165, 0, 0, "165");
 
 	/* different banking mechanism (disable the old one) */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
 }
 
 

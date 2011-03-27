@@ -444,7 +444,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( galsnew_interrupt )
 {
-	cpu_set_input_line(device, cpu_getiloops(device) + 3, HOLD_LINE);	/* IRQs 5, 4, and 3 */
+	device_set_input_line(device, cpu_getiloops(device) + 3, HOLD_LINE);	/* IRQs 5, 4, and 3 */
 }
 
 static MACHINE_RESET( galsnew )

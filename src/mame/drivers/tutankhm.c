@@ -68,7 +68,7 @@ static INTERRUPT_GEN( tutankhm_interrupt )
 	/* flip flops cause the interrupt to be signalled every other frame */
 	state->irq_toggle ^= 1;
 	if (state->irq_toggle && state->irq_enable)
-		cpu_set_input_line(device, 0, ASSERT_LINE);
+		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
@@ -78,7 +78,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	state->irq_enable = data & 1;
 	if (!state->irq_enable)
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 

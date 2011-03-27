@@ -83,18 +83,18 @@ static WRITE8_HANDLER( z80_intreq_w )
 /* Periodic Z80 interrupt */
 static INTERRUPT_GEN( z80_irq )
 {
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( z80_shared_r )
 {
-	address_space *cpu2space = cputag_get_address_space(space->machine, "audio_cpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpu2space = space->machine->device("audio_cpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	return cpu2space->read_byte(offset);
 }
 
 static WRITE16_HANDLER( z80_shared_w )
 {
-	address_space *cpu2space = cputag_get_address_space(space->machine, "audio_cpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpu2space = space->machine->device("audio_cpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	cpu2space->write_byte(offset, data & 0xff);
 }
 

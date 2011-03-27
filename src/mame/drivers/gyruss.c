@@ -102,7 +102,7 @@ static WRITE8_DEVICE_HANDLER( gyruss_dac_w )
 static WRITE8_HANDLER( gyruss_irq_clear_w )
 {
 	gyruss_state *state = space->machine->driver_data<gyruss_state>();
-	cpu_set_input_line(state->audiocpu_2, 0, CLEAR_LINE);
+	device_set_input_line(state->audiocpu_2, 0, CLEAR_LINE);
 }
 
 static void filter_w( device_t *device, int chip, int data )
@@ -134,13 +134,13 @@ static WRITE8_HANDLER( gyruss_sh_irqtrigger_w )
 {
 	gyruss_state *state = space->machine->driver_data<gyruss_state>();
 	/* writing to this register triggers IRQ on the sound CPU */
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( gyruss_i8039_irq_w )
 {
 	gyruss_state *state = space->machine->driver_data<gyruss_state>();
-	cpu_set_input_line(state->audiocpu_2, 0, ASSERT_LINE);
+	device_set_input_line(state->audiocpu_2, 0, ASSERT_LINE);
 }
 
 

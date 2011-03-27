@@ -335,10 +335,10 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 {
 	lgp_state *state = device->machine->driver_data<lgp_state>();
 	// NMI
-	//cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	//device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
 	// IRQ
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	state->irq_timer->adjust(attotime::from_usec(50));
 }
 

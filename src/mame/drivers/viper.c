@@ -674,7 +674,7 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(viper)
 {
-//  memory_install_readwrite64_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff207fff, 0, 0, hdd_r, hdd_w ); //TODO
+//  memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff207fff, 0, 0, hdd_r, hdd_w ); //TODO
 }
 
 static DRIVER_INIT(vipercf)
@@ -683,8 +683,8 @@ static DRIVER_INIT(vipercf)
 
 	DRIVER_INIT_CALL(viper);
 
-	memory_install_readwrite64_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
-	memory_install_readwrite64_device_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
+	memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), ide, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
+	memory_install_readwrite64_device_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), ide, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
 }
 
 

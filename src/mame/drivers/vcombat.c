@@ -236,15 +236,15 @@ static WRITE16_HANDLER( wiggle_i860p1_pins_w )
 static READ16_HANDLER( main_irqiack_r )
 {
 	//fprintf(stderr, "M0: irq iack\n");
-	cpu_set_input_line(space->machine->device("maincpu"), M68K_IRQ_1, CLEAR_LINE);
-	//cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
+	device_set_input_line(space->machine->device("maincpu"), M68K_IRQ_1, CLEAR_LINE);
+	//device_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
 }
 
 static READ16_HANDLER( sound_resetmain_r )
 {
 	//fprintf(stderr, "M1: reset line to M0\n");
-	//cpu_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
+	//device_set_input_line(space->machine->device("maincpu"), INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -545,7 +545,7 @@ INPUT_PORTS_END
 static WRITE_LINE_DEVICE_HANDLER(sound_update)
 {
 	/* Seems reasonable */
-	cpu_set_input_line(device->machine->device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device->machine->device("soundcpu"), M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const mc6845_interface mc6845_intf =

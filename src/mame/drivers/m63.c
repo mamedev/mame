@@ -356,7 +356,7 @@ static WRITE8_HANDLER( coin_w )
 static WRITE8_HANDLER( snd_irq_w )
 {
 	m63_state *state = space->machine->driver_data<m63_state>();
-	cpu_set_input_line(state->soundcpu, 0, ASSERT_LINE);
+	device_set_input_line(state->soundcpu, 0, ASSERT_LINE);
 	space->machine->scheduler().synchronize();
 }
 
@@ -389,7 +389,7 @@ static WRITE8_HANDLER( p2_w )
 	state->p2 = data;
 	if((state->p2 & 0xf0) == 0x50)
 	{
-		cpu_set_input_line(state->soundcpu, 0, CLEAR_LINE);
+		device_set_input_line(state->soundcpu, 0, CLEAR_LINE);
 	}
 }
 

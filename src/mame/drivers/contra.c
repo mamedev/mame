@@ -29,7 +29,7 @@ static INTERRUPT_GEN( contra_interrupt )
 {
 	contra_state *state = device->machine->driver_data<contra_state>();
 	if (k007121_ctrlram_r(state->k007121_1, 7) & 0x02)
-		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_bankswitch_w )
@@ -40,7 +40,7 @@ static WRITE8_HANDLER( contra_bankswitch_w )
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
 {
 	contra_state *state = space->machine->driver_data<contra_state>();
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_coin_counter_w )

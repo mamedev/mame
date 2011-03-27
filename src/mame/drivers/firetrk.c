@@ -23,7 +23,7 @@ static void set_service_mode(running_machine *machine, int enable)
 	watchdog_enable(machine, !enable);
 
 	/* change CPU clock speed according to service switch change */
-	cputag_set_clock(machine, "maincpu", enable ? (MASTER_CLOCK/12) : (MASTER_CLOCK/16));
+	machine->device("maincpu")->set_unscaled_clock(enable ? (MASTER_CLOCK/12) : (MASTER_CLOCK/16));
 }
 
 
@@ -54,7 +54,7 @@ static INTERRUPT_GEN( firetrk_interrupt )
 
 	/* NMI interrupts are disabled during service mode in firetrk and montecar */
 	if (!state->in_service_mode)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

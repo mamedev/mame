@@ -594,7 +594,7 @@ static INPUT_CHANGED( coin_inserted )
 	if (newval == 0)
 	{
 		UINT32 credit;
-		address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = field->port->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 		/* Get the current credit value and add the new coin value */
 		credit = space->read_dword(0x8002c) + (UINT32)(FPTR)param;

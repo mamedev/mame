@@ -90,7 +90,7 @@ static INTERRUPT_GEN( senjyo_interrupt )
 {
 	senjyo_state *state = device->machine->driver_data<senjyo_state>();
 
-	if (state->int_delay_kludge == 0) cpu_set_input_line(device, 0, HOLD_LINE);
+	if (state->int_delay_kludge == 0) device_set_input_line(device, 0, HOLD_LINE);
 	else state->int_delay_kludge--;
 }
 

@@ -196,7 +196,7 @@ static SCREEN_UPDATE( rdx_v33 )
 	{
 		static UINT32 src_addr = 0x100000;
 		static int frame;
-		address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = screen->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 		//if(input_code_pressed_once(screen->machine,KEYCODE_A))
 		//  src_addr+=0x800;
@@ -474,7 +474,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( rdx_v33_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc0/4);	/* VBL */
 }
 
 static const gfx_layout rdx_v33_charlayout =

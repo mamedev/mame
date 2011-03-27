@@ -68,12 +68,12 @@ static INTERRUPT_GEN( dbz_interrupt )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
 			break;
 
 		case 1:
 			if (k053246_is_irq_enabled(state->k053246))
-				cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
+				device_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 			break;
 	}
 }
@@ -110,7 +110,7 @@ static WRITE16_HANDLER( dbz_sound_command_w )
 static WRITE16_HANDLER( dbz_sound_cause_nmi )
 {
 	dbz_state *state = space->machine->driver_data<dbz_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq( device_t *device, int irq )
@@ -118,9 +118,9 @@ static void dbz_sound_irq( device_t *device, int irq )
 	dbz_state *state = device->machine->driver_data<dbz_state>();
 
 	if (irq)
-		cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+		device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 	else
-		cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+		device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dbz_map, ADDRESS_SPACE_PROGRAM, 16 )

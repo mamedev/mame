@@ -189,7 +189,7 @@ ADDRESS_MAP_END
 static INTERRUPT_GEN( tankbatt_interrupt )
 {
 	tankbatt_state *state = device->machine->driver_data<tankbatt_state>();
-	if (state->nmi_enable) cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+	if (state->nmi_enable) device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted )

@@ -125,7 +125,7 @@ WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
-	return soundlatch_r(cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM),0);
+	return soundlatch_r(device->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM),0);
 }
 
 static void filter_w(device_t *device, int data)
@@ -161,7 +161,7 @@ WRITE8_HANDLER( frogger_filter_w )
 
 void scramble_sh_init(running_machine *machine)
 {
-	cpu_set_irq_callback(machine->device("audiocpu"), scramble_sh_irq_callback);
+	device_set_irq_callback(machine->device("audiocpu"), scramble_sh_irq_callback);
 
 	/* PR is always 0, D is always 1 */
 	ttl7474_d_w(machine->device("konami_7474"), 1);

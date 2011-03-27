@@ -74,7 +74,7 @@ static WRITE8_HANDLER( blueprnt_sound_command_w )
 {
 	blueprnt_state *state = space->machine->driver_data<blueprnt_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blueprnt_coin_counter_w )

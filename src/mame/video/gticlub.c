@@ -392,13 +392,13 @@ WRITE32_HANDLER( K001005_w )
 			if (cpu_get_pc(space->cpu) == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
-				cpu_spinuntil_trigger(space->cpu, 10000);
+				device_spin_until_trigger(space->cpu, 10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
 			if (cpu_get_pc(space->cpu) == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
-				cpu_spinuntil_trigger(space->cpu, 10000);
+				device_spin_until_trigger(space->cpu, 10000);
 			}
 
 			break;

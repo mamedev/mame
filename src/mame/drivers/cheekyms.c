@@ -18,7 +18,7 @@ static INPUT_CHANGED( coin_inserted )
 
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

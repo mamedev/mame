@@ -320,7 +320,7 @@ static WRITE16_HANDLER( paddlema_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data);
-		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -331,7 +331,7 @@ static WRITE16_HANDLER( tnextspc_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 //ZT
@@ -1842,7 +1842,7 @@ static const ym2203_interface ym2203_config =
 static void YM3812_irq( device_t *device, int param )
 {
 	alpha68k_state *state = device->machine->driver_data<alpha68k_state>();
-	cpu_set_input_line(state->audiocpu, 0, (param) ? HOLD_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -1853,9 +1853,9 @@ static const ym3812_interface ym3812_config =
 static INTERRUPT_GEN( alpha68k_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, 1, HOLD_LINE);
+		device_set_input_line(device, 1, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 }
 //ZT
 
@@ -3108,7 +3108,7 @@ static DRIVER_INIT( kyros )
 static DRIVER_INIT( jongbou )
 {
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0c0001, 0, 0, jongbou_inputs_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0c0000, 0x0c0001, 0, 0, jongbou_inputs_r);
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x00ff;
 	state->coin_id = 0x23 | (0x24 << 8);

@@ -515,7 +515,7 @@ static READ8_HANDLER( angelkds_sub_sound_r )
 static void irqhandler( device_t *device, int irq )
 {
 	angelkds_state *state = device->machine->driver_data<angelkds_state>();
-	cpu_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

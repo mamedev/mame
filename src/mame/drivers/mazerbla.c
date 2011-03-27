@@ -735,7 +735,7 @@ static WRITE8_HANDLER( cfb_zpu_int_req_set_w )
 
 	state->zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
 
-	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	device_set_input_line(state->maincpu, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
 static READ8_HANDLER( cfb_zpu_int_req_clr )
@@ -746,7 +746,7 @@ static READ8_HANDLER( cfb_zpu_int_req_clr )
 
 	/* clear the INT line when there are no more interrupt requests */
 	if (state->zpu_int_vector == 0xff)
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -937,7 +937,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	state->soundlatch = param;
 
 	/* cause NMI on sound CPU */
-	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( main_sound_w )
@@ -948,13 +948,13 @@ static WRITE8_HANDLER( main_sound_w )
 static WRITE8_HANDLER( sound_int_clear_w )
 {
 	mazerbla_state *state = space->machine->driver_data<mazerbla_state>();
-	cpu_set_input_line(state->subcpu, 0, CLEAR_LINE);
+	device_set_input_line(state->subcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( sound_nmi_clear_w )
 {
 	mazerbla_state *state = space->machine->driver_data<mazerbla_state>();
-	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1402,7 +1402,7 @@ static IRQ_CALLBACK(irq_callback)
 /* frequency is 14.318 MHz/16/16/16/16 */
 static INTERRUPT_GEN( sound_interrupt )
 {
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
@@ -1483,7 +1483,7 @@ static MACHINE_RESET( mazerbla )
 
 	memset(state->lookup_ram, 0, ARRAY_LENGTH(state->lookup_ram));
 
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 

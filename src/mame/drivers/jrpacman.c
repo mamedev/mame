@@ -115,7 +115,7 @@ public:
 
 static WRITE8_HANDLER( jrpacman_interrupt_vector_w )
 {
-	cpu_set_input_line_vector(space->machine->device("maincpu"), 0, data);
+	device_set_input_line_vector(space->machine->device("maincpu"), 0, data);
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 

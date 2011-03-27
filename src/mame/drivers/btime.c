@@ -174,7 +174,7 @@ static WRITE8_HANDLER( audio_nmi_enable_w )
 	if (state->audio_nmi_enable_type == AUDIO_ENABLE_DIRECT)
 	{
 		state->audio_nmi_enabled = data & 1;
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -186,7 +186,7 @@ static WRITE8_DEVICE_HANDLER( ay_audio_nmi_enable_w )
 	if (state->audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
 	{
 		state->audio_nmi_enabled = ~data & 1;
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -195,7 +195,7 @@ static TIMER_DEVICE_CALLBACK( audio_nmi_gen )
 	btime_state *state = timer.machine->driver_data<btime_state>();
 	int scanline = param;
 	state->audio_nmi_state = scanline & 8;
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->audio_nmi_enabled && state->audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -528,7 +528,7 @@ static INPUT_CHANGED( coin_inserted_irq_hi )
 	btime_state *state = field->port->machine->driver_data<btime_state>();
 
 	if (newval)
-		cpu_set_input_line(state->maincpu, 0, HOLD_LINE);
+		device_set_input_line(state->maincpu, 0, HOLD_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_irq_lo )
@@ -536,13 +536,13 @@ static INPUT_CHANGED( coin_inserted_irq_lo )
 	btime_state *state = field->port->machine->driver_data<btime_state>();
 
 	if (!newval)
-		cpu_set_input_line(state->maincpu, 0, HOLD_LINE);
+		device_set_input_line(state->maincpu, 0, HOLD_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi_lo )
 {
 	btime_state *state = field->port->machine->driver_data<btime_state>();
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -550,13 +550,13 @@ static WRITE8_HANDLER( audio_command_w )
 {
 	btime_state *state = space->machine->driver_data<btime_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( audio_command_r )
 {
 	btime_state *state = space->machine->driver_data<btime_state>();
-	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
 
@@ -2071,7 +2071,7 @@ ROM_END
 
 static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 {
-	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device(cputag)->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine->region(cputag)->base();
 	offs_t addr;
@@ -2101,7 +2101,7 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 
 static void init_rom1(running_machine *machine)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
@@ -2176,7 +2176,7 @@ static DRIVER_INIT( cookrace )
 	btime_state *state = machine->driver_data<btime_state>();
 	decrypt_C10707_cpu(machine, "maincpu");
 
-	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
+	memory_install_read_bank(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
 	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_DIRECT;
 }
@@ -2193,9 +2193,9 @@ static DRIVER_INIT( wtennis )
 	btime_state *state = machine->driver_data<btime_state>();
 	decrypt_C10707_cpu(machine, "maincpu");
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 
-	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
+	memory_install_read_bank(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0200, 0x0fff, 0, 0, "bank10");
 	memory_set_bankptr(machine, "bank10", machine->region("audiocpu")->base() + 0xe200);
 	state->audio_nmi_enable_type = AUDIO_ENABLE_AY8910;
 }

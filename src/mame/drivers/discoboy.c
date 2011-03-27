@@ -218,9 +218,9 @@ static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
 {
 	discoboy_state *state = space->machine->driver_data<discoboy_state>();
 	//  printf("unk discoboy_port_03_w %02x\n", data);
-	//  cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, HOLD_LINE);
+	//  device_set_input_line(state->audiocpu, INPUT_LINE_NMI, HOLD_LINE);
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( discoboy_port_06_w )

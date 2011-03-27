@@ -85,7 +85,7 @@ static WRITE8_HANDLER( mainevt_coin_w )
 static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
 {
 	mainevt_state *state = space->machine->driver_data<mainevt_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_DEVICE_HANDLER( mainevt_sh_busy_r )

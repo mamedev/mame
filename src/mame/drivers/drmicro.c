@@ -28,7 +28,7 @@ static INTERRUPT_GEN( drmicro_interrupt )
 	drmicro_state *state = device->machine->driver_data<drmicro_state>();
 
 	if (state->nmi_enable)
-		 cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		 device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )

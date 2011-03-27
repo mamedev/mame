@@ -332,7 +332,7 @@ SCREEN_UPDATE( ojankoc )
 
 	if (state->screen_refresh)
 	{
-		address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = screen->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)

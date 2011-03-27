@@ -187,7 +187,7 @@ static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chi
 					fd1094_machine_init(chip->cpu);
 
 				/* fd1094_machine_init calls device_reset on the CPU, so we must do this afterwards */
-				cpu_set_input_line(chip->cpu, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
+				device_set_input_line(chip->cpu, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
 			}
 			break;
 
@@ -202,7 +202,7 @@ static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chi
 			{
 				int irqnum;
 				for (irqnum = 0; irqnum < 8; irqnum++)
-					cpu_set_input_line(chip->cpu, irqnum, (irqnum == (~chip->regs[offset] & 7)) ? HOLD_LINE : CLEAR_LINE);
+					device_set_input_line(chip->cpu, irqnum, (irqnum == (~chip->regs[offset] & 7)) ? HOLD_LINE : CLEAR_LINE);
 			}
 			break;
 
@@ -212,13 +212,13 @@ static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chi
 			/*   02 - read data into latches 00,01 from 2 * (address in 07,08,09) */
 			if (data == 0x01)
 			{
-				address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
+				address_space *targetspace = chip->cpu->memory().space(ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
 				targetspace->write_word(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
 			}
 			else if (data == 0x02)
 			{
-				address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
+				address_space *targetspace = chip->cpu->memory().space(ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
 				result = targetspace->read_word(addr);
@@ -295,7 +295,7 @@ static UINT16 memory_mapper_r(struct memory_mapper_chip *chip, offs_t offset, UI
 static void update_memory_mapping(running_machine *machine, struct memory_mapper_chip *chip, int decrypt)
 {
 	int rgnum;
-	address_space *space = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = chip->cpu->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 

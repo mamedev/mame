@@ -144,11 +144,11 @@ WRITE8_HANDLER( ajax_ls138_f10_w )
 				watchdog_reset_w(space, 0, data);
 			else{
 				if (state->firq_enable)	/* Cause interrupt on slave CPU */
-					cpu_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE);
+					device_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE);
 			}
 			break;
 		case 0x01:	/* Cause interrupt on audio CPU */
-			cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+			device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 			break;
 		case 0x02:	/* Sound command number */
 			soundlatch_w(space, offset, data);
@@ -235,5 +235,5 @@ INTERRUPT_GEN( ajax_interrupt )
 	ajax_state *state = device->machine->driver_data<ajax_state>();
 
 	if (k051960_is_irq_enabled(state->k051960))
-		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }

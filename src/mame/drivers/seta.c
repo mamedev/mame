@@ -1333,7 +1333,7 @@ static void uPD71054_update_timer( running_machine *machine, device_t *cpu, int 
 	UINT16 max = uPD71054->max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime::from_hz(cputag_get_clock(machine, "maincpu")) * (16 * max);
+		attotime period = attotime::from_hz(machine->device("maincpu")->unscaled_clock()) * (16 * max);
 		uPD71054->timer[no]->adjust( period, no );
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
@@ -1663,7 +1663,7 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 	{
 		soundlatch_word_w(space, 0, data, mem_mask);
 		cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
+		device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
 	}
 }
 
@@ -3087,14 +3087,14 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(calibr50)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	sub_bankswitch_w(space, 0, 0);
 }
 
 static WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
 	soundlatch2_w(space,0,data);
-	cpu_spinuntil_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
+	device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -6909,8 +6909,8 @@ static INTERRUPT_GEN( seta_interrupt_1_and_2 )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
-		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 0:		device_set_input_line(device, 1, HOLD_LINE);	break;
+		case 1:		device_set_input_line(device, 2, HOLD_LINE);	break;
 	}
 }
 
@@ -6918,8 +6918,8 @@ static INTERRUPT_GEN( seta_interrupt_2_and_4 )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
-		case 1:		cpu_set_input_line(device, 4, HOLD_LINE);	break;
+		case 0:		device_set_input_line(device, 2, HOLD_LINE);	break;
+		case 1:		device_set_input_line(device, 4, HOLD_LINE);	break;
 	}
 }
 
@@ -6930,8 +6930,8 @@ static INTERRUPT_GEN( seta_sub_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	break;
-		case 1:		cpu_set_input_line(device, 0, HOLD_LINE);				break;
+		case 0:		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	break;
+		case 1:		device_set_input_line(device, 0, HOLD_LINE);				break;
 	}
 }
 
@@ -6958,9 +6958,9 @@ static const ym2203_interface tndrcade_ym2203_interface =
 static INTERRUPT_GEN( tndrcade_sub_interrupt )
 {
 	if (cpu_getiloops(device) & 1)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( tndrcade, seta_state )
@@ -7104,8 +7104,8 @@ static INTERRUPT_GEN( calibr50_interrupt )
 		case 0:
 		case 1:
 		case 2:
-		case 3:		cpu_set_input_line(device, 4, HOLD_LINE);	break;
-		case 4:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 3:		device_set_input_line(device, 4, HOLD_LINE);	break;
+		case 4:		device_set_input_line(device, 2, HOLD_LINE);	break;
 	}
 }
 
@@ -7497,8 +7497,8 @@ static INTERRUPT_GEN( setaroul_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 4, HOLD_LINE);	break;
-		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 0:		device_set_input_line(device, 4, HOLD_LINE);	break;
+		case 1:		device_set_input_line(device, 2, HOLD_LINE);	break;
 	}
 }
 
@@ -7618,7 +7618,7 @@ MACHINE_CONFIG_END
 #if __uPD71054_TIMER
 static INTERRUPT_GEN( wrofaero_interrupt )
 {
-	cpu_set_input_line(device, 2, HOLD_LINE );
+	device_set_input_line(device, 2, HOLD_LINE );
 }
 
 static MACHINE_START( wrofaero ) { uPD71054_timer_init(machine); }
@@ -8485,8 +8485,8 @@ static INTERRUPT_GEN( crazyfgt_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
-		default:	cpu_set_input_line(device, 2, HOLD_LINE);	break;	// should this be triggered by the 3812?
+		case 0:		device_set_input_line(device, 1, HOLD_LINE);	break;
+		default:	device_set_input_line(device, 2, HOLD_LINE);	break;	// should this be triggered by the 3812?
 	}
 }
 
@@ -8538,13 +8538,13 @@ static INTERRUPT_GEN( inttoote_interrupt )
 		case 4:
 		case 5:
 		case 6:
-		case 7:		cpu_set_input_line(device, 6, HOLD_LINE);	break;
+		case 7:		device_set_input_line(device, 6, HOLD_LINE);	break;
 
-		case 8:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 8:		device_set_input_line(device, 2, HOLD_LINE);	break;
 
-		case 9:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		case 9:		device_set_input_line(device, 1, HOLD_LINE);	break;
 
-		case 10:	cpu_set_input_line(device, 4, HOLD_LINE);	break;
+		case 10:	device_set_input_line(device, 4, HOLD_LINE);	break;
 	}
 }
 
@@ -10057,10 +10057,10 @@ static WRITE16_HANDLER( twineagl_200100_w )
 static DRIVER_INIT( twineagl )
 {
 	/* debug? */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200100, 0x20010f, 0, 0, twineagl_200100_r, twineagl_200100_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200100, 0x20010f, 0, 0, twineagl_200100_r, twineagl_200100_w);
 }
 
 
@@ -10091,7 +10091,7 @@ static WRITE16_HANDLER( downtown_protection_w )
 
 static DRIVER_INIT( downtown )
 {
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x2001ff, 0, 0, downtown_protection_r, downtown_protection_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200000, 0x2001ff, 0, 0, downtown_protection_r, downtown_protection_w);
 }
 
 
@@ -10111,7 +10111,7 @@ static READ16_HANDLER( arbalest_debug_r )
 
 static DRIVER_INIT( arbalest )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
 }
 
 
@@ -10120,7 +10120,7 @@ static DRIVER_INIT( metafox )
 	UINT16 *RAM = (UINT16 *) machine->region("maincpu")->base();
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0);
+//  memory_nop_readwrite(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -10164,14 +10164,14 @@ static DRIVER_INIT ( blandia )
 
 static DRIVER_INIT( eightfrc )
 {
-	memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0);	// watchdog??
+	memory_nop_read(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0);	// watchdog??
 }
 
 
 static DRIVER_INIT( zombraid )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
 }
 
 
@@ -10189,7 +10189,7 @@ static DRIVER_INIT( kiwame )
 
 static DRIVER_INIT( rezon )
 {
-	memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0);	// irq ack?
+	memory_nop_read(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0);	// irq ack?
 }
 
 static DRIVER_INIT( wiggie )
@@ -10221,9 +10221,9 @@ static DRIVER_INIT( wiggie )
 	}
 
 	/* X1_010 is not used. */
-	memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0);
+	memory_nop_readwrite(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0);
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
 
 }
 

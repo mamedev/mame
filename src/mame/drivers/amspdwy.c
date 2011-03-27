@@ -71,7 +71,7 @@ static WRITE8_HANDLER( amspdwy_sound_w )
 {
 	amspdwy_state *state = space->machine->driver_data<amspdwy_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -242,7 +242,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	amspdwy_state *state = device->machine->driver_data<amspdwy_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface amspdwy_ym2151_interface =

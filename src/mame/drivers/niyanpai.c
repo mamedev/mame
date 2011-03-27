@@ -272,7 +272,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 static MACHINE_RESET( niyanpai )
 {
 	niyanpai_state *state = machine->driver_data<niyanpai_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
@@ -338,7 +338,7 @@ static READ16_HANDLER( musobana_inputport_0_r )
 static CUSTOM_INPUT( musobana_outcoin_flag_r )
 {
 	niyanpai_state *state = field->port->machine->driver_data<niyanpai_state>();
-	address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = field->port->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on
@@ -854,7 +854,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( niyanpai_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 1, HOLD_LINE,0x100/4);
+	device_set_input_line_and_vector(device, 1, HOLD_LINE,0x100/4);
 }
 
 static const z80_daisy_config daisy_chain_sound[] =

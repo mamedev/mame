@@ -690,7 +690,7 @@ static INTERRUPT_GEN( mastboy_interrupt )
 	mastboy_state *state = device->machine->driver_data<mastboy_state>();
 	if ((state->irq0_ack & 1) == 1)
 	{
-		cpu_set_input_line(device, 0, ASSERT_LINE);
+		device_set_input_line(device, 0, ASSERT_LINE);
 	}
 }
 

@@ -362,7 +362,7 @@ static INTERRUPT_GEN( groundfx_interrupt )
 {
 	groundfx_state *state = device->machine->driver_data<groundfx_state>();
 	state->frame_counter^=1;
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( groundfx, groundfx_state )
@@ -464,7 +464,7 @@ static DRIVER_INIT( groundfx )
 	int data;
 
 	/* Speedup handlers */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x20b574, 0x20b577, 0, 0, irq_speedup_r_groundfx);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x20b574, 0x20b577, 0, 0, irq_speedup_r_groundfx);
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;

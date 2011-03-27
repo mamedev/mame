@@ -486,7 +486,7 @@ UINT8 debug_read_byte(address_space *_space, offs_t address, int apply_translati
 		result = 0xff;
 
 	/* if there is a custom read handler, and it returns true, use that value */
-	else if (device_memory(space->cpu)->read(space->spacenum(), address, 1, custom))
+	else if (space->cpu->memory().read(space->spacenum(), address, 1, custom))
 		result = custom;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -539,7 +539,7 @@ UINT16 debug_read_word(address_space *_space, offs_t address, int apply_translat
 			result = 0xffff;
 
 		/* if there is a custom read handler, and it returns true, use that value */
-		else if (device_memory(space->cpu)->read(space->spacenum(), address, 2, custom))
+		else if (space->cpu->memory().read(space->spacenum(), address, 2, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -594,7 +594,7 @@ UINT32 debug_read_dword(address_space *_space, offs_t address, int apply_transla
 			result = 0xffffffff;
 
 		/* if there is a custom read handler, and it returns true, use that value */
-		else if (device_memory(space->cpu)->read(space->spacenum(), address, 4, custom))
+		else if (space->cpu->memory().read(space->spacenum(), address, 4, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -649,7 +649,7 @@ UINT64 debug_read_qword(address_space *_space, offs_t address, int apply_transla
 			result = ~(UINT64)0;
 
 		/* if there is a custom read handler, and it returns true, use that value */
-		else if (device_memory(space->cpu)->read(space->spacenum(), address, 8, custom))
+		else if (space->cpu->memory().read(space->spacenum(), address, 8, custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -704,7 +704,7 @@ void debug_write_byte(address_space *_space, offs_t address, UINT8 data, int app
 		;
 
 	/* if there is a custom write handler, and it returns true, use that */
-	else if (device_memory(space->cpu)->write(space->spacenum(), address, 1, data))
+	else if (space->cpu->memory().write(space->spacenum(), address, 1, data))
 		;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -756,7 +756,7 @@ void debug_write_word(address_space *_space, offs_t address, UINT16 data, int ap
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (device_memory(space->cpu)->write(space->spacenum(), address, 2, data))
+		else if (space->cpu->memory().write(space->spacenum(), address, 2, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -809,7 +809,7 @@ void debug_write_dword(address_space *_space, offs_t address, UINT32 data, int a
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (device_memory(space->cpu)->write(space->spacenum(), address, 4, data))
+		else if (space->cpu->memory().write(space->spacenum(), address, 4, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -862,7 +862,7 @@ void debug_write_qword(address_space *_space, offs_t address, UINT64 data, int a
 			;
 
 		/* if there is a custom write handler, and it returns true, use that */
-		else if (device_memory(space->cpu)->write(space->spacenum(), address, 8, data))
+		else if (space->cpu->memory().write(space->spacenum(), address, 8, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1180,7 +1180,7 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+			space = device->memory().space(ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 			if (space != NULL)
 				result = debug_read_memory(space, space->address_to_byte(address), size, true);
 			break;
@@ -1193,7 +1193,7 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+			space = device->memory().space(ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 			if (space != NULL)
 				result = debug_read_memory(space, space->address_to_byte(address), size, false);
 			break;
@@ -1204,7 +1204,7 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			result = expression_read_program_direct(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
+			result = expression_read_program_direct(device->memory().space(ADDRESS_SPACE_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size);
 			break;
 
 		case EXPSPACE_REGION:
@@ -1348,7 +1348,7 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
+			space = device->memory().space(ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 			if (space != NULL)
 				debug_write_memory(space, space->address_to_byte(address), data, size, true);
 			break;
@@ -1361,7 +1361,7 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
+			space = device->memory().space(ADDRESS_SPACE_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 			if (space != NULL)
 				debug_write_memory(space, space->address_to_byte(address), data, size, false);
 			break;
@@ -1372,7 +1372,7 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 				device = expression_get_device(machine, name);
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			expression_write_program_direct(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
+			expression_write_program_direct(device->memory().space(ADDRESS_SPACE_PROGRAM), (spacenum == EXPSPACE_OPCODE), address, size, data);
 			break;
 
 		case EXPSPACE_REGION:
@@ -1531,7 +1531,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)) == NULL)
+			if (device->memory().space(ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)) == NULL)
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
@@ -1547,7 +1547,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)) == NULL)
+			if (device->memory().space(ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)) == NULL)
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
@@ -1561,7 +1561,7 @@ static expression_error::error_code expression_validate(void *param, const char 
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
-			if (cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM) == NULL)
+			if (device->memory().space(ADDRESS_SPACE_PROGRAM) == NULL)
 				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 

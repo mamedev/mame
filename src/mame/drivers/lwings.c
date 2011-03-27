@@ -90,8 +90,8 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 
 static INTERRUPT_GEN( lwings_interrupt )
 {
-	if (interrupt_enable_r(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0))
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7); /* RST 10h */
+	if (interrupt_enable_r(device->memory().space(ADDRESS_SPACE_PROGRAM), 0))
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
 

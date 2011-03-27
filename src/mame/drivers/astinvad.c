@@ -206,7 +206,7 @@ static SCREEN_UPDATE( spaceint )
 static TIMER_CALLBACK( kamikaze_int_off )
 {
 	astinvad_state *state = machine->driver_data<astinvad_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -214,7 +214,7 @@ static TIMER_CALLBACK( kamizake_int_gen )
 {
 	astinvad_state *state = machine->driver_data<astinvad_state>();
 	/* interrupts are asserted on every state change of the 128V line */
-	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 	param ^= 128;
 	state->int_timer->adjust(machine->primary_screen->time_until_pos(param), param);
 
@@ -277,7 +277,7 @@ static INPUT_CHANGED( spaceint_coin_inserted )
 {
 	astinvad_state *state = field->port->machine->driver_data<astinvad_state>();
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

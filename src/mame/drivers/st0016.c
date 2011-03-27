@@ -413,10 +413,10 @@ GFXDECODE_END
 static INTERRUPT_GEN(st0016_int)
 {
 	if(!cpu_getiloops(device))
-		cpu_set_input_line(device,0,HOLD_LINE);
+		device_set_input_line(device,0,HOLD_LINE);
 	else
 		if(cpu_get_reg(device, Z80_IFF1)) /* dirty hack ... */
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE );
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static const st0016_interface st0016_config =

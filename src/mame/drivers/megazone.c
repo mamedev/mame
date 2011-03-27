@@ -59,7 +59,7 @@ static WRITE8_DEVICE_HANDLER( megazone_port_b_w )
 static WRITE8_HANDLER( megazone_i8039_irq_w )
 {
 	megazone_state *state = space->machine->driver_data<megazone_state>();
-	cpu_set_input_line(state->daccpu, 0, ASSERT_LINE);
+	device_set_input_line(state->daccpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 	megazone_state *state = space->machine->driver_data<megazone_state>();
 
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(state->daccpu, 0, CLEAR_LINE);
+		device_set_input_line(state->daccpu, 0, CLEAR_LINE);
 	state->i8039_status = (data & 0x70) >> 4;
 }
 

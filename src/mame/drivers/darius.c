@@ -145,7 +145,7 @@ static void parse_control( running_machine *machine )	/* assumes Z80 sandwiched 
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	darius_state *state = machine->driver_data<darius_state>();
-	cpu_set_input_line(state->cpub, INPUT_LINE_RESET, (state->cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->cpub, INPUT_LINE_RESET, (state->cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( cpua_ctrl_w )
@@ -518,7 +518,7 @@ static void darius_adpcm_int( device_t *device )
 	darius_state *state = device->machine->driver_data<darius_state>();
 
 	if (state->nmi_enable)
-		cpu_set_input_line(state->adpcm, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->adpcm, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -801,7 +801,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )	/* assumes Z80 sandwiched between 68Ks */
 {
 	darius_state *state = device->machine->driver_data<darius_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_interface_1 =

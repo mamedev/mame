@@ -99,7 +99,7 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	lkage_state *state = machine->driver_data<lkage_state>();
 	if (state->sound_nmi_enable)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->pending_nmi = 1;
 }
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 	if (state->pending_nmi)
 	{
 		/* probably wrong but commands may go lost otherwise */
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		state->pending_nmi = 0;
 	}
 }
@@ -481,7 +481,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	lkage_state *state = device->machine->driver_data<lkage_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -977,9 +977,9 @@ static DRIVER_INIT( lkage )
 static DRIVER_INIT( lkageb )
 {
 	lkage_state *state = machine->driver_data<lkage_state>();
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf087, 0xf087, 0, 0, fake_status_r);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf087, 0xf087, 0, 0, fake_status_r);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
 	state->sprite_dx=0;
 }
 

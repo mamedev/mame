@@ -217,7 +217,7 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 		state->latch1_full = 1;
 		soundlatch_w(space, 0, data & 0xff);
 		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(100));	// Allow the other cpu to reply
+		device_spin_until_time(space->cpu, attotime::from_usec(100));	// Allow the other cpu to reply
 	}
 }
 

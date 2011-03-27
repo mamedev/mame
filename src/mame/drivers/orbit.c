@@ -36,20 +36,20 @@ static TIMER_DEVICE_CALLBACK( nmi_32v )
 	orbit_state *state = timer.machine->driver_data<orbit_state>();
 	int scanline = param;
 	int nmistate = (scanline & 32) && (state->misc_flags & 4);
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( irq_off )
 {
 	orbit_state *state = machine->driver_data<orbit_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( orbit_interrupt )
 {
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_vblank_end(), FUNC(irq_off));
 }
 

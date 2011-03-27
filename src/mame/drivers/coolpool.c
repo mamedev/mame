@@ -213,8 +213,8 @@ static TIMER_DEVICE_CALLBACK( amerdart_audio_int_gen )
 {
 	coolpool_state *state = timer.machine->driver_data<coolpool_state>();
 
-	cpu_set_input_line(state->dsp, 0, ASSERT_LINE);
-	cpu_set_input_line(state->dsp, 0, CLEAR_LINE);
+	device_set_input_line(state->dsp, 0, ASSERT_LINE);
+	device_set_input_line(state->dsp, 0, CLEAR_LINE);
 }
 
 
@@ -243,7 +243,7 @@ static READ16_HANDLER( amerdart_dsp_bio_line_r )
 	if (state->same_cmd_count >= 5)
 	{
 		state->same_cmd_count = 5;
-		cpu_spin(space->cpu);
+		device_spin(space->cpu);
 	}
 	state->old_cmd = state->cmd_pending;
 
@@ -1200,7 +1200,7 @@ static DRIVER_INIT( amerdart )
 
 static DRIVER_INIT( coolpool )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "dsp", ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, coolpool_input_r);
+	memory_install_read16_handler(machine->device("dsp")->memory().space(ADDRESS_SPACE_IO), 0x07, 0x07, 0, 0, coolpool_input_r);
 
 	register_state_save(machine);
 }

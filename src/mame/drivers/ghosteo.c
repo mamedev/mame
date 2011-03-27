@@ -422,12 +422,12 @@ static READ32_HANDLER( bballoon_speedup_r )
 	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)
 	{
 		// BnB Arcade
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+		device_spin_until_time(space->cpu, attotime::from_usec(20));
 	}
 	else if (pc == 0x3002b580 || pc == 0x3002b550)
 	{
 		// Happy Tour
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+		device_spin_until_time(space->cpu, attotime::from_usec(20));
 	}
 	//else
 	//  printf("speedup %08x %08x\n", pc, ret);
@@ -437,7 +437,7 @@ static READ32_HANDLER( bballoon_speedup_r )
 
 static MACHINE_RESET( bballoon )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4d000010, 0x4d000013, 0, 0, bballoon_speedup_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4d000010, 0x4d000013, 0, 0, bballoon_speedup_r);
 	s3c2410 = machine->device("s3c2410");
 }
 

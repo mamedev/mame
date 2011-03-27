@@ -115,7 +115,7 @@ static INTERRUPT_GEN( yiear_nmi_interrupt )
 
 	/* can't use nmi_line_pulse() because interrupt_enable_w() effects it */
 	if (state->yiear_nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

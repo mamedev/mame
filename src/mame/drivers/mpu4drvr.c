@@ -2828,7 +2828,7 @@ static DRIVER_INIT (crmaze3a)
 static DRIVER_INIT (mating)
 {
 	mpu4_state *state = machine->driver_data<mpu4_state>();
-	address_space *space = cputag_get_address_space(machine, "video", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("video")->memory().space(ADDRESS_SPACE_PROGRAM);
 	device_t *device = machine->device("oki");
 
 	/* The Mating Game has an extra 256kB RAM on the program card */

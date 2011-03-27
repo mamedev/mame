@@ -160,18 +160,18 @@ public:
 static void IntReq( running_machine *machine, int num )
 {
 	crystal_state *state = machine->driver_data<crystal_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT32 IntEn = space->read_dword(0x01800c08);
 	UINT32 IntPend = space->read_dword(0x01800c0c);
 	if (IntEn & (1 << num))
 	{
 		IntPend |= (1 << num);
 		space->write_dword(0x01800c0c, IntPend);
-		cpu_set_input_line(state->maincpu, SE3208_INT, ASSERT_LINE);
+		device_set_input_line(state->maincpu, SE3208_INT, ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
 	state->FlipCntRead = 0;
-	cpu_resume(state->maincpu, SUSPEND_REASON_SPIN);
+	device_resume(state->maincpu, SUSPEND_REASON_SPIN);
 #endif
 }
 
@@ -183,7 +183,7 @@ static READ32_HANDLER( FlipCount_r )
 	UINT32 IntPend = space->read_dword(0x01800c0c);
 	state->FlipCntRead++;
 	if (state->FlipCntRead >= 16 && !IntPend && state->FlipCount != 0)
-		cpu_suspend(state->maincpu, SUSPEND_REASON_SPIN, 1);
+		device_suspend(state->maincpu, SUSPEND_REASON_SPIN, 1);
 #endif
 	return ((UINT32) state->FlipCount) << 16;
 }
@@ -233,7 +233,7 @@ static WRITE32_HANDLER( IntAck_w )
 		IntPend &= ~(1 << (data & 0x1f));
 		space->write_dword(0x01800c0c, IntPend);
 		if (!IntPend)
-			cpu_set_input_line(state->maincpu, SE3208_INT, CLEAR_LINE);
+			device_set_input_line(state->maincpu, SE3208_INT, CLEAR_LINE);
 	}
 	if (mem_mask & 0xff00)
 		state->IntHigh = (data >> 8) & 7;
@@ -242,7 +242,7 @@ static WRITE32_HANDLER( IntAck_w )
 static IRQ_CALLBACK( icallback )
 {
 	crystal_state *state = device->machine->driver_data<crystal_state>();
-	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT32 IntPend = space->read_dword(0x01800c0c);
 	int i;
 
@@ -567,7 +567,7 @@ static MACHINE_START( crystal )
 	state->ds1302 = machine->device("rtc");
 	state->vr0video = machine->device("vr0");
 
-	cpu_set_irq_callback(machine->device("maincpu"), icallback);
+	device_set_irq_callback(machine->device("maincpu"), icallback);
 	for (i = 0; i < 4; i++)
 		state->Timer[i] = machine->scheduler().timer_alloc(FUNC(Timercb), (void*)(FPTR)i);
 
@@ -597,7 +597,7 @@ static MACHINE_RESET( crystal )
 	memset(state->vidregs, 0, 0x10000);
 	state->FlipCount = 0;
 	state->IntHigh = 0;
-	cpu_set_irq_callback(machine->device("maincpu"), icallback);
+	device_set_irq_callback(machine->device("maincpu"), icallback);
 	state->Bank = 0;
 	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0);
 	state->FlashCmd = 0xff;
@@ -634,7 +634,7 @@ static void SetVidReg( address_space *space, UINT16 reg, UINT16 val )
 static SCREEN_UPDATE( crystal )
 {
 	crystal_state *state = screen->machine->driver_data<crystal_state>();
-	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int DoFlip;
 
 	UINT32 B0 = 0x0;
@@ -695,7 +695,7 @@ static SCREEN_UPDATE( crystal )
 static SCREEN_EOF(crystal)
 {
 	crystal_state *state = machine->driver_data<crystal_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT16 head, tail;
 	int DoFlip = 0;
 

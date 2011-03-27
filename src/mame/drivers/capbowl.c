@@ -108,7 +108,7 @@
 static INTERRUPT_GEN( capbowl_interrupt )
 {
 	if (input_port_read(device->machine, "SERVICE") & 1)						/* get status of the F2 key */
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* trigger self test */
 }
 
 
@@ -186,7 +186,7 @@ static WRITE8_HANDLER( track_reset_w )
 static WRITE8_HANDLER( capbowl_sndcmd_w )
 {
 	capbowl_state *state = space->machine->driver_data<capbowl_state>();
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 	soundlatch_w(space, offset, data);
 }
 
@@ -202,7 +202,7 @@ static WRITE8_HANDLER( capbowl_sndcmd_w )
 static void firqhandler( device_t *device, int irq )
 {
 	capbowl_state *state = device->machine->driver_data<capbowl_state>();
-	cpu_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -646,7 +646,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 	if (state->scanline1 == state->scancount || (state->scanline1 < state->scancount && !state->scancalls))
 	{
 		state->cps_b_regs[0x10/2] = 0;
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 		cps2_set_sprite_priorities(device->machine);
 		device->machine->primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		state->scancalls++;
@@ -657,7 +657,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 	if(state->scanline2 == state->scancount || (state->scanline2 < state->scancount && !state->scancalls))
 	{
 		state->cps_b_regs[0x12 / 2] = 0;
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 		cps2_set_sprite_priorities(device->machine);
 		device->machine->primary_screen->update_partial(16 - 10 + state->scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		state->scancalls++;
@@ -668,7 +668,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 	{
 		state->cps_b_regs[0x10 / 2] = state->scanline1;
 		state->cps_b_regs[0x12 / 2] = state->scanline2;
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 		if(state->scancalls)
 		{
 			cps2_set_sprite_priorities(device->machine);
@@ -727,7 +727,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 
 	        /* Z80 Reset */
 		if (state->audiocpu != NULL)
-			cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+			device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 		coin_counter_w(space->machine, 0, data & 0x0001);
 		if ((strncmp(space->machine->gamedrv->name, "pzloop2", 8) == 0) ||
@@ -8012,7 +8012,7 @@ static DRIVER_INIT ( pzloop2 )
 
 	state->save_item(NAME(state->readpaddle));
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x804000, 0x804001, 0, 0, joy_or_paddle_r);
 }
 
 static READ16_HANDLER( gigamn2_dummyqsound_r )
@@ -8030,7 +8030,7 @@ static WRITE16_HANDLER( gigamn2_dummyqsound_w )
 static DRIVER_INIT( gigamn2 )
 {
 	cps_state *state = machine->driver_data<cps_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	int length = machine->region("maincpu")->bytes();
 
@@ -8039,7 +8039,7 @@ static DRIVER_INIT( gigamn2 )
 	state->gigamn2_dummyqsound_ram = auto_alloc_array(machine, UINT16, 0x20000 / 2);
 	state->save_pointer(NAME(state->gigamn2_dummyqsound_ram), 0x20000 / 2);
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
 	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
 }

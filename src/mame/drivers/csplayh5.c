@@ -587,7 +587,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 static MACHINE_RESET( csplayh5 )
 {
 	csplayh5_state *state = machine->driver_data<csplayh5_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
@@ -607,7 +607,7 @@ static INTERRUPT_GEN( scanline_irq )
 
 static INTERRUPT_GEN( csplayh5_irq )
 {
-	cpu_set_input_line_and_vector(device, 1, HOLD_LINE,0x100/4);
+	device_set_input_line_and_vector(device, 1, HOLD_LINE,0x100/4);
 }
 
 static const z80_daisy_config daisy_chain_sound[] =

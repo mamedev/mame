@@ -3256,7 +3256,7 @@ static INTERRUPT_GEN( suzume_irq )
 {
 	royalmah_state *state = device->machine->driver_data<royalmah_state>();
 	if ( state->suzume_bank & 0x40 )
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_DERIVED( suzume, dondenmj )
@@ -3300,9 +3300,9 @@ static INTERRUPT_GEN( janptr96_interrupt )
 {
 	switch(cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x80);	break;	// vblank
-		case 1:		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x82);	break;	// rtc
-		default:	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x84);			// demo
+		case 0:		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x80);	break;	// vblank
+		case 1:		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x82);	break;	// rtc
+		default:	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x84);			// demo
 	}
 }
 
@@ -3346,8 +3346,8 @@ static INTERRUPT_GEN( mjtensin_interrupt )
 {
 	switch(cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;	// vblank
-		case 1:		cpu_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;	// rtc
+		case 0:		device_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;	// vblank
+		case 1:		device_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;	// rtc
 	}
 }
 

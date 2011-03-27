@@ -174,25 +174,25 @@ static WRITE16_HANDLER( ddragon3_io_w )
 
 		case 1: /* soundlatch_w */
 			soundlatch_w(space, 1, state->io_reg[1] & 0xff);
-			cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+			device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
 			/*  this gets written to on startup and at the end of IRQ6
             **  possibly trigger IRQ on sound CPU
             */
-			cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
+			device_set_input_line(state->maincpu, 6, CLEAR_LINE);
 			break;
 
 		case 3:
 			/*  this gets written to on startup,
             **  and at the end of IRQ5 (input port read) */
-			cpu_set_input_line(state->maincpu, 5, CLEAR_LINE);
+			device_set_input_line(state->maincpu, 5, CLEAR_LINE);
 			break;
 
 		case 4:
 			/* this gets written to at the end of IRQ6 only */
-			cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
+			device_set_input_line(state->maincpu, 6, CLEAR_LINE);
 			break;
 
 		default:
@@ -517,7 +517,7 @@ GFXDECODE_END
 static void dd3_ymirq_handler(device_t *device, int irq)
 {
 	ddragon3_state *state = device->machine->driver_data<ddragon3_state>();
-	cpu_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line(state->audiocpu, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -541,14 +541,14 @@ static TIMER_DEVICE_CALLBACK( ddragon3_scanline )
 	{
 		if (scanline > 0)
 			timer.machine->primary_screen->update_partial(scanline - 1);
-		cpu_set_input_line(state->maincpu, 5, ASSERT_LINE);
+		device_set_input_line(state->maincpu, 5, ASSERT_LINE);
 	}
 
 	/* Vblank is raised on scanline 248 */
 	if (scanline == 248)
 	{
 		timer.machine->primary_screen->update_partial(scanline - 1);
-		cpu_set_input_line(state->maincpu, 6, ASSERT_LINE);
+		device_set_input_line(state->maincpu, 6, ASSERT_LINE);
 	}
 }
 

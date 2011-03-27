@@ -491,9 +491,9 @@ static MACHINE_RESET( bmcbowl )
 static INTERRUPT_GEN( bmc_interrupt )
 {
 	if (cpu_getiloops(device))
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )

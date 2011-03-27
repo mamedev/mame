@@ -553,7 +553,7 @@ SCREEN_EOF( twin16 )
 		memcpy(state->sprite_buffer,&machine->generic.spriteram.u16[0x1800],0x800*sizeof(UINT16));
 	}
 	else {
-		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 		buffer_spriteram16_w(space,0,0,0xffff);
 	}
 }

@@ -138,11 +138,11 @@ void asic65_config(running_machine *machine, int asictype)
 
 void asic65_reset(running_machine *machine, int state)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* rom-based means reset and clear states */
 	if (asic65.cpu != NULL)
-		cpu_set_input_line(asic65.cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(asic65.cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* otherwise, do it manually */
 	else
@@ -179,7 +179,7 @@ static TIMER_CALLBACK( m68k_asic65_deferred_w )
 	asic65.cmd = param >> 16;
 	asic65.tdata = param;
 	if (asic65.cpu != NULL)
-		cpu_set_input_line(asic65.cpu, 0, ASSERT_LINE);
+		device_set_input_line(asic65.cpu, 0, ASSERT_LINE);
 }
 
 
@@ -477,7 +477,7 @@ static READ16_HANDLER( asic65_68k_r )
 {
 	asic65.tfull = 0;
 	if (asic65.cpu != NULL)
-		cpu_set_input_line(asic65.cpu, 0, CLEAR_LINE);
+		device_set_input_line(asic65.cpu, 0, CLEAR_LINE);
 	return asic65.tdata;
 }
 
@@ -501,7 +501,7 @@ static READ16_HANDLER( asic65_stat_r )
 static READ16_HANDLER( asci65_get_bio )
 {
 	if (!asic65.tfull)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 	return asic65.tfull ? CLEAR_LINE : ASSERT_LINE;
 }
 

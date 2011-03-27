@@ -496,7 +496,7 @@ void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int ch
 		slapstic_init(device->machine, chipnum);
 
 		/* install the memory handlers */
-		state->slapstic = memory_install_readwrite16_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
+		state->slapstic = memory_install_readwrite16_handler(device->memory().space(ADDRESS_SPACE_PROGRAM), base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
 
 		/* allocate memory for a copy of bank 0 */
 		state->slapstic_bank0 = auto_alloc_array(device->machine, UINT8, 0x2000);
@@ -732,7 +732,7 @@ READ8_HANDLER( atarigen_6502_sound_r )
 {
 	atarigen_state *state = space->machine->driver_data<atarigen_state>();
 	state->cpu_to_sound_ready = 0;
-	cpu_set_input_line(state->sound_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->sound_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return state->cpu_to_sound;
 }
 
@@ -748,9 +748,9 @@ static void update_6502_irq(running_machine *machine)
 {
 	atarigen_state *state = machine->driver_data<atarigen_state>();
 	if (state->timed_int || state->ym2151_int)
-		cpu_set_input_line(state->sound_cpu, M6502_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->sound_cpu, M6502_IRQ_LINE, ASSERT_LINE);
 	else
-		cpu_set_input_line(state->sound_cpu, M6502_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->sound_cpu, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -762,13 +762,13 @@ static void update_6502_irq(running_machine *machine)
 static TIMER_CALLBACK( delayed_sound_reset )
 {
 	atarigen_state *state = machine->driver_data<atarigen_state>();
-	address_space *space = cpu_get_address_space(state->sound_cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->sound_cpu->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
 	{
-		cpu_set_input_line(state->sound_cpu, INPUT_LINE_HALT, CLEAR_LINE);
-		cpu_set_input_line(state->sound_cpu, INPUT_LINE_RESET, PULSE_LINE);
+		device_set_input_line(state->sound_cpu, INPUT_LINE_HALT, CLEAR_LINE);
+		device_set_input_line(state->sound_cpu, INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* reset the sound write state */
@@ -797,7 +797,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	/* set up the states and signal an NMI to the sound CPU */
 	state->cpu_to_sound = param;
 	state->cpu_to_sound_ready = 1;
-	cpu_set_input_line(state->sound_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->sound_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
@@ -1123,7 +1123,7 @@ static void atarivc_common_w(screen_device &screen, offs_t offset, UINT16 newwor
 		/* scanline IRQ ack here */
 		case 0x1e:
 			/* hack: this should be a device */
-			atarigen_scanline_int_ack_w(cputag_get_address_space(screen.machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
+			atarigen_scanline_int_ack_w(screen.machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
 			break;
 
 		/* log anything else */
@@ -1383,7 +1383,7 @@ void atarigen_halt_until_hblank_0(screen_device &screen)
 
 	/* halt and set a timer to wake up */
 	screen.machine->scheduler().timer_set(screen.scan_period() * (hblank - hpos) / width, FUNC(unhalt_cpu), 0, (void *)cpu);
-	cpu_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
+	device_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -1472,7 +1472,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 static TIMER_CALLBACK( unhalt_cpu )
 {
 	device_t *cpu = (device_t *)ptr;
-	cpu_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
+	device_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 

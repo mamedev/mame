@@ -154,7 +154,7 @@ void fd1094_machine_init(device_t *device)
 
 	m68k_set_cmpild_callback(device, fd1094_cmp_callback);
 	m68k_set_rte_callback(device, fd1094_rte_callback);
-	cpu_set_irq_callback(device, fd1094_int_callback);
+	device_set_irq_callback(device, fd1094_int_callback);
 
 	device->reset();
 }

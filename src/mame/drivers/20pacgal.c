@@ -82,7 +82,7 @@ static WRITE8_HANDLER( irqack_w )
 	cpu_interrupt_enable(state->maincpu, bit);
 
 	if (!bit)
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( timer_pulse_w )

@@ -753,7 +753,7 @@ void mips3com_get_info(mips3_state *mips, UINT32 state, cpuinfo *info)
 static TIMER_CALLBACK( compare_int_callback )
 {
 	legacy_cpu_device *device = (legacy_cpu_device *)ptr;
-	cpu_set_input_line(device, MIPS3_IRQ5, ASSERT_LINE);
+	device_set_input_line(device, MIPS3_IRQ5, ASSERT_LINE);
 }
 
 

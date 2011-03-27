@@ -394,7 +394,7 @@ static MACHINE_RESET( mschamp )
 
 static WRITE8_HANDLER( pacman_interrupt_vector_w )
 {
-	cpu_set_input_line_vector(space->machine->device("maincpu"), 0, data);
+	device_set_input_line_vector(space->machine->device("maincpu"), 0, data);
 	cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 }
 
@@ -476,7 +476,7 @@ static WRITE8_HANDLER( piranha_interrupt_vector_w)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	cpu_set_input_line_vector(space->machine->device("maincpu"), 0, data );
+	device_set_input_line_vector(space->machine->device("maincpu"), 0, data );
 }
 
 
@@ -485,7 +485,7 @@ static WRITE8_HANDLER( nmouse_interrupt_vector_w)
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	cpu_set_input_line_vector(space->machine->device("maincpu"), 0, data );
+	device_set_input_line_vector(space->machine->device("maincpu"), 0, data );
 }
 
 
@@ -688,7 +688,7 @@ static READ8_HANDLER( bigbucks_question_r )
 
 static INTERRUPT_GEN( s2650_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
 static WRITE8_HANDLER( porky_banking_w )
@@ -5308,7 +5308,7 @@ ROM_END
 
 static void maketrax_rom_decode(running_machine *machine)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine->region("maincpu")->base();
 
@@ -5332,15 +5332,15 @@ static void maketrax_rom_decode(running_machine *machine)
 static DRIVER_INIT( maketrax )
 {
 	/* set up protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5080, 0x50bf, 0, 0, maketrax_special_port2_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x50c0, 0x50ff, 0, 0, maketrax_special_port3_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5080, 0x50bf, 0, 0, maketrax_special_port2_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x50c0, 0x50ff, 0, 0, maketrax_special_port3_r);
 
 	maketrax_rom_decode(machine);
 }
 
 static void korosuke_rom_decode(running_machine *machine)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine->region("maincpu")->base();
 
@@ -5364,8 +5364,8 @@ static void korosuke_rom_decode(running_machine *machine)
 static DRIVER_INIT( korosuke )
 {
 	/* set up protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5080, 0x5080, 0, 0, korosuke_special_port2_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x50c0, 0x50ff, 0, 0, korosuke_special_port3_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5080, 0x5080, 0, 0, korosuke_special_port2_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x50c0, 0x50ff, 0, 0, korosuke_special_port3_r);
 
 	korosuke_rom_decode(machine);
 }
@@ -5707,10 +5707,10 @@ static READ8_HANDLER( cannonbp_protection_r )
 static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, NULL);
+	memory_install_ram(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, NULL);
 
 	/* protection? */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);
 }
 
 

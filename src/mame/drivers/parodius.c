@@ -23,7 +23,7 @@ static INTERRUPT_GEN( parodius_interrupt )
 {
 	parodius_state *state = device->machine->driver_data<parodius_state>();
 	if (k052109_is_irq_enabled(state->k052109))
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
@@ -114,7 +114,7 @@ static READ8_DEVICE_HANDLER( parodius_sound_r )
 static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
 {
 	parodius_state *state = space->machine->driver_data<parodius_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 #if 0
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
 static void sound_nmi_callback( running_machine *machine, int param )
 {
 	parodius_state *state = machine->driver_data<parodius_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ( state->nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ( state->nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	nmi_enabled = 0;
 }
@@ -131,14 +131,14 @@ static void sound_nmi_callback( running_machine *machine, int param )
 static TIMER_CALLBACK( nmi_callback )
 {
 	parodius_state *state = machine->driver_data<parodius_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	parodius_state *state = space->machine->driver_data<parodius_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	space->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 

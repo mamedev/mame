@@ -1561,7 +1561,7 @@ static void cp1610_xori(cp1610_state *cpustate, int d)
 static CPU_RESET( cp1610 )
 {
 	/* This is how we set the reset vector */
-	cpu_set_input_line(device, CP1610_RESET, PULSE_LINE);
+	device_set_input_line(device, CP1610_RESET, PULSE_LINE);
 }
 
 /***************************************************

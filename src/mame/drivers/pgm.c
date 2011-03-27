@@ -391,7 +391,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 
 	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
 	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
-	cpu_spinuntil_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	device_spin_until_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static READ16_HANDLER( arm7_ram_r )
@@ -439,8 +439,8 @@ static WRITE16_HANDLER ( z80_reset_w )
 	if (data == 0x5050)
 	{
 		state->ics->reset();
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_HALT, CLEAR_LINE);
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, PULSE_LINE);
+		device_set_input_line(state->soundcpu, INPUT_LINE_HALT, CLEAR_LINE);
+		device_set_input_line(state->soundcpu, INPUT_LINE_RESET, PULSE_LINE);
 		if(0)
 		{
 			FILE *out;
@@ -453,7 +453,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 	{
 		/* this might not be 100% correct, but several of the games (ddp2, puzzli2 etc. expect the z80 to be turned
            off during data uploads, they write here before the upload */
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_HALT, ASSERT_LINE);
+		device_set_input_line(state->soundcpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -472,7 +472,7 @@ static WRITE16_HANDLER ( m68k_l1_w )
 		if (PGMLOGERROR)
 			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(space->cpu));
 		soundlatch_w(space, 0, data);
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE );
+		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
 
@@ -486,7 +486,7 @@ static WRITE8_HANDLER( z80_l3_w )
 static void sound_irq( device_t *device, int level )
 {
 	pgm_state *state = device->machine->driver_data<pgm_state>();
-	cpu_set_input_line(state->soundcpu, 0, level);
+	device_set_input_line(state->soundcpu, 0, level);
 }
 
 /*static const ics2115_interface pgm_ics2115_interface =
@@ -931,7 +931,7 @@ static WRITE16_HANDLER( svg_68k_nmi_w )
 	pgm_state *state = space->machine->driver_data<pgm_state>();
 	generic_pulse_irq_line(state->prot, ARM7_FIRQ_LINE);
 	space->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
-	cpu_spinuntil_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	device_spin_until_time(space->cpu, state->prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static WRITE16_HANDLER( svg_latch_68k_w )
@@ -1335,10 +1335,10 @@ static INTERRUPT_GEN( drgw_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		//printf("vbl\n");
-		cpu_set_input_line(device, 6, HOLD_LINE);
+		device_set_input_line(device, 6, HOLD_LINE);
 	}
 	else
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_START( pgm )
@@ -4443,8 +4443,8 @@ static DRIVER_INIT( orlegend )
 	pgm_state *state = machine->driver_data<pgm_state>();
 	pgm_basic_init(machine);
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r, pgm_asic3_w);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xC0400e, 0xC0400f, 0, 0, pgm_asic3_r, pgm_asic3_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xC04000, 0xC04001, 0, 0, pgm_asic3_reg_w);
 
 	state->asic3_reg = 0;
 	state->asic3_latch[0] = 0;
@@ -4477,7 +4477,7 @@ static void drgwld2_common_init(running_machine *machine)
     select and after failing in the 2nd stage (probably there are other checks
     out there).
     */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd80000, 0xd80003, 0, 0, dw2_d80000_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd80000, 0xd80003, 0, 0, dw2_d80000_r);
 }
 
 static DRIVER_INIT( drgw2 )
@@ -4710,8 +4710,8 @@ static DRIVER_INIT( ddp2 )
 
 	// should actually be kov2-like, but keep this simulation for now just to demonstrate it.  It will need the internal ARM rom to work properly.
 	ddp2_protram = auto_alloc_array(machine, UINT16, 0x10000);
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd00000, 0xd0ffff, 0, 0, ddp2_protram_r, ddp2_protram_w);
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd10000, 0xd10001, 0, 0, ddp2_asic27_0xd10000_r, ddp2_asic27_0xd10000_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd00000, 0xd0ffff, 0, 0, ddp2_protram_r, ddp2_protram_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd10000, 0xd10001, 0, 0, ddp2_asic27_0xd10000_r, ddp2_asic27_0xd10000_w);
 
 }
 
@@ -5112,7 +5112,7 @@ static DRIVER_INIT( killbld )
 	pgm_basic_init(machine);
 	pgm_killbld_decrypt(machine);
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_igs025_prot_r, killbld_igs025_prot_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd40000, 0xd40003, 0, 0, killbld_igs025_prot_r, killbld_igs025_prot_w);
 
 	state->kb_cmd = 0;
 	state->kb_reg = 0;
@@ -5278,7 +5278,7 @@ static DRIVER_INIT( drgw3 )
         }
     }
 */
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xDA5610, 0xDA5613, 0, 0, drgw3_igs025_prot_r, drgw3_igs025_prot_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xDA5610, 0xDA5613, 0, 0, drgw3_igs025_prot_r, drgw3_igs025_prot_w);
 
 	pgm_dw3_decrypt(machine);
 }
@@ -5295,11 +5295,11 @@ static DRIVER_INIT( puzzli2 )
 	pgm_basic_init(machine);
 	kovsh_latch_init(machine);
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500000, 0x500003, 0, 0, asic28_r, asic28_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x500000, 0x500003, 0, 0, asic28_r, asic28_w);
 
 	/* 0x4f0000 - ? is actually ram shared with the protection device,
       the protection device provides the region code */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4f0000, 0x4fffff, 0, 0, sango_protram_r);
 
 	pgm_puzzli2_decrypt(machine);
 
@@ -5531,8 +5531,8 @@ static DRIVER_INIT( olds )
 	pgm_state *state = machine->driver_data<pgm_state>();
 	pgm_basic_init(machine);
 
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdcb400, 0xdcb403, 0, 0, olds_r, olds_w);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8178f4, 0x8178f5, 0, 0, olds_prot_swap_r);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xdcb400, 0xdcb403, 0, 0, olds_r, olds_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8178f4, 0x8178f5, 0, 0, olds_prot_swap_r);
 
 	state->kb_cmd = 0;
 	state->kb_reg = 0;
@@ -5796,17 +5796,17 @@ static READ16_HANDLER( ddp3_asic_r )
 
 void install_asic27a_ddp3(running_machine* machine)
 {
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500000, 0x500005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x500000, 0x500005, 0, 0, ddp3_asic_r, ddp3_asic_w);
 }
 
 void install_asic27a_ket(running_machine* machine)
 {
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
 }
 
 void install_asic27a_espgal(running_machine* machine)
 {
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
 }
 
 

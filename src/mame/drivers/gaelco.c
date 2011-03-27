@@ -28,7 +28,7 @@ static WRITE16_HANDLER( bigkarnk_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 

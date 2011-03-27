@@ -72,7 +72,7 @@ static VIDEO_START( acefruit )
 static INTERRUPT_GEN( acefruit_vblank )
 {
 	acefruit_state *state = device->machine->driver_data<acefruit_state>();
-	cpu_set_input_line(device, 0, HOLD_LINE );
+	device_set_input_line(device, 0, HOLD_LINE );
 	state->refresh_timer->adjust( attotime::zero );
 }
 

@@ -106,7 +106,7 @@ static INTERRUPT_GEN( jb_interrupt )
 	jailbrek_state *state = device->machine->driver_data<jailbrek_state>();
 
 	if (state->irq_enable)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( jb_interrupt_nmi )
@@ -114,7 +114,7 @@ static INTERRUPT_GEN( jb_interrupt_nmi )
 	jailbrek_state *state = device->machine->driver_data<jailbrek_state>();
 
 	if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

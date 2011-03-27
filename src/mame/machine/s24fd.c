@@ -132,7 +132,7 @@ void s24_fd1094_machine_init(running_machine *machine)
 
 	m68k_set_cmpild_callback(machine->device("sub"), s24_fd1094_cmp_callback);
 	m68k_set_rte_callback(machine->device("sub"), s24_fd1094_rte_callback);
-	cpu_set_irq_callback(machine->device("sub"), s24_fd1094_int_callback);
+	device_set_irq_callback(machine->device("sub"), s24_fd1094_int_callback);
 
 	machine->device("sub")->reset();
 }

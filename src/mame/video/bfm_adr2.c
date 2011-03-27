@@ -262,7 +262,7 @@ INTERRUPT_GEN( adder2_vbl )
 	if ( adder2_c101 & 0x01 )
 	{
 		adder_vbl_triggered = 1;
-		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE );
+		device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE );
 	}
 }
 

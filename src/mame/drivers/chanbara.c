@@ -346,7 +346,7 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 static void sound_irq( device_t *device, int linestate )
 {
 	chanbara_state *state = device->machine->driver_data<chanbara_state>();
-	cpu_set_input_line(state->maincpu, 0, linestate);
+	device_set_input_line(state->maincpu, 0, linestate);
 }
 
 

@@ -540,9 +540,9 @@ static DRIVER_INIT( simpbowl )
 	state->flash8[2] = machine->device<fujitsu_29f016a_device>("flash2");
 	state->flash8[3] = machine->device<fujitsu_29f016a_device>("flash3");
 
-	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, flash_r, flash_w );
-	memory_install_read32_handler     ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c7, 0, 0, trackball_r );
-	memory_install_read32_handler     ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800c8, 0x1f6800cb, 0, 0, unknown_r ); /* ?? */
+	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, flash_r, flash_w );
+	memory_install_read32_handler     ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c7, 0, 0, trackball_r );
+	memory_install_read32_handler     ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f6800c8, 0x1f6800cb, 0, 0, unknown_r ); /* ?? */
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -633,9 +633,9 @@ static DRIVER_INIT( btchamp )
 
 	state->flash16[0] = machine->device<sharp_lh28f400_device>("flash");
 
-	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
-	memory_nop_write                  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0 );
-	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
+	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
+	memory_nop_write                  ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0 );
+	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -688,8 +688,8 @@ static WRITE32_HANDLER( tokimeki_serial_w )
 
 static DRIVER_INIT( tokimosh )
 {
-	memory_install_read32_handler ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, tokimeki_serial_r );
-	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, tokimeki_serial_w );
+	memory_install_read32_handler ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, tokimeki_serial_r );
+	memory_install_write32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, tokimeki_serial_w );
 
 	DRIVER_INIT_CALL(konamigv);
 }
@@ -721,13 +721,13 @@ static DRIVER_INIT( kdeadeye )
 
 	state->flash16[0] = machine->device<sharp_lh28f400_device>("flash");
 
-	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, "GUNX1" );
-	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, "GUNY1" );
-	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, "GUNX2" );
-	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, "GUNY2" );
-	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, "BUTTONS" );
-	memory_install_write32_handler    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, kdeadeye_0_w );
-	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
+	memory_install_read_port  ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, "GUNX1" );
+	memory_install_read_port  ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, "GUNY1" );
+	memory_install_read_port  ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f6800a0, 0x1f6800a3, 0, 0, "GUNX2" );
+	memory_install_read_port  ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f6800b0, 0x1f6800b3, 0, 0, "GUNY2" );
+	memory_install_read_port  ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c3, 0, 0, "BUTTONS" );
+	memory_install_write32_handler    ( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0, kdeadeye_0_w );
+	memory_install_readwrite32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f380000, 0x1f3fffff, 0, 0, btcflash_r, btcflash_w );
 
 	DRIVER_INIT_CALL(konamigv);
 }

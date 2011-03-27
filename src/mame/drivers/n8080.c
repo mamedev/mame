@@ -397,7 +397,7 @@ static TIMER_DEVICE_CALLBACK( rst1_tick )
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* V7 = 1, V6 = 0 */
-	cpu_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xcf);
+	device_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xcf);
 }
 
 static TIMER_DEVICE_CALLBACK( rst2_tick )
@@ -406,7 +406,7 @@ static TIMER_DEVICE_CALLBACK( rst2_tick )
 	int state = n8080->inte ? ASSERT_LINE : CLEAR_LINE;
 
 	/* vblank */
-	cpu_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xd7);
+	device_set_input_line_and_vector(n8080->maincpu, INPUT_LINE_IRQ0, state, 0xd7);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( n8080_inte_callback )
@@ -420,7 +420,7 @@ static WRITE8_DEVICE_HANDLER( n8080_status_callback )
 	if (data & I8085_STATUS_INTA)
 	{
 		/* interrupt acknowledge */
-		cpu_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
+		device_set_input_line(device, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 

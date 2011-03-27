@@ -639,9 +639,9 @@ static INTERRUPT_GEN( darkhors )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:	cpu_set_input_line(device, 3, HOLD_LINE);	break;
-		case 1:	cpu_set_input_line(device, 4, HOLD_LINE);	break;
-		case 2:	cpu_set_input_line(device, 5, HOLD_LINE);	break;
+		case 0:	device_set_input_line(device, 3, HOLD_LINE);	break;
+		case 1:	device_set_input_line(device, 4, HOLD_LINE);	break;
+		case 2:	device_set_input_line(device, 5, HOLD_LINE);	break;
 	}
 }
 

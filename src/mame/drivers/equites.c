@@ -399,7 +399,7 @@ D                                                                               
 static TIMER_CALLBACK( equites_nmi_callback )
 {
 	equites_state *state = machine->driver_data<equites_state>();
-	cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( equites_frq_adjuster_callback )
@@ -432,7 +432,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			cpu_set_input_line(state->audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+			device_set_input_line(state->audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
@@ -442,7 +442,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			cpu_set_input_line(state->audio_cpu, I8085_INTR_LINE, HOLD_LINE);
+			device_set_input_line(state->audio_cpu, I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -583,9 +583,9 @@ static void equites_msm5232_gate( device_t *device, int state )
 static INTERRUPT_GEN( equites_interrupt )
 {
 	if (cpu_getiloops(device))
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 1, HOLD_LINE);
+		device_set_input_line(device, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER(equites_8155_w)
@@ -689,13 +689,13 @@ static WRITE16_HANDLER(mcu_w)
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
 	equites_state *state = space->machine->driver_data<equites_state>();
-	cpu_set_input_line(state->mcu, INPUT_LINE_HALT, ASSERT_LINE);
+	device_set_input_line(state->mcu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
 	equites_state *state = space->machine->driver_data<equites_state>();
-	cpu_set_input_line(state->mcu, INPUT_LINE_HALT, CLEAR_LINE);
+	device_set_input_line(state->mcu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 
@@ -1899,8 +1899,8 @@ static DRIVER_INIT( gekisou )
 	unpack_region(machine, "gfx3");
 
 	// install special handlers for unknown device (protection?)
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1913,7 +1913,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region(machine, "gfx3");
 
 #if HVOLTAGE_DEBUG
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
 #endif
 }
 

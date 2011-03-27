@@ -111,7 +111,7 @@ static void hangon_generic_init( running_machine *machine )
 static TIMER_CALLBACK( suspend_i8751 )
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	cpu_suspend(state->mcu, SUSPEND_REASON_DISABLE, 1);
+	device_suspend(state->mcu, SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -144,9 +144,9 @@ static INTERRUPT_GEN( hangon_irq )
 {
 	/* according to the schematics, IRQ2 is generated every 16 scanlines */
 	if (cpu_getiloops(device) != 0)
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 }
 #endif
 
@@ -285,7 +285,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, offset, data);
 }
 
@@ -324,7 +324,7 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 	/* D2 : SCONT1 - Tilemap origin bit 1 */
 	/* D1 : SCONT0 - Tilemap origin bit 0 */
 	/* D0 : MUTE (1= audio on, 0= audio off) */
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(device->machine, 0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(device->machine, 0, ~data & 0x02);
 	device->machine->sound().system_enable(data & 0x01);
@@ -339,8 +339,8 @@ static WRITE8_DEVICE_HANDLER( sub_control_adc_w )
 	/* D6 : INTR line on second CPU */
 	/* D5 : RESET line on second CPU */
 	/* D3-D2 : ADC_SELECT */
-	cpu_set_input_line(state->subcpu, 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->subcpu, 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* If the CPU is being Reset we also need to reset the fd1094 state */
 	if (data & 0x20)
@@ -403,7 +403,7 @@ static void sharrier_i8751_sim(running_machine *machine)
 static void sound_irq(device_t *device, int irq)
 {
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
-	cpu_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1856,7 +1856,7 @@ static DRIVER_INIT( enduror )
 
 static DRIVER_INIT( endurobl )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 
@@ -1870,7 +1870,7 @@ static DRIVER_INIT( endurobl )
 
 static DRIVER_INIT( endurob2 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)machine->region("maincpu")->base();
 	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 

@@ -88,7 +88,7 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 			segae_hintpending = 1;
 
 			if  ((segae_vdp_regs[0][0] & 0x10)) {
-				cpu_set_input_line(device, 0, HOLD_LINE);
+				device_set_input_line(device, 0, HOLD_LINE);
 				return;
 			}
 
@@ -101,7 +101,7 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 		hintcount = segae_vdp_regs[0][10];
 
 		if ( (sline<0xe0) && (segae_vintpending) ) {
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 		}
 	}
 
@@ -885,13 +885,13 @@ static DRIVER_INIT(megaplay)
 	mplay_start(machine);
 
 	/* for now ... */
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa10000, 0xa1001f, 0, 0, megaplay_io_read, megaplay_io_write);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa10000, 0xa1001f, 0, 0, megaplay_io_read, megaplay_io_write);
 
 	/* megaplay has ram shared with the bios cpu here */
-	memory_install_ram(cputag_get_address_space(machine, "genesis_snd_z80", ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, &state->ic36_ram[0]);
+	memory_install_ram(machine->device("genesis_snd_z80")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, &state->ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
 
 	DRIVER_INIT_CALL(megatech_bios); // create the SMS vdp etc.
 

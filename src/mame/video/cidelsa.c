@@ -107,8 +107,8 @@ static CDP1869_PCB_READ( draco_pcb_r )
 WRITE_LINE_MEMBER( cidelsa_state::prd_w )
 {
 	/* invert PRD signal */
-	cpu_set_input_line(m_maincpu, COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(m_maincpu, COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* Page RAM */

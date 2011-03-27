@@ -154,7 +154,7 @@ static WRITE8_HANDLER( combatscb_sh_irqtrigger_w )
 {
 	combatsc_state *state = space->machine->driver_data<combatsc_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( combatscb_io_r )
@@ -333,7 +333,7 @@ static WRITE8_HANDLER( protection_clock_w )
 static WRITE8_HANDLER( combatsc_sh_irqtrigger_w )
 {
 	combatsc_state *state = space->machine->driver_data<combatsc_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_DEVICE_HANDLER( combatsc_busy_r )
@@ -711,7 +711,7 @@ static MACHINE_START( combatsc )
 static MACHINE_RESET( combatsc )
 {
 	combatsc_state *state = machine->driver_data<combatsc_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	memset(state->io_ram,  0x00, 0x4000);
@@ -995,7 +995,7 @@ ROM_END
 static DRIVER_INIT( combatsc )
 {
 	/* joystick instead of trackball */
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
+	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0404, 0x0404, 0, 0, "IN1");
 }
 
 

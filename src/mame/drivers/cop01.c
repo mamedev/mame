@@ -70,7 +70,7 @@ static WRITE8_HANDLER( cop01_sound_command_w )
 {
 	cop01_state *state = space->machine->driver_data<cop01_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )

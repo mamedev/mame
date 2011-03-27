@@ -505,7 +505,7 @@ static SCREEN_UPDATE(littlerb)
 static INTERRUPT_GEN( littlerb )
 {
 	logerror("IRQ\n");
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( littlerb, littlerb_state )

@@ -2905,10 +2905,10 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 
 static DRIVER_INIT( midresb )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00180000, 0x0018000f, 0, 0,  dec0_controls_r );
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x001a0000, 0x001a000f, 0, 0,  dec0_rotary_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00180000, 0x0018000f, 0, 0,  dec0_controls_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x001a0000, 0x001a000f, 0, 0,  dec0_rotary_r );
 
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00180014, 0x00180015, 0, 0, midres_sound_w );
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00180014, 0x00180015, 0, 0, midres_sound_w );
 }
 
 /******************************************************************************/

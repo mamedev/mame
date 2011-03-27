@@ -1030,7 +1030,7 @@ static DRIVER_INIT(ppking)
 		}
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf6a3,0xf6a3,0,0, f6a3_r );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf6a3,0xf6a3,0,0, f6a3_r );
 }
 
 

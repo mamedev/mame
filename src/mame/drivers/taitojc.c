@@ -1298,12 +1298,12 @@ static MACHINE_RESET( taitojc )
 
 static INTERRUPT_GEN( taitojc_vblank )
 {
-	cpu_set_input_line_and_vector(device, 2, HOLD_LINE, 130);
+	device_set_input_line_and_vector(device, 2, HOLD_LINE, 130);
 }
 
 static INTERRUPT_GEN( taitojc_int6 )
 {
-	cpu_set_input_line(device, 6, HOLD_LINE);
+	device_set_input_line(device, 6, HOLD_LINE);
 }
 
 static const hc11_config taitojc_config =

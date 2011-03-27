@@ -674,7 +674,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 		"bank9", "bank10", "bank11", "bank12", "bank13", "bank14", "bank15", "bank16"
 	};
 	static const char *const cputags[] = { "maincpu", "sub" };
-	address_space *space = cputag_get_address_space(machine, cputags[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device(cputags[(banknum >> 3) & 1])->memory().space(ADDRESS_SPACE_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 
 	/* for BANK handlers , memory direct and OP-code base */
@@ -1216,7 +1216,7 @@ DRIVER_INIT( tankfrc4 )
 	};
 	namcos1_driver_init(machine, &tankfrce_specific);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }
 
 /*******************************************************************************
@@ -1307,7 +1307,7 @@ static READ8_HANDLER( quester_paddle_r )
 DRIVER_INIT( quester )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, quester_paddle_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, quester_paddle_r);
 }
 
 
@@ -1396,7 +1396,7 @@ static READ8_HANDLER( berabohm_buttons_r )
 DRIVER_INIT( berabohm )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, berabohm_buttons_r);
 }
 
 
@@ -1466,5 +1466,5 @@ static READ8_HANDLER( faceoff_inputs_r )
 DRIVER_INIT( faceoff )
 {
 	namcos1_driver_init(machine, NULL);
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1400, 0x1401, 0, 0, faceoff_inputs_r);
 }

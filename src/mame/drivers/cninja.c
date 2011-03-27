@@ -59,7 +59,7 @@ static WRITE16_HANDLER( cninja_sound_w )
 	cninja_state *state = space->machine->driver_data<cninja_state>();
 
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( stoneage_sound_w )
@@ -67,14 +67,14 @@ static WRITE16_HANDLER( stoneage_sound_w )
 	cninja_state *state = space->machine->driver_data<cninja_state>();
 
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
 {
 	cninja_state *state = timer.machine->driver_data<cninja_state>();
 
-	cpu_set_input_line(state->maincpu, (state->irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
+	device_set_input_line(state->maincpu, (state->irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
 	state->raster_irq_timer->reset();
 }
 
@@ -89,8 +89,8 @@ static READ16_HANDLER( cninja_irq_r )
 		return state->scanline;
 
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cpu_set_input_line(state->maincpu, 3, CLEAR_LINE);
-		cpu_set_input_line(state->maincpu, 4, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 3, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 4, CLEAR_LINE);
 		return 0;
 	}
 
@@ -723,13 +723,13 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	cninja_state *driver_state = device->machine->driver_data<cninja_state>();
-	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static void sound_irq2(device_t *device, int state)
 {
 	cninja_state *driver_state = device->machine->driver_data<cninja_state>();
-	cpu_set_input_line(driver_state->audiocpu, 0, state);
+	device_set_input_line(driver_state->audiocpu, 0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -2032,13 +2032,13 @@ static void cninja_patch( running_machine *machine )
 
 static DRIVER_INIT( cninja )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, cninja_sound_w);
 	cninja_patch(machine);
 }
 
 static DRIVER_INIT( stoneage )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1bc0a8, 0x1bc0a9, 0, 0, stoneage_sound_w);
 }
 
 static DRIVER_INIT( mutantf )

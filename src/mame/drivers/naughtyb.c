@@ -285,7 +285,7 @@ ADDRESS_MAP_END
 static INTERRUPT_GEN( naughtyb_interrupt )
 {
 	if (input_port_read(device->machine, "FAKE") & 1)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( naughtyb )
@@ -854,10 +854,10 @@ ROM_END
 static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9000, 0x9000, 0, 0, popflame_protection_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x9090, 0x9090, 0, 0, popflame_protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x9000, 0x9000, 0, 0, popflame_protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x9090, 0x9090, 0, 0, popflame_protection_r);
 
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xb000, 0xb0ff, 0, 0, popflame_protection_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xb000, 0xb0ff, 0, 0, popflame_protection_w);
 }
 
 
@@ -887,7 +887,7 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 static DRIVER_INIT( trvmstr )
 {
 	/* install questions' handlers  */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
 }
 
 

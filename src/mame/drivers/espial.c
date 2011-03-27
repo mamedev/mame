@@ -106,7 +106,7 @@ static WRITE8_HANDLER( espial_master_soundlatch_w )
 {
 	espial_state *state = space->machine->driver_data<espial_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 

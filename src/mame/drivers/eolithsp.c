@@ -25,7 +25,7 @@ void eolith_speedup_read(address_space *space)
 
 	if (cpu_get_pc(space->cpu)==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{
-		cpu_spinuntil_trigger(space->cpu, 1000);
+		device_spin_until_trigger(space->cpu, 1000);
 	}
 
 }

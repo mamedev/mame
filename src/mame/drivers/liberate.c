@@ -71,9 +71,9 @@ static WRITE8_HANDLER( deco16_bank_w )
 	state->bank = data;
 
 	if (state->bank)
-		memory_install_read8_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
+		memory_install_read8_handler(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
 	else
-		memory_install_read_bank(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, "bank1");
+		memory_install_read_bank(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, "bank1");
 }
 
 static READ8_HANDLER( prosoccr_bank_r )
@@ -181,9 +181,9 @@ static WRITE8_HANDLER( prosoccr_io_bank_w )
 	state->bank = data & 1;
 
 	if (state->bank)
-		memory_install_read8_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
+		memory_install_read8_handler(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, deco16_io_r);
 	else
-		memory_install_read8_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, prosoccr_charram_r);
+		memory_install_read8_handler(state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0x800f, 0, 0, prosoccr_charram_r);
 
 }
 
@@ -773,7 +773,7 @@ static INTERRUPT_GEN( deco16_interrupt )
 	int p = ~input_port_read(device->machine, "IN3");
 	if ((p & 0x43) && !state->latch)
 	{
-		cpu_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
 		state->latch = 1;
 	}
 	else
@@ -787,7 +787,7 @@ static INTERRUPT_GEN( deco16_interrupt )
 static INTERRUPT_GEN( prosport_interrupt )
 {
 	/* ??? */
-	cpu_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
@@ -1357,7 +1357,7 @@ ROM_END
 
 static void sound_cpu_decrypt(running_machine *machine)
 {
-	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = machine->region("audiocpu")->base();
 	int i;
@@ -1385,13 +1385,13 @@ static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
 
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa000, 0xa000, 0, 0, "IN0");
+	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa000, 0xa000, 0, 0, "IN0");
 }
 
 static DRIVER_INIT( liberate )
 {
 	int A;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *ROM = machine->region("maincpu")->base();
 

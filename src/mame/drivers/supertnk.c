@@ -161,7 +161,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 static INTERRUPT_GEN( supertnk_interrupt )
 {
 	/* On a TMS9980, a 6 on the interrupt bus means a level 4 interrupt */
-	cpu_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
+	device_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
 }
 
 
@@ -284,7 +284,7 @@ static SCREEN_UPDATE( supertnk )
 
 static MACHINE_RESET( supertnk )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	supertnk_bankswitch_0_w(space, 0, 0);
 	supertnk_bankswitch_1_w(space, 0, 0);
 

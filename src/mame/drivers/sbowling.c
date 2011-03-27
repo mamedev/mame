@@ -157,7 +157,7 @@ static INTERRUPT_GEN( sbw_interrupt )
 {
 	int vector = device->machine->primary_screen->vblank() ? 0xcf : 0xd7;	/* RST 08h/10h */
 
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
 }
 
 static WRITE8_HANDLER (system_w)

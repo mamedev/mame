@@ -486,7 +486,7 @@ GFXDECODE_END
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
-	cpu_set_input_line(state->maincpu, 1, HOLD_LINE);
+	device_set_input_line(state->maincpu, 1, HOLD_LINE);
 	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(248), FUNC(level_1_interrupt_callback));
 }
 
@@ -494,7 +494,7 @@ static TIMER_CALLBACK( level_1_interrupt_callback )
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
-	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
+	device_set_input_line(state->maincpu, 3, HOLD_LINE);	// VBlank IRQ
 	machine->scheduler().timer_set(machine->primary_screen->time_until_vblank_start(), FUNC(vblank_interrupt_callback));
 }
 
@@ -502,7 +502,7 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 static TIMER_CALLBACK( raster_interrupt_callback )
 {
 	fuuki32_state *state = machine->driver_data<fuuki32_state>();
-	cpu_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
+	device_set_input_line(state->maincpu, 5, HOLD_LINE);	// Raster Line IRQ
 	machine->primary_screen->update_partial(machine->primary_screen->vpos());
 	state->raster_interrupt_timer->adjust(machine->primary_screen->frame_period());
 }
@@ -539,7 +539,7 @@ static MACHINE_RESET( fuuki32 )
 static void irqhandler( device_t *device, int irq )
 {
 	fuuki32_state *state = device->machine->driver_data<fuuki32_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface fuuki32_ymf278b_interface =

@@ -888,7 +888,7 @@ static MACHINE_START( galaga )
 
 static void bosco_latch_reset(running_machine *machine)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -3212,7 +3212,7 @@ static DRIVER_INIT (gatsbee)
 	DRIVER_INIT_CALL(galaga);
 
 	/* Gatsbee has a larger character ROM, we need a handler for banking */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1000, 0x1000, 0, 0, gatsbee_bank_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1000, 0x1000, 0, 0, gatsbee_bank_w);
 }
 
 
@@ -3253,8 +3253,8 @@ static DRIVER_INIT( xevios )
 static DRIVER_INIT( battles )
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, battles_customio_data0_r, battles_customio_data0_w );
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7100, 0x7100, 0, 0, battles_customio0_r, battles_customio0_w );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, battles_customio_data0_r, battles_customio_data0_w );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7100, 0x7100, 0, 0, battles_customio0_r, battles_customio0_w );
 
 	DRIVER_INIT_CALL(xevious);
 }

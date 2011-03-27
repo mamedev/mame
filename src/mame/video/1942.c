@@ -186,7 +186,7 @@ WRITE8_HANDLER( c1942_c804_w )
 
 	coin_counter_w(space->machine, 0,data & 0x01);
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	flip_screen_set(space->machine, data & 0x80);
 }

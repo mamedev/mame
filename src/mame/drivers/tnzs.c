@@ -807,7 +807,7 @@ static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
 	tnzs_state *state = space->machine->driver_data<tnzs_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1562,7 +1562,7 @@ static const ym2203_interface ym2203_config =
 static void irqhandler( device_t *device, int irq )
 {
 	tnzs_state *state = device->machine->driver_data<tnzs_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface kageki_ym2203_interface =

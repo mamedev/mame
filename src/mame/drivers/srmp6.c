@@ -658,9 +658,9 @@ INPUT_PORTS_END
 static INTERRUPT_GEN(srmp6_interrupt)
 {
 	if(!cpu_getiloops(device))
-		cpu_set_input_line(device,3,HOLD_LINE);
+		device_set_input_line(device,3,HOLD_LINE);
 	else
-		cpu_set_input_line(device,4,HOLD_LINE);
+		device_set_input_line(device,4,HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( srmp6, srmp6_state )

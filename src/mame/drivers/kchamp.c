@@ -84,7 +84,7 @@ static WRITE8_HANDLER( sound_reset_w )
 {
 	kchamp_state *state = space->machine->driver_data<kchamp_state>();
 	if (!(data & 1))
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
@@ -98,7 +98,7 @@ static WRITE8_HANDLER( sound_command_w )
 {
 	kchamp_state *state = space->machine->driver_data<kchamp_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sound_msm_w )
@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER( sound_reset_r )
 {
 	kchamp_state *state = space->machine->driver_data<kchamp_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
@@ -350,7 +350,7 @@ static INTERRUPT_GEN( kc_interrupt )
 {
 	kchamp_state *state = device->machine->driver_data<kchamp_state>();
 	if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void msmint( device_t *device )
@@ -367,7 +367,7 @@ static void msmint( device_t *device )
 	if (!(state->counter ^= 1))
 	{
 		if (state->sound_nmi_enable)
-			cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -385,7 +385,7 @@ static INTERRUPT_GEN( sound_int )
 {
 	kchamp_state *state = device->machine->driver_data<kchamp_state>();
 	if (state->sound_nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -730,7 +730,7 @@ ROM_END
 
 static UINT8 *decrypt_code(running_machine *machine)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine->region("maincpu")->base();
 	int A;

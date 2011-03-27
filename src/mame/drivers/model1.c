@@ -711,7 +711,7 @@ static IRQ_CALLBACK(irq_callback)
 static void irq_init(running_machine *machine)
 {
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 static INTERRUPT_GEN(model1_interrupt)
@@ -845,7 +845,7 @@ static READ16_HANDLER( snd_68k_ready_r )
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(space->cpu, attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -862,7 +862,7 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	// signal the 68000 that there's data waiting
 	cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
 	// give the 68k time to reply
-	cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(space->cpu, attotime::from_usec(40));
 }
 
 static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )

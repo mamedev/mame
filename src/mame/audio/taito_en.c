@@ -82,7 +82,7 @@ static TIMER_DEVICE_CALLBACK( taito_en_timer_callback )
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr & 0x08)
 	{
-		cpu_set_input_line_vector(timer.machine->device("audiocpu"), 6, vector_reg);
+		device_set_input_line_vector(timer.machine->device("audiocpu"), 6, vector_reg);
 		cputag_set_input_line(timer.machine, "audiocpu", 6, ASSERT_LINE);
 		imr_status |= 0x08;
 	}

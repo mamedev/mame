@@ -205,9 +205,9 @@ static TIMER_CALLBACK( setirq_callback )
 		return;
 
 	if (irqstate == 0)	/* no IRQs pending */
-		cpu_set_input_line(cpu,0,CLEAR_LINE);
+		device_set_input_line(cpu,0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpu_set_input_line(cpu,0,ASSERT_LINE);
+		device_set_input_line(cpu,0,ASSERT_LINE);
 }
 
 

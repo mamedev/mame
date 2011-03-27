@@ -880,9 +880,9 @@ static INTERRUPT_GEN( tm3k_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
-		case 1:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
-		default:	cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		case 0:		device_set_input_line(device, 2, HOLD_LINE);	break;
+		case 1:		device_set_input_line(device, 3, HOLD_LINE);	break;
+		default:	device_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 
@@ -937,9 +937,9 @@ static INTERRUPT_GEN( galgames_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
+		case 0:		device_set_input_line(device, 3, HOLD_LINE);	break;
 					// lev 2 triggered at the end of a blit
-		default:	cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		default:	device_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 

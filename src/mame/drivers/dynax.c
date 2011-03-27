@@ -103,7 +103,7 @@ void sprtmtch_update_irq( running_machine *machine )
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	int irq = (state->sound_irq ? 0x08 : 0) | ((state->vblank_irq) ? 0x10 : 0) | ((state->blitter_irq) ? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	device_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( dynax_vblank_ack_w )
@@ -144,7 +144,7 @@ void jantouki_update_irq(running_machine *machine)
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	int irq = ((state->blitter_irq) ? 0x08 : 0) | ((state->blitter2_irq) ? 0x10 : 0) | ((state->vblank_irq) ? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	device_set_input_line_and_vector(state->maincpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( jantouki_vblank_ack_w )
@@ -184,7 +184,7 @@ static void jantouki_sound_update_irq(running_machine *machine)
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	int irq = ((state->sound_irq) ? 0x08 : 0) | ((state->soundlatch_irq) ? 0x10 : 0) | ((state->sound_vblank_irq) ? 0x20 : 0) ;
-	cpu_set_input_line_and_vector(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	device_set_input_line_and_vector(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
@@ -420,7 +420,7 @@ static void adpcm_int( device_t *device )
 	if (state->toggle)
 	{
 		if (state->resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -434,7 +434,7 @@ static void adpcm_int_cpu1( device_t *device )
 	if (state->toggle_cpu1)
 	{
 		if (state->resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);	// cpu1
+		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);	// cpu1
 	}
 }
 
@@ -4761,7 +4761,7 @@ void mjelctrn_update_irq( running_machine *machine )
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	state->blitter_irq = 1;
-	cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xfa);
+	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xfa);
 }
 
 static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
@@ -4771,7 +4771,7 @@ static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
 	if (!state->blitter_irq)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
 }
 
 static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
@@ -4796,7 +4796,7 @@ void neruton_update_irq( running_machine *machine )
 {
 	dynax_state *state = machine->driver_data<dynax_state>();
 	state->blitter_irq = 1;
-	cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0x42);
+	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0x42);
 }
 
 static INTERRUPT_GEN( neruton_vblank_interrupt )
@@ -4809,8 +4809,8 @@ static INTERRUPT_GEN( neruton_vblank_interrupt )
 
 	switch (cpu_getiloops(device))
 	{
-		case 0:  cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);	break;
-		default: cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x46);	break;
+		case 0:  device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);	break;
+		default: device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x46);	break;
 	}
 }
 
@@ -4836,7 +4836,7 @@ static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 	// there should be a vblank ack mechanism
 	if (state->blitter_irq)	return;
 
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);
 }
 
 static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
@@ -4910,9 +4910,9 @@ static INTERRUPT_GEN( tenkai_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0: cpu_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;
-		case 1: cpu_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;
-		case 2: cpu_set_input_line(device, INPUT_LINE_IRQ2, HOLD_LINE);	break;
+		case 0: device_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;
+		case 1: device_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;
+		case 2: device_set_input_line(device, INPUT_LINE_IRQ2, HOLD_LINE);	break;
 	}
 }
 
@@ -6517,7 +6517,7 @@ ROM_END
 
 static DRIVER_INIT( mjreach )
 {
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
 }
 
 /***************************************************************************

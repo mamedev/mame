@@ -124,7 +124,7 @@ static WRITE8_HANDLER( zodiac_master_soundlatch_w )
 {
 	zodiack_state *state = space->machine->driver_data<zodiack_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static MACHINE_START( zodiack )

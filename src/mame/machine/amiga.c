@@ -261,7 +261,7 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 static void amiga_m68k_reset(device_t *device)
 {
 	amiga_state *state = device->machine->driver_data<amiga_state>();
-	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
@@ -319,7 +319,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 0)
 	{
 		/* signal VBLANK IRQ */
-		amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
+		amiga_custom_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
 		mos6526_tod_w(cia_0, 1);
@@ -934,7 +934,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	/* signal an interrupt */
-	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
+	amiga_custom_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
 	state->blitter_timer->reset( );
@@ -989,7 +989,7 @@ static void blitter_setup(address_space *space)
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
 	{
 		/* simulate the 68k not running while the blit is going */
-		cpu_adjust_icount( space->cpu, -(blittime/2) );
+		device_adjust_icount( space->cpu, -(blittime/2) );
 
 		blittime = BLITTER_NASTY_DELAY;
 	}
@@ -1089,13 +1089,13 @@ WRITE16_HANDLER( amiga_cia_w )
 
 void amiga_cia_0_irq(device_t *device, int state)
 {
-	amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+	amiga_custom_w(device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
 void amiga_cia_1_irq(device_t *device, int state)
 {
-	amiga_custom_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+	amiga_custom_w(device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
 
 
@@ -1109,7 +1109,7 @@ void amiga_cia_1_irq(device_t *device, int state)
 static void custom_reset(running_machine *machine)
 {
 	amiga_state *state = machine->driver_data<amiga_state>();
-	int clock = cputag_get_clock(machine, "maincpu");
+	int clock = machine->device("maincpu")->unscaled_clock();
 	UINT16	vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
 
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1243,7 +1243,7 @@ static TIMER_CALLBACK( finish_serial_write )
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;
 
 	/* signal an interrupt */
-	amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
+	amiga_custom_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
 }
 
 
@@ -1490,7 +1490,7 @@ WRITE16_HANDLER( amiga_custom_w )
 void amiga_serial_in_w(running_machine *machine, UINT16 data)
 {
 	amiga_state *state = machine->driver_data<amiga_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int mask = (CUSTOM_REG(REG_SERPER) & 0x8000) ? 0x1ff : 0xff;
 
 	/* copy the data to the low 8 bits of SERDATR and set RBF */
@@ -1513,7 +1513,7 @@ attotime amiga_get_serial_char_period(running_machine *machine)
 {
 	amiga_state *state = machine->driver_data<amiga_state>();
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	UINT32 baud = cputag_get_clock(machine, "maincpu") / 2 / divisor;
+	UINT32 baud = machine->device("maincpu")->unscaled_clock() / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
 	return attotime::from_hz(baud) * numbits;
 }

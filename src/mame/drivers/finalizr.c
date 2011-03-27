@@ -28,12 +28,12 @@ static INTERRUPT_GEN( finalizr_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (state->irq_enable)
-			cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
 		if (state->nmi_enable)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -55,7 +55,7 @@ static WRITE8_HANDLER( finalizr_flipscreen_w )
 static WRITE8_HANDLER( finalizr_i8039_irq_w )
 {
 	finalizr_state *state = space->machine->driver_data<finalizr_state>();
-	cpu_set_input_line(state->audio_cpu, 0, ASSERT_LINE);
+	device_set_input_line(state->audio_cpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_w )
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( i8039_irqen_w )
     */
 
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
+		device_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( i8039_T1_r )

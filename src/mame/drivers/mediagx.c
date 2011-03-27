@@ -372,7 +372,7 @@ static READ32_HANDLER( disp_ctrl_r )
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup
-			cpu_spinuntil_int(space->cpu);
+			device_spin_until_interrupt(space->cpu);
 #endif
 			break;
 	}
@@ -1036,7 +1036,7 @@ static MACHINE_RESET(mediagx)
 	mediagx_state *state = machine->driver_data<mediagx_state>();
 	UINT8 *rom = machine->region("bios")->base();
 
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	memcpy(state->bios_ram, rom, 0x40000);
 	machine->device("maincpu")->reset();
@@ -1208,7 +1208,7 @@ INLINE UINT32 generic_speedup(address_space *space, int idx)
 	if (cpu_get_pc(space->cpu) == state->speedup_table[idx].pc)
 	{
 		state->speedup_hits[idx]++;
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 	}
 	return state->main_ram[state->speedup_table[idx].offset/4];
 }
@@ -1255,7 +1255,7 @@ static void install_speedups(running_machine *machine, const speedup_entry *entr
 	state->speedup_count = count;
 
 	for (i = 0; i < count; i++)
-		memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
+		memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
 
 #ifdef MAME_DEBUG
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, report_speedups);

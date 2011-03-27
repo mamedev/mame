@@ -74,7 +74,7 @@ static STREAM_UPDATE( engine_sound_update )
 	}
 
 	/* determine the effective clock rate */
-	clock = (cputag_get_clock(device->machine, "maincpu") / 16) * ((state->sample_msb + 1) * 64 + state->sample_lsb + 1) / (64*64);
+	clock = (device->machine->device("maincpu")->unscaled_clock() / 16) * ((state->sample_msb + 1) * 64 + state->sample_lsb + 1) / (64*64);
 	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */

@@ -2070,12 +2070,12 @@ static INTERRUPT_GEN( iqblocka_interrupt )
 	if (cpu_getiloops(device) & 1)
 	{
 		 if (state->nmi_enable)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
 		 if (state->irq_enable)
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -2143,12 +2143,12 @@ static INTERRUPT_GEN( mgcs_interrupt )
 	if (cpu_getiloops(device) & 1)
 	{
 		 if (state->irq2_enable)
-			cpu_set_input_line(device, 2, HOLD_LINE);
+			device_set_input_line(device, 2, HOLD_LINE);
 	}
 	else
 	{
 		 if (state->irq1_enable)
-			cpu_set_input_line(device, 1, HOLD_LINE);
+			device_set_input_line(device, 1, HOLD_LINE);
 	}
 }
 
@@ -2257,12 +2257,12 @@ static INTERRUPT_GEN( mgdh_interrupt )
 	if (cpu_getiloops(device) & 1)
 	{
 		 if (state->irq2_enable)
-			cpu_set_input_line(device, 3, HOLD_LINE);	// lev 3 instead of 2
+			device_set_input_line(device, 3, HOLD_LINE);	// lev 3 instead of 2
 	}
 	else
 	{
 		 if (state->irq1_enable)
-			cpu_set_input_line(device, 1, HOLD_LINE);
+			device_set_input_line(device, 1, HOLD_LINE);
 	}
 }
 

@@ -192,7 +192,7 @@ static void pitfightb_cheap_slapstic_init(running_machine *machine)
 	atarig1_state *state = machine->driver_data<atarig1_state>();
 
 	/* install a read handler */
-	state->bslapstic_base = memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x038000, 0x03ffff, 0, 0, pitfightb_cheap_slapstic_r);
+	state->bslapstic_base = memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x038000, 0x03ffff, 0, 0, pitfightb_cheap_slapstic_r);
 
 	/* allocate memory for a copy of bank 0 */
 	state->bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);

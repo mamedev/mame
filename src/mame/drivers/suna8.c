@@ -82,7 +82,7 @@ static DRIVER_INIT( hardhead )
 /* Non encrypted bootleg */
 static DRIVER_INIT( hardhedb )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x48000);
 	memory_configure_bank(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x10000, 0x4000);
 }
@@ -95,7 +95,7 @@ static DRIVER_INIT( hardhedb )
 
 static UINT8 *brickzn_decrypt(running_machine *machine)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	machine->region("maincpu")->base();
 	size_t	size	=	machine->region("maincpu")->bytes();
 	UINT8   *decrypt = auto_alloc_array(machine, UINT8, size);
@@ -205,7 +205,7 @@ static DRIVER_INIT( brickzn3 )
 
 static DRIVER_INIT( hardhea2 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	machine->region("maincpu")->base();
 	size_t	size	=	machine->region("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
@@ -292,7 +292,7 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 
 static DRIVER_INIT( starfigh )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	machine->region("maincpu")->base();
 	size_t	size	=	machine->region("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
@@ -360,7 +360,7 @@ static DRIVER_INIT( starfigh )
 
 static DRIVER_INIT( sparkman )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8	*RAM	=	machine->region("maincpu")->base();
 	size_t	size	=	machine->region("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
@@ -1618,8 +1618,8 @@ static const ym3812_interface brickzn_ym3812_interface =
 
 static INTERRUPT_GEN( brickzn_interrupt )
 {
-	if (cpu_getiloops(device)) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-	else				 cpu_set_input_line(device, 0, HOLD_LINE);
+	if (cpu_getiloops(device)) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	else				 device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( brickzn, suna8_state )
@@ -1688,14 +1688,14 @@ static INTERRUPT_GEN( hardhea2_interrupt )
 	if (cpu_getiloops(device))
 	{
 		suna8_state *state = device->machine->driver_data<suna8_state>();
-		if (state->nmi_enable)	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->nmi_enable)	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
-	else cpu_set_input_line(device, 0, HOLD_LINE);
+	else device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_RESET( hardhea2 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	hardhea2_rambank_0_w(space,0,0);
 }
 
@@ -1778,9 +1778,9 @@ static INTERRUPT_GEN( sparkman_interrupt )
 	if (cpu_getiloops(device))
 	{
 		suna8_state *state = device->machine->driver_data<suna8_state>();
-		if (state->nmi_enable)	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		if (state->nmi_enable)	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
-	else cpu_set_input_line(device, 0, HOLD_LINE);
+	else device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( sparkman, suna8_state )

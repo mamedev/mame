@@ -57,22 +57,22 @@ static WRITE16_HANDLER( adrst_w )
 	state->ctrl_reg = data & 0xff;
 
 	/* Bus mastering for shared access */
-	cpu_set_input_line(state->ground, INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(state->object, INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->ground, INPUT_LINE_HALT, data & 0x04 ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->object, INPUT_LINE_HALT, data & 0x20 ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_HALT, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ16_HANDLER( main_gnd_r )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
+	address_space *gndspace = state->ground->memory().space(ADDRESS_SPACE_PROGRAM);
 	return gndspace->read_word(V30_GND_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_gnd_w )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
+	address_space *gndspace = state->ground->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
 		gndspace->write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
@@ -83,14 +83,14 @@ static WRITE16_HANDLER( main_gnd_w )
 static READ16_HANDLER( main_obj_r )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
+	address_space *objspace = state->object->memory().space(ADDRESS_SPACE_PROGRAM);
 	return objspace->read_word(V30_OBJ_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_obj_w )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
+	address_space *objspace = state->object->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
 		objspace->write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
@@ -104,8 +104,8 @@ static WRITE16_HANDLER( tst_w )
 
 	if (offset < 0x800)
 	{
-		address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
-		address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
+		address_space *gndspace = state->ground->memory().space(ADDRESS_SPACE_PROGRAM);
+		address_space *objspace = state->object->memory().space(ADDRESS_SPACE_PROGRAM);
 
 		if (ACCESSING_BITS_0_7)
 			gndspace->write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
@@ -122,14 +122,14 @@ static WRITE16_HANDLER( tst_w )
 static READ16_HANDLER( main_z80_r )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	address_space *sndspace = cpu_get_address_space(state->audiocpu, ADDRESS_SPACE_PROGRAM);
+	address_space *sndspace = state->audiocpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	return 0xff00 | sndspace->read_byte(offset);
 }
 
 static WRITE16_HANDLER( main_z80_w )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	address_space *sndspace = cpu_get_address_space(state->audiocpu, ADDRESS_SPACE_PROGRAM);
+	address_space *sndspace = state->audiocpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	sndspace->write_byte(offset, data);
 }
 
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( sound_vol )
 static void ym2203_irq(device_t *device, int irq)
 {
 	lockon_state *state = device->machine->driver_data<lockon_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static WRITE8_DEVICE_HANDLER( ym2203_out_b )

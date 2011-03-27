@@ -179,7 +179,7 @@ public:
 static void duart_irq_handler( device_t *device, UINT8 vector )
 {
 	adp_state *state = device->machine->driver_data<adp_state>();
-	cpu_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
+	device_set_input_line_and_vector(state->maincpu, 4, HOLD_LINE, vector);
 };
 
 static void duart_tx( device_t *device, int channel, UINT8 data )
@@ -614,7 +614,7 @@ INPUT_PORTS_END
 /*
 static INTERRUPT_GEN( adp_int )
 {
-    cpu_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+    device_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
 static const ay8910_interface ay8910_config =

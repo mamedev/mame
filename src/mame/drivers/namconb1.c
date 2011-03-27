@@ -334,7 +334,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	int scanline = (device->machine->generic.paletteram.u32[0x1808/4]&0xffff)-32;
 
 	if((!state->vblank_irq_active) && (state->namconb_cpureg[0x04] & 0xf0)) {
-		cpu_set_input_line(device, state->namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
+		device_set_input_line(device, state->namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
 		state->vblank_irq_active = 1;
 	}
 
@@ -352,15 +352,15 @@ static INTERRUPT_GEN( mcu_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
-		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) == 1)
 	{
-		cpu_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 
@@ -407,7 +407,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
 	int scanline = (device->machine->generic.paletteram.u32[0x1808/4]&0xffff)-32;
 
 	if((!state->vblank_irq_active) && state->namconb_cpureg[0x00]) {
-		cpu_set_input_line(device, state->namconb_cpureg[0x00], ASSERT_LINE);
+		device_set_input_line(device, state->namconb_cpureg[0x00], ASSERT_LINE);
 		state->vblank_irq_active = 1;
 	}
 
@@ -913,7 +913,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		cpu_spinuntil_time(space->cpu, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(300));	// was 300
+		device_spin_until_time(space->cpu, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(300));	// was 300
 	}
 }
 

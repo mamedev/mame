@@ -69,7 +69,7 @@ WRITE16_HANDLER( apache3_z80_ctrl_w )
 READ16_HANDLER( apache3_v30_v20_r )
 {
 	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
-	address_space *targetspace = cputag_get_address_space(space->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *targetspace = space->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* Each V20 byte maps to a V30 word */
 	if ((state->control_word & 0xe0) == 0xe0)
@@ -86,7 +86,7 @@ READ16_HANDLER( apache3_v30_v20_r )
 WRITE16_HANDLER( apache3_v30_v20_w )
 {
 	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
-	address_space *targetspace = cputag_get_address_space(space->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *targetspace = space->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if ((state->control_word & 0xe0) != 0x80)
 		logerror("%08x: write unmapped v30 rom %08x\n", cpu_get_pc(space->cpu), offset);
@@ -152,7 +152,7 @@ WRITE16_HANDLER( apache3_rotate_w )
 READ16_HANDLER( roundup_v30_z80_r )
 {
 	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
-	address_space *targetspace = cputag_get_address_space(space->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *targetspace = space->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* Each Z80 byte maps to a V30 word */
 	if (state->control_word & 0x20)
@@ -164,7 +164,7 @@ READ16_HANDLER( roundup_v30_z80_r )
 WRITE16_HANDLER( roundup_v30_z80_w )
 {
 	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
-	address_space *targetspace = cputag_get_address_space(space->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *targetspace = space->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
@@ -355,7 +355,7 @@ WRITE16_HANDLER( tatsumi_v30_68000_w )
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
 READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 {
-	address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int r=ym2151_status_port_r(device,0);
 
 	if (cpu_get_pc(space->cpu)==0x2aca || cpu_get_pc(space->cpu)==0x29fe
@@ -369,7 +369,7 @@ READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 // Mame really should emulate the OKI status reads even with Mame sound off.
 READ8_DEVICE_HANDLER(tatsumi_hack_oki_r)
 {
-	address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int r=downcast<okim6295_device *>(device)->read(*space,0);
 
 	if (cpu_get_pc(space->cpu)==0x2b70 || cpu_get_pc(space->cpu)==0x2bb5

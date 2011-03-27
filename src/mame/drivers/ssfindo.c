@@ -340,17 +340,17 @@ ssfindo_speedup_func ssfindo_speedup;
 static void ssfindo_speedups(address_space* space)
 {
 	if (cpu_get_pc(space->cpu)==0x2d6c8) // ssfindo
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+		device_spin_until_time(space->cpu, attotime::from_usec(20));
 	else if (cpu_get_pc(space->cpu)==0x2d6bc) // ssfindo
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+		device_spin_until_time(space->cpu, attotime::from_usec(20));
 }
 
 static void ppcar_speedups(address_space* space)
 {
 	if (cpu_get_pc(space->cpu)==0x000bc8) // ppcar
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+		device_spin_until_time(space->cpu, attotime::from_usec(20));
 	else if (cpu_get_pc(space->cpu)==0x000bbc) // ppcar
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(20));
+		device_spin_until_time(space->cpu, attotime::from_usec(20));
 }
 
 

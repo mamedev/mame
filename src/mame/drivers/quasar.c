@@ -305,7 +305,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( quasar_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
 static const s2636_interface s2636_0_config =

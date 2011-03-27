@@ -71,8 +71,8 @@ static WRITE16_HANDLER( esd16_sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->audio_cpu, 0, ASSERT_LINE);		// Generate an IRQ
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(50));	// Allow the other CPU to reply
+		device_set_input_line(state->audio_cpu, 0, ASSERT_LINE);		// Generate an IRQ
+		device_spin_until_time(space->cpu, attotime::from_usec(50));	// Allow the other CPU to reply
 	}
 }
 
@@ -244,7 +244,7 @@ static READ8_HANDLER( esd16_sound_command_r )
 	esd16_state *state = space->machine->driver_data<esd16_state>();
 
 	/* Clear IRQ only after reading the command, or some get lost */
-	cpu_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
+	device_set_input_line(state->audio_cpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 

@@ -727,7 +727,7 @@ static const k056230_interface zr107_k056230_intf =
 */
 static INTERRUPT_GEN( zr107_vblank )
 {
-	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
+	device_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_RESET( zr107 )

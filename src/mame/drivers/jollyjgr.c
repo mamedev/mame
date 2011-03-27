@@ -610,7 +610,7 @@ static INTERRUPT_GEN( jollyjgr_interrupt )
 {
 	jollyjgr_state *state = device->machine->driver_data<jollyjgr_state>();
 	if(state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

@@ -12,9 +12,9 @@ INTERRUPT_GEN( beezer_interrupt )
 	state->scanline = (state->scanline + 1) % 0x80;
 	via_0->write_ca2((state->scanline & 0x10) ? 1 : 0);
 	if ((state->scanline & 0x78) == 0x78)
-		cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+		device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpu_set_input_line(device, M6809_FIRQ_LINE, CLEAR_LINE);
+		device_set_input_line(device, M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 SCREEN_UPDATE( beezer )

@@ -119,7 +119,7 @@ static TIMER_CALLBACK( destroyr_dial_callback )
 
 	if (state->potmask[dial])
 	{
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
 	destroyr_state *state = space->machine->driver_data<destroyr_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 

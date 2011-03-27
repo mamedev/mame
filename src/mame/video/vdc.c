@@ -1185,7 +1185,7 @@ READ8_HANDLER( vpc_r )
 
 static void vpc_init( running_machine *machine )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	vpc_w( space, 0, 0x11 );
 	vpc_w( space, 1, 0x11 );
 	vpc.window1.w = 0;

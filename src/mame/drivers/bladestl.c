@@ -43,11 +43,11 @@ static INTERRUPT_GEN( bladestl_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (k007342_is_int_enabled(state->k007342))
-			cpu_set_input_line(device, HD6309_FIRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, HD6309_FIRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -97,7 +97,7 @@ static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 	bladestl_state *state = space->machine->driver_data<bladestl_state>();
 
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 

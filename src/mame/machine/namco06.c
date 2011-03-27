@@ -123,7 +123,7 @@ static TIMER_CALLBACK( nmi_generate )
 	{
 		LOG(("NMI cpu '%s'\n",state->nmicpu->tag()));
 
-		cpu_set_input_line(state->nmicpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->nmicpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		LOG(("NMI not generated because cpu '%s' is suspended\n",state->nmicpu->tag()));

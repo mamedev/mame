@@ -71,14 +71,14 @@ static INTERRUPT_GEN( xxmissio_interrupt_m )
 {
 	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
 	state->status &= ~0x20;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( xxmissio_interrupt_s )
 {
 	xxmissio_state *state = device->machine->driver_data<xxmissio_state>();
 	state->status &= ~0x10;
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_START( xxmissio )

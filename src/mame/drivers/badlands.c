@@ -186,7 +186,7 @@ static void update_interrupts(running_machine *machine)
 
 static void scanline_update(screen_device &screen, int scanline)
 {
-	address_space *space = cputag_get_address_space(screen.machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = screen.machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)

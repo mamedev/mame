@@ -386,7 +386,7 @@ static WRITE8_HANDLER(write_a00x)
 		break;
 
 		case 0x08: //A008
-			cpu_set_input_line(space->cpu,0,CLEAR_LINE);
+			device_set_input_line(space->cpu,0,CLEAR_LINE);
 		break;
 	}
 }
@@ -773,12 +773,12 @@ static SCREEN_UPDATE(witch)
 
 static INTERRUPT_GEN( witch_main_interrupt )
 {
-	cpu_set_input_line(device,0,ASSERT_LINE);
+	device_set_input_line(device,0,ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( witch_sub_interrupt )
 {
-	cpu_set_input_line(device,0,ASSERT_LINE);
+	device_set_input_line(device,0,ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( witch, witch_state )
@@ -868,7 +868,7 @@ static DRIVER_INIT(witch)
 	UINT8 *ROM = (UINT8 *)machine->region("maincpu")->base();
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000+UNBANKED_SIZE]);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);
+	memory_install_read8_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);
 	state->bank = -1;
 }
 

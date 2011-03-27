@@ -91,7 +91,7 @@ static void ojankohs_adpcm_int( device_t *device )
 
 	/* generate an NMI if we're out of data */
 	if (!state->vclk_left)
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( ojankoc_ctrl_w )

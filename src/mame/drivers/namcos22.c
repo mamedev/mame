@@ -2235,7 +2235,7 @@ static INTERRUPT_GEN( namcos22s_interrupt )
 	if( cpu_getiloops(device) == 0 )
 	{
 		int vblank_level   = nthbyte(namcos22_system_controller,0x00)&0x7; /* $700004: ack */
-		cpu_set_input_line(device, vblank_level, HOLD_LINE);
+		device_set_input_line(device, vblank_level, HOLD_LINE);
 		mFrameCount++;
 	}
 	else
@@ -2243,7 +2243,7 @@ static INTERRUPT_GEN( namcos22s_interrupt )
 		//int scanline_level = nthbyte(namcos22_system_controller,0x01)&0x7; /* $700005: ack */
 		//int sci_level      = nthbyte(namcos22_system_controller,0x02)&0x7; /* $700006: ack */
 		//int unk_irq        = nthbyte(namcos22_system_controller,0x03)&0x7; /* $700007: ack */
-		//cpu_set_input_line(device, sci_level, HOLD_LINE);
+		//device_set_input_line(device, sci_level, HOLD_LINE);
 	}
 }
 
@@ -2856,15 +2856,15 @@ static INTERRUPT_GEN( mcu_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
-		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) == 1)
 	{
-		cpu_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 
@@ -3267,13 +3267,13 @@ static INTERRUPT_GEN( namcos22_interrupt )
 	case 0:
 		if( irq_level1 )
 		{
-			cpu_set_input_line(device, irq_level1, HOLD_LINE); /* vblank */
+			device_set_input_line(device, irq_level1, HOLD_LINE); /* vblank */
 		}
 		break;
 	case 1:
 		if( irq_level2 )
 		{
-			cpu_set_input_line(device, irq_level2, HOLD_LINE); /* SCI */
+			device_set_input_line(device, irq_level2, HOLD_LINE); /* SCI */
 		}
 		break;
 	}
@@ -5742,7 +5742,7 @@ static READ16_HANDLER( mcu141_speedup_r )
 {
 	if ((cpu_get_pc(space->cpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 	}
 
 	return su_82;
@@ -5758,7 +5758,7 @@ static READ16_HANDLER( mcu130_speedup_r )
 {
 	if ((cpu_get_pc(space->cpu) == 0xc12a) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 	}
 
 	return su_82;
@@ -5769,7 +5769,7 @@ static READ16_HANDLER( mcuc74_speedup_r )
 {
 	if (((cpu_get_pc(space->cpu) == 0xc0df) || (cpu_get_pc(space->cpu) == 0xc101)) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 	}
 
 	return su_82;
@@ -5777,19 +5777,19 @@ static READ16_HANDLER( mcuc74_speedup_r )
 
 static void install_c74_speedup(running_machine *machine)
 {
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x80, 0x81, 0, 0, mcuc74_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x80, 0x81, 0, 0, mcuc74_speedup_r, mcu_speedup_w);
 }
 
 static void install_130_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.30 MCU BIOS
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu130_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu130_speedup_r, mcu_speedup_w);
 }
 
 static void install_141_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.41 MCU BIOS
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
 }
 
 static void namcos22_init( running_machine *machine, enum namcos22_gametype game_type )
@@ -5808,7 +5808,7 @@ static DRIVER_INIT( alpiner )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_RACER);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_130_speedup(machine);
 }
@@ -5817,7 +5817,7 @@ static DRIVER_INIT( alpiner2 )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_RACER_2);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_130_speedup(machine);
 }
@@ -5826,7 +5826,7 @@ static DRIVER_INIT( alpinesa )
 {
 	namcos22s_init(machine, NAMCOS22_ALPINE_SURFER);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_141_speedup(machine);
 }
@@ -5835,7 +5835,7 @@ static DRIVER_INIT( airco22 )
 {
 	namcos22s_init(machine, NAMCOS22_AIR_COMBAT22);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
 }
 
 static DRIVER_INIT( propcycl )
@@ -5859,7 +5859,7 @@ static DRIVER_INIT( propcycl )
 
 	namcos22s_init(machine, NAMCOS22_PROP_CYCLE);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
 
 	install_141_speedup(machine);
 }
@@ -5945,7 +5945,7 @@ static DRIVER_INIT( cybrcyc )
 
 	namcos22s_init(machine, NAMCOS22_CYBER_CYCLES);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
 
 	install_130_speedup(machine);
 }
@@ -5961,21 +5961,21 @@ static DRIVER_INIT( tokyowar )
 {
 	namcos22s_init(machine, NAMCOS22_TOKYO_WARS);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, tokyowar_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, tokyowar_mcu_adc_r);
 }
 
 static DRIVER_INIT( aquajet )
 {
 	namcos22s_init(machine, NAMCOS22_AQUA_JET);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
 }
 
 static DRIVER_INIT( dirtdash )
 {
 	namcos22s_init(machine, NAMCOS22_DIRT_DASH);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
+	memory_install_read8_handler(machine->device("mcu")->memory().space(ADDRESS_SPACE_IO), M37710_ADC0_L, M37710_ADC7_H, 0, 0, aquajet_mcu_adc_r);
 }
 
 /************************************************************************************/

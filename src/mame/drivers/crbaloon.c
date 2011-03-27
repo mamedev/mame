@@ -341,7 +341,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( crballoon )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 	device_t *discrete = machine->device("discrete");
 
 	pc3092_reset();

@@ -231,7 +231,7 @@ static void system16a_generic_init(running_machine *machine)
 static TIMER_CALLBACK( suspend_i8751 )
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	cpu_suspend(state->mcu, SUSPEND_REASON_DISABLE, 1);
+	device_suspend(state->mcu, SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -378,7 +378,7 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
 	segaic16_sprites_set_flip(device->machine, 0, data & 0x80);
 
 	if (state->mcu != NULL)
-		cpu_set_input_line(state->mcu, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->mcu, MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	segaic16_set_display_enable(device->machine, data & 0x10);
 	set_led_status(device->machine, 1, data & 0x08);
@@ -413,7 +413,7 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
     */
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(device->machine, 0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(device->machine, 0, ~data & 0x02);
 }
@@ -471,8 +471,8 @@ static WRITE8_DEVICE_HANDLER( n7751_control_w )
     */
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
 
-	cpu_set_input_line(state->n7751, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(state->n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->n7751, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 	device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
@@ -558,7 +558,7 @@ static void dumpmtmt_i8751_sim(running_machine *machine)
 	UINT8 min = workram[0x202/2] & 0xff;
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->maincpu, 4, HOLD_LINE);
 
 	/* out of time? set the flag */
 	if (tick == 0 && sec == 0 && min == 0)
@@ -598,10 +598,10 @@ static void dumpmtmt_i8751_sim(running_machine *machine)
 static void quartet_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* signal a VBLANK to the main CPU */
-	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
+	device_set_input_line(state->maincpu, 4, HOLD_LINE);
 
 	/* X scroll values */
 	segaic16_textram_0_w(space, 0xff8/2, workram[0x0d14/2], 0xffff);
@@ -879,9 +879,9 @@ static WRITE8_HANDLER( mcu_control_w )
 	if (state->i8751_vblank_hook != NULL)
 		return;
 
-	cpu_set_input_line(state->maincpu, INPUT_LINE_RESET, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_RESET, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	for (irqline = 1; irqline <= 7; irqline++)
-		cpu_set_input_line(state->maincpu, irqline, ((~data & 7) == irqline) ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(state->maincpu, irqline, ((~data & 7) == irqline) ? ASSERT_LINE : CLEAR_LINE);
 
 	if (data & 0x40)
 		segaic16_set_display_enable(space->machine, 1);
@@ -987,8 +987,8 @@ static READ8_HANDLER( mcu_io_r )
 static INTERRUPT_GEN( mcu_irq_assert )
 {
 	/* toggle the INT0 line on the MCU */
-	cpu_set_input_line(device, MCS51_INT0_LINE, ASSERT_LINE);
-	cpu_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
+	device_set_input_line(device, MCS51_INT0_LINE, ASSERT_LINE);
+	device_set_input_line(device, MCS51_INT0_LINE, CLEAR_LINE);
 
 	/* boost interleave to ensure that the MCU can break the M68000 out of a STOP */
 	device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));

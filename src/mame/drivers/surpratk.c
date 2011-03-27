@@ -22,7 +22,7 @@ static INTERRUPT_GEN( surpratk_interrupt )
 {
 	surpratk_state *state = device->machine->driver_data<surpratk_state>();
 	if (k052109_is_irq_enabled(state->k052109))
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
@@ -171,7 +171,7 @@ INPUT_PORTS_END
 static void irqhandler( device_t *device, int linestate )
 {
 	surpratk_state *state = device->machine->driver_data<surpratk_state>();
-	cpu_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, linestate);
+	device_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, linestate);
 }
 
 static const ym2151_interface ym2151_config =

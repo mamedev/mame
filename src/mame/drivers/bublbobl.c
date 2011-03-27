@@ -700,7 +700,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	bublbobl_state *state = device->machine->driver_data<bublbobl_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1555,7 +1555,7 @@ static DRIVER_INIT( tokiob )
 {
 	DRIVER_INIT_CALL(tokio);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe00, 0xfe00, 0, 0, tokiob_mcu_r );
 }
 
 static DRIVER_INIT( dland )

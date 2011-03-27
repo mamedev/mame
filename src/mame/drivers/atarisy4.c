@@ -962,7 +962,7 @@ next_line:
 static DRIVER_INIT( laststar )
 {
 	atarisy4_state *state = machine->driver_data<atarisy4_state>();
-	address_space *main = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *main = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* Allocate 16kB of shared RAM */
 	state->shared_ram[0] = auto_alloc_array_clear(machine, UINT16, 0x2000);
@@ -974,7 +974,7 @@ static DRIVER_INIT( laststar )
 	/* Set up the DSP */
 	memory_set_bankptr(machine, "dsp0_bank0", state->shared_ram[0]);
 	memory_set_bankptr(machine, "dsp0_bank1", &state->shared_ram[0][0x800]);
-	load_ldafile(cputag_get_address_space(machine, "dsp0", ADDRESS_SPACE_PROGRAM), machine->region("dsp")->base());
+	load_ldafile(machine->device("dsp0")->memory().space(ADDRESS_SPACE_PROGRAM), machine->region("dsp")->base());
 }
 
 static DRIVER_INIT( airrace )
@@ -985,17 +985,17 @@ static DRIVER_INIT( airrace )
 	state->shared_ram[1] = auto_alloc_array_clear(machine, UINT16, 0x4000);
 
 	/* Populate RAM with data from the HEX files */
-	load_hexfile(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), machine->region("code")->base());
+	load_hexfile(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), machine->region("code")->base());
 
 	/* Set up the first DSP */
 	memory_set_bankptr(machine, "dsp0_bank0", state->shared_ram[0]);
 	memory_set_bankptr(machine, "dsp0_bank1", &state->shared_ram[0][0x800]);
-	load_ldafile(cputag_get_address_space(machine, "dsp0", ADDRESS_SPACE_PROGRAM), machine->region("dsp")->base());
+	load_ldafile(machine->device("dsp0")->memory().space(ADDRESS_SPACE_PROGRAM), machine->region("dsp")->base());
 
 	/* Set up the second DSP */
 	memory_set_bankptr(machine, "dsp1_bank0", state->shared_ram[1]);
 	memory_set_bankptr(machine, "dsp1_bank1", &state->shared_ram[1][0x800]);
-	load_ldafile(cputag_get_address_space(machine, "dsp1", ADDRESS_SPACE_PROGRAM), machine->region("dsp")->base());
+	load_ldafile(machine->device("dsp1")->memory().space(ADDRESS_SPACE_PROGRAM), machine->region("dsp")->base());
 }
 
 static MACHINE_RESET( atarisy4 )

@@ -500,7 +500,7 @@ static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source 
 {
 	namcona1_state *state = machine->driver_data<namcona1_state>();
 	UINT16 data;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
 	{
@@ -994,7 +994,7 @@ static INTERRUPT_GEN( namcona1_interrupt )
 					device->machine->primary_screen->update_partial(scanline );
 				}
 			}
-			cpu_set_input_line(device, level+1, HOLD_LINE);
+			device_set_input_line(device, level+1, HOLD_LINE);
 		}
 	}
 }
@@ -1007,11 +1007,11 @@ static INTERRUPT_GEN( mcu_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
-		cpu_set_input_line(device, M37710_LINE_IRQ1, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ1, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) == 1)
 	{
-		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 

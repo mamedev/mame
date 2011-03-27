@@ -124,7 +124,7 @@ static WRITE16_HANDLER( soundcmd_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 	}
 }
 

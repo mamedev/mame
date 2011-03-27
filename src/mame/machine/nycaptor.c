@@ -52,7 +52,7 @@ WRITE8_HANDLER( nycaptor_68705_port_b_w )
 		state->port_a_in = state->from_main;
 
 		if (state->main_sent)
-			cpu_set_input_line(state->mcu, 0, CLEAR_LINE);
+			device_set_input_line(state->mcu, 0, CLEAR_LINE);
 		state->main_sent = 0;
 
 	}
@@ -104,7 +104,7 @@ WRITE8_HANDLER( nycaptor_mcu_w )
 
 	state->from_main = data;
 	state->main_sent = 1;
-	cpu_set_input_line(state->mcu, 0, ASSERT_LINE);
+	device_set_input_line(state->mcu, 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( nycaptor_mcu_r )

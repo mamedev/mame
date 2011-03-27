@@ -180,7 +180,7 @@ static MACHINE_START( spacefb )
 
 static MACHINE_RESET( spacefb )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 	/* the 3 output ports are cleared on reset */
 	spacefb_port_0_w(space, 0, 0);
 	spacefb_port_1_w(space, 0, 0);

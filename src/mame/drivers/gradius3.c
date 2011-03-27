@@ -90,7 +90,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 		state->priority = data & 0x04;
 
 		/* bit 3 enables cpu B */
-		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 5 enables irq */
 		state->irqAen = data & 0x20;
@@ -112,7 +112,7 @@ static INTERRUPT_GEN( cpuA_interrupt )
 {
 	gradius3_state *state = device->machine->driver_data<gradius3_state>();
 	if (state->irqAen)
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cpuB_interrupt )
@@ -122,12 +122,12 @@ static INTERRUPT_GEN( cpuB_interrupt )
 	if (cpu_getiloops(device) & 1)	/* ??? */
 	{
 		if (state->irqBmask & 2)
-			cpu_set_input_line(device, 2, HOLD_LINE);
+			device_set_input_line(device, 2, HOLD_LINE);
 	}
 	else
 	{
 		if (state->irqBmask & 1)
-			cpu_set_input_line(device, 1, HOLD_LINE);
+			device_set_input_line(device, 1, HOLD_LINE);
 	}
 }
 
@@ -138,7 +138,7 @@ static WRITE16_HANDLER( cpuB_irqtrigger_w )
 	if (state->irqBmask & 4)
 	{
 		logerror("%04x trigger cpu B irq 4 %02x\n",cpu_get_pc(space->cpu),data);
-		cpu_set_input_line(state->subcpu, 4, HOLD_LINE);
+		device_set_input_line(state->subcpu, 4, HOLD_LINE);
 	}
 	else
 		logerror("%04x MISSED cpu B irq 4 %02x\n",cpu_get_pc(space->cpu),data);
@@ -153,7 +153,7 @@ static WRITE16_HANDLER( sound_command_w )
 static WRITE16_HANDLER( sound_irq_w )
 {
 	gradius3_state *state = space->machine->driver_data<gradius3_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bank_w )

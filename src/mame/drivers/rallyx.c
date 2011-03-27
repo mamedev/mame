@@ -208,8 +208,8 @@ static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 {
 	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 
-	cpu_set_input_line_vector(state->maincpu, 0, data);
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line_vector(state->maincpu, 0, data);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -237,7 +237,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 		case 0x01:	/* INT ON */
 			cpu_interrupt_enable(state->maincpu, bit);
 			if (!bit)
-				cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+				device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* SOUND ON */

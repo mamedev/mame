@@ -46,7 +46,7 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 
 static MACHINE_RESET( srumbler )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	/* initialize banked ROM pointers */
 	srumbler_bankswitch_w(space,0,0);
 }
@@ -54,9 +54,9 @@ static MACHINE_RESET( srumbler )
 static INTERRUPT_GEN( srumbler_interrupt )
 {
 	if (cpu_getiloops(device)==0)
-		cpu_set_input_line(device,0,HOLD_LINE);
+		device_set_input_line(device,0,HOLD_LINE);
 	else
-		cpu_set_input_line(device,M6809_FIRQ_LINE,HOLD_LINE);
+		device_set_input_line(device,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 /*

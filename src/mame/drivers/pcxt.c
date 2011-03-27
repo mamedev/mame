@@ -947,7 +947,7 @@ static MACHINE_RESET( filetto )
 	state->bank = -1;
 	state->lastvalue = -1;
 	state->hv_blank = 0;
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 	state->pit8253 = machine->device( "pit8253" );
 	state->pic8259_1 = machine->device( "pic8259_1" );
 	state->pic8259_2 = machine->device( "pic8259_2" );

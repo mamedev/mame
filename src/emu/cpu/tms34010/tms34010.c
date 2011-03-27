@@ -769,7 +769,7 @@ static TIMER_CALLBACK( internal_interrupt_callback )
 	LOG(("TMS34010 '%s' set internal interrupt $%04x\n", tms->device->tag(), type));
 
 	/* generate triggers so that spin loops can key off them */
-	cpu_triggerint(tms->device);
+	device_triggerint(tms->device);
 }
 
 
@@ -1196,7 +1196,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			/* if the CPU is halting itself, stop execution right away */
 			if ((data & 0x8000) && !tms->external_host_access)
 				tms->icount = 0;
-			cpu_set_input_line(tms->device, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
+			device_set_input_line(tms->device, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
 
 			/* NMI issued? */
 			if (data & 0x0100)
@@ -1347,7 +1347,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 			/* if the CPU is halting itself, stop execution right away */
 			if ((data & 0x8000) && !tms->external_host_access)
 				tms->icount = 0;
-			cpu_set_input_line(tms->device, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
+			device_set_input_line(tms->device, INPUT_LINE_HALT, (data & 0x8000) ? ASSERT_LINE : CLEAR_LINE);
 
 			/* NMI issued? */
 			if (data & 0x0100)

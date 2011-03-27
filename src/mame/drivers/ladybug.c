@@ -192,7 +192,7 @@ static INPUT_CHANGED( coin1_inserted )
 	ladybug_state *state = field->port->machine->driver_data<ladybug_state>();
 
 	/* left coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_CHANGED( coin2_inserted )
@@ -201,7 +201,7 @@ static INPUT_CHANGED( coin2_inserted )
 
 	/* right coin insertion causes an IRQ */
 	if (newval)
-		cpu_set_input_line(state->maincpu, 0, HOLD_LINE);
+		device_set_input_line(state->maincpu, 0, HOLD_LINE);
 }
 
 
@@ -1062,7 +1062,7 @@ static DRIVER_INIT( dorodon )
 	/* decode the opcodes */
 
 	offs_t i;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *table = machine->region("user1")->base();

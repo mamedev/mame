@@ -204,7 +204,7 @@ static WRITE8_HANDLER( sound_w )
 	ddayjlc_state *state = space->machine->driver_data<ddayjlc_state>();
 
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )
@@ -431,14 +431,14 @@ static INTERRUPT_GEN( ddayjlc_interrupt )
 {
 	ddayjlc_state *state = device->machine->driver_data<ddayjlc_state>();
 	if(state->main_nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 {
 	ddayjlc_state *state = device->machine->driver_data<ddayjlc_state>();
 	if(state->sound_nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

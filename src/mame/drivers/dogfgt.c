@@ -32,13 +32,13 @@ static WRITE8_HANDLER( subirqtrigger_w )
 	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
 	/* bit 0 used but unknown */
 	if (data & 0x04)
-		cpu_set_input_line(state->subcpu, 0, ASSERT_LINE);
+		device_set_input_line(state->subcpu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
 	dogfgt_state *state = space->machine->driver_data<dogfgt_state>();
-	cpu_set_input_line(state->subcpu, 0, CLEAR_LINE);
+	device_set_input_line(state->subcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dogfgt_soundlatch_w )

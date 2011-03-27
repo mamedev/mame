@@ -839,8 +839,8 @@ static INTERRUPT_GEN( master_irq )
 {
 	switch(cpu_getiloops(device))
 	{
-		case 0: cpu_set_input_line(device,1,HOLD_LINE); break;
-		case 1: cpu_set_input_line(device,3,HOLD_LINE); break;
+		case 0: device_set_input_line(device,1,HOLD_LINE); break;
+		case 1: device_set_input_line(device,3,HOLD_LINE); break;
 	}
 }
 
@@ -848,8 +848,8 @@ static INTERRUPT_GEN( slave_irq )
 {
 	switch(cpu_getiloops(device))
 	{
-		case 0: cpu_set_input_line(device,3,HOLD_LINE); break;
-		case 1: cpu_set_input_line(device,1,HOLD_LINE); break;
+		case 0: device_set_input_line(device,3,HOLD_LINE); break;
+		case 1: device_set_input_line(device,1,HOLD_LINE); break;
 	}
 }
 #endif

@@ -230,7 +230,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( ttchamp_irq ) /* right? */
 {
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( ttchamp, ttchamp_state )

@@ -169,7 +169,7 @@ static void mcr68_common_init(running_machine *machine)
 	}
 
 	/* initialize the clock */
-	state->m6840_internal_counter_period = attotime::from_hz(cputag_get_clock(machine, "maincpu") / 10);
+	state->m6840_internal_counter_period = attotime::from_hz(machine->device("maincpu")->unscaled_clock() / 10);
 
 	/* initialize the sound */
 	mcr_sound_reset(machine);
@@ -292,7 +292,7 @@ WRITE8_DEVICE_HANDLER( zwackery_pia1_w )
 WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 {
 	mcr68_state *drvstate = device->machine->driver_data<mcr68_state>();
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	csdeluxe_data_w(space, 0, (state << 4) | drvstate->zwackery_sound_data);
 }
 

@@ -344,7 +344,7 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 
 	cpu_interrupt_enable(space->cpu,data);
 	if (!data)
-		cpu_set_input_line(space->cpu, 0, CLEAR_LINE);
+		device_set_input_line(space->cpu, 0, CLEAR_LINE);
 }
 
 
@@ -458,7 +458,7 @@ static const namco_53xx_interface namco_53xx_intf =
 
 static MACHINE_RESET( polepos )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -466,8 +466,8 @@ static MACHINE_RESET( polepos )
 		polepos_latch_w(space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
-	cpu_set_input_line_vector(machine->device("sub"), 0, Z8000_NVI);
-	cpu_set_input_line_vector(machine->device("sub2"), 0, Z8000_NVI);
+	device_set_input_line_vector(machine->device("sub"), 0, Z8000_NVI);
+	device_set_input_line_vector(machine->device("sub2"), 0, Z8000_NVI);
 }
 
 
@@ -1986,15 +1986,15 @@ ROM_END
 static DRIVER_INIT( topracern )
 {
 	/* extra direct mapped inputs read */
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, "STEER");
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "IN0");
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSWA");
+	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, "STEER");
+	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "IN0");
+	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSWA");
 }
 
 static DRIVER_INIT( polepos2 )
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	memory_install_read16_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
+	memory_install_read16_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
 }
 
 

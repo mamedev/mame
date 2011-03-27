@@ -123,7 +123,7 @@ static TIMER_CALLBACK( dmaend_callback )
 {
 	moo_state *state = machine->driver_data<moo_state>();
 	if (state->cur_control2 & 0x800)
-		cpu_set_input_line(state->maincpu, 4, HOLD_LINE);
+		device_set_input_line(state->maincpu, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( moo_interrupt )
@@ -139,7 +139,7 @@ static INTERRUPT_GEN( moo_interrupt )
 
 	// trigger V-blank interrupt
 	if (state->cur_control2 & 0x20)
-		cpu_set_input_line(device, 5, HOLD_LINE);
+		device_set_input_line(device, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( moobl_interrupt )
@@ -151,7 +151,7 @@ static INTERRUPT_GEN( moobl_interrupt )
     state->dmaend_timer->adjust(attotime::from_usec(MOO_DMADELAY));
 
 	// trigger V-blank interrupt
-	cpu_set_input_line(device, 5, HOLD_LINE);
+	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( sound_cmd1_w )
@@ -172,7 +172,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 static WRITE16_HANDLER( sound_irq_w )
 {
 	moo_state *state = space->machine->driver_data<moo_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )

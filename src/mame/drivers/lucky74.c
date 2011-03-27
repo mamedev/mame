@@ -797,7 +797,7 @@ static INTERRUPT_GEN( nmi_interrupt )
 	lucky74_state *state = device->machine->driver_data<lucky74_state>();
 	if ((state->ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
 	{
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

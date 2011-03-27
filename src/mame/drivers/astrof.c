@@ -82,7 +82,7 @@
 static READ8_HANDLER( irq_clear_r )
 {
 	astrof_state *state = space->machine->driver_data<astrof_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -91,7 +91,7 @@ static READ8_HANDLER( irq_clear_r )
 static TIMER_DEVICE_CALLBACK( irq_callback )
 {
 	astrof_state *state = timer.machine->driver_data<astrof_state>();
-	cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+	device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
 
@@ -107,7 +107,7 @@ static INPUT_CHANGED( coin_inserted )
 	astrof_state *state = field->port->machine->driver_data<astrof_state>();
 
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 	coin_counter_w(field->port->machine, 0, newval);
 }
 
@@ -117,7 +117,7 @@ static INPUT_CHANGED( service_coin_inserted )
 	astrof_state *state = field->port->machine->driver_data<astrof_state>();
 
 	/* service coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1308,8 +1308,8 @@ static DRIVER_INIT( abattle )
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
 
 
@@ -1322,8 +1322,8 @@ static DRIVER_INIT( afire )
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, afire_coin_prot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, afire_coin_prot_r);
 }
 
 
@@ -1336,8 +1336,8 @@ static DRIVER_INIT( sstarbtl )
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa003, 0xa003, 0, 0, shoot_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa004, 0xa004, 0, 0, abattle_coin_prot_r);
 }
 
 

@@ -154,7 +154,7 @@ static WRITE8_HANDLER( beast_data_w )
 	state->data_to_beast = data;
 	state->z80_to_beast_full = 1;
 	state->beast_int0_l = 0;
-	cpu_set_input_line(state->beast, INPUT_LINE_IRQ0, ASSERT_LINE);
+	device_set_input_line(state->beast, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( beast_data_r )
@@ -176,7 +176,7 @@ static READ8_HANDLER( beast_status_r )
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
 	djboy_state *state = space->machine->driver_data<djboy_state>();
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
@@ -240,7 +240,7 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
 	djboy_state *state = space->machine->driver_data<djboy_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->cpu2, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->cpu2, INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
@@ -346,7 +346,7 @@ static WRITE8_HANDLER( beast_p1_w )
 	if (data == 0xff)
 	{
 		state->beast_int0_l = 1;
-		cpu_set_input_line(state->beast, INPUT_LINE_IRQ0, CLEAR_LINE);
+		device_set_input_line(state->beast, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 
 	state->beast_p1 = data;
@@ -394,7 +394,7 @@ static WRITE8_HANDLER( beast_p3_w )
 	djboy_state *state = space->machine->driver_data<djboy_state>();
 
 	state->beast_p3 = data;
-	cpu_set_input_line(state->cpu1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->cpu1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 /* Program/data maps are defined in the 8051 core */
 

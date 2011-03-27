@@ -40,7 +40,7 @@ static INTERRUPT_GEN( pandoras_master_interrupt )
 	pandoras_state *state = device->machine->driver_data<pandoras_state>();
 
 	if (state->irq_enable_a)
-		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( pandoras_slave_interrupt )
@@ -48,7 +48,7 @@ static INTERRUPT_GEN( pandoras_slave_interrupt )
 	pandoras_state *state = device->machine->driver_data<pandoras_state>();
 
 	if (state->irq_enable_b)
-		cpu_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( pandoras_int_control_w )
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 	switch (offset)
 	{
 		case 0x00:	if (!data)
-					cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+					device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 				state->irq_enable_a = data;
 				break;
 		case 0x02:	coin_counter_w(space->machine, 0,data & 0x01);
@@ -77,10 +77,10 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 		case 0x05:	pandoras_flipscreen_w(space, 0, data);
 				break;
 		case 0x06:	if (!data)
-					cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+					device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 				state->irq_enable_b = data;
 				break;
-		case 0x07:	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+		case 0x07:	device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 				break;
 
 		default:	logerror("%04x: (irq_ctrl) write %02x to %02x\n",cpu_get_pc(space->cpu), data, offset);
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w )
 	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	if (!state->firq_old_data_a && data)
-		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 
 	state->firq_old_data_a = data;
 }
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w )
 	pandoras_state *state = space->machine->driver_data<pandoras_state>();
 
 	if (!state->firq_old_data_b && data)
-		cpu_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE);
 
 	state->firq_old_data_b = data;
 }
@@ -111,7 +111,7 @@ static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w )
 static WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
 {
 	pandoras_state *state = space->machine->driver_data<pandoras_state>();
-	cpu_set_input_line(state->mcu, 0, ASSERT_LINE);
+	device_set_input_line(state->mcu, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
@@ -120,7 +120,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(state->mcu, 0, CLEAR_LINE);
+		device_set_input_line(state->mcu, 0, CLEAR_LINE);
 
 	/* bit 5 goes to 8910 port A */
 	state->i8039_status = (data & 0x20) >> 5;
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( i8039_irqen_and_status_w )
 static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 {
 	pandoras_state *state = space->machine->driver_data<pandoras_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 

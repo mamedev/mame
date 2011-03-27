@@ -401,7 +401,7 @@ static WRITE8_HANDLER(mstworld_sound_w)
 {
 	mitchell_state *state = space->machine->driver_data<mitchell_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( mstworld_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1203,7 +1203,7 @@ static void spangbl_adpcm_int( device_t *device )
 	state->sample_buffer >>= 4;
 	state->sample_select ^= 1;
 	if(state->sample_select == 0)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -2099,7 +2099,7 @@ ROM_END
 
 static void bootleg_decode( running_machine *machine )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	space->set_decrypted_region(0x0000, 0x7fff, machine->region("maincpu")->base() + 0x50000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 16, machine->region("maincpu")->base() + 0x60000, 0x4000);
 }
@@ -2210,8 +2210,8 @@ static DRIVER_INIT( mgakuen )
 	mitchell_state *state = machine->driver_data<mitchell_state>();
 	state->input_type = 1;
 	configure_banks(machine);
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW0");
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSW1");
+	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW0");
+	memory_install_read_port(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSW1");
 }
 static DRIVER_INIT( mgakuen2 )
 {

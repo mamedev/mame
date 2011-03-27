@@ -33,7 +33,7 @@
 
 static INTERRUPT_GEN( fromanc2_interrupt )
 {
-	cpu_set_input_line(device, 1, HOLD_LINE);
+	device_set_input_line(device, 1, HOLD_LINE);
 }
 
 
@@ -44,7 +44,7 @@ static WRITE16_HANDLER( fromanc2_sndcmd_w )
 	soundlatch_w(space, offset, (data >> 8) & 0xff);	// 1P (LEFT)
 	soundlatch2_w(space, offset, data & 0xff);			// 2P (RIGHT)
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	state->sndcpu_nmi_flag = 0;
 }
 
@@ -117,14 +117,14 @@ static WRITE16_HANDLER( fromanc2_subcpu_w )
 	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
 	state->datalatch1 = data;
 
-	cpu_set_input_line(state->subcpu, 0, HOLD_LINE);
+	device_set_input_line(state->subcpu, 0, HOLD_LINE);
 	state->subcpu_int_flag = 0;
 }
 
 static READ16_HANDLER( fromanc2_subcpu_r )
 {
 	fromanc2_state *state = space->machine->driver_data<fromanc2_state>();
-	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 	state->subcpu_nmi_flag = 0;
 
 	return (state->datalatch_2h << 8) | state->datalatch_2l;
@@ -498,7 +498,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	fromanc2_state *state = device->machine->driver_data<fromanc2_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

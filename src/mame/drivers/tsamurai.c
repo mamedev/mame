@@ -58,7 +58,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static INTERRUPT_GEN( samurai_interrupt )
 {
 	tsamurai_state *state = device->machine->driver_data<tsamurai_state>();
-	if (state->nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( unknown_d803_r )
@@ -286,7 +286,7 @@ static WRITE8_HANDLER( vsgongf_sound_nmi_enable_w )
 static INTERRUPT_GEN( vsgongf_sound_interrupt )
 {
 	tsamurai_state *state = device->machine->driver_data<tsamurai_state>();
-	if (state->vsgongf_sound_nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (state->vsgongf_sound_nmi_enabled) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* what are these, protection of some kind? */

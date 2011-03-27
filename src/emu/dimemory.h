@@ -181,31 +181,6 @@ protected:
 //**************************************************************************
 
 //-------------------------------------------------
-//  device_memory - return a pointer to the device
-//  memory interface for this device
-//-------------------------------------------------
-
-inline device_memory_interface *device_memory(device_t *device)
-{
-	device_memory_interface *intf;
-	if (!device->interface(intf))
-		throw emu_fatalerror("Device '%s' does not have memory interface", device->tag());
-	return intf;
-}
-
-
-//-------------------------------------------------
-//  device_get_space - return a pointer to the
-//  given address space on this device
-//-------------------------------------------------
-
-inline address_space *device_get_space(device_t *device, int spacenum = 0)
-{
-	return device_memory(device)->space(spacenum);
-}
-
-
-//-------------------------------------------------
 //  devconfig_get_space_config - return a pointer
 //  to sthe given address space's configuration
 //-------------------------------------------------

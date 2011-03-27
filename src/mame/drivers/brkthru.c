@@ -87,14 +87,14 @@ static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
 	brkthru_state *state = space->machine->driver_data<brkthru_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted )
 {
 	brkthru_state *state = field->port->machine->driver_data<brkthru_state>();
 	/* coin insertion causes an IRQ */
-	cpu_set_input_line(state->maincpu, 0, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->maincpu, 0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -347,7 +347,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	brkthru_state *state = device->machine->driver_data<brkthru_state>();
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, linestate);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =

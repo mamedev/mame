@@ -60,7 +60,7 @@ static void sega_decode_2(running_machine *machine,const char *cputag,
 	};
 
 
-	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device(cputag)->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = machine->region(cputag)->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x8000);
 

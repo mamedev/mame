@@ -115,7 +115,7 @@ static TIMER_CALLBACK( dmaend_callback )
 	gijoe_state *state = machine->driver_data<gijoe_state>();
 
 	if (state->cur_control2 & 0x0020)
-		cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
+		device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( gijoe_interrupt )
@@ -136,7 +136,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 
 	// trigger V-blank interrupt
 	if (state->cur_control2 & 0x0080)
-		cpu_set_input_line(device, 5, HOLD_LINE);
+		device_set_input_line(device, 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
@@ -151,7 +151,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 static WRITE16_HANDLER( sound_irq_w )
 {
 	gijoe_state *state = space->machine->driver_data<gijoe_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
@@ -162,7 +162,7 @@ static READ16_HANDLER( sound_status_r )
 static void sound_nmi( device_t *device )
 {
 	gijoe_state *state = device->machine->driver_data<gijoe_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( gijoe_map, ADDRESS_SPACE_PROGRAM, 16 )

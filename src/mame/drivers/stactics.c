@@ -160,7 +160,7 @@ static INTERRUPT_GEN( stactics_interrupt )
 
 	move_motor(device->machine, state);
 
-    cpu_set_input_line(device, 0, HOLD_LINE);
+    device_set_input_line(device, 0, HOLD_LINE);
 }
 
 

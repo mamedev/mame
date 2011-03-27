@@ -277,7 +277,7 @@ GFXDECODE_END
 static void ym2203_irq_handler( device_t *device, int irq )
 {
 	ashnojoe_state *state = device->machine->driver_data<ashnojoe_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( ym2203_write_a )
@@ -317,7 +317,7 @@ static void ashnojoe_vclk_cb( device_t *device )
 	else
 	{
 		msm5205_data_w(device, state->adpcm_byte & 0xf);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	state->msm5205_vclk_toggle ^= 1;

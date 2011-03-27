@@ -142,7 +142,7 @@ static READ8_HANDLER( popper_input_ports_r )
 static READ8_HANDLER( popper_soundcpu_nmi_r )
 {
 	popper_state *state = space->machine->driver_data<popper_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 

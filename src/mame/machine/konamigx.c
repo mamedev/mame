@@ -442,7 +442,7 @@ static UINT32 fantjour_dma[8];
 void fantjour_dma_install(running_machine *machine)
 {
 	state_save_register_global_array(machine, fantjour_dma);
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xdb0000, 0xdb001f, 0, 0, fantjour_dma_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xdb0000, 0xdb001f, 0, 0, fantjour_dma_w);
 	memset(fantjour_dma, 0, sizeof(fantjour_dma));
 }
 

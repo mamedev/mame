@@ -215,7 +215,7 @@ static INTERRUPT_GEN( meadows_interrupt )
 	meadows_state *state = device->machine->driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
 	state->main_sense_state ^= 1;
-	cpu_set_input_line(device, 1, state->main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device, 1, state->main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -230,7 +230,7 @@ static INTERRUPT_GEN( minferno_interrupt )
 {
 	meadows_state *state = device->machine->driver_data<meadows_state>();
 	state->main_sense_state++;
-	cpu_set_input_line(device, 1, (state->main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line(device, 1, (state->main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -315,7 +315,7 @@ static INTERRUPT_GEN( audio_interrupt )
 	meadows_state *state = device->machine->driver_data<meadows_state>();
     /* fake something toggling the sense input line of the S2650 */
 	state->audio_sense_state ^= 1;
-	cpu_set_input_line(device, 1, state->audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(device, 1, state->audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -40,7 +40,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 	if ((data & 0x80) == 0)
 		soundlatch_w(space, 0, data & 0x7f);
 	else
-		cpu_set_input_line(state->soundcpu, 0, ASSERT_LINE);
+		device_set_input_line(state->soundcpu, 0, ASSERT_LINE);
 }
 
 
@@ -100,7 +100,7 @@ static READ8_DEVICE_HANDLER( m6803_port2_r )
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
 	kncljoe_state *state = space->machine->driver_data<kncljoe_state>();
-	cpu_set_input_line(state->soundcpu, 0, CLEAR_LINE);
+	device_set_input_line(state->soundcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER(unused_w)
@@ -245,7 +245,7 @@ static const ay8910_interface ay8910_config =
 
 static INTERRUPT_GEN (sound_nmi)
 {
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( kncljoe )

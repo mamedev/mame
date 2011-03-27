@@ -612,17 +612,17 @@ static void stv_SMPC_w8 (address_space *space, int offset, UINT8 data)
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
-				cputag_set_clock(space->machine, "maincpu", MASTER_CLOCK_352/2);
-				cputag_set_clock(space->machine, "slave", MASTER_CLOCK_352/2);
-				cputag_set_clock(space->machine, "audiocpu", MASTER_CLOCK_352/5);
+				space->machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_352/2);
+				space->machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_352/2);
+				space->machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_352/5);
 				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
-				cputag_set_clock(space->machine, "maincpu", MASTER_CLOCK_320/2);
-				cputag_set_clock(space->machine, "slave", MASTER_CLOCK_320/2);
-				cputag_set_clock(space->machine, "audiocpu", MASTER_CLOCK_320/5);
+				space->machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+				space->machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+				space->machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 				cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			/*"Interrupt Back"*/
@@ -2359,10 +2359,10 @@ DRIVER_INIT ( stv )
 	sh2drc_set_options(machine->device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
-	memory_install_write32_handler(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
-	memory_install_write32_handler(cputag_get_address_space(machine, "slave", ADDRESS_SPACE_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
+	memory_install_write32_handler(machine->device("slave")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
+	memory_install_write32_handler(machine->device("slave")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
 
     smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  smpc_ram[0x33] = input_port_read(machine, "FAKE");
@@ -2835,9 +2835,9 @@ static MACHINE_RESET( stv )
 	port_sel = mux_data = 0;
 	port_i = -1;
 
-	cputag_set_clock(machine, "maincpu", MASTER_CLOCK_320/2);
-	cputag_set_clock(machine, "slave", MASTER_CLOCK_320/2);
-	cputag_set_clock(machine, "audiocpu", MASTER_CLOCK_320/5);
+	machine->device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine->device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
+	machine->device("audiocpu")->set_unscaled_clock(MASTER_CLOCK_320/5);
 
 	stvcd_reset(machine);
 

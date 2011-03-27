@@ -196,7 +196,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( ultrsprt_vblank )
 {
-	cpu_set_input_line(device, INPUT_LINE_IRQ1, ASSERT_LINE);
+	device_set_input_line(device, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static void sound_irq_callback(running_machine *machine, int irq)

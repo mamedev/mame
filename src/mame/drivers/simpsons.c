@@ -115,7 +115,7 @@ static WRITE8_HANDLER( z80_bankswitch_w )
 static void sound_nmi_callback( running_machine *machine, int param )
 {
 	simpsons_state *state = machine->driver_data<simpsons_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->nmi_enabled) ? CLEAR_LINE : ASSERT_LINE );
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, (state->nmi_enabled) ? CLEAR_LINE : ASSERT_LINE );
 	state->nmi_enabled = 0;
 }
 #endif
@@ -123,13 +123,13 @@ static void sound_nmi_callback( running_machine *machine, int param )
 static TIMER_CALLBACK( nmi_callback )
 {
 	simpsons_state *state = machine->driver_data<simpsons_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
 	simpsons_state *state = space->machine->driver_data<simpsons_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	space->machine->scheduler().timer_set(attotime::from_usec(25), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -257,7 +257,7 @@ static TIMER_CALLBACK( dmaend_callback )
 {
 	simpsons_state *state = machine->driver_data<simpsons_state>();
 	if (state->firq_enabled)
-		cpu_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, KONAMI_FIRQ_LINE, HOLD_LINE);
 }
 
 
@@ -273,7 +273,7 @@ static INTERRUPT_GEN( simpsons_irq )
 	}
 
 	if (k052109_is_irq_enabled(state->k052109))
-		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static const k052109_interface simpsons_k052109_intf =

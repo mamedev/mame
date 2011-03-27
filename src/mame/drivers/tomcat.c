@@ -156,7 +156,7 @@ static WRITE16_HANDLER(tomcat_mresl_w)
 {
 	// 320 Reset Low         (Address Strobe)
 	// Reset TMS320
-	cpu_set_input_line(space->machine->device("dsp"), INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(space->machine->device("dsp"), INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER(tomcat_mresh_w)
@@ -165,7 +165,7 @@ static WRITE16_HANDLER(tomcat_mresh_w)
 	// 320 Reset high        (Address Strobe)
 	// Release reset of TMS320
 	state->dsp_BIO = 0;
-	cpu_set_input_line(space->machine->device("dsp"), INPUT_LINE_RESET, CLEAR_LINE);
+	device_set_input_line(space->machine->device("dsp"), INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER(tomcat_irqclr_w)

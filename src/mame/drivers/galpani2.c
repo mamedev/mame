@@ -83,7 +83,7 @@ static MACHINE_RESET( galpani2 )
 
 static void galpani2_write_kaneko(device_t *device)
 {
-	address_space *dstspace = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *dstspace = device->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i,x,tpattidx;
 	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
 
@@ -113,8 +113,8 @@ static void galpani2_write_kaneko(device_t *device)
 static WRITE8_HANDLER( galpani2_mcu_init_w )
 {
 	running_machine *machine = space->machine;
-	address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
+	address_space *srcspace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *dstspace = machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT32 mcu_address, mcu_data;
 
 	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
@@ -127,8 +127,8 @@ static WRITE8_HANDLER( galpani2_mcu_init_w )
 
 static void galpani2_mcu_nmi1(running_machine *machine)
 {
-	address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
+	address_space *srcspace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *dstspace = machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
 	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )
@@ -556,10 +556,10 @@ static INTERRUPT_GEN( galpani2_interrupt1 )
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 3:  cpu_set_input_line(device, 3, HOLD_LINE); break;
-		case 2:  cpu_set_input_line(device, 4, HOLD_LINE); break;
-		case 1:  cpu_set_input_line(device, 5, HOLD_LINE); break;	// vblank?
-		case 0:  cpu_set_input_line(device, 6, HOLD_LINE); break;	// hblank?
+		case 3:  device_set_input_line(device, 3, HOLD_LINE); break;
+		case 2:  device_set_input_line(device, 4, HOLD_LINE); break;
+		case 1:  device_set_input_line(device, 5, HOLD_LINE); break;	// vblank?
+		case 0:  device_set_input_line(device, 6, HOLD_LINE); break;	// hblank?
 	}
 }
 
@@ -569,9 +569,9 @@ static INTERRUPT_GEN( galpani2_interrupt2 )
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpu_set_input_line(device, 3, HOLD_LINE); break;
-		case 1:  cpu_set_input_line(device, 4, HOLD_LINE); break;
-		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
+		case 2:  device_set_input_line(device, 3, HOLD_LINE); break;
+		case 1:  device_set_input_line(device, 4, HOLD_LINE); break;
+		case 0:  device_set_input_line(device, 5, HOLD_LINE); break;
 	}
 }
 

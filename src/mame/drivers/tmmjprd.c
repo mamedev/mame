@@ -733,7 +733,7 @@ static INTERRUPT_GEN( tmmjprd_interrupt )
 	else
 		intlevel = 3;
 
-	cpu_set_input_line(device, intlevel, HOLD_LINE);
+	device_set_input_line(device, intlevel, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( tmmjprd, tmmjprd_state )

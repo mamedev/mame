@@ -25,7 +25,7 @@ static WRITE8_HANDLER( hcastle_bankswitch_w )
 static WRITE8_HANDLER( hcastle_soundirq_w )
 {
 	hcastle_state *state = space->machine->driver_data<hcastle_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( hcastle_coin_w )

@@ -435,7 +435,7 @@ static INTERRUPT_GEN(skns_interrupt)
 			interrupt = 1; // SPC
 			break;
 	}
-	cpu_set_input_line(device,interrupt,HOLD_LINE);
+	device_set_input_line(device,interrupt,HOLD_LINE);
 }
 
 /**********************************************************************************
@@ -650,7 +650,7 @@ static WRITE32_HANDLER( skns_io_w )
 			{
 				if (!strcmp(space->machine->gamedrv->name,"vblokbrk") ||
 					!strcmp(space->machine->gamedrv->name,"sarukani"))
-					cpu_spinuntil_int(space->cpu);
+					device_spin_until_interrupt(space->cpu);
 			}
 
 		}
@@ -864,32 +864,32 @@ static READ32_HANDLER( gutsn_speedup_r )
 	if (cpu_get_pc(space->cpu)==0x402206e)
 	{
 		if(skns_main_ram[0x00078/4] == skns_main_ram[0x0c780/4])
-			cpu_spinuntil_int(space->cpu);
+			device_spin_until_interrupt(space->cpu);
 	}
 	return skns_main_ram[0x0c780/4];
 }
 
 static READ32_HANDLER( cyvern_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x402ebd2) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x402ebd2) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x4d3c8/4];
 }
 
 static READ32_HANDLER( puzzloopj_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401dca0) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x401dca0) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x86714/4];
 }
 
 static READ32_HANDLER( puzzloopa_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401d9d4) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x401d9d4) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x85bcc/4];
 }
 
 static READ32_HANDLER( puzzloopu_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401dab0) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x401dab0) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x85cec/4];
 }
 
@@ -902,61 +902,61 @@ static READ32_HANDLER( puzzloop_speedup_r )
     0401DA18: BF      $0401DA26
     0401DA26: BRA     $0401DA12
 */
-	if (cpu_get_pc(space->cpu)==0x401da14) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x401da14) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x81d38/4];
 }
 
 static READ32_HANDLER( senknow_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x4017dce) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x4017dce) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x0000dc/4];
 }
 
 static READ32_HANDLER( teljan_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401ba32) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x401ba32) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x002fb4/4];
 }
 
 static READ32_HANDLER( jjparads_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x4015e84) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x4015e84) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x000994/4];
 }
 
 static READ32_HANDLER( jjparad2_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x401620a) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x401620a) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x000984/4];
 }
 
 static READ32_HANDLER( ryouran_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x40182ce) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x40182ce) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x000a14/4];
 }
 
 static READ32_HANDLER( galpans2_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x4049ae2) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x4049ae2) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x0fb6bc/4];
 }
 
 static READ32_HANDLER( panicstr_speedup_r )
 {
-	if (cpu_get_pc(space->cpu)==0x404e68a) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x404e68a) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0x0f19e4/4];
 }
 
 static READ32_HANDLER( sengekis_speedup_r ) // 60006ee  600308e
 {
-	if (cpu_get_pc(space->cpu)==0x60006ec) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x60006ec) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0xb74bc/4];
 }
 
 static READ32_HANDLER( sengekij_speedup_r ) // 60006ee  600308e
 {
-	if (cpu_get_pc(space->cpu)==0x60006ec) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu)==0x60006ec) device_spin_until_interrupt(space->cpu);
 	return skns_main_ram[0xb7380/4];
 }
 
@@ -966,7 +966,7 @@ static void init_skns(running_machine *machine)
 	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 
 	sh2drc_add_pcflush(machine->device("maincpu"), 0x6f8);
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000028, 0x600002b, 0, 0, bios_skip_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000028, 0x600002b, 0, 0, bios_skip_r );
 }
 
 static void set_drc_pcflush(running_machine *machine, UINT32 addr)
@@ -976,21 +976,21 @@ static void set_drc_pcflush(running_machine *machine, UINT32 addr)
 
 static DRIVER_INIT( galpani4 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns(machine);  }
 static DRIVER_INIT( galpanis ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-5,-1); init_skns(machine);  }
-static DRIVER_INIT( cyvern )   { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+2); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x604d3c8, 0x604d3cb, 0, 0, cyvern_speedup_r );  set_drc_pcflush(machine, 0x402ebd2);  }
-static DRIVER_INIT( galpans2 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60fb6bc, 0x60fb6bf, 0, 0, galpans2_speedup_r ); set_drc_pcflush(machine, 0x4049ae2); }
-static DRIVER_INIT( gutsn )    { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+0); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600c780, 0x600c783, 0, 0, gutsn_speedup_r ); set_drc_pcflush(machine, 0x402206e); }
-static DRIVER_INIT( panicstr ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60f19e4, 0x60f19e7, 0, 0, panicstr_speedup_r ); set_drc_pcflush(machine, 0x404e68a);  }
-static DRIVER_INIT( senknow )  { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+1,+1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60000dc, 0x60000df, 0, 0, senknow_speedup_r ); set_drc_pcflush(machine, 0x4017dce);  }
-static DRIVER_INIT( puzzloop ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6081d38, 0x6081d3b, 0, 0, puzzloop_speedup_r ); set_drc_pcflush(machine, 0x401da14); }
-static DRIVER_INIT( puzzloopj ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6086714, 0x6086717, 0, 0, puzzloopj_speedup_r ); set_drc_pcflush(machine, 0x401dca0); }
-static DRIVER_INIT( puzzloopa ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6085bcc, 0x6085bcf, 0, 0, puzzloopa_speedup_r ); set_drc_pcflush(machine, 0x401d9d4); }
-static DRIVER_INIT( puzzloopu ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6085cec, 0x6085cef, 0, 0, puzzloopu_speedup_r ); set_drc_pcflush(machine, 0x401dab0); }
-static DRIVER_INIT( jjparads ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000994, 0x6000997, 0, 0, jjparads_speedup_r ); set_drc_pcflush(machine, 0x4015e84); }
-static DRIVER_INIT( jjparad2 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000984, 0x6000987, 0, 0, jjparad2_speedup_r ); set_drc_pcflush(machine, 0x401620a); }
-static DRIVER_INIT( ryouran )  { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000a14, 0x6000a17, 0, 0, ryouran_speedup_r );  set_drc_pcflush(machine, 0x40182ce); }
-static DRIVER_INIT( teljan )   { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6002fb4, 0x6002fb7, 0, 0, teljan_speedup_r ); set_drc_pcflush(machine, 0x401ba32); }
-static DRIVER_INIT( sengekis ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60b74bc, 0x60b74bf, 0, 0, sengekis_speedup_r ); set_drc_pcflush(machine, 0x60006ec); }
-static DRIVER_INIT( sengekij ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns(machine); memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60b7380, 0x60b7383, 0, 0, sengekij_speedup_r ); set_drc_pcflush(machine, 0x60006ec); }
+static DRIVER_INIT( cyvern )   { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+2); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x604d3c8, 0x604d3cb, 0, 0, cyvern_speedup_r );  set_drc_pcflush(machine, 0x402ebd2);  }
+static DRIVER_INIT( galpans2 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60fb6bc, 0x60fb6bf, 0, 0, galpans2_speedup_r ); set_drc_pcflush(machine, 0x4049ae2); }
+static DRIVER_INIT( gutsn )    { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+0,+0); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x600c780, 0x600c783, 0, 0, gutsn_speedup_r ); set_drc_pcflush(machine, 0x402206e); }
+static DRIVER_INIT( panicstr ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60f19e4, 0x60f19e7, 0, 0, panicstr_speedup_r ); set_drc_pcflush(machine, 0x404e68a);  }
+static DRIVER_INIT( senknow )  { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+1,+1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60000dc, 0x60000df, 0, 0, senknow_speedup_r ); set_drc_pcflush(machine, 0x4017dce);  }
+static DRIVER_INIT( puzzloop ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6081d38, 0x6081d3b, 0, 0, puzzloop_speedup_r ); set_drc_pcflush(machine, 0x401da14); }
+static DRIVER_INIT( puzzloopj ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6086714, 0x6086717, 0, 0, puzzloopj_speedup_r ); set_drc_pcflush(machine, 0x401dca0); }
+static DRIVER_INIT( puzzloopa ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6085bcc, 0x6085bcf, 0, 0, puzzloopa_speedup_r ); set_drc_pcflush(machine, 0x401d9d4); }
+static DRIVER_INIT( puzzloopu ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-9,-1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6085cec, 0x6085cef, 0, 0, puzzloopu_speedup_r ); set_drc_pcflush(machine, 0x401dab0); }
+static DRIVER_INIT( jjparads ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000994, 0x6000997, 0, 0, jjparads_speedup_r ); set_drc_pcflush(machine, 0x4015e84); }
+static DRIVER_INIT( jjparad2 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000984, 0x6000987, 0, 0, jjparad2_speedup_r ); set_drc_pcflush(machine, 0x401620a); }
+static DRIVER_INIT( ryouran )  { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000a14, 0x6000a17, 0, 0, ryouran_speedup_r );  set_drc_pcflush(machine, 0x40182ce); }
+static DRIVER_INIT( teljan )   { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(+5,+1); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6002fb4, 0x6002fb7, 0, 0, teljan_speedup_r ); set_drc_pcflush(machine, 0x401ba32); }
+static DRIVER_INIT( sengekis ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60b74bc, 0x60b74bf, 0, 0, sengekis_speedup_r ); set_drc_pcflush(machine, 0x60006ec); }
+static DRIVER_INIT( sengekij ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-192,-272); init_skns(machine); memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60b7380, 0x60b7383, 0, 0, sengekij_speedup_r ); set_drc_pcflush(machine, 0x60006ec); }
 static DRIVER_INIT( sarukani ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine); set_drc_pcflush(machine, 0x4013b42); } // Speedup is in skns_io_w()
 static DRIVER_INIT( galpans3 ) { machine->device<sknsspr_device>("spritegen")->skns_sprite_kludge(-1,-1); init_skns(machine);  }
 

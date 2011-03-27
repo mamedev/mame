@@ -542,7 +542,7 @@ static void multigam_init_mmc3(running_machine *machine, UINT8 *prg_base, int pr
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x4000), 0x4000);
 	memcpy(&dst[0xc000], prg_base + (prg_size - 0x4000), 0x4000);
 
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
 
 	state->multigam3_mmc3_banks[0] = 0x1e;
 	state->multigam3_mmc3_banks[1] = 0x1f;
@@ -653,7 +653,7 @@ static void multigam_init_mapper02(running_machine *machine, UINT8* prg_base, in
 	multigam_state *state = machine->driver_data<multigam_state>();
 	UINT8* mem = machine->region("maincpu")->base();
 	memcpy(mem + 0x8000, prg_base + prg_size - 0x8000, 0x8000);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mapper02_rom_switch_w );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mapper02_rom_switch_w );
 
 	state->mapper02_prg_base = prg_base;
 	state->mapper02_prg_size = prg_size;
@@ -810,7 +810,7 @@ static void multigam_init_mmc1(running_machine *machine, UINT8 *prg_base, int pr
 
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x8000), 0x8000);
 
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
 	state->mmc1_reg_write_enable = 1;
 	state->mmc1_rom_mask = (prg_size / 0x4000) - 1;
@@ -856,8 +856,8 @@ static void supergm3_set_bank(running_machine *machine)
 		state->supergm3_chr_bank == 0x40 )
 	{
 		// VRAM
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
-		memory_install_write_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+		memory_install_write_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 		memory_set_bankptr(machine, "bank1", state->vram);
 
 		if (state->supergm3_chr_bank == 0x40)
@@ -865,15 +865,15 @@ static void supergm3_set_bank(running_machine *machine)
 	}
 	else
 	{
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
-		memory_install_read_bank(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
-		memory_unmap_write(cpu_get_address_space(ppu, ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0);
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
+		memory_install_read_bank(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
+		memory_unmap_write(ppu->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0);
 
 		set_videorom_bank(machine, 0, 8, 0, 8);
 	}
@@ -1113,7 +1113,7 @@ static MACHINE_RESET( multigam )
 
 static MACHINE_RESET( multigm3 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	/* reset the ppu */
 	multigm3_switch_prg_rom(space, 0, 0x01 );
 };
@@ -1127,8 +1127,8 @@ static MACHINE_START( multigam )
 	state->nt_page[2] = state->nt_ram + 0x800;
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
+	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", machine->region("gfx1")->base());
 }
 
@@ -1141,16 +1141,16 @@ static MACHINE_START( multigm3 )
 	state->nt_page[2] = state->nt_ram + 0x800;
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
 
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
-	memory_install_read_bank(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, "bank2");
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0400, 0x07ff, 0, 0, "bank3");
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0800, 0x0bff, 0, 0, "bank4");
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0c00, 0x0fff, 0, 0, "bank5");
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1000, 0x13ff, 0, 0, "bank6");
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1400, 0x17ff, 0, 0, "bank7");
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1800, 0x1bff, 0, 0, "bank8");
+	memory_install_read_bank(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1c00, 0x1fff, 0, 0, "bank9");
 
 	set_videorom_bank(machine, 0, 8, 0, 8);
 };
@@ -1164,7 +1164,7 @@ static MACHINE_START( supergm3 )
 	state->nt_page[2] = state->nt_ram + 0x800;
 	state->nt_page[3] = state->nt_ram + 0xc00;
 
-	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
+	memory_install_readwrite8_handler(machine->device("ppu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, multigam_nt_r, multigam_nt_w);
 
 	state->vram = auto_alloc_array(machine, UINT8, 0x2000);
 	state->multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
@@ -1343,7 +1343,7 @@ ROM_END
 
 static DRIVER_INIT( multigam )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
@@ -1359,7 +1359,7 @@ static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble
 static DRIVER_INIT(multigm3)
 {
 	multigam_state *state = machine->driver_data<multigam_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
@@ -1373,7 +1373,7 @@ static DRIVER_INIT(multigm3)
 
 static DRIVER_INIT(multigmt)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	UINT8* buf = auto_alloc_array(machine, UINT8, 0x80000);
 	UINT8 *rom;

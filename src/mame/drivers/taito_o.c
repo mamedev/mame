@@ -217,7 +217,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( parentj_interrupt )
 {
-	cpu_set_input_line(device, cpu_getiloops(device) ? 4 : 5, HOLD_LINE);
+	device_set_input_line(device, cpu_getiloops(device) ? 4 : 5, HOLD_LINE);
 }
 
 static const ym2203_interface ym2203_config =

@@ -339,14 +339,14 @@ static INTERRUPT_GEN( thedeep_interrupt )
 				state->protection_irq = 1;
 		}
 		if (state->protection_irq)
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 	}
 	else
 	{
 		if (state->nmi_enable)
 		{
-			cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
-			cpu_set_input_line(device, INPUT_LINE_NMI, CLEAR_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, CLEAR_LINE);
 		}
 	}
 }

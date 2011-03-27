@@ -2164,8 +2164,8 @@ static INTERRUPT_GEN( funcube_interrupt )
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 1:  cpu_set_input_line(device, 2, HOLD_LINE); break;
-		case 0:  cpu_set_input_line(device, 1, HOLD_LINE); break;
+		case 1:  device_set_input_line(device, 2, HOLD_LINE); break;
+		case 0:  device_set_input_line(device, 1, HOLD_LINE); break;
 	}
 }
 
@@ -2175,7 +2175,7 @@ static INTERRUPT_GEN( funcube_sub_timer_irq )
 
 	if ( state->funcube_serial_count )
 	{
-		cpu_set_input_line(device, H8_SCI_1_RX, HOLD_LINE);
+		device_set_input_line(device, H8_SCI_1_RX, HOLD_LINE);
 	}
 	else
 	{
@@ -2194,7 +2194,7 @@ static INTERRUPT_GEN( funcube_sub_timer_irq )
 		state->funcube_press = press;
 	}
 
-	cpu_set_input_line(device, H8_METRO_TIMER_HACK, HOLD_LINE);
+	device_set_input_line(device, H8_METRO_TIMER_HACK, HOLD_LINE);
 }
 
 static MACHINE_RESET( funcube )

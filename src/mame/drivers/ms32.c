@@ -222,7 +222,7 @@ static WRITE32_HANDLER( ms32_sound_w )
 	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(space->cpu, attotime::from_usec(40));
 }
 
 static READ32_HANDLER( ms32_sound_r )
@@ -1303,7 +1303,7 @@ static IRQ_CALLBACK(irq_callback)
 	for(i=15; i>=0 && !(state->irqreq & (1<<i)); i--);
 	state->irqreq &= ~(1<<i);
 	if(!state->irqreq)
-		cpu_set_input_line(device, 0, CLEAR_LINE);
+		device_set_input_line(device, 0, CLEAR_LINE);
 	return i;
 }
 
@@ -1312,7 +1312,7 @@ static void irq_init(running_machine *machine)
 	ms32_state *state = machine->driver_data<ms32_state>();
 	state->irqreq = 0;
 	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)

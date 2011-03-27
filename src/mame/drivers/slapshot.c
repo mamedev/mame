@@ -176,14 +176,14 @@ static WRITE16_HANDLER( color_ram_word_w )
 static TIMER_CALLBACK( slapshot_interrupt6 )
 {
 	slapshot_state *state = machine->driver_data<slapshot_state>();
-	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 
 static INTERRUPT_GEN( slapshot_interrupt )
 {
 	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(slapshot_interrupt6));
-	cpu_set_input_line(device, 5, HOLD_LINE);
+	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 
@@ -236,7 +236,7 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
 	slapshot_state *state = space->machine->driver_data<slapshot_state>();
 
 	/* 4 writes a frame - one for each analogue port */
-	cpu_set_input_line(state->maincpu, 3, HOLD_LINE);
+	device_set_input_line(state->maincpu, 3, HOLD_LINE);
 }
 
 /*****************************************************
@@ -493,7 +493,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	slapshot_state *state = device->machine->driver_data<slapshot_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

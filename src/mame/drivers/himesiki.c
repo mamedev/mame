@@ -101,7 +101,7 @@ static WRITE8_HANDLER( himesiki_sound_w )
 {
 	himesiki_state *state = space->machine->driver_data<himesiki_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /****************************************************************************/

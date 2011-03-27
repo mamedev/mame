@@ -879,7 +879,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( vblank_irq )
 {
-	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
+	device_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
 }
 
 static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
@@ -1159,7 +1159,7 @@ static READ16_HANDLER( ciclone_status_r )
 
 static DRIVER_INIT( ciclone )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0030, 0x0033, 0, 0, ciclone_status_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x0030, 0x0033, 0, 0, ciclone_status_r );
 }
 
 /*
@@ -1229,7 +1229,7 @@ static WRITE16_HANDLER( fashion_output_w )
 
 static DRIVER_INIT( fashion )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_output_w );
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x0002, 0x0003, 0, 0, fashion_output_w );
 }
 
 GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )

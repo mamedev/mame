@@ -310,7 +310,7 @@ static IRQ_CALLBACK( irq_callback )
 static INTERRUPT_GEN( vbl_interrupt )
 {
 	taitol_state *state = device->machine->driver_data<taitol_state>();
-	cpu_set_irq_callback(device, irq_callback);
+	device_set_irq_callback(device, irq_callback);
 
 	/* kludge to make plgirls boot */
 	if (cpu_get_reg(device, Z80_IM) != 2)
@@ -321,17 +321,17 @@ static INTERRUPT_GEN( vbl_interrupt )
 	if (cpu_getiloops(device) == 1 && (state->irq_enable & 1))
 	{
 		state->last_irq_level = 0;
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) == 2 && (state->irq_enable & 2))
 	{
 		state->last_irq_level = 1;
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) == 0 && (state->irq_enable & 4))
 	{
 		state->last_irq_level = 2;
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	// fix Plotting test mode
 	if ((state->irq_enable & (1 << state->last_irq_level)) == 0)
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( irq_enable_r )
@@ -930,7 +930,7 @@ static WRITE8_HANDLER (evilston_snd_w)
 {
 	taitol_state *state = space->machine->driver_data<taitol_state>();
 	state->shared_ram[0x7fe] = data & 0x7f;
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( evilston_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1941,7 +1941,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	taitol_state *state = device->machine->driver_data<taitol_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( portA_w )
@@ -2898,7 +2898,7 @@ static DRIVER_INIT( evilston )
 {
 	UINT8 *ROM = machine->region("audiocpu")->base();
 	ROM[0x72] = 0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }
 
 

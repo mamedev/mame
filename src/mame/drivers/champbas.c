@@ -131,13 +131,13 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	cpu_interrupt_enable(state->maincpu, bit);
 	if (!bit)
-		cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
 	champbas_state *state = machine->driver_data<champbas_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 // Champion Baseball has only one DAC
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( champbas_mcu_halt_w )
 		return;
 
 	data &= 1;
-	cpu_set_input_line(state->mcu, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->mcu, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

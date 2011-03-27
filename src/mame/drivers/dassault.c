@@ -172,7 +172,7 @@ static WRITE16_HANDLER( dassault_sound_w )
 {
 	dassault_state *state = space->machine->driver_data<dassault_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE); /* IRQ1 */
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
@@ -181,8 +181,8 @@ static READ16_HANDLER( dassault_irq_r )
 	dassault_state *state = space->machine->driver_data<dassault_state>();
 	switch (offset)
 	{
-	case 0: cpu_set_input_line(state->maincpu, 5, CLEAR_LINE); break;
-	case 1: cpu_set_input_line(state->subcpu, 6, CLEAR_LINE); break;
+	case 0: device_set_input_line(state->maincpu, 5, CLEAR_LINE); break;
+	case 1: device_set_input_line(state->subcpu, 6, CLEAR_LINE); break;
 	}
 	return state->shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
 }
@@ -192,8 +192,8 @@ static WRITE16_HANDLER( dassault_irq_w )
 	dassault_state *state = space->machine->driver_data<dassault_state>();
 	switch (offset)
 	{
-	case 0: cpu_set_input_line(state->maincpu, 5, ASSERT_LINE); break;
-	case 1: cpu_set_input_line(state->subcpu, 6, ASSERT_LINE); break;
+	case 0: device_set_input_line(state->maincpu, 5, ASSERT_LINE); break;
+	case 1: device_set_input_line(state->subcpu, 6, ASSERT_LINE); break;
 	}
 
 	COMBINE_DATA(&state->shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
@@ -514,7 +514,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	dassault_state *driver_state = device->machine->driver_data<dassault_state>();
-	cpu_set_input_line(driver_state->audiocpu, 1, state);
+	device_set_input_line(driver_state->audiocpu, 1, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -832,7 +832,7 @@ static READ16_HANDLER( dassault_main_skip )
 	int ret = state->ram[0];
 
 	if (cpu_get_previouspc(space->cpu) == 0x1170 && ret & 0x8000)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 
 	return ret;
 }
@@ -843,7 +843,7 @@ static READ16_HANDLER( thndzone_main_skip )
 	int ret = state->ram[0];
 
 	if (cpu_get_pc(space->cpu) == 0x114c && ret & 0x8000)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 
 	return ret;
 }
@@ -865,7 +865,7 @@ static DRIVER_INIT( dassault )
 	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
 }
 
 static DRIVER_INIT( thndzone )
@@ -885,7 +885,7 @@ static DRIVER_INIT( thndzone )
 	auto_free(machine, tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
 }
 
 /**********************************************************************************/

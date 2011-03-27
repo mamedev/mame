@@ -348,7 +348,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(uballoon)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	uballoon_pcm_1_bankswitch_w(space, 0, 0);
 }
 
@@ -744,8 +744,8 @@ static INTERRUPT_GEN( bssoccer_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0: 	cpu_set_input_line(device, 1, HOLD_LINE);	break;
-		case 1: 	cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 0: 	device_set_input_line(device, 1, HOLD_LINE);	break;
+		case 1: 	device_set_input_line(device, 2, HOLD_LINE);	break;
 	}
 }
 

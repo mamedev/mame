@@ -331,7 +331,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( goodejan_irq )
 {
-	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x208/4);
+	device_set_input_line_and_vector(device,0,HOLD_LINE,0x208/4);
 /* vector 0x00c is just a reti */
 }
 

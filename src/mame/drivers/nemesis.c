@@ -58,7 +58,7 @@ static INTERRUPT_GEN( nemesis_interrupt )
 	nemesis_state *state = device->machine->driver_data<nemesis_state>();
 
 	if (state->irq_on)
-		cpu_set_input_line(device, 1, HOLD_LINE);
+		device_set_input_line(device, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( konamigt_interrupt )
@@ -68,12 +68,12 @@ static INTERRUPT_GEN( konamigt_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if ((state->irq_on) && (state->gx400_irq1_cnt++ & 1))
-			cpu_set_input_line(device, 1, HOLD_LINE);
+			device_set_input_line(device, 1, HOLD_LINE);
 	}
 	else
 	{
 		if (state->irq2_on)
-			cpu_set_input_line(device, 2, HOLD_LINE);
+			device_set_input_line(device, 2, HOLD_LINE);
 	}
 }
 
@@ -85,17 +85,17 @@ static INTERRUPT_GEN( gx400_interrupt )
 	{
 		case 0:
 			if (state->irq2_on)
-				cpu_set_input_line(device, 2, HOLD_LINE);
+				device_set_input_line(device, 2, HOLD_LINE);
 			break;
 
 		case 1:
 			if ((state->irq1_on) && (state->gx400_irq1_cnt++ & 1))
-				cpu_set_input_line(device, 1, HOLD_LINE);
+				device_set_input_line(device, 1, HOLD_LINE);
 			break;
 
 		case 2:
 			if (state->irq4_on)
-				cpu_set_input_line(device, 4, HOLD_LINE);
+				device_set_input_line(device, 4, HOLD_LINE);
 			break;
 	}
 }
@@ -105,7 +105,7 @@ static INTERRUPT_GEN( salamand_interrupt )
 	nemesis_state *state = device->machine->driver_data<nemesis_state>();
 
 	if (state->irq_on)
-		cpu_set_input_line(device, 1, HOLD_LINE);
+		device_set_input_line(device, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( blkpnthr_interrupt )
@@ -113,7 +113,7 @@ static INTERRUPT_GEN( blkpnthr_interrupt )
 	nemesis_state *state = device->machine->driver_data<nemesis_state>();
 
 	if (state->irq_on)
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 }
 
 
@@ -1618,7 +1618,7 @@ static void sound_irq(device_t *device, int state)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
 // nemesis_state *driver_state = device->machine->driver_data<nemesis_state>();
-// cpu_set_input_line(driver_state->audiocpu, 0, HOLD_LINE);
+// device_set_input_line(driver_state->audiocpu, 0, HOLD_LINE);
 }
 
 static const ym2151_interface ym2151_config =

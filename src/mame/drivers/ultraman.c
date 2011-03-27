@@ -28,7 +28,7 @@ static WRITE16_HANDLER( sound_irq_trigger_w )
 	ultraman_state *state = space->machine->driver_data<ultraman_state>();
 
 	if (ACCESSING_BITS_0_7)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

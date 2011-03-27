@@ -154,7 +154,7 @@ static READ32_HANDLER( psac_rom_r )
 /* irq 7 does nothing (it jsrs to a rts and then rte) */
 static INTERRUPT_GEN(polygonet_interrupt)
 {
-	cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
+	device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */
@@ -569,7 +569,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static INTERRUPT_GEN(audio_interrupt)
 {
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )

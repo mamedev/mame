@@ -367,9 +367,9 @@ static const segaic16_memory_map_entry outrun_info[] =
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, param);
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -383,7 +383,7 @@ static READ8_HANDLER( sound_data_r )
 {
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
 
@@ -442,9 +442,9 @@ static void update_main_irqs(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
 
-	cpu_set_input_line(state->maincpu, 2, state->irq2_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(state->maincpu, 4, state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(state->maincpu, 6, state->vblank_irq_state && state->irq2_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, 2, state->irq2_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, 4, state->vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, 6, state->vblank_irq_state && state->irq2_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if (state->vblank_irq_state || state->irq2_state)
 		machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
@@ -490,14 +490,14 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 		case 223:
 			state->vblank_irq_state = 1;
 			next_scanline = scanline + 1;
-			cpu_set_input_line(state->subcpu, 4, ASSERT_LINE);
+			device_set_input_line(state->subcpu, 4, ASSERT_LINE);
 			break;
 
 		/* VBLANK turns off at the start of scanline 224 */
 		case 224:
 			state->vblank_irq_state = 0;
 			next_scanline = 65;
-			cpu_set_input_line(state->subcpu, 4, CLEAR_LINE);
+			device_set_input_line(state->subcpu, 4, CLEAR_LINE);
 			break;
 	}
 
@@ -519,7 +519,7 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 static void outrun_reset(device_t *device)
 {
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
-	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, PULSE_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -614,7 +614,7 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
     */
 	segaic16_set_display_enable(device->machine, data & 0x20);
 	state->adc_select = (data >> 2) & 7;
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -766,7 +766,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
 			/* Output port:
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			device_set_input_line(state->soundcpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 0x3000/2:

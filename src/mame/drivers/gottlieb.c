@@ -248,9 +248,9 @@ static MACHINE_START( gottlieb )
 	if (state->laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
-		memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
-		memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
+		memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
+		memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
+		memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		state->laserdisc_bit_timer = machine->scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
@@ -674,7 +674,7 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 {
 	gottlieb_state *state = device->machine->driver_data<gottlieb_state>();
 	/* assert the NMI and set a timer to clear it at the first visible line */
-	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(0), FUNC(nmi_clear));
 
 	/* if we have a laserdisc, update it */
@@ -2613,7 +2613,7 @@ static DRIVER_INIT( romtiles )
 static DRIVER_INIT( stooges )
 {
 	DRIVER_INIT_CALL(ramtiles);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
 }
 
 

@@ -1660,7 +1660,7 @@ static INTERRUPT_GEN( irq_start )
 		break;
 	}
 
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(irq_stop));
 }
 

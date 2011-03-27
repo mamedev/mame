@@ -515,7 +515,7 @@ static INTERRUPT_GEN( unknown_interrupt )
 			generic_pulse_irq_line(device, 0);
 			break;
 		default:
-			cpu_set_input_line(state->maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
+			device_set_input_line(state->maincpu, H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }

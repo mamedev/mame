@@ -168,7 +168,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		state->pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -428,7 +428,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	crshrace_state *state = device->machine->driver_data<crshrace_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

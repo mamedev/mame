@@ -311,7 +311,7 @@ static TIMER_DEVICE_CALLBACK( increment_t1_clock )
 void sega_usb_reset(running_machine *machine, UINT8 t1_clock_mask)
 {
 	/* halt the USB CPU at reset time */
-	cpu_set_input_line(usb.cpu, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(usb.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
 	usb.t1_clock_mask = t1_clock_mask;
@@ -329,7 +329,7 @@ READ8_HANDLER( sega_usb_status_r )
 {
 	LOG(("%04X:usb_data_r = %02X\n", cpu_get_pc(space->cpu), (usb.out_latch & 0x81) | (usb.in_latch & 0x7e)));
 
-	cpu_adjust_icount(space->cpu, -200);
+	device_adjust_icount(space->cpu, -200);
 
 	/* only bits 0 and 7 are controlled by the I8035; the remaining */
 	/* bits 1-6 reflect the current input latch values */
@@ -342,7 +342,7 @@ static TIMER_CALLBACK( delayed_usb_data_w )
 	int data = param;
 
 	/* look for rising/falling edges of bit 7 to control the RESET line */
-	cpu_set_input_line(usb.cpu, INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(usb.cpu, INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* if the CLEAR line is set, the low 7 bits of the input are ignored */
 	if ((usb.last_p2_value & 0x40) == 0)

@@ -135,7 +135,7 @@ static INTERRUPT_GEN( superdq_vblank )
        toggles (680usec after the vblank). We could set up a
        timer to do that, but this works as well */
 	laserdisc_data_w(state->laserdisc, state->ld_out_latch);
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( superdq_videoram_w )

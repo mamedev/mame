@@ -831,14 +831,14 @@ g_profiler.start(PROFILER_VIDEO);
 
 			if (irq_vector)
 				/* quizchq */
-				cpu_set_input_line_and_vector(space->cpu, 0, HOLD_LINE, irq_vector);
+				device_set_input_line_and_vector(space->cpu, 0, HOLD_LINE, irq_vector);
 			else
 			{
 				/* ddenlovr */
 				if (state->ddenlovr_blitter_irq_enable)
 				{
 					state->ddenlovr_blitter_irq_flag = 1;
-					cpu_set_input_line(space->cpu, 1, HOLD_LINE);
+					device_set_input_line(space->cpu, 1, HOLD_LINE);
 				}
 			}
 			break;
@@ -998,7 +998,7 @@ g_profiler.start(PROFILER_VIDEO);
 				#endif
 			}
 
-			cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, irq_vector);
+			device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, irq_vector);
 			break;
 
 		default:
@@ -2136,7 +2136,7 @@ static WRITE8_HANDLER( mmpanic_soundlatch_w )
 	dynax_state *state = space->machine->driver_data<dynax_state>();
 
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( mmpanic_blitter_w )
@@ -7820,15 +7820,15 @@ static INTERRUPT_GEN( quizchq_irq )
 		return;
 
 	if ((++state->irq_count % 60) == 0)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfc);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfc);
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xee);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xee);
 }
 
 #ifdef UNUSED_FUNCTION
 static INTERRUPT_GEN( rtc_irq )
 {
-    cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfc);
+    device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfc);
 }
 #endif
 
@@ -7901,9 +7901,9 @@ static INTERRUPT_GEN( mmpanic_irq )
 		return;
 
 	if ((++state->irq_count % 60) == 0)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xe7);	// RST 20, clock
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xe7);	// RST 20, clock
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	// RST 08, vblank
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	// RST 08, vblank
 }
 
 static MACHINE_CONFIG_START( mmpanic, dynax_state )
@@ -7975,9 +7975,9 @@ static INTERRUPT_GEN( hanakanz_irq )
 		return;
 
 	if ((++state->irq_count % 60) == 0)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xe2);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xe2);
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xe0);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xe0);
 }
 
 static MACHINE_CONFIG_START( hanakanz, dynax_state )
@@ -8053,9 +8053,9 @@ static INTERRUPT_GEN( mjchuuka_irq )
 		return;
 
 	if ((++state->irq_count % 60) == 0)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfa);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfa);
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
 }
 
 
@@ -8112,14 +8112,14 @@ static INTERRUPT_GEN( mjmyster_irq )
 
 	switch (cpu_getiloops(device))
 	{
-		case 0:	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);	break;
-		case 1:	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfa);	break;
+		case 0:	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);	break;
+		case 1:	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xfa);	break;
 	}
 }
 
 static INTERRUPT_GEN( rtc_nmi_irq )
 {
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const ay8910_interface mjmyster_ay8910_interface =
@@ -8169,9 +8169,9 @@ static INTERRUPT_GEN( hginga_irq )
 		return;
 
 	if ((++state->irq_count % 60) == 0)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xee);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xee);
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
 }
 
 static const ay8910_interface hginga_ay8910_interface =
@@ -8262,11 +8262,11 @@ static INTERRUPT_GEN( mjflove_irq )
 	{
 		case 0:
 			state->mjflove_irq_cause &= 1;
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 			break;
 		case 1:
 			state->mjflove_irq_cause &= 1 << 1;
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 			break;
 	}
 }
@@ -8291,7 +8291,7 @@ MACHINE_CONFIG_END
     0xee is vblank  */
 static INTERRUPT_GEN( hparadis_irq )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xee);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xee);
 }
 
 static MACHINE_CONFIG_DERIVED( hparadis, quizchq )
@@ -9107,7 +9107,7 @@ static DRIVER_INIT( rongrong )
        version of the game might be a bootleg with the protection
        patched. (both sets need this)
      */
-	memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0);
+	memory_nop_read(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0);
 }
 
 /***************************************************************************

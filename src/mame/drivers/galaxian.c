@@ -468,7 +468,7 @@ static INTERRUPT_GEN( interrupt_gen )
 	/* interrupt line is clocked at VBLANK */
 	/* a flip-flop at 6F is held in the preset state based on the NMI ON signal */
 	if (irq_enabled)
-		cpu_set_input_line(device, irq_line, ASSERT_LINE);
+		device_set_input_line(device, irq_line, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( fakechange_interrupt_gen )
@@ -491,7 +491,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
 	if (!irq_enabled)
-		cpu_set_input_line(space->cpu, irq_line, CLEAR_LINE);
+		device_set_input_line(space->cpu, irq_line, CLEAR_LINE);
 }
 
 /*************************************
@@ -783,7 +783,7 @@ static WRITE8_HANDLER( explorer_sound_control_w )
 static READ8_DEVICE_HANDLER( explorer_sound_latch_r )
 {
 	cputag_set_input_line(device->machine, "audiocpu", 0, CLEAR_LINE);
-	return soundlatch_r(cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0);
+	return soundlatch_r(device->machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0);
 }
 
 
@@ -1023,7 +1023,7 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 
 static INPUT_CHANGED( gmgalax_game_changed )
 {
-	address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = field->port->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* new value is the selected game */
 	gmgalax_selected_game = newval;
@@ -2633,7 +2633,7 @@ static void common_init(
 
 static void unmap_galaxian_sound(running_machine *machine, offs_t base)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	memory_unmap_write(space, base + 0x0004, base + 0x0007, 0, 0x07f8);
 	memory_unmap_write(space, base + 0x0800, base + 0x0807, 0, 0x07f8);
@@ -2656,7 +2656,7 @@ static DRIVER_INIT( galaxian )
 
 static DRIVER_INIT( nolock )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
@@ -2668,7 +2668,7 @@ static DRIVER_INIT( nolock )
 
 static DRIVER_INIT( azurian )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* yellow bullets instead of white ones */
 	common_init(machine, scramble_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -2680,7 +2680,7 @@ static DRIVER_INIT( azurian )
 
 static DRIVER_INIT( gmgalax )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, gmgalax_extend_tile_info, gmgalax_extend_sprite_info);
@@ -2697,7 +2697,7 @@ static DRIVER_INIT( gmgalax )
 
 static DRIVER_INIT( pisces )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
@@ -2709,7 +2709,7 @@ static DRIVER_INIT( pisces )
 
 static DRIVER_INIT( batman2 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
@@ -2721,7 +2721,7 @@ static DRIVER_INIT( batman2 )
 
 static DRIVER_INIT( frogg )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* same as galaxian... */
 	common_init(machine, galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
@@ -2757,7 +2757,7 @@ static DRIVER_INIT( mooncrsu )
 
 static DRIVER_INIT( mooncrgx )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
@@ -2769,7 +2769,7 @@ static DRIVER_INIT( mooncrgx )
 
 static DRIVER_INIT( moonqsr )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	/* video extensions */
@@ -2787,7 +2787,7 @@ static WRITE8_HANDLER( artic_gfxbank_w )
 
 static DRIVER_INIT( pacmanbl )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
@@ -2849,7 +2849,7 @@ void tenspot_set_game_bank(running_machine* machine, int bank, int from_game)
 
 static DRIVER_INIT( tenspot )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
        which tenspot appears to have copied */
@@ -2886,7 +2886,7 @@ static DRIVER_INIT( devilfsg )
 
 static DRIVER_INIT( zigzag )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
@@ -2927,8 +2927,8 @@ static DRIVER_INIT( jumpbug )
 
 static DRIVER_INIT( checkman )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
@@ -2947,7 +2947,7 @@ static DRIVER_INIT( checkman )
 
 static DRIVER_INIT( checkmaj )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -2962,7 +2962,7 @@ static DRIVER_INIT( checkmaj )
 
 static DRIVER_INIT( dingo )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -2977,8 +2977,8 @@ static DRIVER_INIT( dingo )
 
 static DRIVER_INIT( dingoe )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
@@ -2999,7 +2999,7 @@ static DRIVER_INIT( dingoe )
 
 static DRIVER_INIT( skybase )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
@@ -3017,7 +3017,7 @@ static DRIVER_INIT( skybase )
 
 static void mshuttle_decode(running_machine *machine, const UINT8 convtable[8][16])
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	int A;
@@ -3095,7 +3095,7 @@ static DRIVER_INIT( mshuttlj )
 
 static DRIVER_INIT( kingball )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -3112,7 +3112,7 @@ static DRIVER_INIT( kingball )
 
 static DRIVER_INIT( scorpnmc )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
@@ -3133,7 +3133,7 @@ static DRIVER_INIT( scorpnmc )
 
 static DRIVER_INIT( thepitm )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
@@ -3157,7 +3157,7 @@ static DRIVER_INIT( thepitm )
 
 static DRIVER_INIT( theend )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -3176,7 +3176,7 @@ static DRIVER_INIT( scramble )
 
 static DRIVER_INIT( explorer )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
@@ -3202,14 +3202,14 @@ static DRIVER_INIT( sfx )
 	galaxian_sfx_tilemap = TRUE;
 
 	/* sound board has space for extra ROM */
-	memory_install_read_bank(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
+	memory_install_read_bank(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", machine->region("audiocpu")->base());
 }
 
 
 static DRIVER_INIT( atlantis )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
@@ -3251,7 +3251,7 @@ static DRIVER_INIT( frogger )
 
 static DRIVER_INIT( froggrmc )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
@@ -3296,12 +3296,12 @@ static DRIVER_INIT( amidar )
 
 static DRIVER_INIT( scorpion )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 
 	/* hook up AY8910 */
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_IO), 0x00, 0xff, 0, 0, scorpion_ay8910_r, scorpion_ay8910_w);
+	memory_install_readwrite8_handler(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_IO), 0x00, 0xff, 0, 0, scorpion_ay8910_r, scorpion_ay8910_w);
 
 	/* extra ROM */
 	memory_install_read_bank(space, 0x5800, 0x67ff, 0, 0, "bank1");
@@ -3310,7 +3310,7 @@ static DRIVER_INIT( scorpion )
 	/* no background related */
 //  memory_nop_write(space, 0x6803, 0x6803, 0, 0);
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, scorpion_digitalker_intr_r);
+	memory_install_read8_handler(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, scorpion_digitalker_intr_r);
 /*
 {
     const UINT8 *rom = machine->region("speech")->base();

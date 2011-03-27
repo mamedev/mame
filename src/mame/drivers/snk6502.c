@@ -731,10 +731,10 @@ static INTERRUPT_GEN( satansat_interrupt )
 
 		/* user asks to insert coin: generate a NMI interrupt. */
 		if (val & 0x01)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+		device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 static INTERRUPT_GEN( snk6502_interrupt )
@@ -748,10 +748,10 @@ static INTERRUPT_GEN( snk6502_interrupt )
 
 		/* user asks to insert coin: generate a NMI interrupt. */
 		if (val & 0x03)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+		device_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 

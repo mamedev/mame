@@ -314,7 +314,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	crospang_state *state = device->machine->driver_data<crospang_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate);
+	device_set_input_line(state->audiocpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

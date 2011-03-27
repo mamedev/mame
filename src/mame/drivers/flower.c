@@ -93,7 +93,7 @@ static INTERRUPT_GEN( sn_irq )
 {
 	flower_state *state = device->machine->driver_data<flower_state>();
 	if ((*state->sn_irq_enable & 1) == 1)
-		cpu_set_input_line(device, 0, ASSERT_LINE);
+		device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_command_w )
@@ -236,7 +236,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( flower_cpu0_interrupt )
 {
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( flower, flower_state )

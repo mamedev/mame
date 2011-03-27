@@ -73,7 +73,7 @@ K1000233A
 static INTERRUPT_GEN( pitnrun_nmi_source )
 {
 	pitnrun_state *state = device->machine->driver_data<pitnrun_state>();
-	if(state->nmi) cpu_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
+	if(state->nmi) device_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )

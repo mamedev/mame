@@ -336,7 +336,7 @@ static UINT32 dp_clock = 0;
 
 static void sp_dma(running_machine *machine, int direction)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i, c;
 
 	if (sp_dma_length == 0)
@@ -432,7 +432,7 @@ static void sp_set_status(device_t *device, UINT32 status)
 	{
 		//device->machine->scheduler().trigger(6789);
 
-		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
         cpu_set_reg(device, RSP_SR, cpu_get_reg(device, RSP_SR) | RSP_STATUS_HALT);
 		//rsp_sp_status |= SP_STATUS_HALT;
 	}
@@ -544,10 +544,10 @@ WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
                 {
                     //if (first_rsp)
                     //{
-                    //  cpu_spinuntil_trigger(device, 6789);
+                    //  device_spin_until_trigger(device, 6789);
 
                         // printf( "Clearing RSP_STATUS_HALT\n" );
-                        cpu_set_input_line(device, INPUT_LINE_HALT, CLEAR_LINE);
+                        device_set_input_line(device, INPUT_LINE_HALT, CLEAR_LINE);
                         newstatus &= ~RSP_STATUS_HALT;
                         // RSP_STATUS &= ~RSP_STATUS_HALT;
                     //}
@@ -559,7 +559,7 @@ WRITE32_DEVICE_HANDLER( n64_sp_reg_w )
                 if (data & 0x00000002)      // set halt
                 {
                     // printf( "Setting RSP_STATUS_HALT\n" );
-                    cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
+                    device_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
                     newstatus |= RSP_STATUS_HALT;
                     // RSP_STATUS |= RSP_STATUS_HALT;
                 }

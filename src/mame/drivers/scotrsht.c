@@ -52,7 +52,7 @@ static INTERRUPT_GEN( scotrsht_interrupt )
 	scotrsht_state *state = device->machine->driver_data<scotrsht_state>();
 
 	if (state->irq_enable)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( scotrsht_soundlatch_w )

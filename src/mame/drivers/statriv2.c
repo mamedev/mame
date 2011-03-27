@@ -204,8 +204,8 @@ static INTERRUPT_GEN( statriv2_interrupt )
 	state->latched_coin |= new_coin & (new_coin ^ state->last_coin);
 	state->last_coin = new_coin;
 
-	cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
-	cpu_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+	device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
+	device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
 }
 
 
@@ -1126,7 +1126,7 @@ static WRITE8_HANDLER( laserdisc_io_w )
 
 static DRIVER_INIT( laserdisc )
 {
-	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 	memory_install_readwrite8_handler(iospace, 0x28, 0x2b, 0, 0, laserdisc_io_r, laserdisc_io_w);
 }
 

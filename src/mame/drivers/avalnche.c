@@ -236,7 +236,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( avalnche_interrupt )
 {
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( avalnche )

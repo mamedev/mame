@@ -67,7 +67,7 @@ WRITE8_HANDLER( commando_c804_w )
 	coin_counter_w(space->machine, 1, data & 0x02);
 
 	// bit 4 resets the sound CPU
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(space->machine, data & 0x80);
@@ -147,7 +147,7 @@ SCREEN_UPDATE( commando )
 
 SCREEN_EOF( commando )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }

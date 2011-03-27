@@ -251,7 +251,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	{
 		state->i8751_current_command = 0;
 		state->i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
-		cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
 		return;
 	}
 
@@ -302,7 +302,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	}
 
 	/* Signal main cpu task is complete */
-	cpu_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->maincpu, 0, HOLD_LINE, 0xff);
 	state->i8751_current_command=data;
 }
 
@@ -310,7 +310,7 @@ static WRITE8_HANDLER( firetrap_sound_command_w )
 {
 	firetrap_state *state = space->machine->driver_data<firetrap_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
@@ -334,7 +334,7 @@ static void firetrap_adpcm_int( device_t *device )
 
 	state->adpcm_toggle ^= 1;
 	if (state->irq_enable && state->adpcm_toggle)
-		cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_adpcm_data_w )
@@ -602,13 +602,13 @@ static INTERRUPT_GEN( firetrap )
 		if (state->coin_command_pending && !state->i8751_current_command)
 		{
 			state->i8751_return = state->coin_command_pending;
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xff);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xff);
 			state->coin_command_pending = 0;
 		}
 	}
 
 	if (state->nmi_enable && !cpu_getiloops(device))
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( bootleg )
@@ -616,7 +616,7 @@ static INTERRUPT_GEN( bootleg )
 	firetrap_state *state = device->machine->driver_data<firetrap_state>();
 
 	if (state->nmi_enable)
-		cpu_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

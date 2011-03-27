@@ -245,7 +245,7 @@ static MACHINE_START( redbaron )
 static INTERRUPT_GEN( bzone_interrupt )
 {
 	if (input_port_read(device->machine, "IN0") & 0x10)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -797,7 +797,7 @@ static WRITE8_HANDLER( analog_select_w )
 
 static DRIVER_INIT( bradley )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	memory_install_ram(space, 0x400, 0x7ff, 0, 0, NULL);
 	memory_install_read_port(space, 0x1808, 0x1808, 0, 0, "1808");
 	memory_install_read_port(space, 0x1809, 0x1809, 0, 0, "1809");

@@ -91,7 +91,7 @@ TIMER_CALLBACK( cdislave_device::trigger_readback_int )
 void cdislave_device::readback_trigger()
 {
     verboselog(&m_machine, 0, "Asserting IRQ2\n" );
-    cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_2, 26);
+    device_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_2, 26);
     cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
     m_interrupt_timer->adjust(attotime::never);
 }

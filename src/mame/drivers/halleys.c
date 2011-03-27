@@ -1554,7 +1554,7 @@ static INTERRUPT_GEN( halleys_interrupt )
 				latch_data = state->sound_fifo[state->fftail];
 				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
 				state->latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w( cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
+				soundlatch_w( device->memory().space(ADDRESS_SPACE_PROGRAM), 0, latch_data);
 				cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 
@@ -1564,16 +1564,16 @@ static INTERRUPT_GEN( halleys_interrupt )
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
 		case 1:
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
 		case 2:
-			state->mVectorType = 1; cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+			state->mVectorType = 1; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 
 		case 3:
-			state->mVectorType = 0; cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
+			state->mVectorType = 0; device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -1594,19 +1594,19 @@ static INTERRUPT_GEN( benberob_interrupt )
 				latch_data = state->sound_fifo[state->fftail];
 				state->fftail = (state->fftail + 1) & (MAX_SOUNDS - 1);
 				state->latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
+				soundlatch_w(device->memory().space(ADDRESS_SPACE_PROGRAM), 0, latch_data);
 				cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 		break;
 
 		case 1:
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 
 		case 2:
 		case 3:
 			// FIRQ must not happen when the blitter is being updated or it'll cause serious screen artifacts
-			if (!state->blitter_busy) cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else state->firq_level++;
+			if (!state->blitter_busy) device_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else state->firq_level++;
 		break;
 	}
 }

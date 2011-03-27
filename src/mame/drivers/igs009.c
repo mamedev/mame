@@ -668,7 +668,7 @@ static INTERRUPT_GEN( jingbell_interrupt )
 {
 	igs009_state *state = device->machine->driver_data<igs009_state>();
 	 if (state->nmi_enable & 0x80)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( jingbell, igs009_state )

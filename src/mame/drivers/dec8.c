@@ -54,7 +54,7 @@ To do:
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static SCREEN_EOF( dec8 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram_w(space, 0, 0);
 }
 
@@ -119,7 +119,7 @@ static TIMER_CALLBACK( dec8_i8751_timer_callback )
 	// The schematics show a clocked LS194 shift register (3A) is used to automatically
 	// clear the IRQ request.  The MCU does not clear it itself.
 	dec8_state *state = machine->driver_data<dec8_state>();
-	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
+	device_set_input_line(state->mcu, MCS51_INT1_LINE, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( dec8_i8751_w )
@@ -130,7 +130,7 @@ static WRITE8_HANDLER( dec8_i8751_w )
 	{
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		cpu_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
+		device_set_input_line(state->mcu, MCS51_INT1_LINE, ASSERT_LINE);
 		space->machine->scheduler().timer_set(state->mcu->clocks_to_attotime(64), FUNC(dec8_i8751_timer_callback)); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
@@ -229,7 +229,7 @@ static WRITE8_HANDLER( shackled_i8751_w )
 	{
 	case 0: /* High byte */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		cpu_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		device_set_input_line(state->subcpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
@@ -258,7 +258,7 @@ static WRITE8_HANDLER( lastmisn_i8751_w )
 	{
 	case 0: /* High byte */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
@@ -290,7 +290,7 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	{
 	case 0: /* High byte */
 		state->i8751_value = (state->i8751_value & 0xff) | (data << 8);
-		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
 		state->i8751_value = (state->i8751_value & 0xff00) | data;
@@ -360,7 +360,7 @@ static WRITE8_HANDLER( ghostb_bank_w )
 
 	memory_set_bank(space->machine, "bank1", data >> 4);
 
-	if ((data&1)==0) cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+	if ((data&1)==0) device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 	if (data & 2) state->nmi_enable =1; else state->nmi_enable = 0;
 	flip_screen_set(space->machine, data & 0x08);
 }
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( dec8_sound_w )
 {
 	dec8_state *state = space->machine->driver_data<dec8_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void csilver_adpcm_int( device_t *device )
@@ -389,7 +389,7 @@ static void csilver_adpcm_int( device_t *device )
 	dec8_state *state = device->machine->driver_data<dec8_state>();
 	state->toggle ^= 1;
 	if (state->toggle)
-		cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 
 	msm5205_data_w(device, state->msm5205next >> 4);
 	state->msm5205next <<= 4;
@@ -421,16 +421,16 @@ static WRITE8_HANDLER( oscar_int_w )
 	switch (offset)
 	{
 	case 0: /* IRQ2 */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 1: /* IRC 1 */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 2: /* IRQ 1 */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 3: /* IRC 2 */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	}
 }
@@ -446,18 +446,18 @@ static WRITE8_HANDLER( shackled_int_w )
 	switch (offset)
 	{
 	case 0: /* CPU 2 - IRQ acknowledge */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 1: /* CPU 1 - IRQ acknowledge */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 2: /* i8751 - FIRQ acknowledge */
 		return;
 	case 3: /* IRQ 1 */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 4: /* IRQ 2 */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	}
 #endif
@@ -471,10 +471,10 @@ static WRITE8_HANDLER( shackled_int_w )
 	case 2: /* i8751 - FIRQ acknowledge */
 		return;
 	case 3: /* IRQ 1 */
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, HOLD_LINE);
 		return;
 	case 4: /* IRQ 2 */
-		cpu_set_input_line(state->subcpu, M6809_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(state->subcpu, M6809_IRQ_LINE, HOLD_LINE);
 		return;
 	}
 }
@@ -864,7 +864,7 @@ static WRITE8_HANDLER( dec8_mcu_to_main_w )
 
 	// P2 - IRQ to main CPU
 	if (offset==2 && (data&4)==0)
-		cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( dec8_mcu_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1884,7 +1884,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	dec8_state *state = device->machine->driver_data<dec8_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate); /* M6502_IRQ_LINE */
+	device_set_input_line(state->audiocpu, 0, linestate); /* M6502_IRQ_LINE */
 }
 
 static const ym3526_interface ym3526_config =
@@ -1909,7 +1909,7 @@ static INTERRUPT_GEN( gondo_interrupt )
 {
 	dec8_state *state = device->machine->driver_data<dec8_state>();
 	if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
 
 /* Coins generate NMI's */
@@ -1920,7 +1920,7 @@ static INTERRUPT_GEN( oscar_interrupt )
 	if (state->latch && (input_port_read(device->machine, "IN2") & 0x7) != 0x7)
 	{
 		state->latch = 0;
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -3417,7 +3417,7 @@ static DRIVER_INIT( dec8 )
 static DRIVER_INIT( deco222 )
 {
 	dec8_state *state = machine->driver_data<dec8_state>();
-	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int A;
 	UINT8 *decrypt;
 	UINT8 *rom;

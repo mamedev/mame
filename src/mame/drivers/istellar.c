@@ -327,7 +327,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( vblank_callback_istellar )
 {
 	/* Interrupt presumably comes from VBlank */
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 
 	/* Interrupt presumably comes from the LDP's status strobe */
 	cputag_set_input_line(device->machine, "sub", 0, ASSERT_LINE);

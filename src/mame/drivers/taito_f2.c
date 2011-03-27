@@ -578,13 +578,13 @@ driftout  8000 0000/8  0000 0000    The first control changes from 8000 to 0000 
 static TIMER_CALLBACK( taitof2_interrupt6 )
 {
 	taitof2_state *state = machine->driver_data<taitof2_state>();
-	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( taitof2_interrupt )
 {
 	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(500), FUNC(taitof2_interrupt6));
-	cpu_set_input_line(device, 5, HOLD_LINE);
+	device_set_input_line(device, 5, HOLD_LINE);
 }
 
 
@@ -607,7 +607,7 @@ static READ8_HANDLER( driveout_sound_command_r)
 {
 	taitof2_state *state = space->machine->driver_data<taitof2_state>();
 
-	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 //  logerror("sound IRQ OFF (sound command=%02x)\n", state->driveout_sound_latch);
 	return state->driveout_sound_latch;
 }
@@ -650,7 +650,7 @@ static WRITE16_HANDLER( driveout_sound_command_w )
 			else
 			{
 				state->driveout_sound_latch = ((data << 4) & 0xf0) | (state->driveout_sound_latch & 0x0f);
-				cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+				device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 			}
 		}
 	}
@@ -3216,7 +3216,7 @@ GFXDECODE_END
 static void irq_handler( device_t *device, int irq )
 {
 	taitof2_state *state = device->machine->driver_data<taitof2_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

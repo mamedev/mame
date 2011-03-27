@@ -192,8 +192,8 @@ MACHINE_RESET( irobot )
 	/* set an initial timer to go off on scanline 0 */
 	machine->scheduler().timer_set(machine->primary_screen->time_until_pos(0), FUNC(scanline_callback));
 
-	irobot_rom_banksel_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
-	irobot_out0_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),0,0);
+	irobot_rom_banksel_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM),0,0);
+	irobot_out0_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM),0,0);
 	state->combase = state->comRAM[0];
 	state->combase_mb = state->comRAM[1];
 	state->outx = 0;

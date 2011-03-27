@@ -79,9 +79,9 @@ static WRITE8_HANDLER( grndtour_prot_w )
 static INTERRUPT_GEN( iqblock_interrupt )
 {
 	if (cpu_getiloops(device) & 1)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* ???? */
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* ???? */
 	else
-		cpu_set_input_line(device, 0, ASSERT_LINE);			/* ???? */
+		device_set_input_line(device, 0, ASSERT_LINE);			/* ???? */
 }
 
 static WRITE8_HANDLER( iqblock_irqack_w )
@@ -444,7 +444,7 @@ static DRIVER_INIT( iqblock )
 	machine->generic.paletteram2.u8       = rom + 0x12800;
 	state->fgvideoram = rom + 0x16800;
 	state->bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe26, 0xfe26, 0, 0, iqblock_prot_w);
 	state->video_type=1;
 }
 
@@ -467,7 +467,7 @@ static DRIVER_INIT( grndtour )
 	machine->generic.paletteram2.u8       = rom + 0x12800;
 	state->fgvideoram = rom + 0x16800;
 	state->bgvideoram = rom + 0x17000;
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe39, 0xfe39, 0, 0, grndtour_prot_w);
 	state->video_type=0;
 }
 

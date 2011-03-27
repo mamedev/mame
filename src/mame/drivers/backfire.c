@@ -400,7 +400,7 @@ static const ymz280b_interface ymz280b_intf =
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -671,8 +671,8 @@ static READ32_HANDLER( backfire_speedup_r )
 
 	//mame_printf_debug( "%08x\n",cpu_get_pc(space->cpu));
 
-	if (cpu_get_pc(space->cpu )== 0xce44)  cpu_spinuntil_time(space->cpu, attotime::from_usec(400)); // backfire
-	if (cpu_get_pc(space->cpu) == 0xcee4)  cpu_spinuntil_time(space->cpu, attotime::from_usec(400)); // backfirea
+	if (cpu_get_pc(space->cpu )== 0xce44)  device_spin_until_time(space->cpu, attotime::from_usec(400)); // backfire
+	if (cpu_get_pc(space->cpu) == 0xcee4)  device_spin_until_time(space->cpu, attotime::from_usec(400)); // backfirea
 
 	return state->mainram[0x18/4];
 }
@@ -685,7 +685,7 @@ static DRIVER_INIT( backfire )
 	deco156_decrypt(machine);
 	machine->device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
 }
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", GAME_SUPPORTS_SAVE )

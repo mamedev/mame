@@ -379,14 +379,14 @@ ROM_END
 
 static DRIVER_INIT( sidepckt )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepckt_i8751_w  );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepckt_i8751_w  );
 }
 
 static DRIVER_INIT( sidepctj )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepctj_i8751_w  );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3014, 0x3014, 0, 0, sidepckt_i8751_r );
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3018, 0x3018, 0, 0, sidepctj_i8751_w  );
 }
 
 

@@ -156,7 +156,7 @@ static WRITE8_DEVICE_HANDLER( lamps_w )
 
 static WRITE8_DEVICE_HANDLER( sound_w )
 {
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	coin_lockout_global_w(device->machine, ~data & 0x08);
@@ -197,7 +197,7 @@ static WRITE8_DEVICE_HANDLER( lamps2_w )
 
 static WRITE8_DEVICE_HANDLER( nmi_w )
 {
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	set_led_status(device->machine, 8,data & 0x10);

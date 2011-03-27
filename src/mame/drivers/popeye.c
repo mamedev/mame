@@ -25,7 +25,7 @@ static INTERRUPT_GEN( popeye_interrupt )
 {
 	/* NMIs are enabled by the I register?? How can that be? */
 	if (cpu_get_reg(device, Z80_I) & 1)	/* skyskipr: 0/1, popeye: 2/3 but also 0/1 */
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

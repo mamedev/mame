@@ -6058,7 +6058,7 @@ static INTERRUPT_GEN( lucky8_irq )
 	goldstar_state *state = device->machine->driver_data<goldstar_state>();
 
 	if(state->lucky8_nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( lucky8, goldstar_state )
@@ -9853,8 +9853,8 @@ static DRIVER_INIT( schery97 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x1d, 0x1d, 0, 0, fixedvala8_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x2a, 0x2a, 0, 0, fixedvalb4_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -9883,7 +9883,7 @@ static DRIVER_INIT( schery97a )
 
 
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedval38_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -9910,7 +9910,7 @@ static DRIVER_INIT( skill98 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x1e, 0x1e, 0, 0, fixedvalea_r);
 	/* Oki 6295 at 0x20 */
 }
 
@@ -9937,7 +9937,7 @@ static DRIVER_INIT( fb36xc1 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x31, 0x31, 0, 0, fixedval68_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x31, 0x31, 0, 0, fixedval68_r);
 
 }
 
@@ -9974,11 +9974,11 @@ static DRIVER_INIT( fbse354 )
 		ROM[i] = x;
 	}
 	// nfb96b needs both of these
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x23, 0x23, 0, 0, fixedval80_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x5a, 0x5a, 0, 0, fixedvalaa_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x23, 0x23, 0, 0, fixedval80_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x5a, 0x5a, 0, 0, fixedvalaa_r);
 
 	// csel96b
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x6e, 0x6e, 0, 0, fixedval96_r);
 
 }
 
@@ -10006,7 +10006,7 @@ static DRIVER_INIT( fbse362 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x2e, 0x2e, 0, 0, fixedvalbe_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x2e, 0x2e, 0, 0, fixedvalbe_r);
 
 }
 
@@ -10038,8 +10038,8 @@ static DRIVER_INIT( rp35 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x5e, 0x5e, 0, 0, fixedval84_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x36, 0x36, 0, 0, fixedval90_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x5e, 0x5e, 0, 0, fixedval84_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x36, 0x36, 0, 0, fixedval90_r);
 }
 
 static READ8_HANDLER( fixedvalb2_r )
@@ -10066,7 +10066,7 @@ static DRIVER_INIT( rp36 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x34, 0x34, 0, 0, fixedvalb2_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x34, 0x34, 0, 0, fixedvalb2_r);
 }
 
 static READ8_HANDLER( fixedval48_r )
@@ -10093,7 +10093,7 @@ static DRIVER_INIT( rp36c3 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x17, 0x17, 0, 0, fixedval48_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x17, 0x17, 0, 0, fixedval48_r);
 }
 
 static READ8_HANDLER( fixedval09_r )
@@ -10125,8 +10125,8 @@ static DRIVER_INIT( po33 )
 
 		ROM[i] = x;
 	}
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x32, 0x32, 0, 0, fixedval74_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x12, 0x12, 0, 0, fixedval09_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x32, 0x32, 0, 0, fixedval74_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x12, 0x12, 0, 0, fixedval09_r);
 	/* oki6295 at 0x20 */
 }
 
@@ -10154,7 +10154,7 @@ static DRIVER_INIT( tc132axt )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fixedval58_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fixedval58_r);
 }
 
 static READ8_HANDLER( fixedvale4_r )
@@ -10186,8 +10186,8 @@ static DRIVER_INIT( match133 )
 		ROM[i] = x;
 	}
 
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedvalc7_r);
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x16, 0x16, 0, 0, fixedvalc7_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x1a, 0x1a, 0, 0, fixedvale4_r);
 }
 
 static DRIVER_INIT(cherrys)
@@ -10252,7 +10252,7 @@ static DRIVER_INIT( unkch4 )
 static DRIVER_INIT( tonypok )
 {
 	// the ppi doesn't seem to work properly, so just install the inputs directly
-	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *io = machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO);
 	memory_install_read_port(io, 0x04, 0x04, 0, 0, "IN0" );
 	memory_install_read_port(io, 0x05, 0x05, 0, 0, "IN1" );
 	memory_install_read_port(io, 0x06, 0x06, 0, 0, "IN2" );

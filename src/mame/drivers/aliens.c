@@ -24,7 +24,7 @@ static INTERRUPT_GEN( aliens_interrupt )
 	aliens_state *state = device->machine->driver_data<aliens_state>();
 
 	if (k051960_is_irq_enabled(state->k051960))
-		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
@@ -76,7 +76,7 @@ static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
 	aliens_state *state = space->machine->driver_data<aliens_state>();
 
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )

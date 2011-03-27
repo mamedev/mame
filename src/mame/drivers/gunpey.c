@@ -324,7 +324,7 @@ static PALETTE_INIT( gunpey )
 
 static INTERRUPT_GEN( gunpey_interrupt )
 {
-	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x200/4);
+	device_set_input_line_and_vector(device,0,HOLD_LINE,0x200/4);
 }
 
 /***************************************************************************************/

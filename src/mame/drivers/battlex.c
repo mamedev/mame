@@ -53,7 +53,7 @@ static INTERRUPT_GEN( battlex_interrupt )
 {
 	battlex_state *state = device->machine->driver_data<battlex_state>();
 	state->in0_b4 = 1;
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static CUSTOM_INPUT( battlex_in0_b4_r )

@@ -292,13 +292,13 @@ static WRITE8_HANDLER( sound_latch_w )
 {
 	jangou_state *state = space->machine->driver_data<jangou_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->cpu_1, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->cpu_1, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( sound_latch_r )
 {
 	jangou_state *state = space->machine->driver_data<jangou_state>();
-	cpu_set_input_line(state->cpu_1, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->cpu_1, INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
@@ -319,7 +319,7 @@ static TIMER_CALLBACK( cvsd_bit_timer_callback )
 
 	/* Trigger an IRQ for every 8 shifted bits */
 	if ((++state->cvsd_shift_cnt & 7) == 0)
-		cpu_set_input_line(state->cpu_1, 0, HOLD_LINE);
+		device_set_input_line(state->cpu_1, 0, HOLD_LINE);
 }
 
 
@@ -339,7 +339,7 @@ static void jngolady_vclk_cb( device_t *device )
 	else
 	{
 		msm5205_data_w(device, state->adpcm_byte & 0xf);
-		cpu_set_input_line(state->cpu_1, 0, HOLD_LINE);
+		device_set_input_line(state->cpu_1, 0, HOLD_LINE);
 	}
 
 	state->msm5205_vclk_toggle ^= 1;
@@ -362,7 +362,7 @@ static WRITE8_HANDLER( master_com_w )
 {
 	jangou_state *state = space->machine->driver_data<jangou_state>();
 
-	cpu_set_input_line(state->nsc, 0, HOLD_LINE);
+	device_set_input_line(state->nsc, 0, HOLD_LINE);
 	state->nsc_latch = data;
 }
 
@@ -1360,7 +1360,7 @@ static READ8_HANDLER( jngolady_rng_r )
 
 static DRIVER_INIT( jngolady )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "nsc", ADDRESS_SPACE_PROGRAM), 0x08, 0x08, 0, 0, jngolady_rng_r );
+	memory_install_read8_handler(machine->device("nsc")->memory().space(ADDRESS_SPACE_PROGRAM), 0x08, 0x08, 0, 0, jngolady_rng_r );
 }
 
 static DRIVER_INIT (luckygrl)

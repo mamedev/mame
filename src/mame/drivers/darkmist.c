@@ -218,9 +218,9 @@ GFXDECODE_END
 static INTERRUPT_GEN( darkmist_interrupt )
 {
 	if(cpu_getiloops(device))
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 }
 
 
@@ -402,7 +402,7 @@ static void decrypt_snd(running_machine *machine)
 
 static DRIVER_INIT(darkmist)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i, len;
 	UINT8 *ROM = machine->region("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x10000);

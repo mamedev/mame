@@ -333,7 +333,7 @@ GFXDECODE_END
 static void irq_handler(device_t *device, int irq)
 {
 	oneshot_state *state = device->machine->driver_data<oneshot_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

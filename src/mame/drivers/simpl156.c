@@ -395,7 +395,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( simpl156_vbl_interrupt )
 {
-	cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -1067,14 +1067,14 @@ static READ32_HANDLER( joemacr_speedup_r )
 {
 	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x284)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(400));
+		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0x18/4];
 }
 
 
 static DRIVER_INIT( joemacr )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201018, 0x020101b, 0, 0, joemacr_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0201018, 0x020101b, 0, 0, joemacr_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1082,13 +1082,13 @@ static READ32_HANDLER( chainrec_speedup_r )
 {
 	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x2d4)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(400));
+		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0x18/4];
 }
 
 static DRIVER_INIT( chainrec )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201018, 0x020101b, 0, 0, chainrec_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0201018, 0x020101b, 0, 0, chainrec_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1096,13 +1096,13 @@ static READ32_HANDLER( prtytime_speedup_r )
 {
 	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x4f0)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(400));
+		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0xae0/4];
 }
 
 static DRIVER_INIT( prtytime )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0201ae0, 0x0201ae3, 0, 0, prtytime_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1111,13 +1111,13 @@ static READ32_HANDLER( charlien_speedup_r )
 {
 	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0xc8c8)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(400));
+		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0x10/4];
 }
 
 static DRIVER_INIT( charlien )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, charlien_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, charlien_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 }
 
@@ -1125,13 +1125,13 @@ static READ32_HANDLER( osman_speedup_r )
 {
 	simpl156_state *state = space->machine->driver_data<simpl156_state>();
 	if (cpu_get_pc(space->cpu) == 0x5974)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(400));
+		device_spin_until_time(space->cpu, attotime::from_usec(400));
 	return state->systemram[0x10/4];
 }
 
 static DRIVER_INIT( osman )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0201010, 0x0201013, 0, 0, osman_speedup_r );
 	DRIVER_INIT_CALL(simpl156);
 
 }

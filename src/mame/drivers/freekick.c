@@ -83,7 +83,7 @@ static INTERRUPT_GEN( freekick_irqgen )
 {
 	freekick_state *state = device->machine->driver_data<freekick_state>();
 	if (state->nmi_en)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( oigas_5_w )
@@ -1108,7 +1108,7 @@ ROM_END
 
 static DRIVER_INIT(gigasb)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	space->set_decrypted_region(0x0000, 0xbfff, machine->region("maincpu")->base() + 0x10000);
 }
 

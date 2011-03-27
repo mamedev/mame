@@ -319,12 +319,12 @@ static INTERRUPT_GEN( panic_interrupt )
 		/* only enabled if game in progress! */
 
 		if ((input_port_read(device->machine, "SYSTEM") & 0xc0) != 0xc0)
-			panic_sound_output_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 17, 1);
+			panic_sound_output_w(device->memory().space(ADDRESS_SPACE_PROGRAM), 17, 1);
 
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
 	}
 	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 static INTERRUPT_GEN( cosmica_interrupt )
@@ -335,7 +335,7 @@ static INTERRUPT_GEN( cosmica_interrupt )
 	if (state->pixel_clock == 0)
 	{
 		if (input_port_read(device->machine, "FAKE") & 1)	/* Left Coin */
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -350,25 +350,25 @@ static INTERRUPT_GEN( cosmicg_interrupt )
 
 	if ((input_port_read(device->machine, "IN2") & 1))	/* Coin */
 		/* on tms9980, a 6 on the interrupt bus means level 4 interrupt */
-		cpu_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
+		device_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
 	else
-		cpu_set_input_line(device, 0, CLEAR_LINE);
+		device_set_input_line(device, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( magspot_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
 	if (input_port_read(device->machine, "COINS") & 0x01)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else if (input_port_read(device->machine, "COINS") & 0x02)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( nomnlnd_interrupt )
 {
 	/* Coin causes an NMI */
 	if (input_port_read(device->machine, "COIN") & 0x01)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1596,17 +1596,17 @@ static DRIVER_INIT( cosmica )
 
 static DRIVER_INIT( devzone )
 {
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
 }
 
 
 static DRIVER_INIT( nomnlnd )
 {
 	device_t *dac = machine->device("dac");
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
-	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
-	memory_install_write8_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5000, 0x5001, 0, 0, nomnlnd_port_0_1_r);
+	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4800, 0x4800, 0, 0);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4807, 0x4807, 0, 0, cosmic_background_enable_w);
+	memory_install_write8_device_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), dac, 0x480a, 0x480a, 0, 0, dac_w);
 }
 
 static DRIVER_INIT( panic )

@@ -170,7 +170,7 @@ static READ16_HANDLER( xexex_waitskip_r )
 
 	if (cpu_get_pc(space->cpu) == 0x1158)
 	{
-		cpu_spinuntil_trigger(space->cpu, state->resume_trigger);
+		device_spin_until_trigger(space->cpu, state->resume_trigger);
 		state->suspension_active = 1;
 	}
 
@@ -235,7 +235,7 @@ static WRITE16_HANDLER( sound_cmd2_w )
 static WRITE16_HANDLER( sound_irq_w )
 {
 	xexex_state *state = space->machine->driver_data<xexex_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
@@ -280,7 +280,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// IRQ 5 is the "object DMA end interrupt" and shouldn't be triggered
 		// if object data isn't ready for DMA within the frame.
-		cpu_set_input_line(state->maincpu, 5, HOLD_LINE);
+		device_set_input_line(state->maincpu, 5, HOLD_LINE);
 	}
 }
 
@@ -299,7 +299,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 		case 0:
 			// IRQ 6 is for test mode only
 			if (state->cur_control2 & 0x0020)
-				cpu_set_input_line(device, 6, HOLD_LINE);
+				device_set_input_line(device, 6, HOLD_LINE);
 		break;
 
 		case 1:
@@ -315,7 +315,7 @@ static INTERRUPT_GEN( xexex_interrupt )
 			// IRQ 4 is the V-blank interrupt. It controls color, sound and
 			// vital game logics that shouldn't be interfered by frame-drop.
 			if (state->cur_control2 & 0x0800)
-				cpu_set_input_line(device, 4, HOLD_LINE);
+				device_set_input_line(device, 4, HOLD_LINE);
 		break;
 	}
 }

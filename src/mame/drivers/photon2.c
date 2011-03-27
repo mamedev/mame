@@ -288,7 +288,7 @@ static INTERRUPT_GEN( spec_interrupt_hack )
 	photon2_state *state = device->machine->driver_data<photon2_state>();
 	if (cpu_getiloops(device) == 1)
 	{
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	}
 	else
 	{

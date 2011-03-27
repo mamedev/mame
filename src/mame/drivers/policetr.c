@@ -108,7 +108,7 @@ static TIMER_CALLBACK( irq5_gen )
 
 static INTERRUPT_GEN( irq4_gen )
 {
-	cpu_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
+	device_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
 	device->machine->scheduler().timer_set(device->machine->primary_screen->time_until_pos(0), FUNC(irq5_gen));
 }
 
@@ -218,7 +218,7 @@ static WRITE32_HANDLER( speedup_w )
 
 			/* more than 2 in a row and we spin */
 			if (state->loop_count > 2)
-				cpu_spinuntil_int(space->cpu);
+				device_spin_until_interrupt(space->cpu);
 		}
 		else
 			state->loop_count = 0;
@@ -679,14 +679,14 @@ ROM_END
 static DRIVER_INIT( policetr )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
 	state->speedup_pc = 0x1fc028ac;
 }
 
 static DRIVER_INIT( plctr13b )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
 	state->speedup_pc = 0x1fc028bc;
 }
 
@@ -694,14 +694,14 @@ static DRIVER_INIT( plctr13b )
 static DRIVER_INIT( sshooter )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
 	state->speedup_pc = 0x1fc03470;
 }
 
 static DRIVER_INIT( sshoot12 )
 {
 	policetr_state *state = machine->driver_data<policetr_state>();
-	state->speedup_data = memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	state->speedup_data = memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
 	state->speedup_pc = 0x1fc033e0;
 }
 

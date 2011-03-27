@@ -24,13 +24,13 @@ Main CPU:
 static WRITE8_HANDLER( video_interrupt_w )
 {
 	kingofb_state *state = space->machine->driver_data<kingofb_state>();
-	cpu_set_input_line_and_vector(state->video_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->video_cpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sprite_interrupt_w )
 {
 	kingofb_state *state = space->machine->driver_data<kingofb_state>();
-	cpu_set_input_line_and_vector(state->sprite_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->sprite_cpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( scroll_interrupt_w )
@@ -44,7 +44,7 @@ static WRITE8_HANDLER( sound_command_w )
 {
 	kingofb_state *state = space->machine->driver_data<kingofb_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line_and_vector(state->audio_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audio_cpu, 0, HOLD_LINE, 0xff);
 }
 
 
@@ -451,7 +451,7 @@ static INTERRUPT_GEN( kingofb_interrupt )
 	kingofb_state *state = device->machine->driver_data<kingofb_state>();
 
 	if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( kingofb )

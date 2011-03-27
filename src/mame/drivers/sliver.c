@@ -565,7 +565,7 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( sliver_int )
 {
 	//valid interrupts are 2,3,4
-	cpu_set_input_line(device, 2+cpu_getiloops(device), HOLD_LINE);
+	device_set_input_line(device, 2+cpu_getiloops(device), HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( sliver, sliver_state )

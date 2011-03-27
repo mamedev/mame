@@ -796,7 +796,7 @@ static void dcs_boot(void)
 		/* rev 3/4: HALT the ADSP-2181 until program is downloaded via IDMA */
 		case 3:
 		case 4:
-			cpu_set_input_line(dcs.cpu, INPUT_LINE_HALT, ASSERT_LINE);
+			device_set_input_line(dcs.cpu, INPUT_LINE_HALT, ASSERT_LINE);
 			dsio.start_on_next_write = 0;
 			break;
 	}
@@ -849,9 +849,9 @@ static TIMER_CALLBACK( dcs_reset )
 	memset(dcs.control_regs, 0, sizeof(dcs.control_regs));
 
 	/* clear all interrupts */
-	cpu_set_input_line(dcs.cpu, ADSP2105_IRQ0, CLEAR_LINE);
-	cpu_set_input_line(dcs.cpu, ADSP2105_IRQ1, CLEAR_LINE);
-	cpu_set_input_line(dcs.cpu, ADSP2105_IRQ2, CLEAR_LINE);
+	device_set_input_line(dcs.cpu, ADSP2105_IRQ0, CLEAR_LINE);
+	device_set_input_line(dcs.cpu, ADSP2105_IRQ1, CLEAR_LINE);
+	device_set_input_line(dcs.cpu, ADSP2105_IRQ2, CLEAR_LINE);
 
 	/* initialize the comm bits */
 	SET_INPUT_EMPTY();
@@ -1470,7 +1470,7 @@ WRITE32_HANDLER( dsio_idma_data_w )
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
 		logerror("Starting DSIO CPU\n");
-		cpu_set_input_line(dcs.cpu, INPUT_LINE_HALT, CLEAR_LINE);
+		device_set_input_line(dcs.cpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -1522,12 +1522,12 @@ void dcs_reset_w(int state)
 
 		/* just run through the init code again */
 		dcs.cpu->machine->scheduler().synchronize(FUNC(dcs_reset));
-		cpu_set_input_line(dcs.cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(dcs.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	/* going low resets and reactivates the CPU */
 	else
-		cpu_set_input_line(dcs.cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(dcs.cpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -1569,7 +1569,7 @@ static void dcs_delayed_data_w(running_machine *machine, int data)
 	machine->scheduler().boost_interleave(attotime::from_nsec(500), attotime::from_usec(5));
 
 	/* set the IRQ line on the ADSP */
-	cpu_set_input_line(dcs.cpu, ADSP2105_IRQ2, ASSERT_LINE);
+	device_set_input_line(dcs.cpu, ADSP2105_IRQ2, ASSERT_LINE);
 
 	/* indicate we are no longer empty */
 	if (dcs.last_input_empty && dcs.input_empty_cb)
@@ -1606,7 +1606,7 @@ static WRITE16_HANDLER( input_latch_ack_w )
 	if (!dcs.last_input_empty && dcs.input_empty_cb)
 		(*dcs.input_empty_cb)(space->machine, dcs.last_input_empty = 1);
 	SET_INPUT_EMPTY();
-	cpu_set_input_line(dcs.cpu, ADSP2105_IRQ2, CLEAR_LINE);
+	device_set_input_line(dcs.cpu, ADSP2105_IRQ2, CLEAR_LINE);
 }
 
 
@@ -1760,8 +1760,8 @@ static TIMER_DEVICE_CALLBACK( internal_timer_callback )
 		timer.adjust(dcs.cpu->cycles_to_attotime(target_cycles));
 
 	/* the IRQ line is edge triggered */
-	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, ASSERT_LINE);
-	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, CLEAR_LINE);
+	device_set_input_line(dcs.cpu, ADSP2105_TIMER, ASSERT_LINE);
+	device_set_input_line(dcs.cpu, ADSP2105_TIMER, CLEAR_LINE);
 }
 
 
@@ -1878,7 +1878,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if (data & 0x0200)
 			{
 				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", cpu_get_pc(space->cpu));
-				cpu_set_input_line(dcs.cpu, INPUT_LINE_RESET, PULSE_LINE);
+				device_set_input_line(dcs.cpu, INPUT_LINE_RESET, PULSE_LINE);
 				dcs_boot();
 				dcs.control_regs[SYSCONTROL_REG] = 0;
 			}
@@ -1986,8 +1986,8 @@ static TIMER_DEVICE_CALLBACK( sport0_irq )
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
 	if ((dcs.cpu->total_cycles() - dcs.output_control_cycles) > 5)
 	{
-		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, ASSERT_LINE);
-		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, CLEAR_LINE);
+		device_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, ASSERT_LINE);
+		device_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, CLEAR_LINE);
 	}
 }
 
@@ -2073,7 +2073,7 @@ static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data)
 static READ16_HANDLER( dcs_polling_r )
 {
 	if (dcs.polling_count++ > 5)
-		cpu_eat_cycles(space->cpu, 10000);
+		device_eat_cycles(space->cpu, 10000);
 	return *dcs_polling_base;
 }
 
@@ -2131,7 +2131,7 @@ static TIMER_CALLBACK( s1_ack_callback2 )
 		machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2), param);
 		return;
 	}
-	output_latch_w(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM), 0, 0x000a, 0xffff);
+	output_latch_w(dcs.cpu->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0x000a, 0xffff);
 }
 
 
@@ -2143,7 +2143,7 @@ static TIMER_CALLBACK( s1_ack_callback1 )
 		machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback1), param);
 		return;
 	}
-	output_latch_w(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM), 0, param, 0xffff);
+	output_latch_w(dcs.cpu->memory().space(ADDRESS_SPACE_PROGRAM), 0, param, 0xffff);
 
 	/* chain to the next word we need to write back */
 	machine->scheduler().timer_set(attotime::from_usec(1), FUNC(s1_ack_callback2));
@@ -2273,7 +2273,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 
 static TIMER_CALLBACK( s2_ack_callback )
 {
-	address_space *space = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = dcs.cpu->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())

@@ -443,7 +443,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	lastduel_state *state = device->machine->driver_data<lastduel_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -459,17 +459,17 @@ static const ym2203_interface ym2203_config =
 static INTERRUPT_GEN( lastduel_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, 2, HOLD_LINE); /* VBL */
+		device_set_input_line(device, 2, HOLD_LINE); /* VBL */
 	else
-		cpu_set_input_line(device, 4, HOLD_LINE); /* Controls */
+		device_set_input_line(device, 4, HOLD_LINE); /* Controls */
 }
 
 static INTERRUPT_GEN( madgear_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, 5, HOLD_LINE); /* VBL */
+		device_set_input_line(device, 5, HOLD_LINE); /* VBL */
 	else
-		cpu_set_input_line(device, 6, HOLD_LINE); /* Controls */
+		device_set_input_line(device, 6, HOLD_LINE); /* Controls */
 }
 
 static MACHINE_START( lastduel )

@@ -22,7 +22,7 @@ static READ8_HANDLER( citycon_in_r )
 static READ8_HANDLER( citycon_irq_ack_r )
 {
 	citycon_state *state = space->machine->driver_data<citycon_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }

@@ -28,8 +28,8 @@ UINT16 actel_id;
 static READ64_HANDLER( naomi_bios_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc04173c)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
-		//cpu_spinuntil_int(space->cpu);
+		device_spin_until_time(space->cpu, attotime::from_usec(500));
+		//device_spin_until_interrupt(space->cpu);
 //  else
 //      printf("%08x\n", cpu_get_pc(space->cpu));
 
@@ -171,7 +171,7 @@ static void create_pic_from_retdat(running_machine* machine)
 
 DRIVER_INIT(naomi)
 {
-	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
+	memory_install_read64_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
 	jvsboard_type = JVSBD_DEFAULT;
 	actel_id = 0xffff;
 
@@ -188,7 +188,7 @@ DRIVER_INIT(naomi2)
 
 DRIVER_INIT(naomi_mp)
 {
-	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
+	memory_install_read64_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc2ad238, 0xc2ad23f, 0, 0, naomi_bios_idle_skip_r); // rev e bios
 	jvsboard_type = JVSBD_MAHJONG;
 	actel_id = 0xffff;
 
@@ -198,21 +198,21 @@ DRIVER_INIT(naomi_mp)
 static READ64_HANDLER( naomigd_ggxxsla_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0x0c0c9adc)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
+		device_spin_until_time(space->cpu, attotime::from_usec(500));
 
 	return naomi_ram64[0x1aae18/8];
 }
 
 DRIVER_INIT( ggxxsla )
 {
-	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc1aae18, 0xc1aae1f, 0, 0, naomigd_ggxxsla_idle_skip_r);
+	memory_install_read64_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc1aae18, 0xc1aae1f, 0, 0, naomigd_ggxxsla_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
 }
 
 static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0b5c3c) // or 0xc0bab0c
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
+		device_spin_until_time(space->cpu, attotime::from_usec(500));
 
 	return naomi_ram64[0x1837b8/8];
 }
@@ -220,14 +220,14 @@ static READ64_HANDLER( naomigd_ggxx_idle_skip_r )
 
 DRIVER_INIT( ggxx )
 {
-	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc1837b8, 0xc1837bf, 0, 0, naomigd_ggxx_idle_skip_r);
+	memory_install_read64_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc1837b8, 0xc1837bf, 0, 0, naomigd_ggxx_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
 }
 
 static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0b84bc) // or 0xc0bab0c
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
+		device_spin_until_time(space->cpu, attotime::from_usec(500));
 
 	//printf("%08x\n", cpu_get_pc(space->cpu));
 
@@ -236,7 +236,7 @@ static READ64_HANDLER( naomigd_ggxxrl_idle_skip_r )
 
 DRIVER_INIT( ggxxrl )
 {
-	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
+	memory_install_read64_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc18d6c8, 0xc18d6cf, 0, 0, naomigd_ggxxrl_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
 }
 
@@ -244,14 +244,14 @@ DRIVER_INIT( ggxxrl )
 static READ64_HANDLER( naomigd_sfz3ugd_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc36a2dc)
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(500));
+		device_spin_until_time(space->cpu, attotime::from_usec(500));
 
 	return naomi_ram64[0x5dc900/8];
 }
 
 DRIVER_INIT( sfz3ugd )
 {
-	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc5dc900, 0xc5dc907, 0, 0, naomigd_sfz3ugd_idle_skip_r);
+	memory_install_read64_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc5dc900, 0xc5dc907, 0, 0, naomigd_sfz3ugd_idle_skip_r);
 	DRIVER_INIT_CALL(naomi);
 }
 

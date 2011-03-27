@@ -1113,7 +1113,7 @@ static READ32_HANDLER( galileo_r )
 			}
 
 			/* eat some time for those which poll this register */
-			cpu_eat_cycles(space->cpu, 100);
+			device_eat_cycles(space->cpu, 100);
 
 			if (LOG_TIMERS)
 				logerror("%08X:hires_timer_r = %08X\n", cpu_get_pc(space->cpu), result);
@@ -1336,7 +1336,7 @@ static WRITE32_HANDLER( seattle_voodoo_w )
 	state->cpu_stalled_mem_mask = mem_mask;
 
 	/* spin until we send the magic trigger */
-	cpu_spinuntil_trigger(space->cpu, 45678);
+	device_spin_until_trigger(space->cpu, 45678);
 	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", cpu_get_pc(space->cpu));
 }
 
@@ -1358,7 +1358,7 @@ static void voodoo_stall(device_t *device, int stall)
 		else
 		{
 			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine->device("maincpu")));
-			cpu_spinuntil_trigger(device->machine->device("maincpu"), 45678);
+			device_spin_until_trigger(device->machine->device("maincpu"), 45678);
 		}
 	}
 
@@ -1371,7 +1371,7 @@ static void voodoo_stall(device_t *device, int stall)
 		for (which = 0; which < 4; which++)
 			if (state->galileo.dma_stalled_on_voodoo[which])
 			{
-				address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+				address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */
@@ -1553,7 +1553,7 @@ static READ32_DEVICE_HANDLER( widget_r )
 			break;
 
 		case WREG_ANALOG:
-			result = analog_port_r(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, mem_mask);
+			result = analog_port_r(device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1585,7 +1585,7 @@ static WRITE32_DEVICE_HANDLER( widget_w )
 			break;
 
 		case WREG_ANALOG:
-			analog_port_w(cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, data, mem_mask);
+			analog_port_w(device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, data, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1641,7 +1641,7 @@ static READ32_HANDLER( cmos_protect_r )
 
 static WRITE32_HANDLER( seattle_watchdog_w )
 {
-	cpu_eat_cycles(space->cpu, 100);
+	device_eat_cycles(space->cpu, 100);
 }
 
 
@@ -1757,7 +1757,7 @@ static READ32_DEVICE_HANDLER( seattle_ide_r )
 {
 	/* note that blitz times out if we don't have this cycle stealing */
 	if (offset == 0x3f6/4)
-		cpu_eat_cycles(device->machine->device("maincpu"), 100);
+		device_eat_cycles(device->machine->device("maincpu"), 100);
 	return ide_controller32_r(device, offset, mem_mask);
 }
 
@@ -2821,22 +2821,22 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			memory_unmap_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00400000, 0x007fffff, 0, 0);
+			memory_unmap_readwrite(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x00400000, 0x007fffff, 0, 0);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
 			device = machine->device("ethernet");
-			memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
+			memory_install_readwrite32_device_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
 			break;
 
 		case FLAGSTAFF_CONFIG:
 			/* set up the analog inputs */
-			memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
+			memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
 
 			/* set up the ethernet controller */
 			device = machine->device("ethernet");
-			memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
+			memory_install_readwrite32_device_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), device, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
 			break;
 	}
 }
@@ -2965,7 +2965,7 @@ static DRIVER_INIT( carnevil )
 	init_common(machine, MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
 
 	/* set up the gun */
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine->device("maincpu"), 0x8015176C, 0x3C03801A, 250);		/* confirmed */

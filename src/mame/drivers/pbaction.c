@@ -75,7 +75,7 @@ static WRITE8_HANDLER( pbaction_sh_command_w )
 {
 	pbaction_state *state = space->machine->driver_data<pbaction_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x00);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x00);
 }
 
 
@@ -248,7 +248,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( pbaction_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
 }
 
 
@@ -484,7 +484,7 @@ static DRIVER_INIT( pbactio3 )
 	pbaction_decode(machine, "maincpu");
 
 	/* install a protection (?) workaround */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );
 }
 
 static DRIVER_INIT( pbactio4 )

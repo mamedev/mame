@@ -309,8 +309,8 @@ ADDRESS_MAP_END
 static void memm_driver_init( running_machine *machine )
 {
 	psx_driver_init(machine);
-	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f300000, 0x1f300003, 0, 0, namcos10_bank_w );
-	memory_install_read_bank( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f7fffff, 0, 0, "bank1" );
+	memory_install_write32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f300000, 0x1f300003, 0, 0, namcos10_bank_w );
+	memory_install_read_bank( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f7fffff, 0, 0, "bank1" );
 	memory_configure_bank( machine, "bank1", 0, 16, machine->region( "user2" )->base(), 4 * 1024 * 1024 );
 }
 
@@ -399,15 +399,15 @@ static void memn_driver_init( running_machine *machine )
 	nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
 	nand_copy( (UINT32 *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
 
-	memory_install_read32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f400003, 0, 0, nand_status_r );
-	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f410000, 0x1f410003, 0, 0, nand_address1_w );
-	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f420000, 0x1f420003, 0, 0, nand_address2_w );
-	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f430000, 0x1f430003, 0, 0, nand_address3_w );
-	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f440000, 0x1f440003, 0, 0, nand_address4_w );
-	memory_install_read32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f450000, 0x1f450003, 0, 0, nand_data_r );
-	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fb60000, 0x1fb60003, 0, 0, watchdog_w );
-	memory_install_write32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xbf500000, 0xbf5007d7, 0, 0, nand_block_w );
-	memory_install_read32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xbf500000, 0xbf5007d7, 0, 0, nand_block_r );
+	memory_install_read32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f400003, 0, 0, nand_status_r );
+	memory_install_write32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f410000, 0x1f410003, 0, 0, nand_address1_w );
+	memory_install_write32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f420000, 0x1f420003, 0, 0, nand_address2_w );
+	memory_install_write32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f430000, 0x1f430003, 0, 0, nand_address3_w );
+	memory_install_write32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f440000, 0x1f440003, 0, 0, nand_address4_w );
+	memory_install_read32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1f450000, 0x1f450003, 0, 0, nand_data_r );
+	memory_install_write32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1fb60000, 0x1fb60003, 0, 0, watchdog_w );
+	memory_install_write32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xbf500000, 0xbf5007d7, 0, 0, nand_block_w );
+	memory_install_read32_handler( machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xbf500000, 0xbf5007d7, 0, 0, nand_block_r );
 
 	psx_driver_init(machine);
 }

@@ -94,7 +94,7 @@ static void draw_sprite_collision( running_machine *machine, bitmap_t *bitmap, c
 	}
 
 	if (collision)
-		cpu_set_input_line(state->maincpu, 0, ASSERT_LINE);
+		device_set_input_line(state->maincpu, 0, ASSERT_LINE);
 }
 
 static void circus_draw_fg( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )

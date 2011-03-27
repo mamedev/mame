@@ -102,7 +102,7 @@
 
 static INTERRUPT_GEN( sys16_interrupt )
 {
-	cpu_set_input_line(device, 4, HOLD_LINE); /* Interrupt vector 4, used by VBlank */
+	device_set_input_line(device, 4, HOLD_LINE); /* Interrupt vector 4, used by VBlank */
 }
 
 
@@ -115,7 +115,7 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->soundcpu, 0, HOLD_LINE);
+		device_set_input_line(state->soundcpu, 0, HOLD_LINE);
 	}
 }
 
@@ -378,7 +378,7 @@ static void tturfbl_msm5205_callback( device_t *device )
 	state->sample_buffer <<=  4;
 	state->sample_select ^=  1;
 	if(state->sample_select == 0)
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface tturfbl_msm5205_interface  =
@@ -1141,7 +1141,7 @@ static WRITE16_HANDLER( sound_command_irq_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cpu_set_input_line(state->soundcpu, 0, HOLD_LINE);
+		device_set_input_line(state->soundcpu, 0, HOLD_LINE);
 	}
 }
 
@@ -1218,7 +1218,7 @@ static void shdancbl_msm5205_callback(device_t *device)
 	state->sample_buffer >>=  4;
 	state->sample_select ^=  1;
 	if (state->sample_select == 0)
-		cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface shdancbl_msm5205_interface  =
@@ -2084,7 +2084,7 @@ static void sound_cause_nmi( device_t *device, int chip )
 	segas1x_bootleg_state *state = device->machine->driver_data<segas1x_bootleg_state>();
 
 	/* upd7759 callback */
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -3390,7 +3390,7 @@ static DRIVER_INIT( goldnaxeb1 )
 	int i;
 	UINT8 *ROM = machine->region("maincpu")->base();
 	UINT8 *KEY = machine->region("decryption")->base();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 data[0x1000];
 
 	// the decryption key is in a rom (part of an MSDOS executable...)

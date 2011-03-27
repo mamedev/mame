@@ -1750,9 +1750,9 @@ static INTERRUPT_GEN( kaneko16_interrupt )
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpu_set_input_line(device, 3, HOLD_LINE); break;
-		case 1:  cpu_set_input_line(device, 4, HOLD_LINE); break;
-		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
+		case 2:  device_set_input_line(device, 3, HOLD_LINE); break;
+		case 1:  device_set_input_line(device, 4, HOLD_LINE); break;
+		case 0:  device_set_input_line(device, 5, HOLD_LINE); break;
 	}
 }
 
@@ -2105,11 +2105,11 @@ static INTERRUPT_GEN( shogwarr_interrupt )
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpu_set_input_line(device, 2, HOLD_LINE); break;
-		case 1:  cpu_set_input_line(device, 3, HOLD_LINE); break;
+		case 2:  device_set_input_line(device, 2, HOLD_LINE); break;
+		case 1:  device_set_input_line(device, 3, HOLD_LINE); break;
 
 		// the code for this interupt is provided by the MCU..
-		case 0:  cpu_set_input_line(device, 4, HOLD_LINE);
+		case 0:  device_set_input_line(device, 4, HOLD_LINE);
 
 				calc3_mcu_run(device->machine);
 		break;
@@ -3877,7 +3877,7 @@ static DRIVER_INIT( shogwarr )
 static DRIVER_INIT( brapboys )
 {
 	// sample banking is different on brap boys for the music, why? GALs / PALs ?
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe00000, 0xe00001, 0, 0, brapboys_oki_bank_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe00000, 0xe00001, 0, 0, brapboys_oki_bank_w);
 
 	// default sample banks
 	kaneko16_common_oki_bank_w(machine, "bank10", "oki1", 0, 0x30000, 0x10000);

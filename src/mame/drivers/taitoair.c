@@ -239,7 +239,7 @@ static WRITE16_HANDLER( system_control_w )
 
 	state->dsp_hold_signal = (data & 4) ? CLEAR_LINE : ASSERT_LINE;
 
-	cpu_set_input_line(state->dsp, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->dsp, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", cpu_get_previouspc(space->cpu), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
@@ -572,7 +572,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	taitoair_state *state = device->machine->driver_data<taitoair_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface airsys_ym2610_interface =

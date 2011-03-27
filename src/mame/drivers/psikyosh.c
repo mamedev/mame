@@ -347,7 +347,7 @@ static READ32_DEVICE_HANDLER( psh_eeprom_r )
 
 static INTERRUPT_GEN(psikyosh_interrupt)
 {
-	cpu_set_input_line(device, 4, ASSERT_LINE);
+	device_set_input_line(device, 4, ASSERT_LINE);
 }
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
@@ -357,7 +357,7 @@ static WRITE32_HANDLER( psikyosh_irqctrl_w )
 	psikyosh_state *state = space->machine->driver_data<psikyosh_state>();
 	if (!(data & 0x00c00000))
 	{
-		cpu_set_input_line(state->maincpu, 4, CLEAR_LINE);
+		device_set_input_line(state->maincpu, 4, CLEAR_LINE);
 	}
 }
 
@@ -789,7 +789,7 @@ INPUT_PORTS_END
 static void irqhandler(device_t *device, int linestate)
 {
 	psikyosh_state *state = device->machine->driver_data<psikyosh_state>();
-	cpu_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -1270,7 +1270,7 @@ static DRIVER_INIT( mjgtaste )
 {
 	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x03000000, 0x03000003, 0, 0, mjgtaste_input_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x03000000, 0x03000003, 0, 0, mjgtaste_input_r);
 }
 
 

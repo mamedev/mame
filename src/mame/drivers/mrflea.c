@@ -85,7 +85,7 @@ static WRITE8_HANDLER( mrflea_io_w )
 	mrflea_state *state = space->machine->driver_data<mrflea_state>();
 	state->status |= 0x08; // pending command to IO CPU
 	state->io = data;
-	cpu_set_input_line(state->subcpu, 0, HOLD_LINE );
+	device_set_input_line(state->subcpu, 0, HOLD_LINE );
 }
 
 static READ8_HANDLER( mrflea_main_r )
@@ -124,7 +124,7 @@ static INTERRUPT_GEN( mrflea_slave_interrupt )
 {
 	mrflea_state *state = device->machine->driver_data<mrflea_state>();
 	if (cpu_getiloops(device) == 0 || (state->status & 0x08))
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mrflea_interrupt_type_r )

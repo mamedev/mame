@@ -102,7 +102,7 @@ static INTERRUPT_GEN( main_nmi_gen )
 {
 	suprridr_state *state = device->machine->driver_data<suprridr_state>();
 	if (state->nmi_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

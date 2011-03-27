@@ -143,7 +143,7 @@ static WRITE8_HANDLER( transmit_data_w )
 static READ8_HANDLER( trigger_slave_nmi_r )
 {
 	imolagp_state *state = space->machine->driver_data<imolagp_state>();
-	cpu_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
@@ -473,7 +473,7 @@ static INTERRUPT_GEN( master_interrupt )
 		memcpy(&state->slave_workram[0x80], state->mComData, state->mComCount);
 		state->mComCount = 0;
 #endif
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	}
 	else
 	{
@@ -491,7 +491,7 @@ static INTERRUPT_GEN( master_interrupt )
 			{
 				state->oldsteer = (state->oldsteer + 1) & 0xf;
 			}
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 } /* master_interrupt */

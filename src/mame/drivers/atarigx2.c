@@ -2246,7 +2246,7 @@ static DRIVER_INIT( rrreveng )
 
 	state->playfield_base = 0x000;
 
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
 }
 
 

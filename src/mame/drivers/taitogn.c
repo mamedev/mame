@@ -564,7 +564,7 @@ static WRITE32_HANDLER(flash_s3_w)
 
 static void install_handlers(running_machine *machine, int mode)
 {
-	address_space *a = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *a = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	if(mode == 0) {
 		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
 		memory_install_readwrite32_handler(a, 0x1f000000, 0x1f1fffff, 0, 0, flash_subbios_r, flash_subbios_w);
@@ -894,7 +894,7 @@ static DRIVER_INIT( coh3002t )
 static DRIVER_INIT( coh3002t_mp )
 {
 	DRIVER_INIT_CALL(coh3002t);
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fa10100, 0x1fa10103, 0, 0, gnet_mahjong_panel_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x1fa10100, 0x1fa10103, 0, 0, gnet_mahjong_panel_r );
 }
 
 static MACHINE_RESET( coh3002t )

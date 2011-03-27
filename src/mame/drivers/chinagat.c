@@ -122,11 +122,11 @@ static TIMER_DEVICE_CALLBACK( chinagat_scanline )
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
+		device_set_input_line(state->maincpu, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* adjust for next scanline */
 	if (++scanline >= screen_height)
@@ -141,23 +141,23 @@ static WRITE8_HANDLER( chinagat_interrupt_w )
 	{
 		case 0: /* 3e00 - SND irq */
 			soundlatch_w(space, 0, data);
-			cpu_set_input_line(state->snd_cpu, state->sound_irq, (state->sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			device_set_input_line(state->snd_cpu, state->sound_irq, (state->sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 
 		case 1: /* 3e01 - NMI ack */
-			cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+			device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 2: /* 3e02 - FIRQ ack */
-			cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
+			device_set_input_line(state->maincpu, M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 3e03 - IRQ ack */
-			cpu_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(state->maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 4: /* 3e04 - sub CPU IRQ ack */
-			cpu_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+			device_set_input_line(state->sub_cpu, state->sprite_irq, (state->sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 			break;
 	}
 }
@@ -495,7 +495,7 @@ GFXDECODE_END
 static void chinagat_irq_handler( device_t *device, int irq )
 {
 	ddragon_state *state = device->machine->driver_data<ddragon_state>();
-	cpu_set_input_line(state->snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	device_set_input_line(state->snd_cpu, 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

@@ -150,7 +150,7 @@ static SCREEN_UPDATE( rblaster )
 static WRITE8_HANDLER( rblaster_sound_w )
 {
 	soundlatch_w(space,0,data);
-	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
+	device_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 #endif
 
@@ -245,7 +245,7 @@ static WRITE8_HANDLER( nmimask_w )
 static INTERRUPT_GEN ( sound_interrupt )
 {
 	deco_ld_state *state = device->machine->driver_data<deco_ld_state>();
-	if (!state->nmimask) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	if (!state->nmimask) device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

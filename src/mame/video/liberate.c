@@ -124,11 +124,11 @@ WRITE8_HANDLER( deco16_io_w )
 			/* Todo */
 			break;
 		case 8: /* Irq ack */
-			cpu_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
 			soundlatch_w(space, 0, data);
-			cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
 }
@@ -153,11 +153,11 @@ WRITE8_HANDLER( prosoccr_io_w )
 			/* x--- ---- used on the attract mode */
 			break;
 		case 8: /* Irq ack */
-			cpu_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
 			soundlatch_w(space, 0, data);
-			cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
 }
@@ -177,10 +177,10 @@ WRITE8_HANDLER( prosport_io_w )
 			break;
 		case 2: /* Sound */
 			soundlatch_w(space, 0, data);
-			cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 		case 4: /* Irq ack */
-			cpu_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(state->maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 	}
 }

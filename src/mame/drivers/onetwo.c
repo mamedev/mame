@@ -126,7 +126,7 @@ static WRITE8_HANDLER( onetwo_soundlatch_w )
 {
 	onetwo_state *state = space->machine->driver_data<onetwo_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void set_color(running_machine *machine, int offset)
@@ -326,7 +326,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int linestate)
 {
 	onetwo_state *state = device->machine->driver_data<onetwo_state>();
-	cpu_set_input_line(state->audiocpu, 0, linestate);
+	device_set_input_line(state->audiocpu, 0, linestate);
 }
 
 static const ym3812_interface ym3812_config =

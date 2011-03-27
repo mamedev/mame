@@ -76,7 +76,7 @@ INTERRUPT_GEN( exidy_vblank_interrupt )
 	state->int_condition &= ~0x80;
 
 	/* set the IRQ line */
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
@@ -87,7 +87,7 @@ INTERRUPT_GEN( teetert_vblank_interrupt )
 		exidy_vblank_interrupt(device);
 
 	/* plus a pulse on the NMI line */
-	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

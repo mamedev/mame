@@ -141,7 +141,7 @@ static WRITE8_DEVICE_HANDLER( audio_reset_w )
 {
 	gameplan_state *state = device->machine->driver_data<gameplan_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 
 	if (data == 0)
 	{
@@ -186,7 +186,7 @@ static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 {
 	gameplan_state *gameplan = device->machine->driver_data<gameplan_state>();
 
-	cpu_set_input_line(gameplan->audiocpu, 0, state);
+	device_set_input_line(gameplan->audiocpu, 0, state);
 	if (state == ASSERT_LINE)
 		device->machine->scheduler().boost_interleave(attotime::zero, attotime::from_usec(10));
 }
@@ -194,7 +194,7 @@ static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 
 static WRITE8_DEVICE_HANDLER( r6532_soundlatch_w )
 {
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, data);
 }
 

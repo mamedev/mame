@@ -661,11 +661,11 @@ static INTERRUPT_GEN( playch10_interrupt ) {
 
 	/* LS161A, Sheet 1 - bottom left of Z80 */
 	if ( !state->pc10_dog_di && !state->pc10_nmi_enable ) {
-		cpu_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE );
+		device_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE );
 	}
 
 	else if ( state->pc10_nmi_enable )
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const nes_interface nes_config =

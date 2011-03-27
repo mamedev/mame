@@ -161,9 +161,9 @@ static INTERRUPT_GEN( interrupt_A )
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
-		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
-		case 2:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		case 0:		device_set_input_line(device, 3, HOLD_LINE);	break;
+		case 1:		device_set_input_line(device, 2, HOLD_LINE);	break;
+		case 2:		device_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 
@@ -195,9 +195,9 @@ static INTERRUPT_GEN( interrupt_B )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 4, HOLD_LINE); break;
-		case 1:		cpu_set_input_line(device, 1, HOLD_LINE); break;
-		default:	cpu_set_input_line(device, 2, HOLD_LINE); break;
+		case 0:		device_set_input_line(device, 4, HOLD_LINE); break;
+		case 1:		device_set_input_line(device, 1, HOLD_LINE); break;
+		default:	device_set_input_line(device, 2, HOLD_LINE); break;
 	}
 }
 
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( interrupt_D )
 {
-	cpu_set_input_line(device, 2, HOLD_LINE);
+	device_set_input_line(device, 2, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( megasys1D_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -3702,7 +3702,7 @@ static READ16_HANDLER( edfbl_input_r )
 
 static DRIVER_INIT( edfbl )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe0002, 0xe000b, 0, 0, edfbl_input_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe0002, 0xe000b, 0, 0, edfbl_input_r);
 }
 
 
@@ -3761,13 +3761,13 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	memory_install_write16_device_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), oki1, 0xa0000, 0xa0003, 0, 0, okim6295_both_w);
-	memory_install_write16_device_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), oki2, 0xc0000, 0xc0003, 0, 0, okim6295_both_w);
+	memory_install_write16_device_handler(machine->device("soundcpu")->memory().space(ADDRESS_SPACE_PROGRAM), oki1, 0xa0000, 0xa0003, 0, 0, okim6295_both_w);
+	memory_install_write16_device_handler(machine->device("soundcpu")->memory().space(ADDRESS_SPACE_PROGRAM), oki2, 0xc0000, 0xc0003, 0, 0, okim6295_both_w);
 }
 
 static DRIVER_INIT( peekaboo )
 {
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x100000, 0x100001, 0, 0, protection_peekaboo_r, protection_peekaboo_w);
 }
 
 static DRIVER_INIT( phantasm )
@@ -3814,7 +3814,7 @@ static DRIVER_INIT( soldamj )
 	astyanax_rom_decode(machine, "maincpu");
 
 	/* Sprite RAM is mirrored */
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
 static DRIVER_INIT( soldam )
@@ -3822,7 +3822,7 @@ static DRIVER_INIT( soldam )
 	phantasm_rom_decode(machine, "maincpu");
 
 	/* Sprite RAM is mirrored */
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+	memory_install_readwrite16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
 
@@ -3847,7 +3847,7 @@ static DRIVER_INIT( monkelf )
 	UINT16 *ROM = (UINT16*)machine->region("maincpu")->base();
 	ROM[0x00744/2] = 0x4e71;
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe0000, 0xe000f, 0, 0, monkelf_input_r);
 
 	state->ram += 0x10000/2;
 

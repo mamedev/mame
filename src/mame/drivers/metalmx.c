@@ -334,8 +334,8 @@ static WRITE32_HANDLER( reset_w )
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
-		cpu_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
-		cpu_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -449,7 +449,7 @@ static READ32_HANDLER( dsp32c_2_r )
 
 static WRITE32_HANDLER( host_gsp_w )
 {
-	address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
+	address_space *gsp_space = space->machine->device("gsp")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	gsp_space->write_word((0xc0000000 + (offset << 5) + 0x10) / 8, data);
 	gsp_space->write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
@@ -457,7 +457,7 @@ static WRITE32_HANDLER( host_gsp_w )
 
 static READ32_HANDLER( host_gsp_r )
 {
-	address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
+	address_space *gsp_space = space->machine->device("gsp")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT32 val;
 
 	val  = gsp_space->read_word((0xc0000000 + (offset << 5) + 0x10) / 8);
@@ -792,8 +792,8 @@ static MACHINE_RESET( metalmx )
 {
 	metalmx_state *state = machine->driver_data<metalmx_state>();
 
-	cpu_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(state->dsp32c_1, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(state->dsp32c_2, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

@@ -129,7 +129,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
 				input_port_write(space->machine, "EEPROMOUT", data, 0xff);
 
 			if (!(data & 0x40))
-				cpu_set_input_line(state->maincpu, M68K_IRQ_5, CLEAR_LINE);
+				device_set_input_line(state->maincpu, M68K_IRQ_5, CLEAR_LINE);
 		break;
 
 		case 0x0c/2:
@@ -161,7 +161,7 @@ static WRITE16_HANDLER( sound_irq_w )
 	rungun_state *state = space->machine->driver_data<rungun_state>();
 
 	if (ACCESSING_BITS_8_15)
-		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_msb_r )
@@ -179,7 +179,7 @@ static INTERRUPT_GEN(rng_interrupt)
 	rungun_state *state = device->machine->driver_data<rungun_state>();
 
 	if (state->sysreg[0x0c / 2] & 0x09)
-		cpu_set_input_line(device, M68K_IRQ_5, ASSERT_LINE);
+		device_set_input_line(device, M68K_IRQ_5, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( rungun_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -228,7 +228,7 @@ static WRITE8_HANDLER( z80ctrl_w )
 	memory_set_bank(space->machine, "bank2", data & 0x07);
 
 	if (data & 0x10)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN(audio_interrupt)
@@ -238,7 +238,7 @@ static INTERRUPT_GEN(audio_interrupt)
 	if (state->z80_control & 0x80)
 		return;
 
-	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 /* sound (this should be split into audio/xexex.c or pregx.c or so someday) */

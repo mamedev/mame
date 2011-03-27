@@ -897,19 +897,19 @@ ROM_END
 
 static DRIVER_INIT( ripribit )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, ripribit_control_w);
 }
 
 
 static DRIVER_INIT( cfarm )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cfarm_control_w);
 }
 
 
 static DRIVER_INIT( cclownz )
 {
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x04100010, 0x0410001f, 0, 0, cclownz_control_w);
 }
 
 

@@ -286,7 +286,7 @@ static WRITE16_HANDLER( gun_select_w )
 
 	logerror("%08x: gun r\n",cpu_get_pc(space->cpu));
 
-	cpu_set_input_line(space->cpu, 2, HOLD_LINE);
+	device_set_input_line(space->cpu, 2, HOLD_LINE);
 
 	state->gun_select = data & 0xff;
 }
@@ -666,7 +666,7 @@ static const ym2610_interface ym2610_config =
 
 static SCREEN_EOF( bbuster )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 	buffer_spriteram16_2_w(space,0,0,0xffff);
@@ -674,7 +674,7 @@ static SCREEN_EOF( bbuster )
 
 static SCREEN_EOF( mechatt )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 

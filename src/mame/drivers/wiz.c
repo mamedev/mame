@@ -1034,7 +1034,7 @@ static DRIVER_INIT( stinger )
 		{ 5,3,7, 0x80 },
 		{ 5,7,3, 0x28 }
 	};
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	int size = machine->region("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
@@ -1071,13 +1071,13 @@ static DRIVER_INIT( stinger )
 
 static DRIVER_INIT( scion )
 {
-	memory_nop_write(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x4001, 0, 0);
+	memory_nop_write(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4000, 0x4001, 0, 0);
 }
 
 
 static DRIVER_INIT( wiz )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd400, 0xd400, 0, 0, wiz_protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd400, 0xd400, 0, 0, wiz_protection_r);
 }
 
 

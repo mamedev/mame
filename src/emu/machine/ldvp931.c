@@ -335,7 +335,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	/* at the start of each line, signal an interrupt and use a timer to turn it off */
 	if (which == 0)
 	{
-		cpu_set_input_line(player->cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
+		device_set_input_line(player->cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
 		machine->scheduler().timer_set(attotime::from_nsec(5580), FUNC(irq_off), 0, ld);
 	}
 
@@ -391,7 +391,7 @@ static TIMER_CALLBACK( deferred_data_w )
 static TIMER_CALLBACK( irq_off )
 {
 	laserdisc_state *ld = (laserdisc_state *)ptr;
-	cpu_set_input_line(ld->player->cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
+	device_set_input_line(ld->player->cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
 }
 
 

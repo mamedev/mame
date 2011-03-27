@@ -271,7 +271,7 @@ static TIMER_CALLBACK( irq0_stop )
 
 static INTERRUPT_GEN( irq0_start )
 {
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	device->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(irq0_stop));
 }
 
@@ -348,7 +348,7 @@ static READ32_HANDLER( kinst_control_r )
 		case 4:		/* $a0 */
 			result = input_port_read(space->machine, portnames[offset]);
 			if (cpu_get_pc(space->cpu) == 0x802d428)
-				cpu_spinuntil_int(space->cpu);
+				device_spin_until_interrupt(space->cpu);
 			break;
 	}
 

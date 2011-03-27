@@ -238,12 +238,12 @@ static INTERRUPT_GEN( sprcros2_m_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if(state->m_port7&0x01)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
 		if(state->m_port7&0x08)
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -252,7 +252,7 @@ static INTERRUPT_GEN( sprcros2_s_interrupt )
 	sprcros2_state *state = device->machine->driver_data<sprcros2_state>();
 
 	if(state->s_port3&0x01)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( sprcros2 )

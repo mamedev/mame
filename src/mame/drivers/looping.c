@@ -312,7 +312,7 @@ static MACHINE_START( looping )
 
 static INTERRUPT_GEN( looping_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, ASSERT_LINE, 4);
+	device_set_input_line_and_vector(device, 0, ASSERT_LINE, 4);
 }
 
 
@@ -899,7 +899,7 @@ static DRIVER_INIT( looping )
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7000, 0x7007, 0, 0, protection_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7000, 0x7007, 0, 0, protection_r);
 }
 
 

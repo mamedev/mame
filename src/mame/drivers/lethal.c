@@ -222,7 +222,7 @@ static INTERRUPT_GEN(lethalen_interrupt)
 	lethal_state *state = device->machine->driver_data<lethal_state>();
 
 	if (k056832_is_irq_enabled(state->k056832, 0))
-		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( sound_cmd_w )
@@ -233,7 +233,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 static WRITE8_HANDLER( sound_irq_w )
 {
 	lethal_state *state = space->machine->driver_data<lethal_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -244,7 +244,7 @@ static READ8_HANDLER( sound_status_r )
 static void sound_nmi( device_t *device )
 {
 	lethal_state *state = device->machine->driver_data<lethal_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( le_bankswitch_w )

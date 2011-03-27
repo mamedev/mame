@@ -192,7 +192,7 @@ static const struct pc_vga_interface vga_interface =
 
 static MACHINE_START( magtouch )
 {
-	cpu_set_irq_callback(machine->device("maincpu"), pcat_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), pcat_irq_callback);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, magtouch_set_keyb_int);
 

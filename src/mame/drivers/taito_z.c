@@ -896,7 +896,7 @@ static void parse_control( running_machine *machine )
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_RESET, (state->cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -932,7 +932,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 static TIMER_CALLBACK( taitoz_interrupt6 )
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	cpu_set_input_line(state->maincpu, 6, HOLD_LINE);
+	device_set_input_line(state->maincpu, 6, HOLD_LINE);
 }
 
 /* 68000 B */
@@ -940,14 +940,14 @@ static TIMER_CALLBACK( taitoz_interrupt6 )
 static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	cpu_set_input_line(state->subcpu, 5, HOLD_LINE);
+	device_set_input_line(state->subcpu, 5, HOLD_LINE);
 }
 
 #if 0
 static TIMER_CALLBACK( taitoz_cpub_interrupt6 )
 {
 	taitoz_state *state = machine->driver_data<taitoz_state>();
-	cpu_set_input_line(state->subcpu, 6, HOLD_LINE);
+	device_set_input_line(state->subcpu, 6, HOLD_LINE);
 }
 #endif
 
@@ -967,7 +967,7 @@ static INTERRUPT_GEN( sci_interrupt )
 	if (state->sci_int6)
 		device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 /* Double Axle seems to keep only 1 sprite frame in sprite ram,
@@ -985,14 +985,14 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 	if (state->dblaxle_int6)
 		device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
 
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( dblaxle_cpub_interrupt )
 {
 	// Unsure how many int6's per frame
 	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000 - 500), FUNC(taitoz_interrupt6));
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 
@@ -2805,7 +2805,7 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 static void irqhandler(device_t *device, int irq)
 {
 	taitoz_state *state = device->machine->driver_data<taitoz_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
@@ -2813,7 +2813,7 @@ static void irqhandlerb(device_t *device, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
 //  taitoz_state *state = device->machine->driver_data<taitoz_state>();
-//  cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+//  device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

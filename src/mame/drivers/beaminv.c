@@ -97,7 +97,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	int next_interrupt_number;
 	int next_vpos;
 
-	cpu_set_input_line(state->maincpu, 0, HOLD_LINE);
+	device_set_input_line(state->maincpu, 0, HOLD_LINE);
 
 	/* set up for next interrupt */
 	next_interrupt_number = (interrupt_number + 1) % INTERRUPTS_PER_FRAME;

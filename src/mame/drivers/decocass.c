@@ -1324,7 +1324,7 @@ ROM_END
 static DRIVER_INIT( decocass )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
@@ -1363,8 +1363,8 @@ static DRIVER_INIT( decocrom )
 		state->decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, "bank1");
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, decocass_de0091_w);
+	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, "bank1");
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, decocass_de0091_w);
 	memory_configure_bank(machine, "bank1", 0, 1, state->charram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, machine->region("user3")->base(), 0);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 1, &state->decrypted[0x6000], 0);
@@ -1372,7 +1372,7 @@ static DRIVER_INIT( decocrom )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* install the bank selector */
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);
 
 	state->save_pointer(NAME(state->decrypted2), romlength);
 }

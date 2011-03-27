@@ -1294,7 +1294,7 @@ static WRITE16_HANDLER(s23_ctl_w)
 	case 5:
 		if(ctl_vbl_active) {
 			ctl_vbl_active = false;
-			cpu_set_input_line(space->cpu, MIPS3_IRQ0, CLEAR_LINE);
+			device_set_input_line(space->cpu, MIPS3_IRQ0, CLEAR_LINE);
 		}
 		break;
 
@@ -2031,7 +2031,7 @@ static INTERRUPT_GEN(s23_interrupt)
 {
 	if(!ctl_vbl_active) {
 		ctl_vbl_active = true;
-		cpu_set_input_line(device, MIPS3_IRQ0, ASSERT_LINE);
+		device_set_input_line(device, MIPS3_IRQ0, ASSERT_LINE);
 	}
 
 	render_cur = !render_cur;

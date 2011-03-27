@@ -49,14 +49,14 @@ static WRITE8_HANDLER( matmania_sh_command_w )
 {
 	matmania_state *state = space->machine->driver_data<matmania_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( maniach_sh_command_w )
 {
 	matmania_state *state = space->machine->driver_data<matmania_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -357,7 +357,7 @@ MACHINE_CONFIG_END
 static void irqhandler(device_t *device, int linestate)
 {
 	matmania_state *state = device->machine->driver_data<matmania_state>();
-	cpu_set_input_line(state->audiocpu, 1, linestate);
+	device_set_input_line(state->audiocpu, 1, linestate);
 }
 
 static const ym3526_interface ym3526_config =

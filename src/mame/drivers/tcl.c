@@ -189,7 +189,7 @@ static DRIVER_INIT(tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *dest = machine->region("maincpu")->base();
 	int len = machine->region("maincpu")->bytes();
 	UINT8 *src = auto_alloc_array(machine, UINT8, len);

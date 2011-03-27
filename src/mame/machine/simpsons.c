@@ -50,7 +50,7 @@ WRITE8_HANDLER( simpsons_coin_counter_w )
 READ8_HANDLER( simpsons_sound_interrupt_r )
 {
 	simpsons_state *state = space->machine->driver_data<simpsons_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff );
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 

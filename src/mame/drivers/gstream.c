@@ -634,7 +634,7 @@ static READ32_HANDLER( gstream_speedup_r )
 
 static DRIVER_INIT( gstream )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
 }
 
 

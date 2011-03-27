@@ -336,7 +336,7 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 
 		/* bit 3 high then low triggers irq on sound CPU */
 		if (state->last == 0x08 && (data & 0x08) == 0)
-			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+			device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 
 		state->last = data & 0x08;
 
@@ -361,7 +361,7 @@ WRITE16_HANDLER( punkshot_0a0020_w )
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (state->last == 0x04 && (data & 0x04) == 0)
-			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+			device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 
 		state->last = data & 0x04;
 
@@ -382,7 +382,7 @@ WRITE16_HANDLER( lgtnfght_0a0018_w )
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (state->last == 0x00 && (data & 0x04) == 0x04)
-			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+			device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 
 		state->last = data & 0x04;
 

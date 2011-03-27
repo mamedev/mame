@@ -86,7 +86,7 @@ static WRITE8_DEVICE_HANDLER( buggychl_68705_port_b_w )
 	{
 		state->port_a_in = state->from_main;
 		if (state->main_sent)
-			cpu_set_input_line(state->mcu, 0, CLEAR_LINE);
+			device_set_input_line(state->mcu, 0, CLEAR_LINE);
 		state->main_sent = 0;
 		logerror("read command %02x from main cpu\n", state->port_a_in);
 	}
@@ -148,7 +148,7 @@ WRITE8_DEVICE_HANDLER( buggychl_mcu_w )
 	logerror("%04x: mcu_w %02x\n", cpu_get_pc(state->mcu), data);
 	state->from_main = data;
 	state->main_sent = 1;
-	cpu_set_input_line(state->mcu, 0, ASSERT_LINE);
+	device_set_input_line(state->mcu, 0, ASSERT_LINE);
 }
 
 READ8_DEVICE_HANDLER( buggychl_mcu_r )

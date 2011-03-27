@@ -103,7 +103,7 @@ static UINT8 decrypt_opcode(int a,int src)
 
 void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 {
-	address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device(cpu)->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
 	UINT8 *rom = machine->region(cpu)->base();
 	int i;
@@ -291,9 +291,9 @@ static void update_irq_lines(running_machine *machine, int param)
 	}
 
 	if ((irq1 & irq2) == 0xff)	/* no IRQs pending */
-		cpu_set_input_line(sound_cpu,0,CLEAR_LINE);
+		device_set_input_line(sound_cpu,0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpu_set_input_line_and_vector(sound_cpu,0,ASSERT_LINE,irq1 & irq2);
+		device_set_input_line_and_vector(sound_cpu,0,ASSERT_LINE,irq1 & irq2);
 }
 
 WRITE8_HANDLER( seibu_irq_clear_w )

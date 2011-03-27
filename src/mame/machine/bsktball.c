@@ -28,9 +28,9 @@ INTERRUPT_GEN( bsktball_interrupt )
 	state->i256v = (state->i256v + 1) % 8;
 
 	if (state->i256v == 0)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else if (state->nmi_on)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************

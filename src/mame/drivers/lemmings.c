@@ -82,13 +82,13 @@ static WRITE16_HANDLER( lemmings_sound_w )
 {
 	lemmings_state *state = space->machine->driver_data<lemmings_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->audiocpu, 1, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )
 {
 	lemmings_state *state = space->machine->driver_data<lemmings_state>();
-	cpu_set_input_line(state->audiocpu, 1, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 1, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -247,7 +247,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int state )
 {
 	lemmings_state *lemmings = device->machine->driver_data<lemmings_state>();
-	cpu_set_input_line(lemmings->audiocpu, 0, state);
+	device_set_input_line(lemmings->audiocpu, 0, state);
 }
 
 static const ym2151_interface ym2151_config =

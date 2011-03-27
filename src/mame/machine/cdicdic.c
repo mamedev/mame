@@ -586,7 +586,7 @@ void cdicdic_device::sample_trigger()
 
         // Set the CDIC interrupt line
         verboselog(&m_machine, 0, "Setting CDIC interrupt line for soundmap decode\n" );
-        cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
+        device_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
         cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
     }
     else
@@ -740,7 +740,7 @@ void cdicdic_device::process_delayed_command()
 
                     //printf( "Setting CDIC interrupt line\n" );
                     verboselog(&m_machine, 0, "Setting CDIC interrupt line for audio sector\n" );
-                    cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
+                    device_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
                     cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
                 }
                 else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
@@ -759,7 +759,7 @@ void cdicdic_device::process_delayed_command()
                     {
                         //printf( "Setting CDIC interrupt line\n" );
                         verboselog(&m_machine, 0, "Setting CDIC interrupt line for message sector\n" );
-                        cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
+                        device_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
                         cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
                     }
                     else
@@ -779,7 +779,7 @@ void cdicdic_device::process_delayed_command()
 
                     //printf( "Setting CDIC interrupt line\n" );
                     verboselog(&m_machine, 0, "Setting CDIC interrupt line for data sector\n" );
-                    cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
+                    device_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
                     cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
                 }
 
@@ -874,7 +874,7 @@ void cdicdic_device::process_delayed_command()
 			}
 
             verboselog(&m_machine, 0, "Setting CDIC interrupt line for CDDA sector\n" );
-            cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
+            device_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
             cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
@@ -925,7 +925,7 @@ void cdicdic_device::process_delayed_command()
             m_time = next_msf << 8;
 
             verboselog(&m_machine, 0, "Setting CDIC interrupt line for Seek sector\n" );
-            cpu_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
+            device_set_input_line_vector(m_machine.device("maincpu"), M68K_IRQ_4, 128);
             cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}

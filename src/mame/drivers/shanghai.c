@@ -120,7 +120,7 @@ static SCREEN_UPDATE( shanghai )
 
 static INTERRUPT_GEN( shanghai_interrupt )
 {
-	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x80);
+	device_set_input_line_and_vector(device,0,HOLD_LINE,0x80);
 }
 
 static WRITE16_HANDLER( shanghai_coin_w )

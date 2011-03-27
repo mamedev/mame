@@ -149,7 +149,7 @@ static WRITE16_HANDLER( mcat_soundlatch_w )
 	mcatadv_state *state = space->machine->driver_data<mcatadv_state>();
 
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -417,7 +417,7 @@ GFXDECODE_END
 static void sound_irq( device_t *device, int irq )
 {
 	mcatadv_state *state = device->machine->driver_data<mcatadv_state>();
-	cpu_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->soundcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface mcatadv_ym2610_interface =

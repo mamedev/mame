@@ -223,7 +223,7 @@ static WRITE8_HANDLER( sexygal_nsc_true_blitter_w )
 						count++;
 				}
 			}
-			//cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE );
+			//device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }
@@ -299,7 +299,7 @@ master-slave algorythm
 static WRITE8_HANDLER( nsc_latch_w )
 {
 	nightgal_state *state = space->machine->driver_data<nightgal_state>();
-	cpu_set_input_line(state->subcpu, 0, HOLD_LINE );
+	device_set_input_line(state->subcpu, 0, HOLD_LINE );
 }
 
 static READ8_HANDLER( nsc_latch_r )
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( royalqn_blitter_2_w )
 {
 	nightgal_state *state = space->machine->driver_data<nightgal_state>();
 	state->blit_raw_data[2] = data;
-	cpu_set_input_line(state->subcpu, 0, ASSERT_LINE );
+	device_set_input_line(state->subcpu, 0, ASSERT_LINE );
 }
 
 static READ8_HANDLER( royalqn_nsc_blit_r )
@@ -362,7 +362,7 @@ static READ8_HANDLER( royalqn_nsc_blit_r )
 	nightgal_state *state = space->machine->driver_data<nightgal_state>();
 
 	if(offset == 2)
-		cpu_set_input_line(state->subcpu, 0, CLEAR_LINE );
+		device_set_input_line(state->subcpu, 0, CLEAR_LINE );
 
 	return state->blit_raw_data[offset];
 }

@@ -1949,7 +1949,7 @@ static INTERRUPT_GEN(firebeat_interrupt)
 	// IRQ 2: Main board UART
 	// IRQ 4: ATAPI
 
-	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
+	device_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_RESET( firebeat )
@@ -2216,9 +2216,9 @@ static void init_lights(running_machine *machine, write32_space_func out1, write
 	if(!out2) out1 = lamp_output2_w;
 	if(!out3) out1 = lamp_output3_w;
 
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7d000804, 0x7d000807, 0, 0, out1);
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7d000320, 0x7d000323, 0, 0, out2);
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7d000324, 0x7d000327, 0, 0, out3);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7d000804, 0x7d000807, 0, 0, out1);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7d000320, 0x7d000323, 0, 0, out2);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7d000324, 0x7d000327, 0, 0, out3);
 }
 
 static void init_firebeat(running_machine *machine)

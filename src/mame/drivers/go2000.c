@@ -54,7 +54,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 {
 	go2000_state *state = space->machine->driver_data<go2000_state>();
 	soundlatch_w(space, offset, data & 0xff);
-	cpu_set_input_line(state->soundcpu, 0, HOLD_LINE);
+	device_set_input_line(state->soundcpu, 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( go2000_map, ADDRESS_SPACE_PROGRAM, 16 )

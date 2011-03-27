@@ -39,7 +39,7 @@ static INPUT_CHANGED( coin_inserted )
 	fcombat_state *state = field->port->machine->driver_data<fcombat_state>();
 
 	/* coin insertion causes an NMI */
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

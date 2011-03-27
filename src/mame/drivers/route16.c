@@ -111,7 +111,7 @@ static WRITE8_HANDLER( route16_sharedram_w )
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		cpu_yield(space->cpu);
+		device_yield(space->cpu);
 	}
 }
 

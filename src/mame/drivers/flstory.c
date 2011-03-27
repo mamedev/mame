@@ -42,7 +42,7 @@ static TIMER_CALLBACK( nmi_callback )
 {
 	flstory_state *state = machine->driver_data<flstory_state>();
 	if (state->sound_nmi_enable)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->pending_nmi = 1;
 }
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		state->pending_nmi = 0;
 	}
 }
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 {
 	flstory_state *state = field->port->machine->driver_data<flstory_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	return (victnine_mcu_status_r(space, 0) & 3);
 }

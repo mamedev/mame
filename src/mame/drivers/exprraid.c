@@ -235,7 +235,7 @@ static WRITE8_HANDLER( sound_cpu_command_w )
 {
 	exprraid_state *state = space->machine->driver_data<exprraid_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( vblank_r )
@@ -281,13 +281,13 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin_inserted_deco16 )
 {
 	exprraid_state *state = field->port->machine->driver_data<exprraid_state>();
-	cpu_set_input_line(state->maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi )
 {
 	exprraid_state *state = field->port->machine->driver_data<exprraid_state>();
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( exprraid )
@@ -442,7 +442,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int linestate )
 {
 	exprraid_state *state = device->machine->driver_data<exprraid_state>();
-	cpu_set_input_line_and_vector(state->slave, 0, linestate, 0xff);
+	device_set_input_line_and_vector(state->slave, 0, linestate, 0xff);
 }
 
 static const ym3526_interface ym3526_config =
@@ -460,13 +460,13 @@ static INTERRUPT_GEN( exprraid_interrupt )
 		if (state->coin == 0)
 		{
 			state->coin = 1;
-			//cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
-			cpu_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
+			//device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	else
 	{
-		cpu_set_input_line(device, DECO16_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(device, DECO16_IRQ_LINE, CLEAR_LINE);
 		state->coin = 0;
 	}
 }
@@ -778,13 +778,13 @@ static DRIVER_INIT( exprraid )
 
 static DRIVER_INIT( wexpressb )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpressb2 )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 

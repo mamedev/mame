@@ -63,7 +63,7 @@ static TIMER_CALLBACK( gunbustr_interrupt5 )
 static INTERRUPT_GEN( gunbustr_interrupt )
 {
 	device->machine->scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(200000-500), FUNC(gunbustr_interrupt5));
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( gunbustr_palette_w )
@@ -409,7 +409,7 @@ static READ32_HANDLER( main_cycle_r )
 {
 	gunbustr_state *state = space->machine->driver_data<gunbustr_state>();
 	if (cpu_get_pc(space->cpu)==0x55a && (state->ram[0x3acc/4]&0xff000000)==0)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 
 	return state->ram[0x3acc/4];
 }
@@ -417,7 +417,7 @@ static READ32_HANDLER( main_cycle_r )
 static DRIVER_INIT( gunbustr )
 {
 	/* Speedup handler */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x203acc, 0x203acf, 0, 0, main_cycle_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x203acc, 0x203acf, 0, 0, main_cycle_r);
 }
 
 GAME( 1992, gunbustr, 0,      gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation", "Gunbuster (Japan)", 0 )

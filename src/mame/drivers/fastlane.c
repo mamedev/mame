@@ -25,12 +25,12 @@ static INTERRUPT_GEN( fastlane_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (k007121_ctrlram_r(state->k007121, 7) & 0x02)
-			cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
 		if (k007121_ctrlram_r(state->k007121, 7) & 0x01)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

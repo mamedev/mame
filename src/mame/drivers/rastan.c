@@ -347,7 +347,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	rastan_state *state = device->machine->driver_data<rastan_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

@@ -71,7 +71,7 @@ static WRITE8_HANDLER( to_main_w )
 static WRITE8_HANDLER( sound_cpu_reset_w )
 {
 	ladyfrog_state *state = space->machine->driver_data<ladyfrog_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -79,7 +79,7 @@ static TIMER_CALLBACK( nmi_callback )
 	ladyfrog_state *state = machine->driver_data<ladyfrog_state>();
 
 	if (state->sound_nmi_enable)
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		state->pending_nmi = 1;
 }
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		state->pending_nmi = 0;
 	}
 }

@@ -293,7 +293,7 @@ WRITE8_HANDLER( leland_master_video_addr_w )
 
 static TIMER_CALLBACK( leland_delayed_mvram_w )
 {
-	address_space *space = cputag_get_address_space(machine, "master", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("master")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;

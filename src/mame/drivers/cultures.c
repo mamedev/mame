@@ -354,7 +354,7 @@ static INTERRUPT_GEN( cultures_interrupt )
 {
 	cultures_state *state = device->machine->driver_data<cultures_state>();
 	if (state->irq_enable)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_START( cultures )

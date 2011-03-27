@@ -200,7 +200,7 @@ static WRITE8_HANDLER( egghunt_soundlatch_w )
 {
 	egghunt_state *state = space->machine->driver_data<egghunt_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( egghunt_okibanking_r )

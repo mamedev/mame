@@ -83,7 +83,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 static WRITE16_HANDLER( sound_irq_w )
 {
 	xmen_state *state = space->machine->driver_data<xmen_state>();
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( xmen_18fa00_w )

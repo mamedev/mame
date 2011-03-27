@@ -425,7 +425,7 @@ static SOUND_START( mario )
 	if (audiocpu != NULL && audiocpu->type() != Z80)
 	{
 		state->eabank = "bank1";
-		memory_install_read_bank(cpu_get_address_space(audiocpu, ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, "bank1");
+		memory_install_read_bank(audiocpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, "bank1");
 		memory_configure_bank(machine, "bank1", 0, 1, machine->region("audiocpu")->base(), 0);
 	    memory_configure_bank(machine, "bank1", 1, 1, machine->region("audiocpu")->base() + 0x1000, 0x800);
 	}
@@ -437,7 +437,7 @@ static SOUND_START( mario )
 static SOUND_RESET( mario )
 {
 	mario_state	*state = machine->driver_data<mario_state>();
-	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 #if USE_8039
     set_ea(machine, 1);

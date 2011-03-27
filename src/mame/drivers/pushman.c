@@ -76,8 +76,8 @@ static WRITE16_HANDLER( pushman_68705_w )
 
 	if (offset == 1)
 	{
-		cpu_set_input_line(state->mcu, M68705_IRQ_LINE, HOLD_LINE);
-		cpu_spin(space->cpu);
+		device_set_input_line(state->mcu, M68705_IRQ_LINE, HOLD_LINE);
+		device_spin(space->cpu);
 		state->new_latch = 0;
 	}
 }
@@ -392,7 +392,7 @@ GFXDECODE_END
 static void irqhandler(device_t *device, int irq)
 {
 	pushman_state *state = device->machine->driver_data<pushman_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

@@ -104,7 +104,7 @@ INLINE int vysnc_chain_counter_to_vpos( UINT16 counter )
 static TIMER_CALLBACK( interrupt_clear_callback )
 {
 	enigma2_state *state = machine->driver_data<enigma2_state>();
-	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
+	device_set_input_line(state->maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -118,7 +118,7 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 	int vpos = machine->primary_screen->vpos();
 	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
-	cpu_set_input_line_and_vector(state->maincpu, 0, ASSERT_LINE, vector);
+	device_set_input_line_and_vector(state->maincpu, 0, ASSERT_LINE, vector);
 
 	/* set up for next interrupt */
 	if (counter == INT_TRIGGER_COUNT_1)
@@ -387,7 +387,7 @@ static WRITE8_HANDLER( sound_data_w )
 	if (!(data & 0x04) && (state->last_sound_data & 0x04))
 		state->sound_latch = (state->sound_latch << 1) | (~data & 0x01);
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 	state->last_sound_data = data;
 }

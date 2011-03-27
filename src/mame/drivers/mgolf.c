@@ -95,7 +95,7 @@ static void update_plunger( running_machine *machine )
 			state->time_released = machine->time();
 
 			if (!state->mask)
-				cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
+				device_set_input_line(state->maincpu, INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
 			state->time_pushed = machine->time();

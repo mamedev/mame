@@ -140,10 +140,10 @@ static const segaic16_memory_map_entry *const region_info_list[] =
 static void sound_w(running_machine *machine, UINT8 data)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, data & 0xff);
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 sound_r(running_machine *machine)
@@ -595,7 +595,7 @@ static WRITE8_HANDLER( mcu_data_w )
 {
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	state->mcu_data = data;
-	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, HOLD_LINE);
+	device_set_input_line(state->mcu, MCS51_INT1_LINE, HOLD_LINE);
 }
 
 

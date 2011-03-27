@@ -152,7 +152,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 		address_space *mainspace;
 		UINT8 *RAM = space->machine->region("maincpu")->base();
 
-		mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		mainspace = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 		state->wardner_membank = data;
 
 		if (data)
@@ -188,7 +188,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 STATE_POSTLOAD( wardner_restore_bank )
 {
 	wardner_state *state = machine->driver_data<wardner_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	wardner_ramrom_bank_sw(space,0,1);	/* Dummy value to ensure restoration */
 	wardner_ramrom_bank_sw(space,0,state->wardner_membank);

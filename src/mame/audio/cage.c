@@ -172,7 +172,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	timer[1] = machine->device<timer_device>("cage_timer1");
 
 	if (speedup)
-		speedup_ram = memory_install_write32_handler(cpu_get_address_space(cage_cpu, ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
+		speedup_ram = memory_install_write32_handler(cage_cpu->memory().space(ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
 
 	for (chan = 0; chan < DAC_BUFFER_CHANNELS; chan++)
 	{
@@ -202,7 +202,7 @@ void cage_reset_w(int state)
 {
 	if (state)
 		cage_control_w(cage_cpu->machine, 0);
-	cpu_set_input_line(cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -231,7 +231,7 @@ static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 	tms32031_io_regs[DMA_SOURCE_ADDR] = param;
 
 	/* set the interrupt */
-	cpu_set_input_line(cage_cpu, TMS3203X_DINT, ASSERT_LINE);
+	device_set_input_line(cage_cpu, TMS3203X_DINT, ASSERT_LINE);
 	dma_enabled = 0;
 }
 
@@ -300,7 +300,7 @@ static TIMER_DEVICE_CALLBACK( cage_timer_callback )
 	int which = param;
 
 	/* set the interrupt */
-	cpu_set_input_line(cage_cpu, TMS3203X_TINT0 + which, ASSERT_LINE);
+	device_set_input_line(cage_cpu, TMS3203X_TINT0 + which, ASSERT_LINE);
 	cage_timer_enabled[which] = 0;
 	update_timer(which);
 }
@@ -483,7 +483,7 @@ static READ32_HANDLER( cage_from_main_r )
 		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 	cpu_to_cage_ready = 0;
 	update_control_lines(space->machine);
-	cpu_set_input_line(cage_cpu, TMS3203X_IRQ0, CLEAR_LINE);
+	device_set_input_line(cage_cpu, TMS3203X_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 
@@ -531,7 +531,7 @@ static TIMER_CALLBACK( deferred_cage_w )
 	cage_from_main = param;
 	cpu_to_cage_ready = 1;
 	update_control_lines(machine);
-	cpu_set_input_line(cage_cpu, TMS3203X_IRQ0, ASSERT_LINE);
+	device_set_input_line(cage_cpu, TMS3203X_IRQ0, ASSERT_LINE);
 }
 
 
@@ -564,7 +564,7 @@ void cage_control_w(running_machine *machine, UINT16 data)
 	/* CPU is reset if both control lines are 0 */
 	if (!(cage_control & 3))
 	{
-		cpu_set_input_line(cage_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(cage_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
@@ -581,7 +581,7 @@ void cage_control_w(running_machine *machine, UINT16 data)
 		cage_to_cpu_ready = 0;
 	}
 	else
-		cpu_set_input_line(cage_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(cage_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 
 	/* update the control state */
 	update_control_lines(machine);
@@ -597,7 +597,7 @@ void cage_control_w(running_machine *machine, UINT16 data)
 
 static WRITE32_HANDLER( speedup_w )
 {
-	cpu_eat_cycles(space->cpu, 100);
+	device_eat_cycles(space->cpu, 100);
 	COMBINE_DATA(&speedup_ram[offset]);
 }
 

@@ -193,13 +193,13 @@ INTERRUPT_GEN( bang_interrupt )
 {
 	gaelco2_state *state = device->machine->driver_data<gaelco2_state>();
 	if (cpu_getiloops(device) == 0){
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 
 		state->clr_gun_int = 0;
 	}
 	else if (cpu_getiloops(device) % 2){
 		if (state->clr_gun_int){
-			cpu_set_input_line(device, 4, HOLD_LINE);
+			device_set_input_line(device, 4, HOLD_LINE);
 		}
 	}
 }

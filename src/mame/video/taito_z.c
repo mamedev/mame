@@ -828,7 +828,7 @@ WRITE16_HANDLER( contcirc_out_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = reset sub CPU */
-		cpu_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->audiocpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bits 1-3 n.c. */
 

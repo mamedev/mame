@@ -464,14 +464,14 @@ static READ16_HANDLER( pasha2_speedup_r )
 	pasha2_state *state = space->machine->driver_data<pasha2_state>();
 
 	if(cpu_get_pc(space->cpu) == 0x8302)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 
 	return state->wram[(0x95744 / 2) + offset];
 }
 
 static DRIVER_INIT( pasha2 )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
 
 	memory_set_bankptr(machine, "bank1", machine->region("user2")->base());
 }

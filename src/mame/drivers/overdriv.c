@@ -76,9 +76,9 @@ static WRITE16_HANDLER( eeprom_w )
 static INTERRUPT_GEN( cpuA_interrupt )
 {
 	if (cpu_getiloops(device))
-		cpu_set_input_line(device, 5, HOLD_LINE);
+		device_set_input_line(device, 5, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cpuB_interrupt )
@@ -86,7 +86,7 @@ static INTERRUPT_GEN( cpuB_interrupt )
 	overdriv_state *state = device->machine->driver_data<overdriv_state>();
 
 	if (k053246_is_irq_enabled(state->k053246))
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 }
 
 
@@ -97,7 +97,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
-		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 1 is clear during service mode - function unknown */
 
@@ -140,19 +140,19 @@ static READ8_DEVICE_HANDLER( overdriv_sound_r )
 static WRITE16_HANDLER( overdriv_soundirq_w )
 {
 	overdriv_state *state = space->machine->driver_data<overdriv_state>();
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq5_w )
 {
 	overdriv_state *state = space->machine->driver_data<overdriv_state>();
-	cpu_set_input_line(state->subcpu, 5, HOLD_LINE);
+	device_set_input_line(state->subcpu, 5, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 {
 	overdriv_state *state = space->machine->driver_data<overdriv_state>();
-	cpu_set_input_line(state->subcpu, 6, HOLD_LINE);
+	device_set_input_line(state->subcpu, 6, HOLD_LINE);
 }
 
 

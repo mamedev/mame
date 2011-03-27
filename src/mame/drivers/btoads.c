@@ -50,7 +50,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	btoads_state *state = machine->driver_data<btoads_state>();
 	state->main_to_sound_data = param;
 	state->main_to_sound_ready = 1;
-	cpu_triggerint(machine->device("audiocpu"));
+	device_triggerint(machine->device("audiocpu"));
 
 	/* use a timer to make long transfers faster */
 	machine->scheduler().timer_set(attotime::from_usec(50), FUNC(NULL));
@@ -119,7 +119,7 @@ static READ8_HANDLER( sound_data_ready_r )
 {
 	btoads_state *state = space->machine->driver_data<btoads_state>();
 	if (cpu_get_pc(space->cpu) == 0xd50 && !state->main_to_sound_ready)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 	return state->main_to_sound_ready ? 0x00 : 0x80;
 }
 

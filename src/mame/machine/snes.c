@@ -104,7 +104,7 @@ static TIMER_CALLBACK( snes_nmi_tick )
 	snes_state *state = machine->driver_data<snes_state>();
 
 	// pull NMI
-	cpu_set_input_line(state->maincpu, G65816_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->maincpu, G65816_LINE_NMI, ASSERT_LINE);
 
 	// don't happen again
 	state->nmi_timer->adjust(attotime::never);
@@ -118,7 +118,7 @@ static void snes_hirq_tick( running_machine *machine )
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
 	snes_latch_counters(machine);
 	snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
-	cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, ASSERT_LINE);
+	device_set_input_line(state->maincpu, G65816_LINE_IRQ, ASSERT_LINE);
 
 	// don't happen again
 	state->hirq_timer->adjust(attotime::never);
@@ -133,7 +133,7 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 {
 	snes_state *state = machine->driver_data<snes_state>();
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
-	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if (!(snes_ppu.screen_disabled)) //Reset OAM address, byuu says it happens at H=10
 	{
@@ -146,14 +146,14 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 static TIMER_CALLBACK( snes_reset_hdma )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	snes_hdma_init(cpu0space);
 }
 
 static TIMER_CALLBACK( snes_update_io )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	state->io_read(cpu0space->machine);
 	snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
 
@@ -178,7 +178,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 			snes_ram[TIMEUP] = 0x80;	/* Indicate that irq occured */
 			// IRQ latches the counters, do it now
 			snes_latch_counters(machine);
-			cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, ASSERT_LINE );
+			device_set_input_line(state->maincpu, G65816_LINE_IRQ, ASSERT_LINE );
 		}
 	}
 	/* Horizontal IRQ timer */
@@ -231,7 +231,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	// hdma reset happens at scanline 0, H=~6
 	if (snes_ppu.beam.current_vert == 0)
 	{
-		address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+		address_space *cpu0space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 		snes_hdma_init(cpu0space);
 	}
 
@@ -242,7 +242,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		snes_ram[STAT78] ^= 0x80;		/* Toggle field flag */
 		snes_ppu.stat77_flags &= 0x3f;	/* Clear Time Over and Range Over bits */
 
-		cpu_set_input_line(state->maincpu, G65816_LINE_NMI, CLEAR_LINE );
+		device_set_input_line(state->maincpu, G65816_LINE_NMI, CLEAR_LINE );
 	}
 
 	state->scanline_timer->adjust(attotime::never);
@@ -255,7 +255,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 static TIMER_CALLBACK( snes_hblank_tick )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = state->maincpu->memory().space(ADDRESS_SPACE_PROGRAM);
 	int nextscan;
 
 	snes_ppu.beam.current_vert = machine->primary_screen->vpos();
@@ -543,7 +543,7 @@ READ8_HANDLER( snes_r_io )
 			return value | 2; //CPU version number
 		case TIMEUP:		/* IRQ flag by H/V count timer */
 			value = (snes_open_bus_r(space, 0) & 0x7f) | (snes_ram[TIMEUP] & 0x80);
-			cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
+			device_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
 			snes_ram[TIMEUP] = 0;	// flag is cleared on both read and write
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
@@ -694,7 +694,7 @@ WRITE8_HANDLER( snes_w_io )
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
 			if((data & 0x30) == 0x00)
 			{
-				cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
+				device_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
 				snes_ram[TIMEUP] = 0;	// clear pending IRQ if irq is disabled here, 3x3 Eyes - Seima Korin Den behaves on this
 			}
 			break;
@@ -810,7 +810,7 @@ WRITE8_HANDLER( snes_w_io )
 WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w )
 {
 	snes_state *driver_state = device->machine->driver_data<snes_state>();
-	cpu_set_input_line(driver_state->maincpu, G65816_LINE_IRQ, state);
+	device_set_input_line(driver_state->maincpu, G65816_LINE_IRQ, state);
 }
 
 /*************************************
@@ -1005,7 +1005,7 @@ READ8_HANDLER( snes_r_bank1 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 	#endif
 
 	return value;
@@ -1071,7 +1071,7 @@ READ8_HANDLER( snes_r_bank2 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 	#endif
 
 	return value;
@@ -1114,7 +1114,7 @@ READ8_HANDLER( snes_r_bank3 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -8);
+		device_adjust_icount(space->cpu, -8);
 	#endif
 
 	return value;
@@ -1163,7 +1163,7 @@ READ8_HANDLER( snes_r_bank4 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -8);
+		device_adjust_icount(space->cpu, -8);
 	#endif
 
 	return value;
@@ -1201,7 +1201,7 @@ READ8_HANDLER( snes_r_bank5 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -8);
+		device_adjust_icount(space->cpu, -8);
 	#endif
 
 	return value;
@@ -1251,7 +1251,7 @@ READ8_HANDLER( snes_r_bank6 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
 	#endif
 
 	return value;
@@ -1315,7 +1315,7 @@ READ8_HANDLER( snes_r_bank7 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
+		device_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 	#endif
 
 	return value;
@@ -1374,7 +1374,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 	#endif
 }
 
@@ -1435,7 +1435,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 	#endif
 }
 
@@ -1476,7 +1476,7 @@ WRITE8_HANDLER( snes_w_bank4 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -8);
+		device_adjust_icount(space->cpu, -8);
 	#endif
 }
 
@@ -1503,7 +1503,7 @@ WRITE8_HANDLER( snes_w_bank5 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -8);
+		device_adjust_icount(space->cpu, -8);
 	#endif
 }
 
@@ -1559,7 +1559,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+		device_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
 	#endif
 }
 
@@ -1614,7 +1614,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 
 	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
-		cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
+		device_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 	#endif
 }
 
@@ -1732,7 +1732,7 @@ static void snes_init_timers( running_machine *machine )
 static void snes_init_ram( running_machine *machine )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */
@@ -1987,7 +1987,7 @@ MACHINE_RESET( snes )
 DRIVER_INIT( snes )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
@@ -2053,7 +2053,7 @@ DRIVER_INIT( snes )
 DRIVER_INIT( snes_hirom )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
@@ -2141,7 +2141,7 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 
 	#if USE_CYCLE_STEAL
 	/* every byte transfer takes 8 master cycles */
-	cpu_adjust_icount(space->cpu,-8);
+	device_adjust_icount(space->cpu,-8);
 	#endif
 
 	if (state->dma_channel[dma].dmap & 0x80)	/* PPU->CPU */
@@ -2352,7 +2352,7 @@ static void snes_dma( address_space *space, UINT8 channels )
 
 	#if USE_CYCLE_STEAL
 	/* overhead steals 8 master cycles, correct? */
-	cpu_adjust_icount(space->cpu,-8);
+	device_adjust_icount(space->cpu,-8);
 	#endif
 
 	/* Assume priority of the 8 DMA channels is 0-7 */
@@ -2466,14 +2466,14 @@ static void snes_dma( address_space *space, UINT8 channels )
 
 			#if USE_CYCLE_STEAL
 			/* active channel takes 8 master cycles */
-			cpu_adjust_icount(space->cpu,-8);
+			device_adjust_icount(space->cpu,-8);
 			#endif
 		}
 	}
 
 	/* finally, take yet another 8 master cycles for the aforementioned overhead */
 	#if USE_CYCLE_STEAL
-	cpu_adjust_icount(space->cpu,-8);
+	device_adjust_icount(space->cpu,-8);
 	#endif
 }
 

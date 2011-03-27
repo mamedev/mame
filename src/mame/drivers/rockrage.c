@@ -60,7 +60,7 @@ static INTERRUPT_GEN( rockrage_interrupt )
 {
 	rockrage_state *state = device->machine->driver_data<rockrage_state>();
 	if (k007342_is_int_enabled(state->k007342))
-		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( rockrage_bankswitch_w )
@@ -79,7 +79,7 @@ static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 {
 	rockrage_state *state = space->machine->driver_data<rockrage_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(state->audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( rockrage_VLM5030_busy_r )

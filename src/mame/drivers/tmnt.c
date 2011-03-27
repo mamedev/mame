@@ -180,12 +180,12 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
+			device_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 			break;
 
 		default:
 			if (state->cuebrick_snd_irqlatch)
-				cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
+				device_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 			break;
 	}
 }
@@ -227,7 +227,7 @@ static WRITE8_DEVICE_HANDLER( glfgreat_sound_w )
 	k053260_w(device, offset, data);
 
 	if (offset)
-		cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ16_HANDLER( prmrsocr_sound_r )
@@ -250,7 +250,7 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 static WRITE16_HANDLER( prmrsocr_sound_irq_w )
 {
 	tmnt_state *state = space->machine->driver_data<tmnt_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
@@ -339,14 +339,14 @@ static void sound_nmi_callback( int param )
 static TIMER_CALLBACK( nmi_callback )
 {
 	tmnt_state *state = machine->driver_data<tmnt_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 //  sound_nmi_enabled = 1;
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	space->machine->scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
@@ -544,7 +544,7 @@ static WRITE16_HANDLER( thndrx2_eeprom_w )
 
 		/* bit 5 triggers IRQ on sound cpu */
 		if (state->last == 0 && (data & 0x20) != 0)
-			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+			device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 		state->last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
@@ -696,7 +696,7 @@ static WRITE16_HANDLER( ssriders_soundkludge_w )
 	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 
 	/* I think this is more than just a trigger */
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2617,7 +2617,7 @@ MACHINE_CONFIG_END
 static void sound_nmi( device_t *device )
 {
 	tmnt_state *state = device->machine->driver_data<tmnt_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const k054539_interface k054539_config =

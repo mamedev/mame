@@ -117,7 +117,7 @@ static READ16_HANDLER( thunderj_atarivc_r )
        the beginning of interrupt and once near the end. It stores these values in a
        table starting at $163484. CPU #2 periodically looks at this table to make
        sure that it is getting interrupts at the appropriate times, and that the
-       VBLANK bit is set appropriately. Unfortunately, due to all the cpu_yield(space->cpu)
+       VBLANK bit is set appropriately. Unfortunately, due to all the device_yield(space->cpu)
        calls we make to synchronize the two CPUs, we occasionally get out of time
        and generate the interrupt outside of the tight tolerances CPU #2 expects.
 

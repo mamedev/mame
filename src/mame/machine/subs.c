@@ -27,7 +27,7 @@ INTERRUPT_GEN( subs_interrupt )
 {
 	/* only do NMI interrupt if not in TEST mode */
 	if ((input_port_read(device->machine, "IN1") & 0x40)==0x40)
-		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 /***************************************************************************

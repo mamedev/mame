@@ -255,7 +255,7 @@ static INTERRUPT_GEN( gsword_snd_interrupt )
 	gsword_state *state = device->machine->driver_data<gsword_state>();
 	if(state->nmi_enable)
 	{
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -917,7 +917,7 @@ static DRIVER_INIT( gsword )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	memory_install_read8_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
 #endif
 }
 
@@ -932,7 +932,7 @@ static DRIVER_INIT( gsword2 )
 #endif
 #if 1
 	/* hack for sound protection or time out function */
-	memory_install_read8_handler(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
+	memory_install_read8_handler(machine->device("sub")->memory().space(ADDRESS_SPACE_PROGRAM), 0x4004, 0x4005, 0, 0, gsword_hack_r);
 #endif
 }
 

@@ -33,12 +33,12 @@ static INTERRUPT_GEN( chqflag_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (k051960_is_irq_enabled(state->k051960))
-			cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+			device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
 		if (k051960_is_nmi_enabled(state->k051960))
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
 	chqflag_state *state = space->machine->driver_data<chqflag_state>();
 	soundlatch2_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -293,7 +293,7 @@ INPUT_PORTS_END
 static void chqflag_ym2151_irq_w( device_t *device, int data )
 {
 	chqflag_state *state = device->machine->driver_data<chqflag_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

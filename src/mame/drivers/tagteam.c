@@ -76,7 +76,7 @@ static INTERRUPT_GEN( tagteam_interrupt )
 		if (state->coin == 0)
 		{
 			state->coin = 1;
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else state->coin = 0;

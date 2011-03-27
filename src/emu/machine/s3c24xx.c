@@ -247,7 +247,7 @@ static void s3c24xx_lcd_dma_init( device_t *device)
 static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	address_space* space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = device->machine->device( "maincpu")->memory().space( ADDRESS_SPACE_PROGRAM);
 	UINT8 *vram, data[4];
 	vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
 	for (int i = 0; i < 2; i++)
@@ -291,7 +291,7 @@ static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 static UINT32 s3c24xx_lcd_dma_read( device_t *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	address_space* space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space* space = device->machine->device( "maincpu")->memory().space( ADDRESS_SPACE_PROGRAM);
 	UINT8 *vram, data[4];
 	vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
 	for (int i = 0; i < 2; i++)
@@ -1039,7 +1039,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_clkpow_w )
 		case S3C24XX_MPLLCON :
 		{
 			verboselog( device->machine, 5, "CLKPOW - fclk %d hclk %d pclk %d\n", s3c24xx_get_fclk( device), s3c24xx_get_hclk( device), s3c24xx_get_pclk( device));
-			cputag_set_clock( device->machine, "maincpu", s3c24xx_get_fclk( device) * CLOCK_MULTIPLIER);
+			device->machine->device( "maincpu")->set_unscaled_clock(s3c24xx_get_fclk( device) * CLOCK_MULTIPLIER);
 		}
 		break;
 	}
@@ -1454,7 +1454,7 @@ static void s3c24xx_dma_trigger( device_t *device, int ch)
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx_dma_regs_t *regs = &s3c24xx->dma[ch].regs;
 	UINT32 curr_tc, curr_src, curr_dst;
-	address_space *space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device( "maincpu")->memory().space( ADDRESS_SPACE_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode, tsz;
 	const UINT32 ch_int[] = { S3C24XX_INT_DMA0, S3C24XX_INT_DMA1, S3C24XX_INT_DMA2, S3C24XX_INT_DMA3};
 	verboselog( device->machine, 5, "DMA %d trigger\n", ch);

@@ -425,7 +425,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_interrupt )
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device->owner());
 	if (ld->player->cpu != NULL)
-		cpu_set_input_line(ld->player->cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(ld->player->cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

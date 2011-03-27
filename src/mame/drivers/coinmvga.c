@@ -652,7 +652,7 @@ static const ymz280b_interface ymz280b_intf =
 static INTERRUPT_GEN( vblank_irq )
 {
 	//printf("1\n");
-	cpu_set_input_line(device, 2, HOLD_LINE);
+	device_set_input_line(device, 2, HOLD_LINE);
 }
 
 

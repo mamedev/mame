@@ -615,7 +615,7 @@ static WRITE16_HANDLER( dspram16_w )
 					offset == 0x103 &&
 					space->cpu == space->machine->device("maincpu"))
 		{ /* hack; synchronization for solvalou */
-			cpu_yield(space->cpu);
+			device_yield(space->cpu);
 		}
 	}
 } /* dspram16_w */

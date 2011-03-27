@@ -252,8 +252,8 @@ TODO:
 static void update_irq( running_machine *machine )
 {
 	othunder_state *state = machine->driver_data<othunder_state>();
-	cpu_set_input_line(state->maincpu, 6, state->ad_irq ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(state->maincpu, 5, state->vblank_irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, 6, state->ad_irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, 5, state->vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( irq_ack_w )
@@ -637,7 +637,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	othunder_state *state = device->machine->driver_data<othunder_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

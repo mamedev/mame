@@ -336,7 +336,7 @@ static WRITE16_HANDLER( jumping_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		state->jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
-		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -628,7 +628,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	rainbow_state *state = device->machine->driver_data<rainbow_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

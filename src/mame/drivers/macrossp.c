@@ -341,9 +341,9 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(space->cpu),data,mem_mask);
 		soundlatch_word_w(space, 0, data >> 16, 0xffff);
 		state->sndpending = 1;
-		cpu_set_input_line(state->audiocpu, 2, HOLD_LINE);
+		device_set_input_line(state->audiocpu, 2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(50));
+		device_spin_until_time(space->cpu, attotime::from_usec(50));
 	}
 }
 
@@ -589,7 +589,7 @@ static void irqhandler(device_t *device, int irq)
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
     but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-	//  cpu_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
+	//  device_set_input_line(state->audiocpu, 1, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const es5506_interface es5506_config =
@@ -777,7 +777,7 @@ PC :00018110 018110: beq     18104
 	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->mainram[0x10158 / 4]);
-	if (cpu_get_pc(space->cpu) == 0x001810A) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu) == 0x001810A) device_spin_until_interrupt(space->cpu);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -786,19 +786,19 @@ static WRITE32_HANDLER( quizmoon_speedup_w )
 	macrossp_state *state = space->machine->driver_data<macrossp_state>();
 
 	COMBINE_DATA(&state->mainram[0x00020 / 4]);
-	if (cpu_get_pc(space->cpu) == 0x1cc) cpu_spinuntil_int(space->cpu);
+	if (cpu_get_pc(space->cpu) == 0x1cc) device_spin_until_interrupt(space->cpu);
 }
 #endif
 
 static DRIVER_INIT( macrossp )
 {
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
 }
 
 static DRIVER_INIT( quizmoon )
 {
 #ifdef UNUSED_FUNCTION
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
 #endif
 }
 

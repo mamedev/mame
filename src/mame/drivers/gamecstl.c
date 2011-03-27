@@ -626,7 +626,7 @@ static MACHINE_RESET(gamecstl)
 {
 	memory_set_bankptr(machine, "bank1", machine->region("user1")->base() + 0x30000);
 
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 }
 
 

@@ -482,7 +482,7 @@ static CPU_EXECUTE( jaguargpu )
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar->ctrl[G_CTRL] & 1))
 	{
-		//cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
+		//device_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
 		jaguar->icount = 0;
 		return;
 	}
@@ -521,7 +521,7 @@ static CPU_EXECUTE( jaguardsp )
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar->ctrl[G_CTRL] & 1))
 	{
-		//cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
+		//device_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
 		jaguar->icount = 0;
 		return;
 	}
@@ -1299,8 +1299,8 @@ void jaguargpu_ctrl_w(device_t *device, offs_t offset, UINT32 data, UINT32 mem_m
 			jaguar->ctrl[offset] = newval;
 			if ((oldval ^ newval) & 0x01)
 			{
-				cpu_set_input_line(device, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
-				cpu_yield(device);
+				device_set_input_line(device, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
+				device_yield(device);
 			}
 			if (newval & 0x02)
 			{
@@ -1398,8 +1398,8 @@ void jaguardsp_ctrl_w(device_t *device, offs_t offset, UINT32 data, UINT32 mem_m
 			jaguar->ctrl[offset] = newval;
 			if ((oldval ^ newval) & 0x01)
 			{
-				cpu_set_input_line(device, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
-				cpu_yield(device);
+				device_set_input_line(device, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
+				device_yield(device);
 			}
 			if (newval & 0x02)
 			{

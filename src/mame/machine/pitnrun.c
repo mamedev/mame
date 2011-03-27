@@ -111,7 +111,7 @@ static TIMER_CALLBACK( pitnrun_mcu_status_real_w )
 WRITE8_HANDLER( pitnrun_68705_portB_w )
 {
 	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
-	address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = space->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */

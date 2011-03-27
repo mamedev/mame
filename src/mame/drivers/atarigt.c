@@ -81,7 +81,7 @@ static MACHINE_RESET( atarigt )
 
 static void cage_irq_callback(running_machine *machine, int reason)
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if (reason)
 		atarigen_sound_int_gen(machine->device("maincpu"));
@@ -1282,7 +1282,7 @@ static DRIVER_INIT( tmek )
 	state->protection_w = tmek_protection_w;
 
 	/* temp hack */
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd72000, 0xd75fff, 0, 0, tmek_pf_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xd72000, 0xd75fff, 0, 0, tmek_pf_w);
 }
 
 

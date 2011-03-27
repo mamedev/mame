@@ -61,12 +61,12 @@
 static INTERRUPT_GEN( blockade_interrupt )
 {
 	blockade_state *state = device->machine->driver_data<blockade_state>();
-	cpu_resume(device, SUSPEND_ANY_REASON);
+	device_resume(device, SUSPEND_ANY_REASON);
 
 	if ((input_port_read(device->machine, "IN0") & 0x80) == 0)
 	{
 		state->just_been_reset = 1;
-		cpu_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

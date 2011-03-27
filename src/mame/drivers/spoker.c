@@ -382,7 +382,7 @@ static INTERRUPT_GEN( spoker_interrupt )
 	spoker_state *state = device->machine->driver_data<spoker_state>();
 
 	 if (state->nmi_enable & 0x80)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_CONFIG_START( spoker, spoker_state )

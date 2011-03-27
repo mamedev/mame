@@ -113,7 +113,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_word_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		if (data & 0x0100)
-			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+			device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 	}
 }
 
@@ -167,7 +167,7 @@ WRITE16_HANDLER( salamand_control_port_word_w )
 		coin_lockout_w(space->machine, 1, data & 0x0400);
 
 		if (data & 0x0800)
-			cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+			device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 
 		state->selected_ip = (~data & 0x1000) >> 12;		/* citybomb steering & accel */
 	}

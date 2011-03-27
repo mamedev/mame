@@ -53,7 +53,7 @@ static void update_irq_state( device_t *cpu )
 
 	int i;
 	for (i = 1; i < 5; i++)
-		cpu_set_input_line(cpu, i, state->irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
+		device_set_input_line(cpu, i, state->irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -101,7 +101,7 @@ static MACHINE_START( dcheese )
 	state->audiocpu = machine->device("audiocpu");
 	state->bsmt = machine->device("bsmt");
 
-	cpu_set_irq_callback(state->maincpu, irq_callback);
+	device_set_irq_callback(state->maincpu, irq_callback);
 
 	state->save_item(NAME(state->irq_state));
 	state->save_item(NAME(state->soundlatch_full));
@@ -144,7 +144,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		/* write the latch and set the IRQ */
 		state->soundlatch_full = 1;
-		cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+		device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
@@ -163,7 +163,7 @@ static READ8_HANDLER( sound_command_r )
 
 	/* read the latch and clear the IRQ */
 	state->soundlatch_full = 0;
-	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 

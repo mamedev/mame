@@ -144,7 +144,7 @@ static WRITE16_HANDLER( gaiden_sound_command_w )
 		soundlatch_w(space, 0, data & 0xff);	/* Ninja Gaiden */
 	if (ACCESSING_BITS_8_15)
 		soundlatch_w(space, 0, data >> 8);	/* Tecmo Knight */
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE16_HANDLER( drgnbowl_sound_command_w )
@@ -154,7 +154,7 @@ static WRITE16_HANDLER( drgnbowl_sound_command_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, data >> 8);
-		cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+		device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -751,7 +751,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	gaiden_state *state = device->machine->driver_data<gaiden_state>();
-	cpu_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -1506,8 +1506,8 @@ static DRIVER_INIT( wildfang )
 
 	state->prot = 0;
 	state->jumpcode = 0;
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, wildfang_protection_r);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, wildfang_protection_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, wildfang_protection_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, wildfang_protection_w);
 }
 
 static DRIVER_INIT( raiga )
@@ -1519,8 +1519,8 @@ static DRIVER_INIT( raiga )
 
 	state->prot = 0;
 	state->jumpcode = 0;
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, raiga_protection_r);
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, raiga_protection_w);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x07a006, 0x07a007, 0, 0, raiga_protection_r);
+	memory_install_write16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x07a804, 0x07a805, 0, 0, raiga_protection_w);
 }
 
 static void descramble_drgnbowl_gfx(running_machine *machine)

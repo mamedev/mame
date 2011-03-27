@@ -59,7 +59,7 @@ static WRITE16_HANDLER( zerozone_sound_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, offset, data >> 8);
-		cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 	}
 }
 

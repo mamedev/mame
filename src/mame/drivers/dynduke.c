@@ -265,7 +265,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( dynduke_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	// VBL
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	// VBL
 }
 
 /* Machine Driver */

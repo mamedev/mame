@@ -1588,11 +1588,11 @@ GFXDECODE_END
 static INTERRUPT_GEN( cischeat_interrupt )
 {
 	if (cpu_getiloops(device)==0)
-		cpu_set_input_line(device, 4, HOLD_LINE); /* Once */
+		device_set_input_line(device, 4, HOLD_LINE); /* Once */
 	else
 	{
-		if (cpu_getiloops(device)%2)	cpu_set_input_line(device, 2, HOLD_LINE);
-		else					cpu_set_input_line(device, 1, HOLD_LINE);
+		if (cpu_getiloops(device)%2)	device_set_input_line(device, 2, HOLD_LINE);
+		else					device_set_input_line(device, 1, HOLD_LINE);
 	}
 }
 
@@ -1744,8 +1744,8 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpu_set_input_line(device, 3, HOLD_LINE); break;	// update palette, layers etc. Not the sprites.
-		case 14:	cpu_set_input_line(device, 2, HOLD_LINE); break;	// "real" vblank. It just sets a flag that
+		case 0:		device_set_input_line(device, 3, HOLD_LINE); break;	// update palette, layers etc. Not the sprites.
+		case 14:	device_set_input_line(device, 2, HOLD_LINE); break;	// "real" vblank. It just sets a flag that
 											// the main loop polls before updating the sprites.
 		default: break;
 	}
@@ -1796,8 +1796,8 @@ static INTERRUPT_GEN( interrupt_armchmp2)
 {
 	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpu_set_input_line(device, 4, HOLD_LINE); break;
-		case 14:	cpu_set_input_line(device, 2, HOLD_LINE); break;
+		case 0:		device_set_input_line(device, 4, HOLD_LINE); break;
+		case 14:	device_set_input_line(device, 2, HOLD_LINE); break;
 
 		default: break;
 	}
@@ -2554,7 +2554,7 @@ ROM_END
 
 static DRIVER_INIT( wildplt )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "cpu1", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
+	memory_install_read16_handler(machine->device("cpu1")->memory().space(ADDRESS_SPACE_PROGRAM), 0x080000, 0x087fff, 0, 0, wildplt_vregs_r );
 
 	DRIVER_INIT_CALL(f1gpstar);
 }

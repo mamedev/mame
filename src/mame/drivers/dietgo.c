@@ -163,7 +163,7 @@ GFXDECODE_END
 static void sound_irq(device_t *device, int state)
 {
 	dietgo_state *driver_state = device->machine->driver_data<dietgo_state>();
-	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
+	device_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

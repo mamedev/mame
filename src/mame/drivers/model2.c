@@ -188,7 +188,7 @@ static UINT32 copro_fifoout_pop(address_space *space)
 		i960_stall(space->cpu);
 
 		/* spin the main cpu and let the TGP catch up */
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(100));
+		device_spin_until_time(space->cpu, attotime::from_usec(100));
 
 		return 0;
 	}
@@ -247,13 +247,13 @@ static void copro_fifoout_push(device_t *device, UINT32 data)
 		{
 			sharc_set_flag_input(device, 1, ASSERT_LINE);
 
-			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, ASSERT_LINE);
+			//device_set_input_line(device, SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
 			sharc_set_flag_input(device, 1, CLEAR_LINE);
 
-			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, CLEAR_LINE);
+			//device_set_input_line(device, SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
 	}
 }
@@ -763,7 +763,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         {
             logerror("Boot geo, %d dwords\n", state->geocnt);
             cputag_set_input_line(space->machine, "dsp2", INPUT_LINE_HALT, CLEAR_LINE);
-            //cpu_spinuntil_time(space->cpu, attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
+            //device_spin_until_time(space->cpu, attotime::from_usec(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
@@ -999,7 +999,7 @@ static int snd_68k_ready_r(address_space *space)
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(space->cpu, attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -1011,7 +1011,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 	model2_state *state = space->machine->driver_data<model2_state>();
 	if (!snd_68k_ready_r(space))
 	{
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(space->cpu, attotime::from_usec(40));
 	}
 
 	state->to_68k = data;
@@ -1019,7 +1019,7 @@ static void snd_latch_to_68k_w(address_space *space, int data)
 	cputag_set_input_line(space->machine, "audiocpu", 2, HOLD_LINE);
 
 	// give the 68k time to notice
-	cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+	device_spin_until_time(space->cpu, attotime::from_usec(40));
 }
 
 static READ32_HANDLER( model2_serial_r )
@@ -1047,7 +1047,7 @@ static WRITE32_HANDLER( model2_serial_w )
 		scsp_midi_in(space->machine->device("scsp"), 0, data&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(space->cpu, attotime::from_usec(40));
+		device_spin_until_time(space->cpu, attotime::from_usec(40));
 	}
 }
 
@@ -1795,14 +1795,14 @@ static INTERRUPT_GEN(model2_interrupt)
 			state->intreq |= (1<<10);
 			if (state->intena & (1<<10))
 			{
-				cpu_set_input_line(device, I960_IRQ3, ASSERT_LINE);
+				device_set_input_line(device, I960_IRQ3, ASSERT_LINE);
 			}
 			break;
 		case 1:
 			state->intreq |= (1<<0);
 			if (state->intena & (1<<0))
 			{
-				cpu_set_input_line(device, I960_IRQ0, ASSERT_LINE);
+				device_set_input_line(device, I960_IRQ0, ASSERT_LINE);
 			}
 			break;
 	}
@@ -1816,18 +1816,18 @@ static INTERRUPT_GEN(model2c_interrupt)
 		case 0:
 			state->intreq |= (1<<10);
 			if (state->intena & (1<<10))
-				cpu_set_input_line(device, I960_IRQ3, ASSERT_LINE);
+				device_set_input_line(device, I960_IRQ3, ASSERT_LINE);
 			break;
 		case 1:
 			state->intreq |= (1<<2);
 			if (state->intena & (1<<2))
-				cpu_set_input_line(device, I960_IRQ2, ASSERT_LINE);
+				device_set_input_line(device, I960_IRQ2, ASSERT_LINE);
 
 			break;
 		case 2:
 			state->intreq |= (1<<0);
 			if (state->intena & (1<<0))
-				cpu_set_input_line(device, I960_IRQ0, ASSERT_LINE);
+				device_set_input_line(device, I960_IRQ0, ASSERT_LINE);
 			break;
 	}
 }
@@ -4995,7 +4995,7 @@ ROM_END
 static DRIVER_INIT( genprot )
 {
 	model2_state *state = machine->driver_data<model2_state>();
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	state->protstate = state->protpos = 0;
 }
 
@@ -5004,7 +5004,7 @@ static DRIVER_INIT( pltkids )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	state->protstate = state->protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5016,7 +5016,7 @@ static DRIVER_INIT( zerogun )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	state->protstate = state->protpos = 0;
 
 	// fix bug in program: it destroys the interrupt table and never fixes it
@@ -5025,7 +5025,7 @@ static DRIVER_INIT( zerogun )
 
 static DRIVER_INIT( daytonam )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x240000, 0x24ffff, 0, 0, maxx_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x240000, 0x24ffff, 0, 0, maxx_r );
 }
 
 /* very crude support for let the game set itself into stand-alone mode */
@@ -5061,8 +5061,8 @@ static DRIVER_INIT( sgt24h )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
 
 	state->protstate = state->protpos = 0;
 
@@ -5072,7 +5072,7 @@ static DRIVER_INIT( sgt24h )
 
 static DRIVER_INIT( overrev )
 {
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01a10000, 0x01a1ffff, 0, 0, jaleco_network_r, jaleco_network_w);
 
 	//TODO: cache patch?
 }
@@ -5083,7 +5083,7 @@ static DRIVER_INIT( doa )
 	model2_state *state = machine->driver_data<model2_state>();
 	UINT32 *ROM = (UINT32 *)machine->region("maincpu")->base();
 
-	memory_install_readwrite32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
+	memory_install_readwrite32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01d80000, 0x01dfffff, 0, 0, model2_prot_r, model2_prot_w);
 	state->protstate = state->protpos = 0;
 
 	ROM[0x630/4] = 0x08000004;
@@ -5092,12 +5092,12 @@ static DRIVER_INIT( doa )
 
 static DRIVER_INIT( rchase2 )
 {
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, rchase2_devices_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, rchase2_devices_w);
 }
 
 static DRIVER_INIT( srallyc )
 {
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, srallyc_devices_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x01c00008, 0x01c0000b, 0, 0, srallyc_devices_w);
 }
 
 

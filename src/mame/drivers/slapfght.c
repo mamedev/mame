@@ -737,7 +737,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 static SCREEN_EOF( perfrman )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram_w(space, 0, 0);
 }
 
@@ -1742,12 +1742,12 @@ ROM_END
 
 static DRIVER_INIT( tigerh )
 {
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerh_mcu_r, tigerh_mcu_w  );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerh_mcu_r, tigerh_mcu_w  );
 }
 
 static DRIVER_INIT( tigerhb )
 {
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerhb_e803_r, tigerhb_e803_w  );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, tigerhb_e803_r, tigerhb_e803_w  );
 }
 
 
@@ -1807,8 +1807,8 @@ static READ8_HANDLER( gtstarb1_port_0_read )
 
 static void getstar_init( running_machine *machine )
 {
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_e803_r, getstar_e803_w );
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, slapfight_port_00_r );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, getstar_e803_r, getstar_e803_w );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, slapfight_port_00_r );
 }
 
 static DRIVER_INIT( getstar )
@@ -1834,7 +1834,7 @@ static DRIVER_INIT( gtstarb1 )
 	getstar_init(machine);
 
 	/* specific handlers for this bootleg */
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x0, 0x0, 0, 0, gtstarb1_port_0_read );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x0, 0x0, 0, 0, gtstarb1_port_0_read );
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */
@@ -1851,13 +1851,13 @@ static DRIVER_INIT( gtstarb2 )
 
 static DRIVER_INIT( slapfigh )
 {
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, slapfight_mcu_r, slapfight_mcu_w );
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, slapfight_mcu_status_r );
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe803, 0xe803, 0, 0, slapfight_mcu_r, slapfight_mcu_w );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, slapfight_mcu_status_r );
 }
 
 static DRIVER_INIT( perfrman )
 {
-	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, perfrman_port_00_r );
+	memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, perfrman_port_00_r );
 }
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */

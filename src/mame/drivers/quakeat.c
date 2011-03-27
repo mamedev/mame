@@ -149,7 +149,7 @@ static IRQ_CALLBACK(irq_callback)
 static MACHINE_START(quakeat)
 {
 	quakeat_state *state = machine->driver_data<quakeat_state>();
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	state->pic8259_1 = machine->device( "pic8259_1" );
 	state->pic8259_2 = machine->device( "pic8259_2" );

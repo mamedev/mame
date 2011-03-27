@@ -280,7 +280,7 @@ static DRIVER_INIT( kuniokun )
 
 static DRIVER_INIT( kuniokunb )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* Remove the MCU handlers */
 	memory_unmap_readwrite(space, 0x3804, 0x3804, 0, 0);
@@ -658,9 +658,9 @@ static INTERRUPT_GEN( renegade_interrupt )
 #endif
 
 	if (cpu_getiloops(device))
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( renegade_coin_counter_w )

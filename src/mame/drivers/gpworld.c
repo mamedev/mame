@@ -437,11 +437,11 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 	{
 		laserdisc_data_w(state->laserdisc,state->ldp_write_latch);
 		state->ldp_read_latch  = laserdisc_data_r(state->laserdisc);
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
-	cpu_set_input_line(device, 0, ASSERT_LINE);
+	device_set_input_line(device, 0, ASSERT_LINE);
 	device->machine->scheduler().timer_set(attotime::from_usec(100), FUNC(irq_stop));
 }
 

@@ -294,7 +294,7 @@ static void toaplan1_set_scrolls(running_machine *machine)
 static STATE_POSTLOAD( rallybik_flipscreen )
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	rallybik_bcu_flipscreen_w(space, 0, state->bcu_flipscreen, 0xffff);
 }
@@ -302,7 +302,7 @@ static STATE_POSTLOAD( rallybik_flipscreen )
 static STATE_POSTLOAD( toaplan1_flipscreen )
 {
 	toaplan1_state *state = machine->driver_data<toaplan1_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	toaplan1_bcu_flipscreen_w(space, 0, state->bcu_flipscreen, 0xffff);
 }

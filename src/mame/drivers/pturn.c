@@ -457,7 +457,7 @@ static INTERRUPT_GEN( pturn_sub_intgen )
 	pturn_state *state = device->machine->driver_data<pturn_state>();
 	if(state->nmi_sub)
 	{
-		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -466,13 +466,13 @@ static INTERRUPT_GEN( pturn_main_intgen )
 	pturn_state *state = device->machine->driver_data<pturn_state>();
 	if (state->nmi_main)
 	{
-		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
+		device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
 static MACHINE_RESET( pturn )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	soundlatch_clear_w(space,0,0);
 }
 
@@ -552,8 +552,8 @@ ROM_END
 static DRIVER_INIT(pturn)
 {
 	/*
-    memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
-    memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
+    memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
+    memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
     */
 }
 

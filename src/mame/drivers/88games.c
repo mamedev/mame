@@ -74,7 +74,7 @@ static WRITE8_HANDLER( k88games_5f84_w )
 static WRITE8_HANDLER( k88games_sh_irqtrigger_w )
 {
 	_88games_state *state = space->machine->driver_data<_88games_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 

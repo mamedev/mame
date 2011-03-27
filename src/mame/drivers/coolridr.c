@@ -1067,12 +1067,12 @@ INPUT_PORTS_END
 // IRQs 4 & 6 are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
 {
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 /*  switch(cpu_getiloops(device))
     {
         case 0: break;
-        case 1:cpu_set_input_line(device, 6, HOLD_LINE); break;
-//      case 2:cpu_set_input_line(device, 8, HOLD_LINE); break;
+        case 1:device_set_input_line(device, 6, HOLD_LINE); break;
+//      case 2:device_set_input_line(device, 8, HOLD_LINE); break;
     }*/
 }
 
@@ -1081,9 +1081,9 @@ static INTERRUPT_GEN( system_h1_sub )
 {
 	switch(cpu_getiloops(device))
 	{
-    	case 0:cpu_set_input_line(device, 0xa, HOLD_LINE); break;
-        case 1:cpu_set_input_line(device, 0xc, HOLD_LINE); break;
-        case 2:cpu_set_input_line(device, 0xe, HOLD_LINE); break;
+    	case 0:device_set_input_line(device, 0xa, HOLD_LINE); break;
+        case 1:device_set_input_line(device, 0xc, HOLD_LINE); break;
+        case 2:device_set_input_line(device, 0xe, HOLD_LINE); break;
 	}
 }
 
@@ -1187,8 +1187,8 @@ static READ32_HANDLER( coolridr_hack2_r )
 
 static DRIVER_INIT( coolridr )
 {
-//  memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack1_r );
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x60d8894, 0x060d8897, 0, 0, coolridr_hack2_r );
+//  memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack1_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x60d8894, 0x060d8897, 0, 0, coolridr_hack2_r );
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders (US)",GAME_NOT_WORKING|GAME_NO_SOUND )

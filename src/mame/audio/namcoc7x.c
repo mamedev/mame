@@ -39,7 +39,7 @@ static READ16_HANDLER( speedup_r )
 {
 	if ((cpu_get_pc(space->cpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 	}
 
 	return su_82;
@@ -90,7 +90,7 @@ void namcoc7x_on_driver_init(running_machine *machine)
 	// install speedup cheat
 	for (cpu = machine->device("maincpu"); cpu != NULL; cpu = cpu->typenext())
 		if (cpu->type() == M37702)
-			memory_install_readwrite16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, speedup_r, speedup_w);
+			memory_install_readwrite16_handler(cpu->memory().space(ADDRESS_SPACE_PROGRAM), 0x82, 0x83, 0, 0, speedup_r, speedup_w);
 }
 
 void namcoc7x_set_host_ram(UINT32 *hostram)
@@ -189,8 +189,8 @@ ADDRESS_MAP_END
 INTERRUPT_GEN( namcoc7x_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	else
-		cpu_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
+		device_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
 }
 

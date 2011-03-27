@@ -163,7 +163,7 @@ static void fromance_adpcm_int( device_t *device )
 
 	/* generate an NMI if we're out of data */
 	if (!state->vclk_left)
-		cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

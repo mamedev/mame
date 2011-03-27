@@ -120,7 +120,7 @@
 
 static MACHINE_RESET( tiamc1 )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	tiamc1_bankswitch_w(space, 0, 0);
 }
 

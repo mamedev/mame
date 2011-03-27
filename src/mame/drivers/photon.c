@@ -178,7 +178,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( pk8000_interrupt )
 {
-	cpu_set_input_line(device, 0, HOLD_LINE);
+	device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static IRQ_CALLBACK(pk8000_irq_callback)
@@ -190,7 +190,7 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 static MACHINE_RESET(pk8000)
 {
 	pk8000_set_bank(machine,0);
-	cpu_set_irq_callback(machine->device("maincpu"), pk8000_irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), pk8000_irq_callback);
 }
 
 static VIDEO_START( photon )

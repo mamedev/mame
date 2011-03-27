@@ -610,7 +610,7 @@ static MACHINE_RESET (ddealer)
 
 static INTERRUPT_GEN( ddealer_interrupt )
 {
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( ddealer, ddealer_state )
@@ -671,7 +671,7 @@ static READ16_HANDLER( ddealer_mcu_r )
 
 static DRIVER_INIT( ddealer )
 {
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
 }
 
 ROM_START( ddealer )

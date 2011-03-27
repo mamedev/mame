@@ -407,7 +407,7 @@ ROM_END
 static DRIVER_INIT( deco222 )
 {
 	int A;
-	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = machine->region("audiocpu")->base();
 

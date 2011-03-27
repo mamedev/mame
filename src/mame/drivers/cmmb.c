@@ -289,7 +289,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( cmmb_irq )
 {
 	//if(input_code_pressed_once(device->machine, KEYCODE_Z))
-	//  cpu_set_input_line(device, 0, HOLD_LINE);
+	//  device_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_RESET( cmmb )

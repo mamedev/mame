@@ -394,21 +394,21 @@ static void start_interrupt_timers( running_machine *machine )
 static void audio_cpu_irq(device_t *device, int assert)
 {
 	neogeo_state *state = device->machine->driver_data<neogeo_state>();
-	cpu_set_input_line(state->audiocpu, 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void audio_cpu_assert_nmi(running_machine *machine)
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -738,7 +738,7 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 
 static void main_cpu_banking_init( running_machine *machine )
 {
-	address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mainspace = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* create vector banks */
 	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, machine->region("mainbios")->base(), 0);
@@ -879,7 +879,7 @@ static void audio_cpu_banking_init( running_machine *machine )
 	set_audio_cpu_banking(machine);
 
 	state->audio_cpu_rom_source_last = 0;
-	set_audio_cpu_rom_source(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0);
+	set_audio_cpu_rom_source(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0);
 }
 
 
@@ -1035,7 +1035,7 @@ static STATE_POSTLOAD( neogeo_postload )
 	_set_main_cpu_bank_address(machine);
 	_set_main_cpu_vector_table_source(machine);
 	set_audio_cpu_banking(machine);
-	_set_audio_cpu_rom_source(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM));
+	_set_audio_cpu_rom_source(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM));
 	set_outputs(machine);
 }
 
@@ -1105,7 +1105,7 @@ static MACHINE_RESET( neogeo )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 	offs_t offs;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)

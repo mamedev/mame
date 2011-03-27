@@ -2081,18 +2081,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)
 				{
-					case 8:		install_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, *object), data.m_mask);		break;
-					case 16:	install_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, *object), data.m_mask);		break;
-					case 32:	install_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, *object), data.m_mask);		break;
-					case 64:	install_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, *object), data.m_mask);		break;
+					case 8:		install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read8_delegate(entry.m_rproto8, *object), data.m_mask);		break;
+					case 16:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read16_delegate(entry.m_rproto16, *object), data.m_mask);		break;
+					case 32:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read32_delegate(entry.m_rproto32, *object), data.m_mask);		break;
+					case 64:	install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, read64_delegate(entry.m_rproto64, *object), data.m_mask);		break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:		install_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, *object), data.m_mask);		break;
-					case 16:	install_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, *object), data.m_mask);	break;
-					case 32:	install_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, *object), data.m_mask);	break;
-					case 64:	install_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, *object), data.m_mask);	break;
+					case 8:		install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write8_delegate(entry.m_wproto8, *object), data.m_mask);		break;
+					case 16:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write16_delegate(entry.m_wproto16, *object), data.m_mask);	break;
+					case 32:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write32_delegate(entry.m_wproto32, *object), data.m_mask);	break;
+					case 64:	install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, write64_delegate(entry.m_wproto64, *object), data.m_mask);	break;
 				}
 			break;
 
@@ -2100,18 +2100,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)
 				{
-					case 8:		install_legacy_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rspace8, data.m_name, data.m_mask);	break;
-					case 16:	install_legacy_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rspace16, data.m_name, data.m_mask);	break;
-					case 32:	install_legacy_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rspace32, data.m_name, data.m_mask);	break;
-					case 64:	install_legacy_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rspace64, data.m_name, data.m_mask);	break;
+					case 8:		install_legacy_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rspace8, data.m_name, data.m_mask);	break;
+					case 16:	install_legacy_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rspace16, data.m_name, data.m_mask);	break;
+					case 32:	install_legacy_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rspace32, data.m_name, data.m_mask);	break;
+					case 64:	install_legacy_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rspace64, data.m_name, data.m_mask);	break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:		install_legacy_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wspace8, data.m_name, data.m_mask);	break;
-					case 16:	install_legacy_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wspace16, data.m_name, data.m_mask);	break;
-					case 32:	install_legacy_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wspace32, data.m_name, data.m_mask);	break;
-					case 64:	install_legacy_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wspace64, data.m_name, data.m_mask);	break;
+					case 8:		install_legacy_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wspace8, data.m_name, data.m_mask);	break;
+					case 16:	install_legacy_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wspace16, data.m_name, data.m_mask);	break;
+					case 32:	install_legacy_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wspace32, data.m_name, data.m_mask);	break;
+					case 64:	install_legacy_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wspace64, data.m_name, data.m_mask);	break;
 				}
 			break;
 
@@ -2123,18 +2123,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			if (readorwrite == ROW_READ)
 				switch (data.m_bits)
 				{
-					case 8:		install_legacy_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice8, data.m_name, data.m_mask);	break;
-					case 16:	install_legacy_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice16, data.m_name, data.m_mask);	break;
-					case 32:	install_legacy_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice32, data.m_name, data.m_mask);	break;
-					case 64:	install_legacy_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice64, data.m_name, data.m_mask);	break;
+					case 8:		install_legacy_read_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice8, data.m_name, data.m_mask);	break;
+					case 16:	install_legacy_read_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice16, data.m_name, data.m_mask);	break;
+					case 32:	install_legacy_read_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice32, data.m_name, data.m_mask);	break;
+					case 64:	install_legacy_read_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_rdevice64, data.m_name, data.m_mask);	break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:		install_legacy_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice8, data.m_name, data.m_mask);	break;
-					case 16:	install_legacy_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice16, data.m_name, data.m_mask);	break;
-					case 32:	install_legacy_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice32, data.m_name, data.m_mask);	break;
-					case 64:	install_legacy_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice64, data.m_name, data.m_mask);	break;
+					case 8:		install_legacy_write_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice8, data.m_name, data.m_mask);	break;
+					case 16:	install_legacy_write_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice16, data.m_name, data.m_mask);	break;
+					case 32:	install_legacy_write_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice32, data.m_name, data.m_mask);	break;
+					case 64:	install_legacy_write_handler(*device, entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_wdevice64, data.m_name, data.m_mask);	break;
 				}
 			break;
 
@@ -2582,9 +2582,9 @@ void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrma
 //  delegate handlers for the space
 //-------------------------------------------------
 
-UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_delegate handler, UINT64 unitmask)
+UINT8 *address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_delegate handler, UINT64 unitmask)
 {
-	VPRINTF(("address_space::install_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
+	VPRINTF(("address_space::install_read_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
@@ -2595,9 +2595,9 @@ UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t a
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_delegate handler, UINT64 unitmask)
+UINT8 *address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_delegate handler, UINT64 unitmask)
 {
-	VPRINTF(("address_space::install_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
+	VPRINTF(("address_space::install_write_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
@@ -2608,10 +2608,10 @@ UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t a
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_delegate rhandler, write8_delegate whandler, UINT64 unitmask)
+UINT8 *address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_delegate rhandler, write8_delegate whandler, UINT64 unitmask)
 {
-	install_handler(addrstart, addrend, addrmask, addrmirror, rhandler, unitmask);
-	return install_handler(addrstart, addrend, addrmask, addrmirror, whandler, unitmask);
+	install_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, unitmask);
+	return install_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, unitmask);
 }
 
 
@@ -2621,9 +2621,9 @@ UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t a
 //  space
 //-------------------------------------------------
 
-UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, const char *rname, UINT64 unitmask)
+UINT8 *address_space::install_legacy_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, const char *rname, UINT64 unitmask)
 {
-	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s) [read8]\n",
+	VPRINTF(("address_space::install_legacy_read_handler(%s-%s mask=%s mirror=%s, %s, %s) [read8]\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 rname, core_i64_hex_format(unitmask, data_width() / 4)));
@@ -2634,9 +2634,9 @@ UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, o
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_space_func whandler, const char *wname, UINT64 unitmask)
+UINT8 *address_space::install_legacy_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_space_func whandler, const char *wname, UINT64 unitmask)
 {
-	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s) [write8]\n",
+	VPRINTF(("address_space::install_legacy_write_handler(%s-%s mask=%s mirror=%s, %s, %s) [write8]\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 wname, core_i64_hex_format(unitmask, data_width() / 4)));
@@ -2647,10 +2647,10 @@ UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, o
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, const char *rname, write8_space_func whandler, const char *wname, UINT64 unitmask)
+UINT8 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, const char *rname, write8_space_func whandler, const char *wname, UINT64 unitmask)
 {
-	install_legacy_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
+	install_legacy_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
+	return install_legacy_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -2659,9 +2659,9 @@ UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, o
 //  write legacy device handlers for the space
 //-------------------------------------------------
 
-UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rname, UINT64 unitmask)
+UINT8 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rname, UINT64 unitmask)
 {
-	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [read8]\n",
+	VPRINTF(("address_space::install_legacy_read_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [read8]\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 rname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
@@ -2672,9 +2672,9 @@ UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart,
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_device_func whandler, const char *wname, UINT64 unitmask)
+UINT8 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_device_func whandler, const char *wname, UINT64 unitmask)
 {
-	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [write8]\n",
+	VPRINTF(("address_space::install_legacy_write_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [write8]\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 wname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
@@ -2685,10 +2685,10 @@ UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart,
 	return reinterpret_cast<UINT8 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rname, write8_device_func whandler, const char *wname, UINT64 unitmask)
+UINT8 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rname, write8_device_func whandler, const char *wname, UINT64 unitmask)
 {
-	install_legacy_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
+	install_legacy_read_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
+	return install_legacy_write_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -2697,7 +2697,7 @@ UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart,
 //  delegate handlers for the space
 //-------------------------------------------------
 
-UINT16 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_delegate handler, UINT64 unitmask)
+UINT16 *address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_delegate handler, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_delegate(handler, unitmask);
@@ -2705,7 +2705,7 @@ UINT16 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT16 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_delegate handler, UINT64 unitmask)
+UINT16 *address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_delegate handler, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_delegate(handler, unitmask);
@@ -2713,10 +2713,10 @@ UINT16 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT16 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_delegate rhandler, write16_delegate whandler, UINT64 unitmask)
+UINT16 *address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_delegate rhandler, write16_delegate whandler, UINT64 unitmask)
 {
-	install_handler(addrstart, addrend, addrmask, addrmirror, rhandler, unitmask);
-	return install_handler(addrstart, addrend, addrmask, addrmirror, whandler, unitmask);
+	install_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, unitmask);
+	return install_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, unitmask);
 }
 
 
@@ -2726,7 +2726,7 @@ UINT16 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 //  space
 //-------------------------------------------------
 
-UINT16 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, const char *rname, UINT64 unitmask)
+UINT16 *address_space::install_legacy_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, const char *rname, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_legacy_func(*this, rhandler, rname, unitmask);
@@ -2734,7 +2734,7 @@ UINT16 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT16 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_space_func whandler, const char *wname, UINT64 unitmask)
+UINT16 *address_space::install_legacy_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_space_func whandler, const char *wname, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_legacy_func(*this, whandler, wname, unitmask);
@@ -2742,10 +2742,10 @@ UINT16 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT16 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, const char *rname, write16_space_func whandler, const char *wname, UINT64 unitmask)
+UINT16 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, const char *rname, write16_space_func whandler, const char *wname, UINT64 unitmask)
 {
-	install_legacy_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
+	install_legacy_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
+	return install_legacy_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -2754,7 +2754,7 @@ UINT16 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 //  write legacy device handlers for the space
 //-------------------------------------------------
 
-UINT16 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rname, UINT64 unitmask)
+UINT16 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rname, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_legacy_func(device, rhandler, rname, unitmask);
@@ -2762,7 +2762,7 @@ UINT16 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT16 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_device_func whandler, const char *wname, UINT64 unitmask)
+UINT16 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write16_device_func whandler, const char *wname, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_legacy_func(device, whandler, wname, unitmask);
@@ -2770,10 +2770,10 @@ UINT16 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 	return reinterpret_cast<UINT16 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT16 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rname, write16_device_func whandler, const char *wname, UINT64 unitmask)
+UINT16 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rname, write16_device_func whandler, const char *wname, UINT64 unitmask)
 {
-	install_legacy_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
+	install_legacy_read_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
+	return install_legacy_write_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -2782,7 +2782,7 @@ UINT16 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 //  delegate handlers for the space
 //-------------------------------------------------
 
-UINT32 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_delegate handler, UINT64 unitmask)
+UINT32 *address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_delegate handler, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_delegate(handler, unitmask);
@@ -2790,7 +2790,7 @@ UINT32 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT32 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_delegate handler, UINT64 unitmask)
+UINT32 *address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_delegate handler, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_delegate(handler, unitmask);
@@ -2798,10 +2798,10 @@ UINT32 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT32 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_delegate rhandler, write32_delegate whandler, UINT64 unitmask)
+UINT32 *address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_delegate rhandler, write32_delegate whandler, UINT64 unitmask)
 {
-	install_handler(addrstart, addrend, addrmask, addrmirror, rhandler, unitmask);
-	return install_handler(addrstart, addrend, addrmask, addrmirror, whandler, unitmask);
+	install_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, unitmask);
+	return install_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, unitmask);
 }
 
 
@@ -2811,7 +2811,7 @@ UINT32 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 //  space
 //-------------------------------------------------
 
-UINT32 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, const char *rname, UINT64 unitmask)
+UINT32 *address_space::install_legacy_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, const char *rname, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_legacy_func(*this, rhandler, rname, unitmask);
@@ -2819,7 +2819,7 @@ UINT32 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT32 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_space_func whandler, const char *wname, UINT64 unitmask)
+UINT32 *address_space::install_legacy_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_space_func whandler, const char *wname, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_legacy_func(*this, whandler, wname, unitmask);
@@ -2827,10 +2827,10 @@ UINT32 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT32 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, const char *rname, write32_space_func whandler, const char *wname, UINT64 unitmask)
+UINT32 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, const char *rname, write32_space_func whandler, const char *wname, UINT64 unitmask)
 {
-	install_legacy_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
+	install_legacy_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
+	return install_legacy_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -2839,7 +2839,7 @@ UINT32 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 //  write legacy device handlers for the space
 //-------------------------------------------------
 
-UINT32 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rname, UINT64 unitmask)
+UINT32 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rname, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_legacy_func(device, rhandler, rname, unitmask);
@@ -2847,7 +2847,7 @@ UINT32 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT32 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_device_func whandler, const char *wname, UINT64 unitmask)
+UINT32 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write32_device_func whandler, const char *wname, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_legacy_func(device, whandler, wname, unitmask);
@@ -2855,10 +2855,10 @@ UINT32 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 	return reinterpret_cast<UINT32 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT32 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rname, write32_device_func whandler, const char *wname, UINT64 unitmask)
+UINT32 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rname, write32_device_func whandler, const char *wname, UINT64 unitmask)
 {
-	install_legacy_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
+	install_legacy_read_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
+	return install_legacy_write_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -2867,7 +2867,7 @@ UINT32 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 //  delegate handlers for the space
 //-------------------------------------------------
 
-UINT64 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_delegate handler, UINT64 unitmask)
+UINT64 *address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_delegate handler, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_delegate(handler, unitmask);
@@ -2875,7 +2875,7 @@ UINT64 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT64 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_delegate handler, UINT64 unitmask)
+UINT64 *address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_delegate handler, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_delegate(handler, unitmask);
@@ -2883,10 +2883,10 @@ UINT64 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT64 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask)
+UINT64 *address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_delegate rhandler, write64_delegate whandler, UINT64 unitmask)
 {
-	install_handler(addrstart, addrend, addrmask, addrmirror, rhandler, unitmask);
-	return install_handler(addrstart, addrend, addrmask, addrmirror, whandler, unitmask);
+	install_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, unitmask);
+	return install_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, unitmask);
 }
 
 
@@ -2896,7 +2896,7 @@ UINT64 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t 
 //  space
 //-------------------------------------------------
 
-UINT64 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, const char *rname, UINT64 unitmask)
+UINT64 *address_space::install_legacy_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, const char *rname, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_legacy_func(*this, rhandler, rname, unitmask);
@@ -2904,7 +2904,7 @@ UINT64 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT64 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_space_func whandler, const char *wname, UINT64 unitmask)
+UINT64 *address_space::install_legacy_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_space_func whandler, const char *wname, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_legacy_func(*this, whandler, wname, unitmask);
@@ -2912,10 +2912,10 @@ UINT64 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT64 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, const char *rname, write64_space_func whandler, const char *wname, UINT64 unitmask)
+UINT64 *address_space::install_legacy_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, const char *rname, write64_space_func whandler, const char *wname, UINT64 unitmask)
 {
-	install_legacy_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
+	install_legacy_read_handler(addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
+	return install_legacy_write_handler(addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 
@@ -2924,7 +2924,7 @@ UINT64 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, 
 //  write legacy device handlers for the space
 //-------------------------------------------------
 
-UINT64 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rname, UINT64 unitmask)
+UINT64 *address_space::install_legacy_read_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rname, UINT64 unitmask)
 {
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_legacy_func(device, rhandler, rname, unitmask);
@@ -2932,7 +2932,7 @@ UINT64 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT64 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_device_func whandler, const char *wname, UINT64 unitmask)
+UINT64 *address_space::install_legacy_write_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write64_device_func whandler, const char *wname, UINT64 unitmask)
 {
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_legacy_func(device, whandler, wname, unitmask);
@@ -2940,10 +2940,10 @@ UINT64 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 	return reinterpret_cast<UINT64 *>(find_backing_memory(addrstart, addrend));
 }
 
-UINT64 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rname, write64_device_func whandler, const char *wname, UINT64 unitmask)
+UINT64 *address_space::install_legacy_readwrite_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rname, write64_device_func whandler, const char *wname, UINT64 unitmask)
 {
-	install_legacy_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
-	return install_legacy_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
+	install_legacy_read_handler(device, addrstart, addrend, addrmask, addrmirror, rhandler, rname, unitmask);
+	return install_legacy_write_handler(device, addrstart, addrend, addrmask, addrmirror, whandler, wname, unitmask);
 }
 
 

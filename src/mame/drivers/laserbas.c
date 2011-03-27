@@ -147,9 +147,9 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( laserbas_interrupt )
 {
 	if(device->machine->primary_screen->vblank())
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( laserbas )

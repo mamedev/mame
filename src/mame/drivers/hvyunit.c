@@ -190,7 +190,7 @@ static SCREEN_EOF( hvyunit )
 static WRITE8_HANDLER( trigger_nmi_on_slave_cpu )
 {
 	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
-	cpu_set_input_line(state->slave_cpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->slave_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( master_bankswitch_w )
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( mermaid_data_w )
 	state->data_to_mermaid = data;
 	state->z80_to_mermaid_full = 1;
 	state->mermaid_int0_l = 0;
-	cpu_set_input_line(state->mermaid, INPUT_LINE_IRQ0, ASSERT_LINE);
+	device_set_input_line(state->mermaid, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( mermaid_data_r )
@@ -238,7 +238,7 @@ static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
 
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->sound_cpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->sound_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( hu_videoram_w )
@@ -349,7 +349,7 @@ static WRITE8_HANDLER( mermaid_p1_w )
 	if (data == 0xff)
 	{
 		state->mermaid_int0_l = 1;
-		cpu_set_input_line(state->mermaid, INPUT_LINE_IRQ0, CLEAR_LINE);
+		device_set_input_line(state->mermaid, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 
 	state->mermaid_p[1] = data;
@@ -399,7 +399,7 @@ static WRITE8_HANDLER( mermaid_p3_w )
 	hvyunit_state *state = space->machine->driver_data<hvyunit_state>();
 
 	state->mermaid_p[3] = data;
-	cpu_set_input_line(state->slave_cpu, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(state->slave_cpu, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -623,7 +623,7 @@ static INTERRUPT_GEN( hvyunit_interrupt )
 	hvyunit_state *state = device->machine->driver_data<hvyunit_state>();
 
 	state->int_vector ^= 0x02;
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, state->int_vector);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, state->int_vector);
 }
 
 static const kaneko_pandora_interface hvyunit_pandora_config =

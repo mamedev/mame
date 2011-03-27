@@ -193,7 +193,7 @@ static READ32_DEVICE_HANDLER( ps4_eeprom_r )
 
 static INTERRUPT_GEN(psikyosh_interrupt)
 {
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static CUSTOM_INPUT( system_port_r )
@@ -688,7 +688,7 @@ INPUT_PORTS_END
 static void irqhandler( device_t *device, int linestate )
 {
 	psikyo4_state *state = device->machine->driver_data<psikyo4_state>();
-	cpu_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->maincpu, 12, linestate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -1012,7 +1012,7 @@ PC  :00001B48: BT      $00001B3C
 	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 
 	if (cpu_get_pc(space->cpu) == 0x00001b3e)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 
 	return state->ram[0x000020 / 4];
 }
@@ -1031,7 +1031,7 @@ PC  :00001B54: BT      $00001B48
 	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 
 	if (cpu_get_pc(space->cpu) == 0x00001b4a)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 
 	return state->ram[0x000020 / 4];
 }
@@ -1050,7 +1050,7 @@ PC  :000029F8: BT      $000029EC
 	psikyo4_state *state = space->machine->driver_data<psikyo4_state>();
 
 	if (cpu_get_pc(space->cpu) == 0x000029ee)
-		cpu_spinuntil_int(space->cpu);
+		device_spin_until_interrupt(space->cpu);
 
 	return state->ram[0x00001c / 4];
 }
@@ -1072,7 +1072,7 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 	set_hotgmck_pcm_bank(machine, 0);
 	set_hotgmck_pcm_bank(machine, 1);
 
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x5800008, 0x580000b, 0, 0, hotgmck_pcm_bank_w );
 	machine->state().register_postload(hotgmck_pcm_bank_postload, (void *)0);
 	machine->state().register_postload(hotgmck_pcm_bank_postload, (void *)1);
 }
@@ -1086,17 +1086,17 @@ static DRIVER_INIT( hotgmck )
 
 static DRIVER_INIT( loderndf )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderndf_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderndf_speedup_r );
 }
 
 static DRIVER_INIT( loderdfa )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderdfa_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x6000020, 0x6000023, 0, 0, loderdfa_speedup_r );
 }
 
 static DRIVER_INIT( hotdebut )
 {
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x600001c, 0x600001f, 0, 0, hotdebut_speedup_r );
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x600001c, 0x600001f, 0, 0, hotdebut_speedup_r );
 }
 
 

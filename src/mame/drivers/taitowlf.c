@@ -573,7 +573,7 @@ static IRQ_CALLBACK(irq_callback)
 static MACHINE_START(taitowlf)
 {
 	taitowlf_state *state = machine->driver_data<taitowlf_state>();
-	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
+	device_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	state->pit8254 = machine->device( "pit8254" );
 	state->pic8259_1 = machine->device( "pic8259_1" );

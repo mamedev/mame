@@ -164,11 +164,11 @@ static INTERRUPT_GEN( xorworld_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 	}
 	else if (cpu_getiloops(device) % 2)
 	{
-		cpu_set_input_line(device, 6, HOLD_LINE);
+		device_set_input_line(device, 6, HOLD_LINE);
 	}
 }
 

@@ -41,11 +41,11 @@ public:
 static INTERRUPT_GEN( rotaryf_interrupt )
 {
 	if (device->machine->primary_screen->vblank())
-		cpu_set_input_line(device, I8085_RST55_LINE, HOLD_LINE);
+		device_set_input_line(device, I8085_RST55_LINE, HOLD_LINE);
 	else
 	{
-		cpu_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
-		cpu_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
+		device_set_input_line(device, I8085_RST75_LINE, ASSERT_LINE);
+		device_set_input_line(device, I8085_RST75_LINE, CLEAR_LINE);
 	}
 }
 

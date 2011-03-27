@@ -92,13 +92,13 @@ static INTERRUPT_GEN( gberet_interrupt )
 	if (cpu_getiloops(device) == 0)
 	{
 		if (state->irq_enable)
-			cpu_set_input_line(device, 0, HOLD_LINE);
+			device_set_input_line(device, 0, HOLD_LINE);
 	}
 
 	if (cpu_getiloops(device) % 2)
 	{
 		if (state->nmi_enable)
-			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

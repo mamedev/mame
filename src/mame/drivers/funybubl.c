@@ -69,7 +69,7 @@ static WRITE8_HANDLER( funybubl_soundcommand_w )
 {
 	funybubl_state *state = space->machine->driver_data<funybubl_state>();
 	soundlatch_w(space, 0, data);
-	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+	device_set_input_line(state->audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )

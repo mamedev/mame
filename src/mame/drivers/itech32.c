@@ -364,7 +364,7 @@ Notes:
 
 
 
-#define START_TMS_SPINNING(n)			do { cpu_spinuntil_trigger(space->cpu, 7351 + n); space->machine->driver_data<itech32_state>()->tms_spinning[n] = 1; } while (0)
+#define START_TMS_SPINNING(n)			do { device_spin_until_trigger(space->cpu, 7351 + n); space->machine->driver_data<itech32_state>()->tms_spinning[n] = 1; } while (0)
 #define STOP_TMS_SPINNING(machine, n)	do { machine->scheduler().trigger(7351 + n); machine->driver_data<itech32_state>()->tms_spinning[n] = 0; } while (0)
 
 
@@ -703,7 +703,7 @@ static READ8_HANDLER( sound_data_buffer_r )
 
 static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 {
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 0 controls the fan light */
@@ -728,7 +728,7 @@ static WRITE8_DEVICE_HANDLER( drivedge_turbo_light )
 
 static WRITE8_DEVICE_HANDLER( pia_portb_out )
 {
-	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = device->machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 4 controls the ticket dispenser */
@@ -4008,8 +4008,8 @@ static DRIVER_INIT( drivedge )
 	state->planes = 1;
 	state->is_drivedge = 1;
 
-	memory_install_read32_handler(cputag_get_address_space(machine, "dsp1", ADDRESS_SPACE_PROGRAM), 0x8382, 0x8382, 0, 0, drivedge_tms1_speedup_r);
-	memory_install_read32_handler(cputag_get_address_space(machine, "dsp2", ADDRESS_SPACE_PROGRAM), 0x8382, 0x8382, 0, 0, drivedge_tms2_speedup_r);
+	memory_install_read32_handler(machine->device("dsp1")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8382, 0x8382, 0, 0, drivedge_tms1_speedup_r);
+	memory_install_read32_handler(machine->device("dsp2")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8382, 0x8382, 0, 0, drivedge_tms2_speedup_r);
 }
 
 
@@ -4026,11 +4026,11 @@ static DRIVER_INIT( wcbowl )
 	state->vram_height = 1024;
 	state->planes = 1;
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680000, 0x680001, 0, 0, trackball_r);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x680000, 0x680001, 0, 0, trackball_r);
 
-	memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x578000, 0x57ffff, 0, 0);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680080, 0x680081, 0, 0, wcbowl_prot_result_r);
-	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680080, 0x680081, 0, 0);
+	memory_nop_read(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x578000, 0x57ffff, 0, 0);
+	memory_install_read16_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x680080, 0x680081, 0, 0, wcbowl_prot_result_r);
+	memory_nop_write(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x680080, 0x680081, 0, 0);
 }
 
 
@@ -4044,8 +4044,8 @@ static void init_sftm_common(running_machine *machine, int prot_addr)
 
 	state->itech020_prot_address = prot_addr;
 
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x300003, 0, 0, itech020_color2_w);
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x380000, 0x380003, 0, 0, itech020_color1_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x300000, 0x300003, 0, 0, itech020_color2_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x380000, 0x380003, 0, 0, itech020_color1_w);
 }
 
 
@@ -4076,10 +4076,10 @@ static void init_shuffle_bowl_common(running_machine *machine, int prot_addr)
 
 	state->itech020_prot_address = prot_addr;
 
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x300000, 0x300003, 0, 0, itech020_color2_w);
-	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x380000, 0x380003, 0, 0, itech020_color1_w);
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x180800, 0x180803, 0, 0, trackball32_4bit_p1_r);
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x181000, 0x181003, 0, 0, trackball32_4bit_p2_r);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x300000, 0x300003, 0, 0, itech020_color2_w);
+	memory_install_write32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x380000, 0x380003, 0, 0, itech020_color1_w);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x180800, 0x180803, 0, 0, trackball32_4bit_p1_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x181000, 0x181003, 0, 0, trackball32_4bit_p2_r);
 }
 
 
@@ -4098,7 +4098,7 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 static void install_timekeeper(running_machine *machine)
 {
 	device_t *device = machine->device("m48t02");
-	memory_install_readwrite32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), device, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
+	memory_install_readwrite32_device_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), device, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
 }
 
 static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */
@@ -4130,7 +4130,7 @@ static DRIVER_INIT( gt3d )
         Hacked versions of this PCB have been found with GT97
         through GTClassic. This is _NOT_ a factory modification
     */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200003, 0, 0, trackball32_8bit_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200000, 0x200003, 0, 0, trackball32_8bit_r);
 	init_gt_common(machine);
 }
 
@@ -4143,8 +4143,8 @@ static DRIVER_INIT( aama )
         board share the same sound CPU code and sample ROMs.
         This board has all versions of GT for it, GT3D through GTClassic
     */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x180800, 0x180803, 0, 0, trackball32_4bit_p1_r);
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x181000, 0x181003, 0, 0, trackball32_4bit_p2_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x180800, 0x180803, 0, 0, trackball32_4bit_p1_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x181000, 0x181003, 0, 0, trackball32_4bit_p2_r);
 	init_gt_common(machine);
 }
 
@@ -4168,7 +4168,7 @@ static DRIVER_INIT( s_ver )
         board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
         Trackball info is read through 200202 (actually 200203).
     */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200200, 0x200203, 0, 0, trackball32_4bit_p1_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200200, 0x200203, 0, 0, trackball32_4bit_p1_r);
 	init_gt_common(machine);
 }
 
@@ -4182,7 +4182,7 @@ static DRIVER_INIT( gt3dl )
         Player 1 trackball read through 200003
         Player 2 trackball read through 200002
     */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x200003, 0, 0, trackball32_4bit_combined_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x200000, 0x200003, 0, 0, trackball32_4bit_combined_r);
 	init_gt_common(machine);
 }
 
@@ -4190,7 +4190,7 @@ static DRIVER_INIT( gt3dl )
 static DRIVER_INIT( gt2kp )
 {
 	/* a little extra protection */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680000, 0x680003, 0, 0, gt2kp_prot_result_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x680000, 0x680003, 0, 0, gt2kp_prot_result_r);
 	DRIVER_INIT_CALL(aama);
 
 	/* The protection code is:
@@ -4211,7 +4211,7 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
 static DRIVER_INIT( gtclasscp )
 {
 	/* a little extra protection */
-	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x680000, 0x680003, 0, 0, gtclass_prot_result_r);
+	memory_install_read32_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x680000, 0x680003, 0, 0, gtclass_prot_result_r);
 	DRIVER_INIT_CALL(aama);
 
 	/* The protection code is:

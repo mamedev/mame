@@ -28,7 +28,7 @@ static INTERRUPT_GEN( pooyan_interrupt )
 	pooyan_state *state = device->machine->driver_data<pooyan_state>();
 
 	if (state->irq_enable)
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -38,7 +38,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	state->irq_enable = data & 1;
 	if (!state->irq_enable)
-		cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

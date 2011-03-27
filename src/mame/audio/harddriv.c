@@ -39,8 +39,8 @@ void hdsnd_init(running_machine *machine)
 static void update_68k_interrupts(running_machine *machine)
 {
 	harddriv_state *state = machine->driver_data<harddriv_state>();
-	cpu_set_input_line(state->soundcpu, 1, state->mainflag ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(state->soundcpu, 3, state->irq68k   ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->soundcpu, 1, state->mainflag ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->soundcpu, 3, state->irq68k   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -86,8 +86,8 @@ WRITE16_HANDLER( hd68k_snd_data_w )
 WRITE16_HANDLER( hd68k_snd_reset_w )
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(state->soundcpu, INPUT_LINE_RESET, CLEAR_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_RESET, ASSERT_LINE);
+	device_set_input_line(state->soundcpu, INPUT_LINE_RESET, CLEAR_LINE);
 	state->mainflag = state->soundflag = 0;
 	update_68k_interrupts(space->machine);
 	logerror("%06X:Reset sound\n", cpu_get_previouspc(space->cpu));
@@ -195,7 +195,7 @@ WRITE16_HANDLER( hdsnd68k_latches_w )
 		case 4:	/* RES320 */
 			logerror("%06X:RES320=%d\n", cpu_get_previouspc(space->cpu), data);
 			if (state->sounddsp != NULL)
-				cpu_set_input_line(state->sounddsp, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+				device_set_input_line(state->sounddsp, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 7:	/* LED */
@@ -242,7 +242,7 @@ WRITE16_HANDLER( hdsnd68k_320ram_w )
 READ16_HANDLER( hdsnd68k_320ports_r )
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
-	address_space *iospace = cpu_get_address_space(state->sounddsp, ADDRESS_SPACE_IO);
+	address_space *iospace = state->sounddsp->memory().space(ADDRESS_SPACE_IO);
 	return iospace->read_word((offset & 7) << 1);
 }
 
@@ -250,7 +250,7 @@ READ16_HANDLER( hdsnd68k_320ports_r )
 WRITE16_HANDLER( hdsnd68k_320ports_w )
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
-	address_space *iospace = cpu_get_address_space(state->sounddsp, ADDRESS_SPACE_IO);
+	address_space *iospace = state->sounddsp->memory().space(ADDRESS_SPACE_IO);
 	iospace->write_word((offset & 7) << 1, data);
 }
 
@@ -294,7 +294,7 @@ READ16_HANDLER( hdsnddsp_get_bio )
 	/* if we're not at the next BIO yet, advance us there */
 	if (cycles_until_bio > 0)
 	{
-		cpu_adjust_icount(space->cpu, -cycles_until_bio);
+		device_adjust_icount(space->cpu, -cycles_until_bio);
 		state->last_bio_cycles += CYCLES_PER_BIO;
 	}
 	else

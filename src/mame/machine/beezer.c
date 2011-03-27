@@ -173,7 +173,7 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 		memory_install_write8_handler(space, 0xc600, 0xc7ff, 0, 0, watchdog_reset_w);
 		memory_install_write8_handler(space, 0xc800, 0xc9ff, 0, 0, beezer_map_w);
 		memory_install_read8_handler(space, 0xca00, 0xcbff, 0, 0, beezer_line_r);
-		space->install_handler(0xce00, 0xcfff, 0, 0, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
+		space->install_readwrite_handler(0xce00, 0xcfff, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
 	}
 	else
 	{

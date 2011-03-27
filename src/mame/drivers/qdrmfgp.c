@@ -274,13 +274,13 @@ static INTERRUPT_GEN(qdrmfgp_interrupt)
 	{
 		case 0:
 			if (state->control & 0x0001)
-				cpu_set_input_line(device, 1, HOLD_LINE);
+				device_set_input_line(device, 1, HOLD_LINE);
 			break;
 
 		case 1:
 			/* trigger V-blank interrupt */
 			if (state->control & 0x0004)
-				cpu_set_input_line(device, 3, HOLD_LINE);
+				device_set_input_line(device, 3, HOLD_LINE);
 			break;
 	}
 }
@@ -311,7 +311,7 @@ static INTERRUPT_GEN(qdrmfgp2_interrupt)
 	qdrmfgp_state *state = device->machine->driver_data<qdrmfgp_state>();
 	/* trigger V-blank interrupt */
 	if (state->control & 0x0008)
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 }
 
 static void gp2_ide_interrupt(device_t *device, int state)

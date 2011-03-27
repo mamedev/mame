@@ -199,9 +199,9 @@ WRITE8_HANDLER( lastmisn_control_w )
 	state->scroll2[2] = (data >> 6) & 1;
 
 	if (data & 0x80)
-		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 WRITE8_HANDLER( shackled_control_w )

@@ -1545,7 +1545,7 @@ const eeprom_interface eeprom_intf =
 
 static INTERRUPT_GEN( gegege_vblank_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x5a);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x5a);
 }
 
 static MACHINE_CONFIG_START( gegege, sigmab98_state )
@@ -1644,15 +1644,15 @@ static INTERRUPT_GEN( animalc )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// increment counter
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// increment counter
 			break;
 
 		case 1:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);	// read hopper state
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);	// read hopper state
 			break;
 
 		case 2:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1e);	// drive hopper motor
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1e);	// drive hopper motor
 			break;
 	}
 }
@@ -1673,15 +1673,15 @@ static INTERRUPT_GEN( haekaka )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x04);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x04);
 			break;
 
 		case 1:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1a);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1a);
 			break;
 
 		case 2:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x1c);
 			break;
 	}
 }
@@ -1702,15 +1702,15 @@ static INTERRUPT_GEN( itazuram )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// sprites
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x00);	// sprites
 			break;
 
 		case 1:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	// copy palette
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	// copy palette
 			break;
 
 		case 2:
-			cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x16);	// hopper, i/o
+			device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x16);	// hopper, i/o
 			break;
 	}
 }

@@ -94,7 +94,7 @@ static WRITE8_HANDLER(snd_w)
 {
 	dacholer_state *state = space->machine->driver_data<dacholer_state>();
 	soundlatch_w(space, offset, data);
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -406,7 +406,7 @@ static INTERRUPT_GEN( sound_irq )
 	dacholer_state *state = device->machine->driver_data<dacholer_state>();
 	if (state->music_interrupt_enable == 1)
 	{
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x30);
+		device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x30);
 	}
 }
 
@@ -420,7 +420,7 @@ static void adpcm_int( device_t *device )
 		state->msm_toggle ^= 1;
 		if (state->msm_toggle == 0)
 		{
-			cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x38);
+			device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0x38);
 		}
 	}
 }

@@ -716,19 +716,19 @@ static WRITE16_HANDLER( twinkle_spu_ctrl_w )
 
 	if ((!(data & 0x0080)) && (state->spu_ctrl & 0x0080))
 	{
-		cpu_set_input_line(space->cpu, M68K_IRQ_1, CLEAR_LINE);
+		device_set_input_line(space->cpu, M68K_IRQ_1, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0100)) && (state->spu_ctrl & 0x0100))
 	{
-		cpu_set_input_line(space->cpu, M68K_IRQ_2, CLEAR_LINE);
+		device_set_input_line(space->cpu, M68K_IRQ_2, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0200)) && (state->spu_ctrl & 0x0200))
 	{
-		cpu_set_input_line(space->cpu, M68K_IRQ_4, CLEAR_LINE);
+		device_set_input_line(space->cpu, M68K_IRQ_4, CLEAR_LINE);
 	}
 	else if ((!(data & 0x0400)) && (state->spu_ctrl & 0x0400))
 	{
-		cpu_set_input_line(space->cpu, M68K_IRQ_6, CLEAR_LINE);
+		device_set_input_line(space->cpu, M68K_IRQ_6, CLEAR_LINE);
 	}
 
 	state->spu_ctrl = data;

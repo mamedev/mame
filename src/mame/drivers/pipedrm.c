@@ -218,7 +218,7 @@ static TIMER_CALLBACK( delayed_command_w	)
 	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
 	/* sound board. */
 	if (param & 0x100)
-		cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(state->subcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -238,7 +238,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 {
 	fromance_state *state = space->machine->driver_data<fromance_state>();
 	state->pending_command = 0;
-	cpu_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -559,7 +559,7 @@ GFXDECODE_END
 static void irqhandler( device_t *device, int irq )
 {
 	fromance_state *state = device->machine->driver_data<fromance_state>();
-	cpu_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(state->subcpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -882,14 +882,14 @@ static DRIVER_INIT( pipedrm )
 	/* sprite RAM lives at the end of palette RAM */
 	state->spriteram = &machine->generic.paletteram.u8[0xc00];
 	state->spriteram_size = 0x400;
-	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, state->spriteram);
+	memory_install_ram(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcfff, 0, 0, state->spriteram);
 }
 
 
 static DRIVER_INIT( hatris )
 {
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x20, 0x20, 0, 0, sound_command_nonmi_w);
-	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fromance_gfxreg_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x20, 0x20, 0, 0, sound_command_nonmi_w);
+	memory_install_write8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_IO), 0x21, 0x21, 0, 0, fromance_gfxreg_w);
 }
 
 

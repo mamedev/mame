@@ -9402,18 +9402,18 @@ READ32_DEVICE_HANDLER( k001005_r )
 			{
 				if (k001005->fifo_read_ptr < 0x3ff)
 				{
-					//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, CLEAR_LINE);
+					//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, CLEAR_LINE);
 					sharc_set_flag_input(k001005->dsp, 1, CLEAR_LINE);
 				}
 				else
 				{
-					//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+					//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
 					sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 				}
 			}
 			else
 			{
-				//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+				//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
 				sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 			}
 
@@ -9457,18 +9457,18 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 			{
 				if (k001005->fifo_write_ptr < 0x400)
 				{
-					//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+					//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
 					sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 				}
 				else
 				{
-					//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, CLEAR_LINE);
+					//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, CLEAR_LINE);
 					sharc_set_flag_input(k001005->dsp, 1, CLEAR_LINE);
 				}
 			}
 			else
 			{
-				//cpu_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
+				//device_set_input_line(k001005->dsp, SHARC_INPUT_FLAG1, ASSERT_LINE);
 				sharc_set_flag_input(k001005->dsp, 1, ASSERT_LINE);
 			}
 
@@ -9483,13 +9483,13 @@ WRITE32_DEVICE_HANDLER( k001005_w )
 			if (cpu_get_pc(k001005->cpu) == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
-				cpu_spinuntil_trigger(k001005->cpu, 10000);
+				device_spin_until_trigger(k001005->cpu, 10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
 			if (cpu_get_pc(k001005->cpu) == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
-				cpu_spinuntil_trigger(k001005->cpu, 10000);
+				device_spin_until_trigger(k001005->cpu, 10000);
 			}
 
 			break;

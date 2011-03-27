@@ -1439,7 +1439,7 @@ static DRIVER_INIT( phantoma )
 	state->color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf800, 0xffff, 0, 0, "bank1");
+	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xf800, 0xffff, 0, 0, "bank1");
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0xf800);
 }
 
@@ -1470,7 +1470,7 @@ static DRIVER_INIT( pepper2 )
 
 static DRIVER_INIT( fax )
 {
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	exidy_video_config(machine, 0x04, 0x04, TRUE);
 

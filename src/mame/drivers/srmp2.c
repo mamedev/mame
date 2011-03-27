@@ -72,8 +72,8 @@ static INTERRUPT_GEN( srmp2_interrupt )
 {
 	switch (cpu_getiloops(device))
 	{
-		case 0:		cpu_set_input_line(device, 4, HOLD_LINE);	break;	/* vblank */
-		default:	cpu_set_input_line(device, 2, HOLD_LINE);	break;	/* sound */
+		case 0:		device_set_input_line(device, 4, HOLD_LINE);	break;	/* vblank */
+		default:	device_set_input_line(device, 2, HOLD_LINE);	break;	/* sound */
 	}
 }
 

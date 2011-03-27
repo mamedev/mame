@@ -132,7 +132,7 @@ static TIMER_CALLBACK( main_to_sound_callback )
 {
 	crgolf_state *state = machine->driver_data<crgolf_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 	state->main_to_sound_data = param;
 }
 
@@ -147,7 +147,7 @@ static READ8_HANDLER( main_to_sound_r )
 {
 	crgolf_state *state = space->machine->driver_data<crgolf_state>();
 
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return state->main_to_sound_data;
 }
 
@@ -163,7 +163,7 @@ static TIMER_CALLBACK( sound_to_main_callback )
 {
 	crgolf_state *state = machine->driver_data<crgolf_state>();
 
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 	state->sound_to_main_data = param;
 }
 
@@ -178,7 +178,7 @@ static READ8_HANDLER( sound_to_main_r )
 {
 	crgolf_state *state = space->machine->driver_data<crgolf_state>();
 
-	cpu_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return state->sound_to_main_data;
 }
 
@@ -600,7 +600,7 @@ ROM_END
 static DRIVER_INIT( crgolfhi )
 {
 	device_t *msm = machine->device("msm");
-	memory_install_write8_device_handler(cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	memory_install_write8_device_handler(machine->device("audiocpu")->memory().space(ADDRESS_SPACE_PROGRAM), msm, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 
 

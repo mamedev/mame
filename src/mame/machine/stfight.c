@@ -39,7 +39,7 @@ Encryption PAL 16R4 on CPU board
 DRIVER_INIT( empcity )
 {
 	stfight_state *state = machine->driver_data<stfight_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	int A;
 
@@ -85,7 +85,7 @@ DRIVER_INIT( stfight )
 MACHINE_RESET( stfight )
 {
 	stfight_state *state = machine->driver_data<stfight_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	state->adpcm_data_offs = state->adpcm_data_end = 0;
 	state->toggle = 0;
 	state->fm_data = 0;
@@ -121,7 +121,7 @@ static TIMER_CALLBACK( stfight_interrupt_1 )
 INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
-    cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);
+    device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);
     device->machine->scheduler().timer_set(attotime::from_hz(120), FUNC(stfight_interrupt_1));
 }
 

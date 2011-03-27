@@ -391,7 +391,7 @@ static I8257_INTERFACE( hb_dma )
 
 static INTERRUPT_GEN( s2650_interrupt )
 {
-    cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
+    device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -721,13 +721,13 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 
 	if (data & 1)
 	{
-		cpu_set_input_line(state->dev_n2a03a, INPUT_LINE_RESET, CLEAR_LINE);
-		cpu_set_input_line(state->dev_n2a03b, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(state->dev_n2a03a, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(state->dev_n2a03b, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(state->dev_n2a03a, INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(state->dev_n2a03b, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(state->dev_n2a03a, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(state->dev_n2a03b, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -3040,7 +3040,7 @@ static DRIVER_INIT( drakton )
             {7,1,4,0,3,6,2,5},
     };
 
-    memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
+    memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3062,7 +3062,7 @@ static DRIVER_INIT( strtheat )
             {6,3,4,1,0,7,2,5},
     };
 
-    memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
+    memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1" );
 
     /* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -3073,21 +3073,21 @@ static DRIVER_INIT( strtheat )
     drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
     /* custom handlers supporting Joystick or Steering Wheel */
-    memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
-    memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
+    memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
+    memory_install_read8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
 }
 
 
 static DRIVER_INIT( dkongx )
 {
 	UINT8 *decrypted;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	device_t *eeprom = machine->device("eeprom");
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
-	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, "bank1" );
-    memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, "bank2" );
+	memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x0000, 0x5fff, 0, 0, "bank1" );
+    memory_install_read_bank(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, "bank2" );
 
 	memory_install_write8_handler(space, 0xe000, 0xe000, 0, 0, braze_a15_w);
 

@@ -42,28 +42,28 @@ static WRITE8_HANDLER( mouser_sound_interrupt_w )
 	mouser_state *state = space->machine->driver_data<mouser_state>();
 	//logerror("int %02x\n", data);
 	state->sound_byte = data;
-	cpu_set_input_line(state->audiocpu, 0, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, 0, ASSERT_LINE);
 }
 
 static READ8_HANDLER( mouser_sound_byte_r )
 {
 	mouser_state *state = space->machine->driver_data<mouser_state>();
 	//logerror("sound r\n");
-	cpu_set_input_line(state->audiocpu, 0, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, 0, CLEAR_LINE);
 	return state->sound_byte;
 }
 
 static WRITE8_HANDLER( mouser_sound_nmi_clear_w )
 {
 	mouser_state *state = space->machine->driver_data<mouser_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( mouser_sound_nmi_assert )
 {
 	mouser_state *state = device->machine->driver_data<mouser_state>();
 	if (BIT(state->nmi_enable, 0))
-		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( mouser_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -300,7 +300,7 @@ static DRIVER_INIT( mouser )
 	/* Decode the opcodes */
 
 	offs_t i;
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = machine->region("maincpu")->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 	UINT8 *table = machine->region("user1")->base();

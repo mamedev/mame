@@ -679,19 +679,19 @@ static const ym2151_interface ym2151_config =
 static INTERRUPT_GEN( m90_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, NEC_INPUT_LINE_INTP0, ASSERT_LINE);
+		device_set_input_line(device, NEC_INPUT_LINE_INTP0, ASSERT_LINE);
 	else
-		cpu_set_input_line(device, NEC_INPUT_LINE_INTP0, CLEAR_LINE);
+		device_set_input_line(device, NEC_INPUT_LINE_INTP0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( dynablsb_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x60/4);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x60/4);
 }
 
 static INTERRUPT_GEN( bomblord_interrupt )
 {
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x50/4);
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x50/4);
 }
 
 

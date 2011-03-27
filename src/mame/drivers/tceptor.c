@@ -43,7 +43,7 @@ static INTERRUPT_GEN( m6809_vb_interrupt )
 {
 	tceptor_state *state = device->machine->driver_data<tceptor_state>();
 	if (state->m6809_irq_enable)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else
 		state->m6809_irq_enable = 1;
 }
@@ -65,7 +65,7 @@ static INTERRUPT_GEN( m68k_vb_interrupt )
 {
 	tceptor_state *state = device->machine->driver_data<tceptor_state>();
 	if (state->m68k_irq_enable)
-		cpu_set_input_line(device, M68K_IRQ_1, HOLD_LINE);
+		device_set_input_line(device, M68K_IRQ_1, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( m68k_irq_enable_w )
@@ -79,7 +79,7 @@ static INTERRUPT_GEN( mcu_vb_interrupt )
 {
 	tceptor_state *state = device->machine->driver_data<tceptor_state>();
 	if (state->mcu_irq_enable)
-		cpu_set_input_line(device, 0, HOLD_LINE);
+		device_set_input_line(device, 0, HOLD_LINE);
 	else
 		state->mcu_irq_enable = 1;
 }

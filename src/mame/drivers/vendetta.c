@@ -166,7 +166,7 @@ static WRITE8_HANDLER( vendetta_K052109_w )
 static void vendetta_video_banking( running_machine *machine, int select )
 {
 	vendetta_state *state = machine->driver_data<vendetta_state>();
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM);
 
 	if (select & 1)
 	{
@@ -204,13 +204,13 @@ static WRITE8_HANDLER( vendetta_5fe0_w )
 static TIMER_CALLBACK( z80_nmi_callback )
 {
 	vendetta_state *state = machine->driver_data<vendetta_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
 	vendetta_state *state = space->machine->driver_data<vendetta_state>();
-	cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(state->audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 
 	space->machine->scheduler().timer_set(attotime::from_usec(25), FUNC(z80_nmi_callback));
 }
@@ -218,13 +218,13 @@ static WRITE8_HANDLER( z80_arm_nmi_w )
 static WRITE8_HANDLER( z80_irq_w )
 {
 	vendetta_state *state = space->machine->driver_data<vendetta_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_HANDLER( vendetta_sound_interrupt_r )
 {
 	vendetta_state *state = space->machine->driver_data<vendetta_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 	return 0x00;
 }
 
@@ -413,7 +413,7 @@ static INTERRUPT_GEN( vendetta_irq )
 {
 	vendetta_state *state = device->machine->driver_data<vendetta_state>();
 	if (state->irq_enabled)
-		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static const k052109_interface vendetta_k052109_intf =

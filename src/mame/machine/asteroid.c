@@ -17,21 +17,21 @@ INTERRUPT_GEN( asteroid_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (!(input_port_read(device->machine, "IN0") & 0x80))
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( asterock_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
 	if ((input_port_read(device->machine, "IN0") & 0x80))
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( llander_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
 	if (input_port_read(device->machine, "IN0") & 0x02)
-		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_HANDLER( asteroid_IN0_r )
@@ -135,6 +135,6 @@ WRITE8_HANDLER( astdelux_led_w )
 
 MACHINE_RESET( asteroid )
 {
-	asteroid_bank_switch_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
-	avgdvg_reset_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
+	asteroid_bank_switch_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0);
+	avgdvg_reset_w(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0, 0);
 }

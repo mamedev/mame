@@ -408,14 +408,14 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( drill_interrupt )
 {
-	cpu_set_input_line(device, 4, HOLD_LINE);
+	device_set_input_line(device, 4, HOLD_LINE);
 }
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
 static void irqhandler(device_t *device, int irq)
 {
 //  _2mindril_state *state = machine->driver_data<_2mindril_state>();
-//  cpu_set_input_line(state->maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
+//  device_set_input_line(state->maincpu, 5, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

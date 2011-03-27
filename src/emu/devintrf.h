@@ -401,7 +401,8 @@ public:
 
 	// interface helpers
 	template<class T> bool interface(T *&intf) { intf = dynamic_cast<T *>(this); return (intf != NULL); }
-	template<class T> bool next(T *&intf)
+	template<class T> bool interface(T *&intf) const { intf = dynamic_cast<const T *>(this); return (intf != NULL); }
+	template<class T> bool next(T *&intf) const
 	{
 		for (device_t *cur = m_next; cur != NULL; cur = cur->m_next)
 			if (cur->interface(intf))
@@ -409,10 +410,11 @@ public:
 		return false;
 	}
 
-	// specialized helpers
-	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != NULL); }
-	bool interface(device_memory_interface *&intf) { intf = m_memory; return (intf != NULL); }
-	bool interface(device_state_interface *&intf) { intf = m_state; return (intf != NULL); }
+	// specialized helpers for common core interfaces
+	bool interface(device_execute_interface *&intf) const { intf = m_execute; return (intf != NULL); }
+	bool interface(device_memory_interface *&intf) const { intf = m_memory; return (intf != NULL); }
+	bool interface(device_state_interface *&intf) const { intf = m_state; return (intf != NULL); }
+	device_memory_interface &memory() const { assert(m_memory != NULL); return *m_memory; }
 
 	// owned object helpers
 	astring &subtag(astring &dest, const char *tag) const { return m_baseconfig.subtag(dest, tag); }
@@ -494,7 +496,7 @@ protected:
 	state_manager &			m_state_manager;
 	device_debug *			m_debug;
 
-	// for speed
+	// core device interfaces for speed
 	device_execute_interface *m_execute;
 	device_memory_interface *m_memory;
 	device_state_interface *m_state;
@@ -506,7 +508,7 @@ protected:
 
 	bool					m_started;				// true if the start function has succeeded
 	UINT32					m_clock;				// device clock
-	const memory_region *		m_region;				// our device-local region
+	const memory_region *	m_region;				// our device-local region
 
 	const device_config &	m_baseconfig;			// reference to our device_config
 	UINT32					m_unscaled_clock;		// unscaled clock

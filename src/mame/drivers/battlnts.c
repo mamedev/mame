@@ -29,13 +29,13 @@ static INTERRUPT_GEN( battlnts_interrupt )
 {
 	battlnts_state *state = device->machine->driver_data<battlnts_state>();
 	if (k007342_is_int_enabled(state->k007342))
-		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
 	battlnts_state *state = space->machine->driver_data<battlnts_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )

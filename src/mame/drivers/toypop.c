@@ -161,7 +161,7 @@ static INTERRUPT_GEN( toypop_m68000_interrupt )
 {
 	toypop_state *state = device->machine->driver_data<toypop_state>();
 	if (state->interrupt_enable_68k)
-		cpu_set_input_line(device, 6, HOLD_LINE);
+		device_set_input_line(device, 6, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )

@@ -538,7 +538,7 @@ static DEVICE_START( common_sh_start )
 {
 	leland_sound_state *state = get_safe_token(device);
 	running_machine *machine = device->machine;
-	address_space *dmaspace = cputag_get_address_space(machine, "audiocpu", AS_PROGRAM);
+	address_space *dmaspace = machine->device("audiocpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */
@@ -697,7 +697,7 @@ static IRQ_CALLBACK( int_callback )
 	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine->time().as_double(), state->i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	cpu_set_input_line(state->i80186.cpu, 0, CLEAR_LINE);
+	device_set_input_line(state->i80186.cpu, 0, CLEAR_LINE);
 	state->i80186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */
@@ -1511,18 +1511,18 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			temp = (state->i80186.mem.peripheral & 0xffc0) << 4;
 			if (state->i80186.mem.middle_size & 0x0040)
 			{
-				memory_install_readwrite16_device_handler(cpu_get_address_space(state->i80186.cpu, ADDRESS_SPACE_PROGRAM), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
+				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(ADDRESS_SPACE_PROGRAM), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_readwrite16_device_handler(cpu_get_address_space(state->i80186.cpu, ADDRESS_SPACE_IO), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
+				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(ADDRESS_SPACE_IO), device, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
 			}
 
 			/* we need to do this at a time when the 80186 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
-			cpu_set_irq_callback(state->i80186.cpu, int_callback);
+			device_set_irq_callback(state->i80186.cpu, int_callback);
 			break;
 
 		case 0xc0/2:
@@ -1582,12 +1582,12 @@ static WRITE16_DEVICE_HANDLER( i80186_internal_port_w )
 			temp = (data & 0x0fff) << 8;
 			if (data & 0x1000)
 			{
-				memory_install_readwrite16_device_handler(cpu_get_address_space(state->i80186.cpu, ADDRESS_SPACE_PROGRAM), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
+				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(ADDRESS_SPACE_PROGRAM), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
 			}
 			else
 			{
 				temp &= 0xffff;
-				memory_install_readwrite16_device_handler(cpu_get_address_space(state->i80186.cpu, ADDRESS_SPACE_IO), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
+				memory_install_readwrite16_device_handler(state->i80186.cpu->memory().space(ADDRESS_SPACE_IO), device, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;

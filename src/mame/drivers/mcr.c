@@ -2580,7 +2580,7 @@ static DRIVER_INIT( twotiger )
 	mcr_init(machine, 90010, 91399, 90913);
 	mcr_sound_init(machine, MCR_SSIO);
 
-	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r, twotiger_videoram_w);
+	memory_install_readwrite8_handler(machine->device("maincpu")->memory().space(ADDRESS_SPACE_PROGRAM), 0xe800, 0xefff, 0, 0x1000, twotiger_videoram_r, twotiger_videoram_w);
 }
 
 

@@ -135,9 +135,9 @@ static READ16_HANDLER( hacked_soundcommand_r )
 static INTERRUPT_GEN( bionicc_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
-		cpu_set_input_line(device, 2, HOLD_LINE);
+		device_set_input_line(device, 2, HOLD_LINE);
 	else
-		cpu_set_input_line(device, 4, HOLD_LINE);
+		device_set_input_line(device, 4, HOLD_LINE);
 }
 
 /*************************************
