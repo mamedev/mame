@@ -19,6 +19,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/madmotor.h"
+#include "video/decbac06.h"
 
 /******************************************************************************/
 
@@ -36,17 +37,23 @@ static WRITE16_HANDLER( madmotor_sound_w )
 
 /******************************************************************************/
 
+	
 static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x180000, 0x18001f) AM_WRITEONLY AM_BASE_MEMBER(madmotor_state, pf1_control)
-	AM_RANGE(0x184000, 0x1847ff) AM_RAM AM_BASE_MEMBER(madmotor_state, pf1_rowscroll)
-	AM_RANGE(0x188000, 0x189fff) AM_RAM_WRITE(madmotor_pf1_data_w) AM_BASE_MEMBER(madmotor_state, pf1_data)
+	AM_RANGE(0x180000, 0x180007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)							/* text layer */
+	AM_RANGE(0x180010, 0x180017) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x184000, 0x18407f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x184080, 0x1843ff) AM_RAM 
+	AM_RANGE(0x184400, 0x1847ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x188000, 0x189fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x18c000, 0x18c001) AM_NOP
-	AM_RANGE(0x190000, 0x19001f) AM_WRITEONLY AM_BASE_MEMBER(madmotor_state, pf2_control)
-	AM_RANGE(0x198000, 0x1987ff) AM_RAM_WRITE(madmotor_pf2_data_w) AM_BASE_MEMBER(madmotor_state, pf2_data)
+	AM_RANGE(0x190000, 0x190007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)							/* text layer */
+	AM_RANGE(0x190010, 0x190017) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x198000, 0x1987ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x19c000, 0x19c001) AM_READNOP
-	AM_RANGE(0x1a0000, 0x1a001f) AM_WRITEONLY AM_BASE_MEMBER(madmotor_state, pf3_control)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_RAM_WRITE(madmotor_pf3_data_w) AM_BASE_MEMBER(madmotor_state, pf3_data)
+	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)							/* text layer */
+	AM_RANGE(0x1a0010, 0x1a0017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x1a4000, 0x1a4fff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 	AM_RANGE(0x3e0000, 0x3e3fff) AM_RAM
 	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_BASE_SIZE_MEMBER(madmotor_state, spriteram, spriteram_size)
 	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -266,6 +273,13 @@ static MACHINE_CONFIG_START( madmotor, madmotor_state )
 
 	MCFG_GFXDECODE(madmotor)
 	MCFG_PALETTE_LENGTH(1024)
+
+	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
+	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,1,0);
+	MCFG_DEVICE_ADD("tilegen3", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,2,1);
 
 	MCFG_VIDEO_START(madmotor)
 

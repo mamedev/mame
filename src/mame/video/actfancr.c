@@ -6,146 +6,24 @@
 
 #include "emu.h"
 #include "includes/actfancr.h"
-
-
-static TILEMAP_MAPPER( actfancr_scan )
-{
-	/* logical (col,row) -> memory offset */
-	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0xf0) << 4);
-}
-
-static TILEMAP_MAPPER( actfancr_scan2 )
-{
-	/* logical (col,row) -> memory offset */
-	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x70) << 5);
-}
-
-static TILE_GET_INFO( get_tile_info )
-{
-	actfancr_state *state = machine->driver_data<actfancr_state>();
-	int tile = state->pf1_data[2 * tile_index] + (state->pf1_data[2 * tile_index + 1] << 8);
-	int color = tile >> 12;
-
-	tile = tile & 0xfff;
-
-	SET_TILE_INFO(
-			2,
-			tile,
-			color,
-			0);
-}
-
-static TILEMAP_MAPPER( triothep_scan )
-{
-	/* logical (col,row) -> memory offset */
-	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x10) << 5);
-}
-
-static TILE_GET_INFO( get_trio_tile_info )
-{
-	actfancr_state *state = machine->driver_data<actfancr_state>();
-	int tile = state->pf1_data[2 * tile_index] + (state->pf1_data[2 * tile_index + 1] << 8);
-	int color = tile >> 12;
-
-	tile = tile & 0xfff;
-
-	SET_TILE_INFO(
-			2,
-			tile,
-			color,
-			0);
-}
-
-static TILE_GET_INFO( get_pf2_tile_info )
-{
-	actfancr_state *state = machine->driver_data<actfancr_state>();
-	int tile = state->pf2_data[2 * tile_index] + (state->pf2_data[2 * tile_index + 1] << 8);
-	int color = tile >> 12;
-
-	tile = tile & 0xfff;
-
-
-	SET_TILE_INFO(
-				0,
-				tile,
-				color,
-				0);
-}
+#include "video/decbac06.h"
 
 /******************************************************************************/
 
 static void register_savestate( running_machine *machine )
 {
 	actfancr_state *state = machine->driver_data<actfancr_state>();
-	state->save_item(NAME(state->control_1));
-	state->save_item(NAME(state->control_2));
 	state->save_item(NAME(state->flipscreen));
 }
 
 VIDEO_START( actfancr )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
-	state->pf1_tilemap = tilemap_create(machine, get_tile_info, actfancr_scan, 16, 16, 256, 16);
-	state->pf1_alt_tilemap = tilemap_create(machine, get_tile_info, actfancr_scan2, 16, 16, 128, 32);
-	state->pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-
-	tilemap_set_transparent_pen(state->pf2_tilemap, 0);
-
 	register_savestate(machine);
 }
 
 VIDEO_START( triothep )
 {
-	actfancr_state *state = machine->driver_data<actfancr_state>();
-	state->pf1_tilemap = tilemap_create(machine, get_trio_tile_info, triothep_scan, 16, 16, 32, 32);
-	state->pf2_tilemap = tilemap_create(machine, get_pf2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
-	state->pf1_alt_tilemap = NULL;
-
-	tilemap_set_transparent_pen(state->pf2_tilemap, 0);
-
 	register_savestate(machine);
-}
-
-/******************************************************************************/
-
-WRITE8_HANDLER( actfancr_pf1_control_w )
-{
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
-	state->control_1[offset] = data;
-}
-
-WRITE8_HANDLER( actfancr_pf2_control_w )
-{
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
-	state->control_2[offset] = data;
-}
-
-WRITE8_HANDLER( actfancr_pf1_data_w )
-{
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
-	state->pf1_data[offset] = data;
-	tilemap_mark_tile_dirty(state->pf1_tilemap, offset / 2);
-	if (state->pf1_alt_tilemap)
-		tilemap_mark_tile_dirty(state->pf1_alt_tilemap, offset / 2);
-}
-
-READ8_HANDLER( actfancr_pf1_data_r )
-{
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
-	return state->pf1_data[offset];
-}
-
-WRITE8_HANDLER( actfancr_pf2_data_w )
-{
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
-	state->pf2_data[offset] = data;
-	tilemap_mark_tile_dirty(state->pf2_tilemap, offset / 2);
-}
-
-READ8_HANDLER( actfancr_pf2_data_r )
-{
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
-	return state->pf2_data[offset];
 }
 
 /******************************************************************************/
@@ -155,22 +33,12 @@ SCREEN_UPDATE( actfancr )
 	actfancr_state *state = screen->machine->driver_data<actfancr_state>();
 	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
 	int offs, mult;
-	int scrollx = (state->control_1[0x10] + (state->control_1[0x11] << 8));
-	int scrolly = (state->control_1[0x12] + (state->control_1[0x13] << 8));
 
 	/* Draw playfield */
-	state->flipscreen = state->control_2[0] & 0x80;
-	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	//state->flipscreen = state->control_2[0] & 0x80;
+	//tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	tilemap_set_scrollx(state->pf1_tilemap,0, scrollx );
-	tilemap_set_scrolly(state->pf1_tilemap,0, scrolly );
-	tilemap_set_scrollx(state->pf1_alt_tilemap, 0, scrollx );
-	tilemap_set_scrolly(state->pf1_alt_tilemap, 0, scrolly );
-
-	if (state->control_1[6] == 1)
-		tilemap_draw(bitmap, cliprect, state->pf1_alt_tilemap, 0, 0);
-	else
-		tilemap_draw(bitmap, cliprect, state->pf1_tilemap, 0, 0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
 	/* Sprites */
 	for (offs = 0; offs < 0x800; offs += 8)
@@ -232,7 +100,8 @@ SCREEN_UPDATE( actfancr )
 		}
 	}
 
-	tilemap_draw(bitmap, cliprect, state->pf2_tilemap, 0, 0);
+	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+
 	return 0;
 }
 
@@ -240,29 +109,13 @@ SCREEN_UPDATE( triothep )
 {
 	actfancr_state *state = screen->machine->driver_data<actfancr_state>();
 	UINT8 *buffered_spriteram = screen->machine->generic.buffered_spriteram.u8;
-	int offs, i, mult;
-	int scrollx = (state->control_1[0x10] + (state->control_1[0x11] << 8));
-	int scrolly = (state->control_1[0x12] + (state->control_1[0x13] << 8));
-
+	int offs, mult;
+	
 	/* Draw playfield */
-	state->flipscreen = state->control_2[0] & 0x80;
-	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	//state->flipscreen = state->control_2[0] & 0x80;
+	//tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	if (state->control_2[0] & 0x4)
-	{
-		tilemap_set_scroll_rows(state->pf1_tilemap, 32);
-		tilemap_set_scrolly(state->pf1_tilemap, 0, scrolly);
-		for (i = 0; i < 32; i++)
-			tilemap_set_scrollx(state->pf1_tilemap, i, scrollx + (state->pf1_rowscroll_data[i * 2] | state->pf1_rowscroll_data[i * 2 + 1] << 8) );
-	}
-	else
-	{
-		tilemap_set_scroll_rows(state->pf1_tilemap, 1);
-		tilemap_set_scrollx(state->pf1_tilemap, 0, scrollx);
-		tilemap_set_scrolly(state->pf1_tilemap, 0, scrolly);
-	}
-
-	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, 0, 0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
 	/* Sprites */
 	for (offs = 0; offs < 0x800; offs += 8)
@@ -324,6 +177,7 @@ SCREEN_UPDATE( triothep )
 		}
 	}
 
-	tilemap_draw(bitmap, cliprect, state->pf2_tilemap, 0, 0);
+	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
+
 	return 0;
 }

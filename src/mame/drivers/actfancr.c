@@ -29,7 +29,7 @@
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/actfancr.h"
-
+#include "video/decbac06.h"
 
 /******************************************************************************/
 
@@ -65,10 +65,12 @@ static WRITE8_HANDLER( actfancr_sound_w )
 
 static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
-	AM_RANGE(0x060000, 0x06001f) AM_WRITE(actfancr_pf1_control_w)
-	AM_RANGE(0x062000, 0x063fff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE_MEMBER(actfancr_state, pf1_data)
-	AM_RANGE(0x070000, 0x07001f) AM_WRITE(actfancr_pf2_control_w)
-	AM_RANGE(0x072000, 0x0727ff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE_MEMBER(actfancr_state, pf2_data)
+	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x062000, 0x063fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x070000, 0x070007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x070010, 0x07001f) AM_DEVWRITE("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
@@ -83,12 +85,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04001f) AM_WRITE(actfancr_pf2_control_w)
-	AM_RANGE(0x044000, 0x045fff) AM_READWRITE(actfancr_pf2_data_r, actfancr_pf2_data_w) AM_BASE_MEMBER(actfancr_state, pf2_data)
-	AM_RANGE(0x046400, 0x0467ff) AM_WRITENOP /* Pf2 rowscroll - is it used? */
-	AM_RANGE(0x060000, 0x06001f) AM_WRITE(actfancr_pf1_control_w)
-	AM_RANGE(0x064000, 0x0647ff) AM_READWRITE(actfancr_pf1_data_r, actfancr_pf1_data_w) AM_BASE_MEMBER(actfancr_state, pf1_data)
-	AM_RANGE(0x066400, 0x0667ff) AM_WRITEONLY AM_BASE_MEMBER(actfancr_state, pf1_rowscroll_data)
+	AM_RANGE(0x040000, 0x040007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x040010, 0x04001f) AM_DEVWRITE("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x044000, 0x045fff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x046400, 0x0467ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
+	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -296,14 +300,7 @@ static MACHINE_START( triothep )
 static MACHINE_RESET( actfancr )
 {
 	actfancr_state *state = machine->driver_data<actfancr_state>();
-	int i;
-
 	state->flipscreen = 0;
-	for (i = 0; i < 0x20; i++)
-	{
-		state->control_1[i] = 0;
-		state->control_2[i] = 0;
-	}
 }
 
 static MACHINE_RESET( triothep )
@@ -342,6 +339,11 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 
 	MCFG_GFXDECODE(actfan)
 	MCFG_PALETTE_LENGTH(768)
+
+	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,1);
+	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
 
 	MCFG_VIDEO_START(actfancr)
 
@@ -388,6 +390,11 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 
 	MCFG_GFXDECODE(triothep)
 	MCFG_PALETTE_LENGTH(768)
+
+	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,0);
+	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
 
 	MCFG_VIDEO_START(triothep)
 
@@ -578,55 +585,8 @@ ROM_END
 
 /******************************************************************************/
 
-static READ8_HANDLER( cycle_r )
-{
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
-	int pc = cpu_get_pc(space->cpu);
-	int ret = state->main_ram[0x26];
-
-	if (offset == 1)
-		return state->main_ram[0x27];
-
-	if (pc == 0xe29a && ret == 0)
-	{
-		device_spin_until_interrupt(space->cpu);
-		return 1;
-	}
-
-	return ret;
-}
-
-static READ8_HANDLER( cyclej_r )
-{
-	actfancr_state *state = space->machine->driver_data<actfancr_state>();
-	int pc = cpu_get_pc(space->cpu);
-	int ret = state->main_ram[0x26];
-
-	if (offset == 1)
-		return state->main_ram[0x27];
-
-	if (pc == 0xe2b1 && ret == 0)
-	{
-		device_spin_until_interrupt(space->cpu);
-		return 1;
-	}
-
-	return ret;
-}
-
-static DRIVER_INIT( actfancr )
-{
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1f0026, 0x1f0027, FUNC(cycle_r));
-}
-
-static DRIVER_INIT( actfancrj )
-{
-	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1f0026, 0x1f0027, FUNC(cyclej_r));
-}
-
-
-GAME( 1989, actfancr, 0,        actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", GAME_SUPPORTS_SAVE )
-GAME( 1989, actfancr1,actfancr, actfancr, actfancr, actfancr, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, actfancrj,actfancr, actfancr, actfancr, actfancrj,ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", GAME_SUPPORTS_SAVE )
-GAME( 1989, triothep, 0,        triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", GAME_SUPPORTS_SAVE )
-GAME( 1989, triothepj,triothep, triothep, triothep, 0,        ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, actfancr, 0,        actfancr, actfancr, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", GAME_SUPPORTS_SAVE )
+GAME( 1989, actfancr1,actfancr, actfancr, actfancr, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, actfancrj,actfancr, actfancr, actfancr, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", GAME_SUPPORTS_SAVE )
+GAME( 1989, triothep, 0,        triothep, triothep, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", GAME_SUPPORTS_SAVE )
+GAME( 1989, triothepj,triothep, triothep, triothep, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", GAME_SUPPORTS_SAVE )

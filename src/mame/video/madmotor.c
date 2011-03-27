@@ -8,141 +8,12 @@
 
 #include "emu.h"
 #include "includes/madmotor.h"
-
-
-/* 512 by 512 playfield, 8 by 8 tiles */
-static TILEMAP_MAPPER( pf1_scan )
-{
-	/* logical (col,row) -> memory offset */
-	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x20) << 5) + ((col & 0x20) << 6);
-}
-
-static TILE_GET_INFO( get_pf1_tile_info )
-{
-	madmotor_state *state = machine->driver_data<madmotor_state>();
-	int tile = state->pf1_data[tile_index];
-	int color = tile >> 12;
-
-	tile = tile & 0xfff;
-
-	SET_TILE_INFO(
-			0,
-			tile,
-			color,
-			0);
-}
-
-/* 512 by 512 playfield, 16 by 16 tiles */
-static TILEMAP_MAPPER( pf2_scan )
-{
-	/* logical (col,row) -> memory offset */
-	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x10) << 4) + ((col & 0x10) << 5);
-}
-
-static TILE_GET_INFO( get_pf2_tile_info )
-{
-	madmotor_state *state = machine->driver_data<madmotor_state>();
-	int tile = state->pf2_data[tile_index];
-	int color = tile >> 12;
-
-	tile = tile & 0xfff;
-
-	SET_TILE_INFO(
-			1,
-			tile,
-			color,
-			0);
-}
-
-/* 512 by 1024 playfield, 16 by 16 tiles */
-static TILEMAP_MAPPER( pf3_scan )
-{
-	/* logical (col,row) -> memory offset */
-	return (col & 0x0f) + ((row & 0x0f) << 4) + ((row & 0x30) << 4) + ((col & 0x10) << 6);
-}
-
-static TILE_GET_INFO( get_pf3_tile_info )
-{
-	madmotor_state *state = machine->driver_data<madmotor_state>();
-	int tile = state->pf3_data[tile_index];
-	int color = tile >> 12;
-
-	tile = tile & 0xfff;
-
-	SET_TILE_INFO(
-			2,
-			tile,
-			color,
-			0);
-}
-
-/* 2048 by 256 playfield, 16 by 16 tiles */
-static TILEMAP_MAPPER( pf3a_scan )
-{
-	/* logical (col,row) -> memory offset */
-	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4);
-}
-
-static TILE_GET_INFO( get_pf3a_tile_info )
-{
-	madmotor_state *state = machine->driver_data<madmotor_state>();
-	int tile = state->pf3_data[tile_index];
-	int color = tile >> 12;
-
-	tile = tile & 0xfff;
-
-	SET_TILE_INFO(
-			2,
-			tile,
-			color,
-			0);
-}
+#include "video/decbac06.h"
 
 /******************************************************************************/
 
 VIDEO_START( madmotor )
 {
-	madmotor_state *state = machine->driver_data<madmotor_state>();
-
-	state->pf1_tilemap = tilemap_create(machine, get_pf1_tile_info,  pf1_scan,   8,  8,  64, 64);
-	state->pf2_tilemap = tilemap_create(machine, get_pf2_tile_info,  pf2_scan,  16, 16,  32, 32);
-	state->pf3_tilemap = tilemap_create(machine, get_pf3_tile_info,  pf3_scan,  16, 16,  32, 64);
-	state->pf3a_tilemap= tilemap_create(machine, get_pf3a_tile_info, pf3a_scan, 16, 16, 128, 16);
-
-	tilemap_set_transparent_pen(state->pf1_tilemap, 0);
-	tilemap_set_transparent_pen(state->pf2_tilemap, 0);
-	tilemap_set_scroll_rows(state->pf1_tilemap, 512);
-}
-
-/******************************************************************************/
-
-WRITE16_HANDLER( madmotor_pf1_data_w )
-{
-	madmotor_state *state = space->machine->driver_data<madmotor_state>();
-
-	COMBINE_DATA(&state->pf1_data[offset]);
-	tilemap_mark_tile_dirty(state->pf1_tilemap, offset);
-}
-
-WRITE16_HANDLER( madmotor_pf2_data_w )
-{
-	madmotor_state *state = space->machine->driver_data<madmotor_state>();
-
-	COMBINE_DATA(&state->pf2_data[offset]);
-	tilemap_mark_tile_dirty(state->pf2_tilemap, offset);
-}
-
-WRITE16_HANDLER( madmotor_pf3_data_w )
-{
-	madmotor_state *state = space->machine->driver_data<madmotor_state>();
-
-	COMBINE_DATA(&state->pf3_data[offset]);
-
-	/* Mark the dirty position on the 512 x 1024 version */
-	tilemap_mark_tile_dirty(state->pf3_tilemap, offset);
-
-	/* Mark the dirty position on the 2048 x 256 version */
-	tilemap_mark_tile_dirty(state->pf3a_tilemap, offset);
 }
 
 /******************************************************************************/
@@ -224,37 +95,13 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 SCREEN_UPDATE( madmotor )
 {
-	madmotor_state *state = screen->machine->driver_data<madmotor_state>();
-	int offs;
+	flip_screen_set(screen->machine, screen->machine->device<deco_bac06_device>("tilegen1")->get_flip_state());
 
-	/* Update flipscreen */
-	if (state->pf1_control[0] & 0x80)
-		state->flipscreen = 1;
-	else
-		state->flipscreen = 0;
+//	tilemap_set_flip_all(screen->machine, screen->machine->device<deco_bac06_device>("tilegen1")->get_flip_state() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	tilemap_set_flip_all(screen->machine, state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
-	/* Setup scroll registers */
-	for (offs = 0; offs < 512; offs++)
-		tilemap_set_scrollx(state->pf1_tilemap, offs, state->pf1_control[0x08] + state->pf1_rowscroll[0x200 + offs]);
-
-	tilemap_set_scrolly(state->pf1_tilemap,  0, state->pf1_control[0x09]);
-	tilemap_set_scrollx(state->pf2_tilemap,  0, state->pf2_control[0x08]);
-	tilemap_set_scrolly(state->pf2_tilemap,  0, state->pf2_control[0x09]);
-	tilemap_set_scrollx(state->pf3_tilemap,  0, state->pf3_control[0x08]);
-	tilemap_set_scrolly(state->pf3_tilemap,  0, state->pf3_control[0x09]);
-	tilemap_set_scrollx(state->pf3a_tilemap, 0, state->pf3_control[0x08]);
-	tilemap_set_scrolly(state->pf3a_tilemap, 0, state->pf3_control[0x09]);
-
-	/* Draw playfields & sprites */
-	if (state->pf3_control[0x03] == 2)
-		tilemap_draw(bitmap, cliprect, state->pf3_tilemap, 0, 0);
-	else
-		tilemap_draw(bitmap, cliprect, state->pf3a_tilemap, 0, 0);
-
-	tilemap_draw(bitmap, cliprect, state->pf2_tilemap, 0, 0);
+	screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x00, 0x00);
-	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, 0, 0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }

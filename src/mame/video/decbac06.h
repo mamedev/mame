@@ -8,11 +8,12 @@ class deco_bac06_device_config : public device_config
 public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
-	static void set_gfx_region(device_config *device, int region8x8, int region16x16);
+	static void set_gfx_region_wide(device_config *device, int region8x8, int region16x16, int wide);
 
 protected:
 	UINT8 m_gfxregion8x8;
 	UINT8 m_gfxregion16x16;
+	int m_wide;
 };
 
 class deco_bac06_device : public device_t
@@ -46,6 +47,7 @@ protected:
 
 	UINT8 m_gfxregion8x8;
 	UINT8 m_gfxregion16x16;
+	int m_wide;
 
 	void custom_tilemap_draw(running_machine *machine,
 							bitmap_t *bitmap,
@@ -95,6 +97,8 @@ WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w );
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w );
 READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r );
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w );
+READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_r );
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w );
 
 const device_type deco_bac06_ = deco_bac06_device_config::static_alloc_device_config;
 

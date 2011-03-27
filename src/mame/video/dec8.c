@@ -414,46 +414,6 @@ SCREEN_UPDATE( cobracom )
 
 /******************************************************************************/
 
-/*
-static TILE_GET_INFO( get_bac0_tile_info )
-{
-	dec8_state *state = machine->driver_data<dec8_state>();
-	int tile, color, offs = tile_index << 1;
-
-	tile = (state->bg_data[offs] << 8) | state->bg_data[offs + 1];
-	color = tile >> 12;
-	if (color > 7 && state->game_uses_priority)
-		tileinfo->category = 1;
-	else
-		tileinfo->category = 0;
-
-	SET_TILE_INFO(
-			2,
-			tile & 0xfff,
-			color & state->gfx_mask,
-			0);
-}
-
-static TILE_GET_INFO( get_bac1_tile_info )
-{
-	dec8_state *state = machine->driver_data<dec8_state>();
-	int tile, color, offs = tile_index << 1;
-
-	tile = (state->pf1_data[offs] << 8) | state->pf1_data[offs + 1];
-	color = tile >> 12;
-	if (color > 7 && state->game_uses_priority)
-		tileinfo->category = 1;
-	else
-		tileinfo->category = 0;
-
-	SET_TILE_INFO(
-			3,
-			tile & 0xfff,
-			color & 3,
-			0);
-}
-*/
-
 
 static TILE_GET_INFO( get_cobracom_fix_tile_info )
 {

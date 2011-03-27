@@ -11,16 +11,11 @@ public:
 		: driver_device(machine, config) { }
 
 	/* memory pointers */
-	UINT8 *        pf1_data;
-	UINT8 *        pf2_data;
-	UINT8 *        pf1_rowscroll_data;
 	UINT8 *        main_ram;
 //  UINT8 *        spriteram;   // currently this uses buffered_spriteram
 //  UINT8 *        paletteram;  // currently this uses generic palette handling
 
 	/* video-related */
-	tilemap_t        *pf1_tilemap, *pf1_alt_tilemap, *pf2_tilemap;
-	UINT8          control_1[0x20], control_2[0x20];
 	int            flipscreen;
 
 	/* misc */

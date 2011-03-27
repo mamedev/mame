@@ -59,7 +59,7 @@ Priority word (Midres):
 deco_bac06_device_config::deco_bac06_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 	: device_config(mconfig, static_alloc_device_config, "decbac06_device", tag, owner, clock)
 {
-	m_gfxregion8x8 = m_gfxregion16x16 = 0;
+	m_gfxregion8x8 = m_gfxregion16x16 = m_wide = 0;
 }
 
 device_config *deco_bac06_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
@@ -72,11 +72,12 @@ device_t *deco_bac06_device_config::alloc_device(running_machine &machine) const
 	return auto_alloc(&machine, deco_bac06_device(machine, *this));
 }
 
-void deco_bac06_device_config::set_gfx_region(device_config *device, int region8x8, int region16x16)
+void deco_bac06_device_config::set_gfx_region_wide(device_config *device, int region8x8, int region16x16, int wide)
 {
 	deco_bac06_device_config *dev = downcast<deco_bac06_device_config *>(device);
 	dev->m_gfxregion8x8 = region8x8;
 	dev->m_gfxregion16x16 = region16x16;
+	dev->m_wide = wide;
 }
 
 
@@ -84,25 +85,27 @@ deco_bac06_device::deco_bac06_device(running_machine &_machine, const deco_bac06
 	: device_t(_machine, config),
 	  m_config(config),
 	  m_gfxregion8x8(m_config.m_gfxregion8x8),
-	  m_gfxregion16x16(m_config.m_gfxregion16x16)
+	  m_gfxregion16x16(m_config.m_gfxregion16x16),
+	  m_wide(m_config.m_wide)
 {
 }
+
 
 
 
 static TILEMAP_MAPPER( tile_shape0_scan )
 {
-	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x30) << 4);
+	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x70) << 4);
 }
 
 static TILEMAP_MAPPER( tile_shape1_scan )
 {
-	return (col & 0xf) + ((row & 0xf) << 4) + ((row & 0x10) << 4) + ((col & 0x10) << 5);
+	return (col & 0xf) + ((row & 0x1f) << 4) + ((col & 0x30) << 5);
 }
 
 static TILEMAP_MAPPER( tile_shape2_scan )
 {
-	return (col & 0xf) + ((row & 0x3f) << 4);
+	return (col & 0xf) + ((row & 0x3f) << 4) + ((col & 0x10) << 6);
 }
 
 static TILEMAP_MAPPER( tile_shape0_8x8_scan )
@@ -119,6 +122,10 @@ static TILEMAP_MAPPER( tile_shape2_8x8_scan )
 {
 	return (col & 0x1f) + ((row & 0x7f) << 5);
 }
+
+
+
+
 
 static TILE_GET_INFO_DEVICE( get_pf8x8_tile_info )
 {
@@ -149,9 +156,18 @@ void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 
 	tile_region = region16x16;
 
-	pf16x16_tilemap[0] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape0_scan,    16,16, 64, 16);
-	pf16x16_tilemap[1] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape1_scan,    16,16, 32, 32);
-	pf16x16_tilemap[2] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape2_scan,    16,16, 16, 64);
+	if (m_wide)
+	{
+		pf16x16_tilemap[0] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape0_scan, 16, 16, 128, 16);
+		pf16x16_tilemap[1] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape1_scan,  16, 16,  64, 32);
+		pf16x16_tilemap[2] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape2_scan,  16, 16,  32, 64);
+	}
+	else
+	{	
+		pf16x16_tilemap[0] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape0_scan,    16,16, 64, 16);
+		pf16x16_tilemap[1] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape1_scan,    16,16, 32, 32);
+		pf16x16_tilemap[2] = tilemap_create_device(this, get_pf16x16_tile_info,tile_shape2_scan,    16,16, 16, 64);
+	}
 }
 
 void deco_bac06_device::device_start()
@@ -391,10 +407,20 @@ READ8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_r )
 /* used by dec8.c */
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w )
 {
-	if (offset&1)
-		deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
-	else
-		deco_bac06_pf_control_1_w(device,offset/2,data<<8,0xff00);
+	if (offset<4) // these registers are 16-bit?
+	{
+		if (offset&1)
+			deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
+		else
+			deco_bac06_pf_control_1_w(device,offset/2,data<<8,0xff00);
+	}
+	else // these registers are 8-bit and mirror? (triothep vs actfancr)
+	{
+		if (offset&1)
+			deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
+		else
+			deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
+	}
 }
 
 READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r )
@@ -414,6 +440,23 @@ WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w )
 		deco_bac06_pf_rowscroll_w(device,offset/2,data<<8,0xff00);
 }
 
+READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_r )
+{
+	if (offset&1)
+		return deco_bac06_pf_rowscroll_r(device,offset/2,0xff00)>>8;
+	else
+		return deco_bac06_pf_rowscroll_r(device,offset/2,0x00ff);
+}
+
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_swap_w )
+{
+	if (offset&1)
+		deco_bac06_pf_rowscroll_w(device,offset/2,data<<8,0xff00);
+	else
+		deco_bac06_pf_rowscroll_w(device,offset/2,data,0x00ff);
+}
+
+
 
 /* used by hippodrm */
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w )
@@ -427,28 +470,17 @@ WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w )
 /* used by hippodrm */
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w )
 {
-	if (offset&1)
-		deco_bac06_pf_control_1_w(device,offset/2,data<<8,0xff00);
-	else
-		deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
-
+	deco_bac06_pf_control1_8bit_w(device, offset^1, data);
 }
 
 /* used by hippodrm */
 READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r )
 {
-	if (offset&1)
-		return deco_bac06_pf_data_r(device,offset/2,0xff00)>>8;
-	else
-		return deco_bac06_pf_data_r(device,offset/2,0x00ff);
+	return deco_bac06_pf_data_8bit_r(device, offset^1);
 }
 
 /* used by hippodrm */
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w )
 {
-	if (offset&1)
-		deco_bac06_pf_data_w(device,offset/2,data<<8,0xff00);
-	else
-		deco_bac06_pf_data_w(device,offset/2,data,0x00ff);
-
+	deco_bac06_pf_data_8bit_w(device, offset^1, data);
 }
