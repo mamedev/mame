@@ -557,8 +557,8 @@
     <part name="cart" interface="megatech_cart">
       <feature name="pcb_type" value="genesis" />
       <dataarea name="rom" size="0x400000">
-        <rom name="mp13933.ic1"                               size="0x080000" crc="13775004" sha1="5decfd35944a2d0e7b996b9a4a12b616a309fd5e" offset="0x000000"/>
-        <rom name="epr-12368-52.ic2" merge="epr-12368-52.ic2" size="0x008000" crc="6a69d20c" sha1="e483b39ff6eca37dc192dc296d004049e220554a" offset="0x300000" loadflag="load16_byte"/>
+        <rom name="mp13933.ic1"      size="0x080000" crc="13775004" sha1="5decfd35944a2d0e7b996b9a4a12b616a309fd5e" offset="0x000000"/>
+        <rom name="epr-12368-52.ic2" size="0x008000" crc="6a69d20c" sha1="e483b39ff6eca37dc192dc296d004049e220554a" offset="0x300000" loadflag="load16_byte"/>
       </dataarea>
     </part>
   </software>
