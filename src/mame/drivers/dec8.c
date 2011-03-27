@@ -47,7 +47,7 @@ To do:
 #include "sound/3526intf.h"
 #include "sound/msm5205.h"
 #include "includes/dec8.h"
-
+#include "video/decbac06.h"
 
 /******************************************************************************/
 
@@ -489,8 +489,8 @@ static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine, data); 
 
 static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(dec8_pf1_data_r, dec8_pf1_data_w) AM_BASE_MEMBER(dec8_state, pf1_data)
+	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
+	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -500,9 +500,11 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x3800, 0x381f) AM_WRITE(dec8_bac06_0_w)
+	AM_RANGE(0x3800, 0x3807) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x3810, 0x381f) AM_DEVWRITE("tilegen1", deco_bac06_pf_control1_8bit_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2")	/* VBL & coins */
-	AM_RANGE(0x3a00, 0x3a1f) AM_WRITE(dec8_bac06_1_w)
+	AM_RANGE(0x3a00, 0x3a07) AM_DEVWRITE("tilegen2", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x3a10, 0x3a1f) AM_DEVWRITE("tilegen2", deco_bac06_pf_control1_8bit_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(dec8_bank_w)
 	AM_RANGE(0x3c02, 0x3c02) AM_WRITE(buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(dec8_sound_w)
@@ -514,10 +516,9 @@ static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM
-	AM_RANGE(0x2c00, 0x2dff) AM_RAM AM_BASE_MEMBER(dec8_state, row)
-	AM_RANGE(0x2e00, 0x2fff) AM_RAM /* Unused */
+	AM_RANGE(0x2000, 0x27ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM // colscroll? mirror?
+	AM_RANGE(0x2c00, 0x2fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_8bit_r, deco_bac06_pf_rowscroll_8bit_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
 	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
@@ -525,7 +526,8 @@ static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")	/* Player 3 */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")	/* Start buttons + VBL */
 	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")	/* Dip */
-	AM_RANGE(0x3820, 0x383f) AM_WRITE(dec8_bac06_0_w)
+	AM_RANGE(0x3820, 0x3827) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x3830, 0x383f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_control1_8bit_r, deco_bac06_pf_control1_8bit_w)
 	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
 	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
 	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
@@ -539,7 +541,7 @@ static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(srdarwin_videoram_w) AM_BASE_MEMBER(dec8_state, videoram) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
-	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
+	AM_RANGE(0x1400, 0x17ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, bg_data)
 	AM_RANGE(0x1800, 0x1801) AM_WRITE(srdarwin_i8751_w)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)		/* Maybe.. */
 	AM_RANGE(0x1803, 0x1803) AM_WRITENOP			/* NMI ack */
@@ -560,7 +562,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, bg_data)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)	/* Sprites */
@@ -585,7 +587,7 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0f00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
+	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprites */
 	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3c00, 0x3c00) AM_READ_PORT("IN0")
@@ -593,7 +595,8 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3c02, 0x3c02) AM_READ_PORT("IN2")	/* VBL & coins */
 	AM_RANGE(0x3c03, 0x3c03) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3c04, 0x3c04) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3c00, 0x3c1f) AM_WRITE(dec8_bac06_0_w)
+	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x3c10, 0x3c1f) AM_DEVWRITE("tilegen1", deco_bac06_pf_control1_8bit_w)
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(buffer_spriteram_w)	/* DMA */
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)  		/* BNKS */
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w) 		/* SOUN */
@@ -632,7 +635,7 @@ static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, bg_data)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -653,7 +656,7 @@ static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITE(shackled_sprite_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -676,7 +679,7 @@ static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, bg_data)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -702,7 +705,7 @@ static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -726,7 +729,7 @@ static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(shackled_sprite_r, shackled_sprite_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, bg_data)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -743,14 +746,14 @@ static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, videoram, videoram_size)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_pf0_data_r, dec8_pf0_data_w) AM_BASE_MEMBER(dec8_state, pf0_data)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, bg_data)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprites */
@@ -1949,7 +1952,7 @@ static MACHINE_START( dec8 )
 	state->save_item(NAME(state->toggle));
 
 	state->save_item(NAME(state->scroll2));
-	state->save_item(NAME(state->pf0_control));
+	state->save_item(NAME(state->bg_control));
 	state->save_item(NAME(state->pf1_control));
 }
 
@@ -1967,7 +1970,7 @@ static MACHINE_RESET( dec8 )
 	state->scroll2[0] = state->scroll2[1] = state->scroll2[2] = state->scroll2[3] = 0;
 	for (i = 0; i < 0x20; i++)
 	{
-		state->pf0_control[i] = 0;
+		state->bg_control[i] = 0;
 		state->pf1_control[i] = 0;
 	}
 }
@@ -1989,6 +1992,11 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
+	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region(device, 2,2);
+	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region(device, 3,3);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -2037,6 +2045,9 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
+	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region(device, 2,2);
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
@@ -2063,6 +2074,58 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 
 	MCFG_SOUND_ADD("ym2", YM3812, 3000000)
 	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( oscar, dec8_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(oscar_map)
+	MCFG_CPU_VBLANK_INT("screen", oscar_interrupt)
+
+	MCFG_CPU_ADD("sub", HD6309, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(oscar_sub_map)
+
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8)
+	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
+								/* NMIs are caused by the main CPU */
+	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
+
+	MCFG_MACHINE_START(dec8)
+	MCFG_MACHINE_RESET(dec8)
+
+	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
+	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region(device, 2,2);
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_UPDATE(oscar)
+
+	MCFG_GFXDECODE(oscar)
+	MCFG_PALETTE_LENGTH(512)
+
+	MCFG_VIDEO_START(oscar)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(0, "mono", 0.23)
+	MCFG_SOUND_ROUTE(1, "mono", 0.23)
+	MCFG_SOUND_ROUTE(2, "mono", 0.23)
+	MCFG_SOUND_ROUTE(3, "mono", 0.20)
+
+	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym3526_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2155,54 +2218,6 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_SOUND_CONFIG(ym3526_config)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( oscar, dec8_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(oscar_map)
-	MCFG_CPU_VBLANK_INT("screen", oscar_interrupt)
-
-	MCFG_CPU_ADD("sub", HD6309, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(oscar_sub_map)
-
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8)
-	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
-								/* NMIs are caused by the main CPU */
-	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
-
-	MCFG_MACHINE_START(dec8)
-	MCFG_MACHINE_RESET(dec8)
-
-	/* video hardware */
-	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* 58Hz, 529ms Vblank duration */)
-	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE(oscar)
-
-	MCFG_GFXDECODE(oscar)
-	MCFG_PALETTE_LENGTH(512)
-
-	MCFG_VIDEO_START(oscar)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MCFG_SOUND_ROUTE(0, "mono", 0.23)
-	MCFG_SOUND_ROUTE(1, "mono", 0.23)
-	MCFG_SOUND_ROUTE(2, "mono", 0.23)
-	MCFG_SOUND_ROUTE(3, "mono", 0.20)
-
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_SOUND_CONFIG(ym3526_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2550,26 +2565,26 @@ DE-0273-1
 |-------------------------------------------------------------|
 |  2018           DW09                       DW00             |
 |  2018                                                       |
-|                 DW08                                       |-|
-|   |---------|                                    6264   | |
-|   |        |   DW07                                      | |
-|   |L7A0072  |                                           | |
-|   |DATA EAST|   DW06                                     | |
-|   |BAC 06   |                                           | |
-|J  |---------|                                           | |
-|A                             DW19                     |-|
-|M                                                          |
-|M   DSW1      DSW2        DW18                      |
-|A                                                         |-|
-|                6116    |---|                           | |
-|                         | H |                          | |
-|                DW05    | D | DW04                     | |
-|                         | 6 |                   2018   | |
-|   65C02        YM3812   | 3 | DW03                        | |
-|                         | C |                          | |
-|   YM2203      YM3014   | 0 | DW02                     |-|
-|                YM3014   | 9 |                           |
-|        VOL  UPC324      |---| DW01-5       i8751H  8MHz  |
+|                 DW08                                      |-|
+|   |---------|                                    6264     | |
+|   |         |   DW07                                      | |
+|   |L7A0072  |                                             | |
+|   |DATA EAST|   DW06                                      | |
+|   |BAC 06   |                                             | |
+|J  |---------|                                             | |
+|A                             DW19                         |-|
+|M                                                            |
+|M   DSW1      DSW2        DW18                               |
+|A                                                          |-|
+|                6116    |---|                              | |
+|                        | H |                              | |
+|                DW05    | D | DW04                         | |
+|                        | 6 |                       2018   | |
+|   65C02        YM3812  | 3 | DW03                         | |
+|                        | C |                              | |
+|   YM2203      YM3014   | 0 | DW02                         |-|
+|                YM3014  | 9 |                                |
+|        VOL  UPC324     |---| DW01-5           i8751H  8MHz  |
 |-------------------------------------------------------------|
 Notes:
       2018         - 2K x8 SRAM (DIP24)
@@ -2592,28 +2607,28 @@ Notes:
 
 DE-0259-1
 |-------------------------------------------------------------|
-|                                                            |
-|                       2018                                 |
-|   2018                                                     |-|
+|                                                             |
+|                       2018                                  |
+|   2018                                                    |-|
 |                       2018                                | |
-|                                         2018            | |
-|   2018                                   2018           | |
+|                                         2018              | |
+|   2018                                   2018             | |
 |                                                           | |
-|                       DW10                   |-------|    | |
-|                                              |       |    | |
-|                       DW11  2018           | DRL40 |  |-|
-|                                              |       |     |
-|                       DW12                   |-------|     |
+|                       DW10                    |-------|   | |
+|                                               |       |   | |
+|                       DW11  2018              | DRL40 |   |-|
+|                                               |       |     |
+|                       DW12                    |-------|     |
 |                                                           |-|
-|                       DW13  2018                        | |
-|     VSC30                                 |-------|   | |
-|                       DW14                   |       |    | |
-|                                              | DRL40 |    | |
-|                       DW15  2018           |     |    | |
-| HMC20                                      |-------|  | |
+|                       DW13  2018                          | |
+|     VSC30                                     |-------|   | |
+|                       DW14                    |       |   | |
+|                                               | DRL40 |   | |
+|                       DW15  2018              |       |   | |
+| HMC20                                         |-------|   | |
 |                       DW16                                |-|
-|                                                            |
-|12MHz                 DW17  2018                          |
+|                                                             |
+|12MHz                 DW17  2018                             |
 |-------------------------------------------------------------|
 Notes:
       2018 - 2K x8 SRAM (DIP24)

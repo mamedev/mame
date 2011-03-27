@@ -30,12 +30,14 @@ public:
 	tilemap_t* pf16x16_tilemap[3];
 	int	   tile_region;
 	void create_tilemaps(int region8x8,int region16x16);
-	UINT16 pf_control_0[4];
-	UINT16 pf_control_1[4];
+	UINT16 pf_control_0[8];
+	UINT16 pf_control_1[8];
 
-	void deco_bac06_pf_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags);
+	void deco_bac06_pf_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
 	UINT8 get_flip_state(void) { return pf_control_0[0]&0x80; };
-	int buffer[0x20];
+	void set_colmask(int data) { m_gfxcolmask = data; }
+
+	UINT8 m_gfxcolmask;
 
 protected:
 	virtual void device_start();
@@ -45,13 +47,26 @@ protected:
 	UINT8 m_gfxregion8x8;
 	UINT8 m_gfxregion16x16;
 
-	
+	void custom_tilemap_draw(running_machine *machine,
+							bitmap_t *bitmap,
+							const rectangle *cliprect,
+							tilemap_t *tilemap_ptr,
+							const UINT16 *rowscroll_ptr,
+							const UINT16 *colscroll_ptr,
+							const UINT16 *control0,
+							const UINT16 *control1,
+							int flags,
+							UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
+							
 private:
 
 
 };
 
+/* 16-bit accessors */
+
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w );
+READ16_DEVICE_HANDLER( deco_bac06_pf_control_1_r );
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_1_w );
 
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w );
@@ -61,10 +76,25 @@ READ16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_r );
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_colscroll_w );
 READ16_DEVICE_HANDLER( deco_bac06_pf_colscroll_r );
 
+/* 8-bit accessors */
+
+/* for dec8.c */
 READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_r );
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control_8bit_w );
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_w );
 
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_w );
+READ8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_r );
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w );
+
+READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r );
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w );
+
+/* for hippodrm (dec0.c) */
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w );
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w );
+READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r );
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w );
 
 const device_type deco_bac06_ = deco_bac06_device_config::static_alloc_device_config;
 

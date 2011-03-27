@@ -161,14 +161,14 @@ SCREEN_UPDATE( hbarrel )
 {
 	flip_screen_set(screen->machine, screen->machine->device<deco_bac06_device>("tilegen1")->get_flip_state());
 
-	screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
+	screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	draw_sprites(screen->machine,bitmap,cliprect,0x08,0x08);
-	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
 	/* HB always keeps pf2 on top of pf3, no need explicitly support priority register */
 
 	draw_sprites(screen->machine,bitmap,cliprect,0x08,0x00);
-	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
@@ -182,32 +182,32 @@ SCREEN_UPDATE( baddudes )
 	/* WARNING: inverted wrt Midnight Resistance */
 	if ((state->pri & 0x01) == 0)
 	{
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
-		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
 		if (state->pri & 2)
-			screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
+			screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 
 		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 		if (state->pri & 4)
-			screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
+			screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 	}
 	else
 	{
-		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
 		if (state->pri & 2)
-			screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
+			screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 
 		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 		if (state->pri & 4)
-			screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0); /* Foreground pens only */
+			screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles /* Foreground pens only */
 	}
 
-	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
@@ -231,21 +231,21 @@ SCREEN_UPDATE( robocop )
 		/* Robocop uses it only for the title screen, so this might be just */
 		/* completely wrong. The top 8 bits of the register might mean */
 		/* something (they are 0x80 in midres, 0x00 here) */
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER1|TILEMAP_DRAW_OPAQUE);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
 		if (state->pri & 0x02)
 			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
-		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 	else
 	{
-		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
+		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
 		if (state->pri & 0x02)
 			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
 	if (state->pri & 0x02)
@@ -253,7 +253,7 @@ SCREEN_UPDATE( robocop )
 	else
 		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
-	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
@@ -266,9 +266,9 @@ SCREEN_UPDATE( birdtry )
 	/* This game doesn't have the extra playfield chip on the game board, but
     the palette does show through. */
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[768]);
-	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
-	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
@@ -281,17 +281,17 @@ SCREEN_UPDATE( hippodrm )
 
 	if (state->pri & 0x01)
 	{
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
-		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 	else
 	{
-		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
 	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
-	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
@@ -302,16 +302,16 @@ SCREEN_UPDATE( slyspy )
 	dec0_state *state = screen->machine->driver_data<dec0_state>();
 	flip_screen_set(screen->machine, screen->machine->device<deco_bac06_device>("tilegen1")->get_flip_state());
 
-	screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
-	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 
 	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
 	/* Redraw top 8 pens of top 8 palettes over sprites */
 	if (state->pri&0x80)
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_LAYER0);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0,0x08,0x08,0x08,0x08); // upper 8 pens of upper 8 priority marked tiles
 
-	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 
@@ -330,21 +330,21 @@ SCREEN_UPDATE( midres )
 
 	if (state->pri & 0x01)
 	{
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
 		if (state->pri & 0x02)
 			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
-		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 	else
 	{
-		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE);
+		screen->machine->device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 
 		if (state->pri & 0x02)
 			draw_sprites(screen->machine,bitmap,cliprect,0x08,trans);
 
-		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+		screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	}
 
 	if (state->pri & 0x02)
@@ -352,7 +352,7 @@ SCREEN_UPDATE( midres )
 	else
 		draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 
-	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
 	return 0;
 }
 

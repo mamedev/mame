@@ -124,16 +124,18 @@ static TILE_GET_INFO_DEVICE( get_pf8x8_tile_info )
 {
 	deco_bac06_device *dev = (deco_bac06_device*)device;
 	int tile=dev->pf_data[tile_index];
-	SET_TILE_INFO_DEVICE(dev->tile_region,tile&0xfff,tile>>12,0);
+	int colourpri=(tile>>12);
+	SET_TILE_INFO_DEVICE(dev->tile_region,tile&0xfff,0,0);
+	tileinfo->category = colourpri;
 }
 
 static TILE_GET_INFO_DEVICE( get_pf16x16_tile_info )
 {
 	deco_bac06_device *dev = (deco_bac06_device*)device;
 	int tile=dev->pf_data[tile_index];
-	int pri=((tile>>12)>7);
-	SET_TILE_INFO_DEVICE(dev->tile_region,tile&0xfff,tile>>12,0);
-	tileinfo->group = pri;
+	int colourpri=(tile>>12);
+	SET_TILE_INFO_DEVICE(dev->tile_region,tile&0xfff,0,0);
+	tileinfo->category = colourpri;
 }
 
 
@@ -158,7 +160,8 @@ void deco_bac06_device::device_start()
 	pf_rowscroll = auto_alloc_array_clear(this->machine, UINT16, 0x2000 / 2);
 	pf_colscroll = auto_alloc_array_clear(this->machine, UINT16, 0x2000 / 2);
 
-	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);	
+	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
+	m_gfxcolmask = 0x0f;
 }
 
 void deco_bac06_device::device_reset()
@@ -167,7 +170,7 @@ void deco_bac06_device::device_reset()
 }
 
 
-static void custom_tilemap_draw(running_machine *machine,
+void deco_bac06_device::custom_tilemap_draw(running_machine *machine,
 								bitmap_t *bitmap,
 								const rectangle *cliprect,
 								tilemap_t *tilemap_ptr,
@@ -175,10 +178,16 @@ static void custom_tilemap_draw(running_machine *machine,
 								const UINT16 *colscroll_ptr,
 								const UINT16 *control0,
 								const UINT16 *control1,
-								int flags)
+								int flags,
+								UINT16 penmask,
+								UINT16 pencondition,
+								UINT16 colprimask,
+								UINT16 colpricondition
+								)
 {
 	const bitmap_t *src_bitmap = tilemap_get_pixmap(tilemap_ptr);
-	int x, y, p;
+	const bitmap_t *flags_bitmap = tilemap_get_flagsmap(tilemap_ptr);
+	int x, y, p, colpri;
 	int column_offset=0, src_x=0, src_y=0;
 	UINT32 scrollx=control1[0];
 	UINT32 scrolly=control1[1];
@@ -230,26 +239,23 @@ static void custom_tilemap_draw(running_machine *machine,
 				column_offset=colscroll_ptr[((src_x >> 3) >> (control1[2]&0xf))&(0x3f>>(control1[2]&0xf))];
 
 			p = *BITMAP_ADDR16(src_bitmap, (src_y + column_offset)&height_mask, src_x&width_mask);
-
+			colpri =  *BITMAP_ADDR8(flags_bitmap, (src_y + column_offset)&height_mask, src_x&width_mask)&0xf;
+		
 			src_x++;
 			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&0xf))
 			{
-				if( flags & TILEMAP_DRAW_LAYER0 )
-				{
-					/* Top 8 pens of top 8 palettes only */
-					if ((p&0x88)==0x88)
-						*BITMAP_ADDR16(bitmap, y, x) = p;
-				}
-				else
-					*BITMAP_ADDR16(bitmap, y, x) = p;
+
+				
+				if ((p&penmask)==pencondition)
+					if((colpri&colprimask)==colpricondition)
+						*BITMAP_ADDR16(bitmap, y, x) = p+(colpri&m_gfxcolmask)*0x10;
 			}
 		}
 		src_y++;
 	}
 }
 
-
-void deco_bac06_device::deco_bac06_pf_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags)
+void deco_bac06_device::deco_bac06_pf_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition)
 {
 	tilemap_t* tm = 0;
 
@@ -278,20 +284,28 @@ void deco_bac06_device::deco_bac06_pf_draw(running_machine *machine,bitmap_t *bi
 	};
 
 	if (tm)
-		custom_tilemap_draw(machine,bitmap,cliprect,tm,pf_rowscroll,pf_colscroll,pf_control_0,pf_control_1,flags);
+		custom_tilemap_draw(machine,bitmap,cliprect,tm,pf_rowscroll,pf_colscroll,pf_control_0,pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
 
 }
-
 
 
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w )
 {
+	offset &= 3;
 	deco_bac06_device *dev = (deco_bac06_device*)device;
 	COMBINE_DATA(&dev->pf_control_0[offset]);
 }
 
+READ16_DEVICE_HANDLER( deco_bac06_pf_control_1_r )
+{
+	offset &= 3;
+	deco_bac06_device *dev = (deco_bac06_device*)device;
+	return dev->pf_control_1[offset];
+}
+
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_1_w )
 {
+	offset &= 7;
 	deco_bac06_device *dev = (deco_bac06_device*)device;
 	COMBINE_DATA(&dev->pf_control_1[offset]);
 }
@@ -314,49 +328,22 @@ READ16_DEVICE_HANDLER( deco_bac06_pf_data_r )
 	return dev->pf_data[offset];
 }
 
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control_8bit_w )
-{
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	UINT16 myword;
 
-	dev->buffer[offset]=data;
-
-	/* Rearrange little endian bytes from H6280 into big endian words for 68k */
-	offset&=0xffe;
-	myword=dev->buffer[offset] + (dev->buffer[offset+1]<<8);
-
-	if (offset<0x10) deco_bac06_pf_control_0_w(device,offset/2,myword,0xffff);
-	else deco_bac06_pf_control_1_w(device,(offset-0x10)/2,myword,0xffff);
-}
 
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_w )
 {
-	deco_bac06_device *dev = (deco_bac06_device*)device;
-	if (offset&1) { /* MSB has changed */
-		UINT16 lsb=dev->pf_data[offset>>1];
-		UINT16 newword=(lsb&0xff) | (data<<8);
-		dev->pf_data[offset>>1]=newword;
-	}
-	else { /* LSB has changed */
-		UINT16 msb=dev->pf_data[offset>>1];
-		UINT16 newword=(msb&0xff00) | data;
-		dev->pf_data[offset>>1]=newword;
-	}
-	tilemap_mark_tile_dirty(dev->pf8x8_tilemap[0],offset>>1);
-	tilemap_mark_tile_dirty(dev->pf8x8_tilemap[1],offset>>1);
-	tilemap_mark_tile_dirty(dev->pf8x8_tilemap[2],offset>>1);
-	tilemap_mark_tile_dirty(dev->pf16x16_tilemap[0],offset>>1);
-	tilemap_mark_tile_dirty(dev->pf16x16_tilemap[1],offset>>1);
-	tilemap_mark_tile_dirty(dev->pf16x16_tilemap[2],offset>>1);
+	if (offset&1)
+		deco_bac06_pf_data_w(device,offset/2,data,0x00ff);
+	else
+		deco_bac06_pf_data_w(device,offset/2,data<<8,0xff00);
 }
 
 READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_r )
 {
-	deco_bac06_device *dev = (deco_bac06_device*)device;
 	if (offset&1) /* MSB */
-		return dev->pf_data[offset>>1]>>8;
-
-	return dev->pf_data[offset>>1]&0xff;
+		return deco_bac06_pf_data_r(device,offset/2,0x00ff);
+	else
+		return deco_bac06_pf_data_r(device,offset/2,0xff00)>>8;
 }
 
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_rowscroll_w )
@@ -383,3 +370,85 @@ READ16_DEVICE_HANDLER( deco_bac06_pf_colscroll_r )
 	return dev->pf_colscroll[offset];
 }
 
+/* used by dec8.c */
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_w )
+{
+	if (offset&1)
+		deco_bac06_pf_control_0_w(device,offset/2,data,0x00ff); // oscar (mirrors?)
+	else
+		deco_bac06_pf_control_0_w(device,offset/2,data,0x00ff);
+}
+
+/* used by dec8.c */
+READ8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_r )
+{
+	if (offset&1)
+		return deco_bac06_pf_control_1_r(device,offset/2,0x00ff);
+	else
+		return deco_bac06_pf_control_1_r(device,offset/2,0xff00)>>8;
+}
+
+/* used by dec8.c */
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w )
+{
+	if (offset&1)
+		deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
+	else
+		deco_bac06_pf_control_1_w(device,offset/2,data<<8,0xff00);
+}
+
+READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r )
+{
+	if (offset&1)
+		return deco_bac06_pf_rowscroll_r(device,offset/2,0x00ff);
+	else
+		return deco_bac06_pf_rowscroll_r(device,offset/2,0xff00)>>8;
+}
+
+
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w )
+{
+	if (offset&1)
+		deco_bac06_pf_rowscroll_w(device,offset/2,data,0x00ff);
+	else
+		deco_bac06_pf_rowscroll_w(device,offset/2,data<<8,0xff00);
+}
+
+
+/* used by hippodrm */
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w )
+{
+	if (offset&1)
+		deco_bac06_pf_control_0_w(device,offset/2,data<<8,0xff00);
+	else
+		deco_bac06_pf_control_0_w(device,offset/2,data,0x00ff);
+}
+
+/* used by hippodrm */
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w )
+{
+	if (offset&1)
+		deco_bac06_pf_control_1_w(device,offset/2,data<<8,0xff00);
+	else
+		deco_bac06_pf_control_1_w(device,offset/2,data,0x00ff);
+
+}
+
+/* used by hippodrm */
+READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r )
+{
+	if (offset&1)
+		return deco_bac06_pf_data_r(device,offset/2,0xff00)>>8;
+	else
+		return deco_bac06_pf_data_r(device,offset/2,0x00ff);
+}
+
+/* used by hippodrm */
+WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_w )
+{
+	if (offset&1)
+		deco_bac06_pf_data_w(device,offset/2,data<<8,0xff00);
+	else
+		deco_bac06_pf_data_w(device,offset/2,data,0x00ff);
+
+}

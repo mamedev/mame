@@ -7,7 +7,7 @@ public:
 
 	/* memory pointers */
 	UINT8 *  videoram;
-	UINT8 *  pf0_data;
+	UINT8 *  bg_data;
 	UINT8 *  pf1_data;
 	UINT8 *  row;
 //  UINT8 *  paletteram;    // currently this uses generic palette handling
@@ -16,11 +16,11 @@ public:
 	size_t   videoram_size;
 
 	/* video-related */
-	tilemap_t  *pf0_tilemap, *pf1_tilemap, *fix_tilemap;
+	tilemap_t  *bg_tilemap, *pf1_tilemap, *fix_tilemap;
 	//int      scroll1[4];
 	int      scroll2[4];
-	int      pf0_control[0x20], pf1_control[0x20];
-	int      gfx_mask, game_uses_priority;
+	int      bg_control[0x20], pf1_control[0x20];
+	int      game_uses_priority;
 
 	/* misc */
 	int      i8751_port0, i8751_port1;
@@ -60,9 +60,9 @@ VIDEO_START( garyoret );
 
 WRITE8_HANDLER( dec8_bac06_0_w );
 WRITE8_HANDLER( dec8_bac06_1_w );
-WRITE8_HANDLER( dec8_pf0_data_w );
+WRITE8_HANDLER( dec8_bg_data_w );
 WRITE8_HANDLER( dec8_pf1_data_w );
-READ8_HANDLER( dec8_pf0_data_r );
+READ8_HANDLER( dec8_bg_data_r );
 READ8_HANDLER( dec8_pf1_data_r );
 WRITE8_HANDLER( srdarwin_videoram_w );
 WRITE8_HANDLER( dec8_scroll2_w );
