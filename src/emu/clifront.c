@@ -998,7 +998,7 @@ static void info_listsoftware(emu_options &options, const char *gamename)
 														fprintf( out, " status=\"nodump\"" );
 
 													if (is_disk)
-														fprintf( out, " writable=\"%s\"", (ROM_GETFLAGS(rom) & DISK_READONLYMASK) ? "no" : "yes");
+														fprintf( out, " writeable=\"%s\"", (ROM_GETFLAGS(rom) & DISK_READONLYMASK) ? "no" : "yes");
 
 													if ((ROM_GETFLAGS(rom) & ROM_SKIPMASK) == ROM_SKIP(1))
 														fprintf( out, " loadflag=\"load16_byte\"" );
@@ -1403,7 +1403,7 @@ static void identify_file(emu_options &options, const char *name, romident_statu
 			header = *chd_get_header(chd);
 			if (header.flags & CHDFLAGS_IS_WRITEABLE)
 			{
-				mame_printf_info("is a writable CHD\n");
+				mame_printf_info("is a writeable CHD\n");
 			}
 			else
 			{
