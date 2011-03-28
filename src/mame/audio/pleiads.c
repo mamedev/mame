@@ -409,7 +409,7 @@ INLINE int noise(pleiads_sound_state *state, int samplerate)
 static STREAM_UPDATE( pleiads_sound_update )
 {
 	pleiads_sound_state *state = get_safe_token(device);
-	int rate = device->machine->sample_rate;
+	int rate = device->machine->sample_rate();
 	stream_sample_t *buffer = outputs[0];
 
 	while( samples-- > 0 )
@@ -496,7 +496,7 @@ static DEVICE_START( common_sh_start )
 		state->poly18[i] = bits;
 	}
 
-	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, NULL, pleiads_sound_update);
+	state->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), NULL, pleiads_sound_update);
 }
 
 static DEVICE_START( pleiads_sound )

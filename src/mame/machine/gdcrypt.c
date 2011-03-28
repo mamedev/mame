@@ -345,7 +345,7 @@ void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"encrypted %s", machine->gamedrv->name);
+		sprintf(filename,"encrypted %s", machine->system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -370,7 +370,7 @@ void naomi_game_decrypt(running_machine* machine, UINT64 key, UINT8* region, int
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted %s", machine->gamedrv->name);
+		sprintf(filename,"decrypted %s", machine->system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

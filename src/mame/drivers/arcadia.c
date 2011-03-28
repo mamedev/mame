@@ -742,7 +742,7 @@ INLINE void generic_decode(running_machine *machine, const char *tag, int bit7, 
 
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine->gamedrv->name);
+		sprintf(filename,"decrypted_%s", machine->system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

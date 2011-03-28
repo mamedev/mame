@@ -472,7 +472,7 @@ static void zn_driver_init( running_machine *machine )
 	n_game = 0;
 	while( zn_config_table[ n_game ].s_name != NULL )
 	{
-		if( strcmp( machine->gamedrv->name, zn_config_table[ n_game ].s_name ) == 0 )
+		if( strcmp( machine->system().name, zn_config_table[ n_game ].s_name ) == 0 )
 		{
 			znsec_init( 0, zn_config_table[ n_game ].p_n_mainsec );
 			znsec_init( 1, zn_config_table[ n_game ].p_n_gamesec );
@@ -721,8 +721,8 @@ static DRIVER_INIT( coh1000c )
 
 	zn_driver_init(machine);
 
-	if( strcmp( machine->gamedrv->name, "glpracr" ) == 0 ||
-		strcmp( machine->gamedrv->name, "glpracr2l" ) == 0 )
+	if( strcmp( machine->system().name, "glpracr" ) == 0 ||
+		strcmp( machine->system().name, "glpracr2l" ) == 0 )
 	{
 		/* disable:
             the QSound CPU for glpracr as it doesn't have any roms &
@@ -2156,7 +2156,7 @@ static DRIVER_INIT( coh1000a )
 	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1fbfff00, 0x1fbfff03, FUNC(acpsx_00_w) );
 	machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler( 0x1fbfff10, 0x1fbfff13, FUNC(acpsx_10_w) );
 
-	if( strcmp( machine->gamedrv->name, "nbajamex" ) == 0 )
+	if( strcmp( machine->system().name, "nbajamex" ) == 0 )
 	{
 		state->nbajamex_eeprom_size = 0x8000;
 		state->nbajamex_eeprom = auto_alloc_array( machine, UINT8, state->nbajamex_eeprom_size );
@@ -2168,8 +2168,8 @@ static DRIVER_INIT( coh1000a )
 		memory_set_bankptr( machine, "bank2", state->nbajamex_eeprom ); /* ram/eeprom/?? */
 	}
 
-	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
-		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
+	if( ( !strcmp( machine->system().name, "jdredd" ) ) ||
+		( !strcmp( machine->system().name, "jdreddb" ) ) )
 	{
 		device_t *ide = machine->device("ide");
 
@@ -2185,8 +2185,8 @@ static MACHINE_RESET( coh1000a )
 {
 	memory_set_bankptr( machine, "bank1", machine->region( "user2" )->base() ); /* fixed game rom */
 	zn_machine_init(machine);
-	if( ( !strcmp( machine->gamedrv->name, "jdredd" ) ) ||
-		( !strcmp( machine->gamedrv->name, "jdreddb" ) ) )
+	if( ( !strcmp( machine->system().name, "jdredd" ) ) ||
+		( !strcmp( machine->system().name, "jdreddb" ) ) )
 	{
 		devtag_reset(machine, "ide");
 	}

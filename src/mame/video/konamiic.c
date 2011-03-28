@@ -2535,7 +2535,7 @@ void K051960_vh_start(running_machine *machine,const char *gfx_memory_region,int
 		fatalerror("Unknown plane_order");
 	}
 
-	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	K051960_dx = K051960_dy = 0;
@@ -3035,7 +3035,7 @@ void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_
 		fatalerror("Unsupported plane_order");
 	}
 
-	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 
@@ -3809,12 +3809,12 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	{
 	if (machine->primary_screen->format() == BITMAP_FORMAT_RGB32)
 	{
-		if ((machine->config->m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+		if ((machine->config().m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 			popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 	}
 	else
 	{
-		if (!(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
+		if (!(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
 			popmessage("driver should use VIDEO_HAS_SHADOWS");
 	}
 	}
@@ -3946,7 +3946,7 @@ void K055673_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		fatalerror("Unsupported layout");
 	}
 
-	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	K053247_dx = dx;
@@ -4245,9 +4245,9 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 
         VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
     */
-	if (machine->config->m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp == 32 && (machine->config->m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap->bpp == 32 && (machine->config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows

@@ -1107,8 +1107,8 @@ static WRITE32_HANDLER( bankoffset_w )
 	namcos12_state *state = space->machine->driver_data<namcos12_state>();
 
 	// Golgo 13 has different banking (maybe the keycus controls it?)
-	if( strcmp( space->machine->gamedrv->name, "golgo13" ) == 0 ||
-		strcmp( space->machine->gamedrv->name, "g13knd" ) == 0 )
+	if( strcmp( space->machine->system().name, "golgo13" ) == 0 ||
+		strcmp( space->machine->system().name, "g13knd" ) == 0 )
 	{
 		if( ( data & 8 ) != 0 )
 		{
@@ -1371,10 +1371,10 @@ static MACHINE_RESET( namcos12 )
 	bankoffset_w(space,0,0,0xffffffff);
 	state->has_tektagt_dma = 0;
 
-	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tektagta" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tektagtb" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tektagtc" ) == 0 )
+	if( strcmp( machine->system().name, "tektagt" ) == 0 ||
+		strcmp( machine->system().name, "tektagta" ) == 0 ||
+		strcmp( machine->system().name, "tektagtb" ) == 0 ||
+		strcmp( machine->system().name, "tektagtc" ) == 0 )
 	{
 		state->has_tektagt_dma = 1;
 		space->install_legacy_readwrite_handler(0x1fb00000, 0x1fb00003, FUNC(tektagt_protection_1_r), FUNC(tektagt_protection_1_w) );
@@ -1382,24 +1382,24 @@ static MACHINE_RESET( namcos12 )
 		space->install_legacy_read_handler(0x1f700000, 0x1f700003, FUNC(tektagt_protection_3_r) );
 	}
 
-	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tektagta" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tektagtb" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tektagtc" ) == 0 ||
-		strcmp( machine->gamedrv->name, "fgtlayer" ) == 0 ||
-		strcmp( machine->gamedrv->name, "golgo13" ) == 0 ||
-		strcmp( machine->gamedrv->name, "g13knd" ) == 0 ||
-		strcmp( machine->gamedrv->name, "mrdrillr" ) == 0 ||
-		strcmp( machine->gamedrv->name, "pacapp" ) == 0 ||
-		strcmp( machine->gamedrv->name, "pacappsp" ) == 0 ||
-		strcmp( machine->gamedrv->name, "pacapp2" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tenkomorj" ) == 0 ||
-		strcmp( machine->gamedrv->name, "tenkomor" ) == 0 ||
-		strcmp( machine->gamedrv->name, "ptblank2" ) == 0 ||
-		strcmp( machine->gamedrv->name, "sws2000" ) == 0 ||
-		strcmp( machine->gamedrv->name, "sws2001" ) == 0 ||
-		strcmp( machine->gamedrv->name, "truckk" ) == 0 ||
-		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
+	if( strcmp( machine->system().name, "tektagt" ) == 0 ||
+		strcmp( machine->system().name, "tektagta" ) == 0 ||
+		strcmp( machine->system().name, "tektagtb" ) == 0 ||
+		strcmp( machine->system().name, "tektagtc" ) == 0 ||
+		strcmp( machine->system().name, "fgtlayer" ) == 0 ||
+		strcmp( machine->system().name, "golgo13" ) == 0 ||
+		strcmp( machine->system().name, "g13knd" ) == 0 ||
+		strcmp( machine->system().name, "mrdrillr" ) == 0 ||
+		strcmp( machine->system().name, "pacapp" ) == 0 ||
+		strcmp( machine->system().name, "pacappsp" ) == 0 ||
+		strcmp( machine->system().name, "pacapp2" ) == 0 ||
+		strcmp( machine->system().name, "tenkomorj" ) == 0 ||
+		strcmp( machine->system().name, "tenkomor" ) == 0 ||
+		strcmp( machine->system().name, "ptblank2" ) == 0 ||
+		strcmp( machine->system().name, "sws2000" ) == 0 ||
+		strcmp( machine->system().name, "sws2001" ) == 0 ||
+		strcmp( machine->system().name, "truckk" ) == 0 ||
+		strcmp( machine->system().name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
 		space->install_read_bank (0x1fc20280, 0x1fc2028b, "bank2" );

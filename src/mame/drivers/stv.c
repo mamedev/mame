@@ -822,7 +822,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			}
 			case 0x47:
 			{
-				if ( strcmp(space->machine->gamedrv->name,"critcrsh") == 0 )
+				if ( strcmp(space->machine->system().name,"critcrsh") == 0 )
 				{
 					int data1 = 0, data2 = 0;
 
@@ -844,7 +844,7 @@ static READ32_HANDLER ( stv_io_r32 )
 			return (input_port_read(space->machine, "P1") << 16) | (input_port_read(space->machine, "P2"));
 		}
 		case 0x04/4:
-		if ( strcmp(space->machine->gamedrv->name,"critcrsh") == 0 )
+		if ( strcmp(space->machine->system().name,"critcrsh") == 0 )
 			return ((input_port_read(space->machine, "SYSTEM") << 16) & ((input_port_read(space->machine, "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
 		else
 			return (input_port_read(space->machine, "SYSTEM") << 16) | (ioga[1]);

@@ -891,7 +891,7 @@ static DRIVER_INIT( luckgrln )
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine->gamedrv->name);
+		sprintf(filename,"decrypted_%s", machine->system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

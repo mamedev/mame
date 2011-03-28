@@ -201,13 +201,13 @@ static int config_load_xml(running_machine *machine, emu_file &file, int which_t
 		goto error;
 
 	/* strip off all the path crap from the source filename */
-	srcfile = strrchr(machine->gamedrv->source_file, '/');
+	srcfile = strrchr(machine->system().source_file, '/');
 	if (!srcfile)
-		srcfile = strrchr(machine->gamedrv->source_file, '\\');
+		srcfile = strrchr(machine->system().source_file, '\\');
 	if (!srcfile)
-		srcfile = strrchr(machine->gamedrv->source_file, ':');
+		srcfile = strrchr(machine->system().source_file, ':');
 	if (!srcfile)
-		srcfile = machine->gamedrv->source_file;
+		srcfile = machine->system().source_file;
 	else
 		srcfile++;
 
@@ -223,7 +223,7 @@ static int config_load_xml(running_machine *machine, emu_file &file, int which_t
 		{
 			case CONFIG_TYPE_GAME:
 				/* only match on the specific game name */
-				if (strcmp(name, machine->gamedrv->name) != 0)
+				if (strcmp(name, machine->system().name) != 0)
 					continue;
 				break;
 
@@ -238,9 +238,9 @@ static int config_load_xml(running_machine *machine, emu_file &file, int which_t
 				const game_driver *clone_of;
 				/* match on: default, game name, source file name, parent name, grandparent name */
 				if (strcmp(name, "default") != 0 &&
-					strcmp(name, machine->gamedrv->name) != 0 &&
+					strcmp(name, machine->system().name) != 0 &&
 					strcmp(name, srcfile) != 0 &&
-					((clone_of = driver_get_clone(machine->gamedrv)) == NULL || strcmp(name, clone_of->name) != 0) &&
+					((clone_of = driver_get_clone(&machine->system())) == NULL || strcmp(name, clone_of->name) != 0) &&
 					(clone_of == NULL || ((clone_of = driver_get_clone(clone_of)) == NULL) || strcmp(name, clone_of->name) != 0))
 					continue;
 				break;
@@ -299,7 +299,7 @@ static int config_save_xml(running_machine *machine, emu_file &file, int which_t
 	systemnode = xml_add_child(confignode, "system", NULL);
 	if (!systemnode)
 		goto error;
-	xml_set_attribute(systemnode, "name", (which_type == CONFIG_TYPE_DEFAULT) ? "default" : machine->gamedrv->name);
+	xml_set_attribute(systemnode, "name", (which_type == CONFIG_TYPE_DEFAULT) ? "default" : machine->system().name);
 
 	/* create the input node and write it out */
 	/* loop over all registrants and call their save function */

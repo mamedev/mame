@@ -135,7 +135,7 @@ DRIVER_INIT(vegaa)
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"vega_%s", machine->gamedrv->name);
+		sprintf(filename,"vega_%s", machine->system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

@@ -1854,7 +1854,7 @@ static DRIVER_INIT( sngkace )
 
 	/* Enable other regions */
 #if 0
-	if (!strcmp(machine->gamedrv->name,"sngkace"))
+	if (!strcmp(machine->system().name,"sngkace"))
 	{
 		UINT8 *ROM	=	machine->region("maincpu")->base();
 		ROM[0x995] = 0x4e;

@@ -702,8 +702,8 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 render_container::render_container(render_manager &manager, screen_device *screen)
 	: m_next(NULL),
 	  m_manager(manager),
-	  m_itemlist(manager.machine().m_respool),
-	  m_item_allocator(manager.machine().m_respool),
+	  m_itemlist(manager.machine().respool()),
+	  m_item_allocator(manager.machine().respool()),
 	  m_screen(screen),
 	  m_overlaybitmap(NULL),
 	  m_overlaytexture(NULL),
@@ -720,7 +720,7 @@ render_container::render_container(render_manager &manager, screen_device *scree
 	if (screen != NULL)
 	{
 		// set the initial orientation and brightness/contrast/gamma
-		m_user.m_orientation = manager.machine().gamedrv->flags & ORIENTATION_MASK;
+		m_user.m_orientation = manager.machine().system().flags & ORIENTATION_MASK;
 		m_user.m_brightness = manager.machine().options().brightness();
 		m_user.m_contrast = manager.machine().options().contrast();
 		m_user.m_gamma = manager.machine().options().gamma();
@@ -1051,7 +1051,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	: m_next(NULL),
 	  m_manager(manager),
 	  m_curview(NULL),
-	  m_filelist(*auto_alloc(&manager.machine(), simple_list<layout_file>(manager.machine().m_respool))),
+	  m_filelist(*auto_alloc(&manager.machine(), simple_list<layout_file>(manager.machine().respool()))),
 	  m_flags(flags),
 	  m_listindex(0),
 	  m_width(640),
@@ -1063,7 +1063,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	  m_base_orientation(ROT0),
 	  m_maxtexwidth(65536),
 	  m_maxtexheight(65536),
-	  m_debug_containers(manager.machine().m_respool)
+	  m_debug_containers(manager.machine().respool())
 {
 	// determine the base layer configuration based on options
 	m_base_layerconfig.set_backdrops_enabled(manager.machine().options().use_backdrops());
@@ -1074,12 +1074,12 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	// determine the base orientation based on options
 	m_orientation = ROT0;
 	if (!manager.machine().options().rotate())
-		m_base_orientation = orientation_reverse(manager.machine().gamedrv->flags & ORIENTATION_MASK);
+		m_base_orientation = orientation_reverse(manager.machine().system().flags & ORIENTATION_MASK);
 
 	// rotate left/right
-	if (manager.machine().options().ror() || (manager.machine().options().auto_ror() && (manager.machine().gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (manager.machine().options().ror() || (manager.machine().options().auto_ror() && (manager.machine().system().flags & ORIENTATION_SWAP_XY)))
 		m_base_orientation = orientation_add(ROT90, m_base_orientation);
-	if (manager.machine().options().rol() || (manager.machine().options().auto_rol() && (manager.machine().gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (manager.machine().options().rol() || (manager.machine().options().auto_rol() && (manager.machine().system().flags & ORIENTATION_SWAP_XY)))
 		m_base_orientation = orientation_add(ROT270, m_base_orientation);
 
 	// flip X/Y
@@ -1631,18 +1631,18 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 		return;
 
 	// try to load a file based on the driver name
-	const game_driver *gamedrv = m_manager.machine().gamedrv;
-	if (!load_layout_file(basename, gamedrv->name))
+	const game_driver &system = m_manager.machine().system();
+	if (!load_layout_file(basename, system.name))
 		load_layout_file(basename, "default");
 
 	// if a default view has been specified, use that as a fallback
-	if (gamedrv->default_layout != NULL)
-		load_layout_file(NULL, gamedrv->default_layout);
-	if (m_manager.machine().m_config.m_default_layout != NULL)
-		load_layout_file(NULL, m_manager.machine().m_config.m_default_layout);
+	if (system.default_layout != NULL)
+		load_layout_file(NULL, system.default_layout);
+	if (m_manager.machine().config().m_default_layout != NULL)
+		load_layout_file(NULL, m_manager.machine().config().m_default_layout);
 
 	// try to load another file based on the parent driver name
-	const game_driver *cloneof = driver_get_clone(gamedrv);
+	const game_driver *cloneof = driver_get_clone(&system);
 	if (cloneof != NULL)
 		if (!load_layout_file(cloneof->name, cloneof->name))
 			load_layout_file(cloneof->name, "default");
@@ -1650,7 +1650,7 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 	// now do the built-in layouts for single-screen games
 	if (m_manager.machine().m_devicelist.count(SCREEN) == 1)
 	{
-		if (gamedrv->flags & ORIENTATION_SWAP_XY)
+		if (system.flags & ORIENTATION_SWAP_XY)
 			load_layout_file(NULL, layout_vertical);
 		else
 			load_layout_file(NULL, layout_horizont);
@@ -2454,12 +2454,12 @@ done:
 
 render_manager::render_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_targetlist(machine.m_respool),
+	  m_targetlist(machine.respool()),
 	  m_ui_target(NULL),
 	  m_live_textures(0),
-	  m_texture_allocator(machine.m_respool),
+	  m_texture_allocator(machine.respool()),
 	  m_ui_container(auto_alloc(&machine, render_container(*this))),
-	  m_screen_container_list(machine.m_respool)
+	  m_screen_container_list(machine.respool())
 {
 	// register callbacks
 	config_register(&machine, "video", config_load_static, config_save_static);

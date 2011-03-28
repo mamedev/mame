@@ -587,7 +587,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 		if (!(old & 0x80) && TONE1_ON)
 		{
 			mos6560->tone1pos = 0;
-			mos6560->tone1samples = device->machine->sample_rate / TONE1_FREQUENCY;
+			mos6560->tone1samples = device->machine->sample_rate() / TONE1_FREQUENCY;
 			if (!mos6560->tone1samples == 0)
 				mos6560->tone1samples = 1;
 		}
@@ -598,7 +598,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 		if (!(old & 0x80) && TONE2_ON)
 		{
 			mos6560->tone2pos = 0;
-			mos6560->tone2samples = device->machine->sample_rate / TONE2_FREQUENCY;
+			mos6560->tone2samples = device->machine->sample_rate() / TONE2_FREQUENCY;
 			if (mos6560->tone2samples == 0)
 				mos6560->tone2samples = 1;
 		}
@@ -609,7 +609,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 		if (!(old & 0x80) && TONE3_ON)
 		{
 			mos6560->tone3pos = 0;
-			mos6560->tone3samples = device->machine->sample_rate / TONE3_FREQUENCY;
+			mos6560->tone3samples = device->machine->sample_rate() / TONE3_FREQUENCY;
 			if (mos6560->tone3samples == 0)
 				mos6560->tone3samples = 1;
 		}
@@ -619,7 +619,7 @@ static void mos6560_soundport_w( device_t *device, int offset, int data )
 		mos6560->reg[offset] = data;
 		if (NOISE_ON)
 		{
-			mos6560->noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * device->machine->sample_rate
+			mos6560->noisesamples = (int) ((double) NOISE_FREQUENCY_MAX * device->machine->sample_rate()
 								  * NOISE_BUFFER_SIZE_SEC / NOISE_FREQUENCY);
 			DBG_LOG (1, "mos6560", ("noise %.2x %d sample:%d\n",
 									data, NOISE_FREQUENCY, mos6560->noisesamples));
@@ -664,7 +664,7 @@ static STREAM_UPDATE( mos6560_update )
 			if (mos6560->tone1pos >= mos6560->tone1samples)
 			{
 				mos6560->tone1pos = 0;
-				mos6560->tone1samples = device->machine->sample_rate / TONE1_FREQUENCY;
+				mos6560->tone1samples = device->machine->sample_rate() / TONE1_FREQUENCY;
 				if (mos6560->tone1samples == 0)
 					mos6560->tone1samples = 1;
 			}
@@ -680,7 +680,7 @@ static STREAM_UPDATE( mos6560_update )
 			if (mos6560->tone2pos >= mos6560->tone2samples)
 			{
 				mos6560->tone2pos = 0;
-				mos6560->tone2samples = device->machine->sample_rate / TONE2_FREQUENCY;
+				mos6560->tone2samples = device->machine->sample_rate() / TONE2_FREQUENCY;
 				if (mos6560->tone2samples == 0)
 					mos6560->tone2samples = 1;
 			}
@@ -696,7 +696,7 @@ static STREAM_UPDATE( mos6560_update )
 			if (mos6560->tone3pos >= mos6560->tone3samples)
 			{
 				mos6560->tone3pos = 0;
-				mos6560->tone3samples = device->machine->sample_rate / TONE3_FREQUENCY;
+				mos6560->tone3samples = device->machine->sample_rate() / TONE3_FREQUENCY;
 				if (mos6560->tone3samples == 0)
 					mos6560->tone3samples = 1;
 			}
@@ -739,7 +739,7 @@ static void mos6560_sound_start( device_t *device )
 	mos6560_state *mos6560 = get_safe_token(device);
 	int i;
 
-	mos6560->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, 0, mos6560_update);
+	mos6560->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), 0, mos6560_update);
 
 	/* buffer for fastest played sample for 5 second so we have enough data for min 5 second */
 	mos6560->noisesize = NOISE_FREQUENCY_MAX * NOISE_BUFFER_SIZE_SEC;
@@ -774,7 +774,7 @@ static void mos6560_sound_start( device_t *device )
 				noiseshift <<= 1;
 		}
 	}
-	mos6560->tonesize = device->machine->sample_rate / TONE_FREQUENCY_MIN;
+	mos6560->tonesize = device->machine->sample_rate() / TONE_FREQUENCY_MIN;
 
 	if (mos6560->tonesize > 0)
 	{

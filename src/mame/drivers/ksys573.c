@@ -1346,7 +1346,7 @@ static INTERRUPT_GEN( sys573_vblank )
 
 	update_mode(device->machine);
 
-	if( strcmp( device->machine->gamedrv->name, "ddr2ml" ) == 0 )
+	if( strcmp( device->machine->system().name, "ddr2ml" ) == 0 )
 	{
 		/* patch out security-plate error */
 
@@ -1368,7 +1368,7 @@ static INTERRUPT_GEN( sys573_vblank )
 			p_n_psxram[ 0x1f850 / 4 ] = 0x08007e22;
 		}
 	}
-	else if( strcmp( device->machine->gamedrv->name, "ddr2mla" ) == 0 )
+	else if( strcmp( device->machine->system().name, "ddr2mla" ) == 0 )
 	{
 		/* patch out security-plate error */
 

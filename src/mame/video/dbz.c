@@ -86,7 +86,7 @@ VIDEO_START( dbz )
 	tilemap_set_transparent_pen(state->bg1_tilemap, 0);
 	tilemap_set_transparent_pen(state->bg2_tilemap, 0);
 
-	if (!strcmp(machine->gamedrv->name, "dbz"))
+	if (!strcmp(machine->system().name, "dbz"))
 		k056832_set_layer_offs(state->k056832, 0, -34, -16);
 	else
 		k056832_set_layer_offs(state->k056832, 0, -35, -16);

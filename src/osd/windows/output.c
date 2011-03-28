@@ -309,7 +309,7 @@ static LRESULT send_id_string(running_machine *machine, HWND hwnd, LPARAM id)
 
 	// id 0 is the name of the game
 	if (id == 0)
-		name = machine->gamedrv->name;
+		name = machine->system().name;
 	else
 		name = output_id_to_name(id);
 

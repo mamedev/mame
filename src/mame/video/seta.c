@@ -218,16 +218,16 @@ void seta_coin_lockout_w(running_machine *machine, int data)
 	static const char *const seta_nolockout[8] = { "blandia", "gundhara", "kamenrid", "zingzip", "eightfrc", "extdwnhl", "sokonuke", "zombraid"};
 
 	/* Only compute seta_coin_lockout when confronted with a new gamedrv */
-	if (state->driver != machine->gamedrv)
+	if (!state->coin_lockout_initialized)
 	{
+		state->coin_lockout_initialized = true;
 		int i;
-		state->driver = machine->gamedrv;
 
 		state->coin_lockout = 1;
 		for (i=0; i<ARRAY_LENGTH(seta_nolockout); i++)
 		{
-			if (strcmp(state->driver->name, seta_nolockout[i]) == 0 ||
-				strcmp(state->driver->parent, seta_nolockout[i]) == 0)
+			if (strcmp(machine->system().name, seta_nolockout[i]) == 0 ||
+				strcmp(machine->system().parent, seta_nolockout[i]) == 0)
 			{
 				state->coin_lockout = 0;
 				break;
@@ -532,7 +532,7 @@ VIDEO_START( seta_no_layers )
 	state->tilemaps_flip = 0;
 
 	state->global_offsets = game_offsets;
-	while (state->global_offsets->gamename && strcmp(machine->gamedrv->name, state->global_offsets->gamename))
+	while (state->global_offsets->gamename && strcmp(machine->system().name, state->global_offsets->gamename))
 		state->global_offsets++;
 	state->samples_bank = -1;	// set the samples bank to an out of range value at start-up
 }
@@ -768,7 +768,7 @@ static void draw_sprites_map(running_machine *machine, bitmap_t *bitmap, const r
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine->config->m_gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->config().m_gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];
@@ -873,7 +873,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int offs;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine->config->m_gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->config().m_gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];

@@ -319,7 +319,6 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 	UINT32 index;
 
 	assert(machine != NULL);
-	assert(machine->config != NULL);
 	assert(palettesize > 0);
 
 	/* allocate the colortable */
@@ -583,9 +582,9 @@ static void allocate_palette(running_machine *machine, palette_private *palette)
 
 	/* determine the number of groups we need */
 	numgroups = 1;
-	if (machine->config->m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config().m_video_attributes & VIDEO_HAS_SHADOWS)
 		palette->shadow_group = numgroups++;
-	if (machine->config->m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
+	if (machine->config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
 		palette->hilight_group = numgroups++;
 	assert_always(machine->total_colors() * numgroups <= 65536, "Error: palette has more than 65536 colors.");
 
@@ -680,7 +679,7 @@ static void allocate_color_tables(running_machine *machine, palette_private *pal
 static void allocate_shadow_tables(running_machine *machine, palette_private *palette)
 {
 	/* if we have shadows, allocate shadow tables */
-	if (machine->config->m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
 		pen_t *table = auto_alloc_array(machine, pen_t, 65536);
 		int i;
@@ -703,7 +702,7 @@ static void allocate_shadow_tables(running_machine *machine, palette_private *pa
 	}
 
 	/* if we have hilights, allocate shadow tables */
-	if (machine->config->m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
+	if (machine->config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS)
 	{
 		pen_t *table = auto_alloc_array(machine, pen_t, 65536);
 		int i;

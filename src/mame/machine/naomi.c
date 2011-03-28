@@ -149,7 +149,7 @@ static void create_pic_from_retdat(running_machine* machine)
 			{
 				FILE *fp;
 				char filename[256];
-				sprintf(filename,"picbin_%s", machine->gamedrv->name);
+				sprintf(filename,"picbin_%s", machine->system().name);
 				fp=fopen(filename, "w+b");
 				if (fp)
 				{

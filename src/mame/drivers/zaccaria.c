@@ -215,7 +215,7 @@ static READ8_HANDLER( zaccaria_prot1_r )
 			return 0x40;    /* Jack Rabbit */
 
 		case 6:
-			if (space->machine->gamedrv == &GAME_NAME(monymony))
+			if (&space->machine->system() == &GAME_NAME(monymony))
 				return 0x70;    /* Money Money */
 			return 0xa0;    /* Jack Rabbit */
 

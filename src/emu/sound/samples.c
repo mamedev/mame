@@ -251,7 +251,7 @@ void sample_start(device_t *device,int channel,int samplenum,int loop)
 	chan->pos = 0;
 	chan->frac = 0;
 	chan->basefreq = sample->frequency;
-	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine->sample_rate;
+	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine->sample_rate();
 	chan->loop = loop;
 }
 
@@ -275,7 +275,7 @@ void sample_start_raw(device_t *device,int channel,const INT16 *sampledata,int s
 	chan->pos = 0;
 	chan->frac = 0;
 	chan->basefreq = frequency;
-	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine->sample_rate;
+	chan->step = ((INT64)chan->basefreq << FRAC_BITS) / info->device->machine->sample_rate();
 	chan->loop = loop;
 }
 
@@ -292,7 +292,7 @@ void sample_set_freq(device_t *device,int channel,int freq)
 	/* force an update before we start */
 	chan->stream->update();
 
-	chan->step = ((INT64)freq << FRAC_BITS) / info->device->machine->sample_rate;
+	chan->step = ((INT64)freq << FRAC_BITS) / info->device->machine->sample_rate();
 }
 
 
@@ -468,7 +468,7 @@ static DEVICE_START( samples )
 
 	/* read audio samples */
 	if (intf->samplenames)
-		info->samples = readsamples(device->machine, intf->samplenames,device->machine->gamedrv->name);
+		info->samples = readsamples(device->machine, intf->samplenames,device->machine->system().name);
 
 	/* allocate channels */
 	info->numchannels = intf->channels;
@@ -476,7 +476,7 @@ static DEVICE_START( samples )
 	info->channel = auto_alloc_array(device->machine, sample_channel, info->numchannels);
 	for (i = 0; i < info->numchannels; i++)
 	{
-	    info->channel[i].stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, &info->channel[i], sample_update_sound);
+	    info->channel[i].stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), &info->channel[i], sample_update_sound);
 
 		info->channel[i].source = NULL;
 		info->channel[i].source_num = -1;

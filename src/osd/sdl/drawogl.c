@@ -1206,7 +1206,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 	// figure out if we're vector
 	scrnum = is_vector = 0;
-	for (screen = window->machine->config->first_screen(); screen != NULL; screen = screen->next_screen())
+	for (screen = window->machine->config().first_screen(); screen != NULL; screen = screen->next_screen())
 	{
 		if (scrnum == window->index)
 		{

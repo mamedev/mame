@@ -884,22 +884,22 @@ static READ8_HANDLER( fixeight_region_r )
 	// this code, and the default eeproms use should be considered subject
 	// to change
 
-	if (!strcmp(space->machine->gamedrv->name,"fixeightkt"))	return 0x00;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightk"))	return 0x01;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightht"))	return 0x02;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighth"))	return 0x03;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighttwt"))	return 0x04;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighttw"))	return 0x05;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightat"))	return 0x06;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x07;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightt"))	return 0x08;
-	if (!strcmp(space->machine->gamedrv->name,"fixeight9"))	return 0x09;
-	if (!strcmp(space->machine->gamedrv->name,"fixeighta"))	return 0x0a;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightu"))	return 0x0b;
-//  if (!strcmp(space->machine->gamedrv->name,"fixeightc")) return 0x0c; // invalid
-//  if (!strcmp(space->machine->gamedrv->name,"fixeightd")) return 0x0d; // invalid
-	if (!strcmp(space->machine->gamedrv->name,"fixeightj"))	return 0x0e;
-	if (!strcmp(space->machine->gamedrv->name,"fixeightjt"))	return 0x0f;
+	if (!strcmp(space->machine->system().name,"fixeightkt"))	return 0x00;
+	if (!strcmp(space->machine->system().name,"fixeightk"))	return 0x01;
+	if (!strcmp(space->machine->system().name,"fixeightht"))	return 0x02;
+	if (!strcmp(space->machine->system().name,"fixeighth"))	return 0x03;
+	if (!strcmp(space->machine->system().name,"fixeighttwt"))	return 0x04;
+	if (!strcmp(space->machine->system().name,"fixeighttw"))	return 0x05;
+	if (!strcmp(space->machine->system().name,"fixeightat"))	return 0x06;
+	if (!strcmp(space->machine->system().name,"fixeighta"))	return 0x07;
+	if (!strcmp(space->machine->system().name,"fixeightt"))	return 0x08;
+	if (!strcmp(space->machine->system().name,"fixeight9"))	return 0x09;
+	if (!strcmp(space->machine->system().name,"fixeighta"))	return 0x0a;
+	if (!strcmp(space->machine->system().name,"fixeightu"))	return 0x0b;
+//  if (!strcmp(space->machine->system().name,"fixeightc")) return 0x0c; // invalid
+//  if (!strcmp(space->machine->system().name,"fixeightd")) return 0x0d; // invalid
+	if (!strcmp(space->machine->system().name,"fixeightj"))	return 0x0e;
+	if (!strcmp(space->machine->system().name,"fixeightjt"))	return 0x0f;
 
 	return 0x00;
 }

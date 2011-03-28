@@ -301,8 +301,8 @@ static DEVICE_START( tx1_sound )
 
 
 	/* Allocate the stream */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate, NULL, tx1_stream_update);
-	state->freq_to_step = (double)(1 << TX1_FRAC) / (double)machine->sample_rate;
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate(), NULL, tx1_stream_update);
+	state->freq_to_step = (double)(1 << TX1_FRAC) / (double)machine->sample_rate();
 
 	/* Compute the engine resistor weights */
 	compute_resistor_weights(0,	10000, -1.0,
@@ -442,7 +442,7 @@ WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 
 	state->ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(device->machine->gamedrv->name, "buggyboyjr"))
+	if (!strcmp(device->machine->system().name, "buggyboyjr"))
 	{
 		coin_counter_w(device->machine, 0, data & 0x01);
 		coin_counter_w(device->machine, 1, data & 0x02);
@@ -489,7 +489,7 @@ static STREAM_UPDATE( buggyboy_stream_update )
 	step_0 = state->pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / state->pit8253.counts[0].val) * state->freq_to_step : 0;
 	step_1 = state->pit8253.counts[1].val ? (BUGGYBOY_PIT_CLOCK / state->pit8253.counts[1].val) * state->freq_to_step : 0;
 
-	if (!strcmp(device->machine->gamedrv->name, "buggyboyjr"))
+	if (!strcmp(device->machine->system().name, "buggyboyjr"))
 		gain0 = BIT(state->ym2_outputb, 3) ? 1.0 : 2.0;
 	else
 		gain0 = BIT(state->ym1_outputa, 3) ? 1.0 : 2.0;
@@ -508,7 +508,7 @@ static STREAM_UPDATE( buggyboy_stream_update )
 		pit1 = state->eng_voltages[(state->step1 >> 24) & 0xf];
 
 		/* Calculate the tyre screech noise source */
-		for (i = 0; i < BUGGYBOY_NOISE_CLOCK / device->machine->sample_rate; ++i)
+		for (i = 0; i < BUGGYBOY_NOISE_CLOCK / device->machine->sample_rate(); ++i)
 		{
 			/* CD4006 is a 4-4-1-4-4-1 shift register */
 			int p13 = BIT(state->noise_lfsra, 3);
@@ -572,8 +572,8 @@ static DEVICE_START( buggyboy_sound )
 		state->eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
-	state->freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate(), NULL, buggyboy_stream_update);
+	state->freq_to_step = (double)(1 << 24) / (double)machine->sample_rate();
 }
 
 static DEVICE_RESET( buggyboy_sound )

@@ -459,7 +459,7 @@ static WRITE32_HANDLER( lanc2_w )
 	}
 	if (offset == 4)
 	{
-		if (mame_stricmp(space->machine->gamedrv->name, "thrilld") == 0)
+		if (mame_stricmp(space->machine->system().name, "thrilld") == 0)
 		{
 			state->work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
 			state->work_ram[(0x3ffed0/4) + 1] = 0x33202020;

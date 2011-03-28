@@ -125,7 +125,7 @@ WRITE16_HANDLER(galpanib_calc_w)
 WRITE16_HANDLER(bloodwar_calc_w)
 {
 
-	int isbrap = ( !strcmp(space->machine->gamedrv->name,"brapboysj") || !strcmp(space->machine->gamedrv->name,"brapboys"));
+	int isbrap = ( !strcmp(space->machine->system().name,"brapboysj") || !strcmp(space->machine->system().name,"brapboys"));
 
 	/* our implementation is incomplete, b.rap boys requires some modifications */
 	if (isbrap)
@@ -200,7 +200,7 @@ READ16_HANDLER(bloodwar_calc_r)
 	INT16 x_coll, y_coll;
 
 	/* our implementation is incomplete, b.rap boys requires some modifications */
-	int isbrap = ( !strcmp(space->machine->gamedrv->name,"brapboysj") || !strcmp(space->machine->gamedrv->name,"brapboys"));
+	int isbrap = ( !strcmp(space->machine->system().name,"brapboysj") || !strcmp(space->machine->system().name,"brapboys"));
 
 	if (isbrap)
 	{
@@ -2057,13 +2057,13 @@ DRIVER_INIT(calc3_scantables)
 			if (calc3_blocksize_offset==3)
 			{
 				sprintf(filename,"data_%s_table_%04x k%02x m%02x u%02x length %04x",
-						machine->gamedrv->name,
+						machine->system().name,
 						x, calc3_decryption_key_byte, calc3_mode, calc3_alternateswaps, length);
 			}
 			else
 			{
 				sprintf(filename,"data_%s_table_%04x k%02x (use indirect size %02x) m%02x u%02x length %04x",
-					machine->gamedrv->name,
+					machine->system().name,
 					x, calc3_decryption_key_byte, calc3_blocksize_offset-3, calc3_mode, calc3_alternateswaps, length);
 			}
 
@@ -2089,7 +2089,7 @@ DRIVER_INIT(calc3_scantables)
 		char filename[256];
 
 		sprintf(filename,"data_%s_finalblock",
-		machine->gamedrv->name);
+		machine->system().name);
 
 		fp=fopen(filename, "w+b");
 		if (fp)
@@ -2349,7 +2349,7 @@ DRIVER_INIT( decrypt_toybox_rom )
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"%s.mcudata", machine->gamedrv->name);
+		sprintf(filename,"%s.mcudata", machine->system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

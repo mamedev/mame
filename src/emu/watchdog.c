@@ -57,7 +57,7 @@ void watchdog_init(running_machine *machine)
 static void watchdog_internal_reset(running_machine &machine)
 {
 	/* set up the watchdog timer; only start off enabled if explicitly configured */
-	watchdog_enabled = (machine.m_config.m_watchdog_vblank_count != 0 || machine.m_config.m_watchdog_time != attotime::zero);
+	watchdog_enabled = (machine.config().m_watchdog_vblank_count != 0 || machine.config().m_watchdog_time != attotime::zero);
 	watchdog_reset(&machine);
 	watchdog_enabled = TRUE;
 }
@@ -90,7 +90,7 @@ static void on_vblank(screen_device &screen, void *param, bool vblank_state)
 	if (vblank_state && watchdog_enabled)
 	{
 		/* check the watchdog */
-		if (screen.machine->config->m_watchdog_vblank_count != 0)
+		if (screen.machine->config().m_watchdog_vblank_count != 0)
 		{
 			watchdog_counter = watchdog_counter - 1;
 
@@ -112,9 +112,9 @@ void watchdog_reset(running_machine *machine)
 		watchdog_timer->adjust(attotime::never);
 
 	/* VBLANK-based watchdog? */
-	else if (machine->config->m_watchdog_vblank_count != 0)
+	else if (machine->config().m_watchdog_vblank_count != 0)
 	{
-		watchdog_counter = machine->config->m_watchdog_vblank_count;
+		watchdog_counter = machine->config().m_watchdog_vblank_count;
 
 		/* register a VBLANK callback for the primary screen */
 		if (machine->primary_screen != NULL)
@@ -122,8 +122,8 @@ void watchdog_reset(running_machine *machine)
 	}
 
 	/* timer-based watchdog? */
-	else if (machine->config->m_watchdog_time != attotime::zero)
-		watchdog_timer->adjust(machine->config->m_watchdog_time);
+	else if (machine->config().m_watchdog_time != attotime::zero)
+		watchdog_timer->adjust(machine->config().m_watchdog_time);
 
 	/* default to an obscene amount of time (3 seconds) */
 	else

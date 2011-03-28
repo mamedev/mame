@@ -2015,7 +2015,6 @@ static DEVICE_START( naomibd )
 	assert(device->baseconfig().static_config() == NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
-	assert(device->machine->config != NULL);
 
 	/* validate configuration */
 	assert(config->type >= ROM_BOARD && config->type < MAX_NAOMIBD_TYPES);
@@ -2027,7 +2026,7 @@ static DEVICE_START( naomibd )
 
 	for (i=0; i<ARRAY_LENGTH(naomibd_translate_tbl); i++)
 	{
-		if (!strcmp(device->machine->gamedrv->name, naomibd_translate_tbl[i].name))
+		if (!strcmp(device->machine->system().name, naomibd_translate_tbl[i].name))
 		{
             v->dc_gamekey = naomibd_translate_tbl[i].m2m3_key;
             v->dc_dmakey = naomibd_translate_tbl[i].m1_key;

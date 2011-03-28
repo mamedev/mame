@@ -294,9 +294,9 @@ static INTERRUPT_GEN( vsgongf_sound_interrupt )
 static READ8_HANDLER( vsgongf_a006_r )
 {
 	/* sound CPU busy? */
-	if (!strcmp(space->machine->gamedrv->name,"vsgongf"))  return 0x80;
-	if (!strcmp(space->machine->gamedrv->name,"ringfgt"))  return 0x80;
-	if (!strcmp(space->machine->gamedrv->name,"ringfgt2")) return 0xc0;
+	if (!strcmp(space->machine->system().name,"vsgongf"))  return 0x80;
+	if (!strcmp(space->machine->system().name,"ringfgt"))  return 0x80;
+	if (!strcmp(space->machine->system().name,"ringfgt2")) return 0xc0;
 
 	logerror ("unhandled read from a006\n");
 	return 0x00;
@@ -305,9 +305,9 @@ static READ8_HANDLER( vsgongf_a006_r )
 static READ8_HANDLER( vsgongf_a100_r )
 {
 	/* protection? */
-	if (!strcmp(space->machine->gamedrv->name,"vsgongf"))  return 0xaa;
-	if (!strcmp(space->machine->gamedrv->name,"ringfgt"))  return 0x63;
-	if (!strcmp(space->machine->gamedrv->name,"ringfgt2")) return 0x6a;
+	if (!strcmp(space->machine->system().name,"vsgongf"))  return 0xaa;
+	if (!strcmp(space->machine->system().name,"ringfgt"))  return 0x63;
+	if (!strcmp(space->machine->system().name,"ringfgt2")) return 0x6a;
 
 	logerror ("unhandled read from a100\n");
 	return 0x00;

@@ -525,7 +525,7 @@ static SCREEN_UPDATE(firebeat)
 
 	bitmap_fill(bitmap, cliprect, 0);
 
-	if (mame_stricmp(screen->machine->gamedrv->name, "popn7") == 0)
+	if (mame_stricmp(screen->machine->system().name, "popn7") == 0)
 	{
 		gcu_exec_display_list(screen->machine, bitmap, cliprect, chip, 0x1f80000);
 	}

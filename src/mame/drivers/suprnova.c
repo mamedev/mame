@@ -648,8 +648,8 @@ static WRITE32_HANDLER( skns_io_w )
 			/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
 			if (cpu_get_pc(space->cpu)==0x04013B42)
 			{
-				if (!strcmp(space->machine->gamedrv->name,"vblokbrk") ||
-					!strcmp(space->machine->gamedrv->name,"sarukani"))
+				if (!strcmp(space->machine->system().name,"vblokbrk") ||
+					!strcmp(space->machine->system().name,"sarukani"))
 					device_spin_until_interrupt(space->cpu);
 			}
 

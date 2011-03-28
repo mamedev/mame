@@ -198,7 +198,7 @@ static WRITE8_HANDLER( geebee_out7_w )
 			coin_counter_w(space->machine, 0,data & 1);
 			break;
 		case 4:
-			if (strcmp(space->machine->gamedrv->name, "geebeeb"))
+			if (strcmp(space->machine->system().name, "geebeeb"))
 				coin_lockout_global_w(space->machine, ~data & 1);
 			break;
 		case 5:

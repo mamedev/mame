@@ -1644,7 +1644,7 @@ static void generic_create_window(running_machine *machine, debug_view_type type
 	char title[256];
 
 	// create the window
-	_snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
+	_snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", machine->system().description, machine->system().name);
 	info = debugwin_window_create(machine, title, NULL);
 	if (info == NULL || !debugwin_view_create(info, 0, type))
 		return;
@@ -1704,7 +1704,7 @@ static void log_create_window(running_machine *machine)
 	RECT bounds;
 
 	// create the window
-	_snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
+	_snprintf(title, ARRAY_LENGTH(title), "Errorlog: %s [%s]", machine->system().description, machine->system().name);
 	info = debugwin_window_create(machine, title, NULL);
 	if (info == NULL || !debugwin_view_create(info, 0, DVT_LOG))
 		return;
@@ -2588,7 +2588,7 @@ static void console_set_cpu(device_t *device)
 	char curtitle[256];
 	astring title;
 
-	title.printf("Debug: %s - %s '%s'", device->machine->gamedrv->name, device->name(), device->tag());
+	title.printf("Debug: %s - %s '%s'", device->machine->system().name, device->name(), device->tag());
 	win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
 	if (title.cmp(curtitle) != 0)
 		win_set_window_text_utf8(main_console->wnd, title);

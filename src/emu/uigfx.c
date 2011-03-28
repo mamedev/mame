@@ -120,12 +120,12 @@ void ui_gfx_init(running_machine *machine)
 	/* set up the graphics state */
 	for (gfx = 0; gfx < MAX_GFX_ELEMENTS; gfx++)
 	{
-		state->gfxset.rotate[gfx] = machine->gamedrv->flags & ORIENTATION_MASK;
+		state->gfxset.rotate[gfx] = machine->system().flags & ORIENTATION_MASK;
 		state->gfxset.count[gfx] = 16;
 	}
 
 	/* set up the tilemap state */
-	state->tilemap.rotate = machine->gamedrv->flags & ORIENTATION_MASK;
+	state->tilemap.rotate = machine->system().flags & ORIENTATION_MASK;
 }
 
 

@@ -89,7 +89,7 @@ void sdloutput_init(running_machine *machine)
 		output = fdopen(fildes, "w");
 
 		mame_printf_verbose("ouput: opened output notifier file %s\n", SDLMAME_OUTPUT);
-		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), machine->gamedrv->name);
+		fprintf(output, "MAME " PID_FMT " START %s\n", osd_getpid(), machine->system().name);
 		fflush(output);
 	}
 

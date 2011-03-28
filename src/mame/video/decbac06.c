@@ -332,7 +332,7 @@ WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w )
 		{
 			// I don't know WHY Stadium Hero uses this as a bank but the RAM test expects it..
 			// I'm curious as to if anything else sets it tho
-			if (strcmp(dev->machine->gamedrv->name,"stadhero"))
+			if (strcmp(dev->machine->system().name,"stadhero"))
 				printf("tilemap ram bank change to %d\n", newbank&1);
 
 			dev->m_rambank = newbank&1;

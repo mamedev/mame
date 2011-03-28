@@ -592,7 +592,7 @@ static DEVICE_START( s14001a )
 
 	chip->SpeechRom = *device->region();
 
-	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate, chip, s14001a_pcm_update);
+	chip->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate(), chip, s14001a_pcm_update);
 }
 
 int s14001a_bsy_r(device_t *device)

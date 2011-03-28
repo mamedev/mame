@@ -1469,7 +1469,7 @@ static void cps1_build_palette(running_machine *machine, const UINT16* const pal
 static MACHINE_RESET( cps )
 {
 	cps_state *state = machine->driver_data<cps_state>();
-	const char *gamename = machine->gamedrv->name;
+	const char *gamename = machine->system().name;
 	const struct CPS1config *pCFG = &cps1_config_table[0];
 
 	while (pCFG->name)

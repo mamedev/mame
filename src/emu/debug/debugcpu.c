@@ -337,7 +337,7 @@ bool debug_comment_save(running_machine *machine)
 		xml_data_node *systemnode = xml_add_child(commentnode, "system", NULL);
 		if (systemnode == NULL)
 			throw emu_exception();
-		xml_set_attribute(systemnode, "name", machine->gamedrv->name);
+		xml_set_attribute(systemnode, "name", machine->system().name);
 
 		// for each device
 		bool found_comments = false;
@@ -413,7 +413,7 @@ bool debug_comment_load(running_machine *machine)
 		// check to make sure the file is applicable
 		xml_data_node *systemnode = xml_get_sibling(commentnode->child, "system");
 		const char *name = xml_get_attribute_string(systemnode, "name", "");
-		if (strcmp(name, machine->gamedrv->name) != 0)
+		if (strcmp(name, machine->system().name) != 0)
 			throw emu_exception();
 
 		// iterate over devices

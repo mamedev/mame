@@ -1445,7 +1445,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 		/* If not found try to load the software list using the driver name */
 		if ( ! software_part_ptr )
 		{
-			swlist_name = (char *)image->device().machine->gamedrv->name;
+			swlist_name = (char *)image->device().machine->system().name;
 
 			if ( software_list_ptr )
 			{
@@ -2035,7 +2035,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 	bool haveCompatible = FALSE;
 	const char *interface = image->image_config().image_interface();
 
-	for (const device_config *dev = machine->config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const device_config *dev = machine->config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
@@ -2065,7 +2065,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 		}
 	}
 
-	for (const device_config *dev = machine->config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const device_config *dev = machine->config().m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 

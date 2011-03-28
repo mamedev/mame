@@ -2598,7 +2598,7 @@ static WRITE8_HANDLER( mcu_port5_w )
 	// bit 1 = fan
 	// bit 2 = button light
 
-	if (!strcmp(space->machine->gamedrv->name, "propcycl"))
+	if (!strcmp(space->machine->system().name, "propcycl"))
 	{
 		output_set_value("fan0", data & 1);
 		set_led_status(space->machine, 0, data & 2);

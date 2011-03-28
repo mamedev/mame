@@ -169,7 +169,7 @@ static void create_bitmap(running_machine *machine, int player)
 	{
 		/* look for default cross?.png in crsshair\game dir */
 		sprintf(filename, "cross%d.png", player + 1);
-		global.bitmap[player] = render_load_png(crossfile, machine->gamedrv->name, filename, NULL, NULL);
+		global.bitmap[player] = render_load_png(crossfile, machine->system().name, filename, NULL, NULL);
 
 		/* look for default cross?.png in crsshair dir */
 		if (global.bitmap[player] == NULL)

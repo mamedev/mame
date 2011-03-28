@@ -103,13 +103,13 @@ VIDEO_START( ms32 )
 	state->reverse_sprite_order = 1;
 
 	/* i hate per game patches...how should priority really work? tetrisp2.c ? i can't follow it */
-	if (!strcmp(machine->gamedrv->name,"kirarast"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->gamedrv->name,"tp2m32"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->gamedrv->name,"47pie2"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->gamedrv->name,"47pie2o"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->gamedrv->name,"hayaosi3"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->gamedrv->name,"bnstars"))	state->reverse_sprite_order = 0;
-	if (!strcmp(machine->gamedrv->name,"wpksocv2"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine->system().name,"kirarast"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine->system().name,"tp2m32"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine->system().name,"47pie2"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine->system().name,"47pie2o"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine->system().name,"hayaosi3"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine->system().name,"bnstars"))	state->reverse_sprite_order = 0;
+	if (!strcmp(machine->system().name,"wpksocv2"))	state->reverse_sprite_order = 0;
 
 	// tp2m32 doesn't set the brightness registers so we need sensible defaults
 	state->brt[0] = state->brt[1] = 0xffff;

@@ -739,6 +739,7 @@ void *memory_get_shared(running_machine &machine, const char *tag, size_t &lengt
 // dump the internal memory tables to the given file
 void memory_dump(running_machine *machine, FILE *file);
 
+address_space *memory_nonspecific_space(running_machine *machine);
 
 
 //**************************************************************************

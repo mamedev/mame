@@ -1031,7 +1031,7 @@ static SCREEN_UPDATE(sfbonus)
     state->_1800_regs[7]);
 #endif
 
-	ipt = screen->machine->gamedrv->ipt;
+	ipt = screen->machine->system().ipt;
 	if ((ipt == INPUT_PORTS_NAME(amcoe2_reels3)) || (ipt == INPUT_PORTS_NAME(amcoe2_reels4))
 		|| (ipt == INPUT_PORTS_NAME(amcoe2_poker)))
 	{
@@ -5526,7 +5526,7 @@ static DRIVER_INIT( sfbonus_common)
 			{
 				FILE *fp;
 				char filename[256];
-				sprintf(filename,"decr_%s", machine->gamedrv->name);
+				sprintf(filename,"decr_%s", machine->system().name);
 				fp = fopen(filename, "w+b");
 				if (fp)
 				{

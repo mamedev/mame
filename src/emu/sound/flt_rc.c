@@ -83,7 +83,7 @@ static void set_RC_info(filter_rc_state *info, int type, double R1, double R2, d
 
 	/* Cut Frequency = 1/(2*Pi*Req*C) */
 	/* k = (1-(EXP(-TIMEDELTA/RC)))    */
-	info->k = 0x10000 - 0x10000 * (exp(-1 / (Req * C) / info->device->machine->sample_rate));
+	info->k = 0x10000 - 0x10000 * (exp(-1 / (Req * C) / info->device->machine->sample_rate()));
 }
 
 
@@ -93,7 +93,7 @@ static DEVICE_START( filter_rc )
 	const flt_rc_config *conf = (const flt_rc_config *)device->baseconfig().static_config();
 
 	info->device = device;
-	info->stream = device->machine->sound().stream_alloc(*device, 1, 1, device->machine->sample_rate, info, filter_rc_update);
+	info->stream = device->machine->sound().stream_alloc(*device, 1, 1, device->machine->sample_rate(), info, filter_rc_update);
 	if (conf)
 		set_RC_info(info, conf->type, conf->R1, conf->R2, conf->R3, conf->C);
 	else

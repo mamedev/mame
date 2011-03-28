@@ -434,7 +434,7 @@ void cdp1869_device::device_start()
 	initialize_palette();
 
 	// create sound stream
-	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, m_machine.sample_rate);
+	m_stream = m_machine.sound().stream_alloc(*this, 0, 1, m_machine.sample_rate());
 
 	// register for state saving
 	save_item(NAME(m_prd));
@@ -529,7 +529,7 @@ void cdp1869_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		double frequency = (clock() / 2) / (512 >> m_tonefreq) / (m_tonediv + 1);
 //      double amplitude = m_toneamp * ((0.78*5) / 15);
 
-		int rate = m_machine.sample_rate / 2;
+		int rate = m_machine.sample_rate() / 2;
 
 		/* get progress through wave */
 		int incr = m_incr;

@@ -637,7 +637,7 @@ static void psx_gpu_init( running_machine *machine, int n_gputype )
 
 	p_psxgpu->machine = machine;
 	p_psxgpu->n_gputype = n_gputype;
-	p_psxgpu->b_need_sianniv_vblank_hack = !strcmp(machine->gamedrv->name, "sianniv");
+	p_psxgpu->b_need_sianniv_vblank_hack = !strcmp(machine->system().name, "sianniv");
 
 #if defined( MAME_DEBUG )
 	DebugMeshInit(p_psxgpu);

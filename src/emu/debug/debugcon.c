@@ -96,7 +96,7 @@ void debug_console_init(running_machine *machine)
 
 	/* print the opening lines */
 	debug_console_printf(machine, "MAME new debugger version %s\n", build_version);
-	debug_console_printf(machine, "Currently targeting %s (%s)\n", machine->gamedrv->name, machine->gamedrv->description);
+	debug_console_printf(machine, "Currently targeting %s (%s)\n", machine->system().name, machine->system().description);
 
 	/* request callback upon exiting */
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_console_exit);

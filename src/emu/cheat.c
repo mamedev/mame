@@ -167,7 +167,7 @@ inline const char *number_and_format::format(astring &string) const
 
 cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &paramnode)
 	: m_value(0),
-	  m_itemlist(manager.machine().m_respool)
+	  m_itemlist(manager.machine().respool())
 {
 	// read the core attributes
 	m_minval = number_and_format(xml_get_attribute_int(&paramnode, "min", 0), xml_get_attribute_int_format(&paramnode, "min"));
@@ -347,7 +347,7 @@ bool cheat_parameter::set_next_state()
 //-------------------------------------------------
 
 cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &scriptnode)
-	: m_entrylist(manager.machine().m_respool),
+	: m_entrylist(manager.machine().respool()),
 	  m_state(SCRIPT_STATE_RUN)
 {
 	// read the core attributes
@@ -433,7 +433,7 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 	: m_next(NULL),
 	  m_condition(&symbols),
 	  m_expression(&symbols),
-	  m_arglist(manager.machine().m_respool)
+	  m_arglist(manager.machine().respool())
 {
 	const char *expression = NULL;
 	try
@@ -1088,7 +1088,7 @@ cheat_script *&cheat_entry::script_for_state(script_state state)
 
 cheat_manager::cheat_manager(running_machine &machine)
 	: m_machine(machine),
-	  m_cheatlist(machine.m_respool),
+	  m_cheatlist(machine.respool()),
 	  m_disabled(true),
 	  m_symtable(&machine)
 {

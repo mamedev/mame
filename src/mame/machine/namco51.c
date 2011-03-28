@@ -128,9 +128,9 @@ WRITE8_DEVICE_HANDLER( namco_51xx_write )
 					static int namcoio_51XX_kludge = 0;
 
 					/* Only compute namcoio_51XX_kludge when gamedrv changes */
-					if (namcoio_51XX_driver != device->machine->gamedrv)
+					if (namcoio_51XX_driver != &device->machine->system())
 					{
-						namcoio_51XX_driver = device->machine->gamedrv;
+						namcoio_51XX_driver = &device->machine->system();
 						if (strcmp(namcoio_51XX_driver->name, "xevious") == 0 ||
 							strcmp(namcoio_51XX_driver->parent, "xevious") == 0)
 							namcoio_51XX_kludge = 1;

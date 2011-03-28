@@ -109,7 +109,7 @@ static struct ioasic_state ioasic;
 
 static void generate_serial_data(running_machine *machine, int upper)
 {
-	int year = atoi(machine->gamedrv->year), month = 12, day = 11;
+	int year = atoi(machine->system().year), month = 12, day = 11;
 	UINT32 serial_number, temp;
 	UINT8 serial_digit[9];
 

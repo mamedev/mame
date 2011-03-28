@@ -87,7 +87,7 @@ void sdlaudio_init(running_machine *machine)
 		sound_log = fopen(SDLMAME_SOUND_LOG, "w");
 
 	// skip if sound disabled
-	if (machine->sample_rate != 0)
+	if (machine->sample_rate() != 0)
 	{
 		// attempt to initialize SDL
 		if (sdl_init(machine))
@@ -446,7 +446,7 @@ static int sdl_init(running_machine *machine)
 	stream_loop = 0;
 
 	// set up the audio specs
-	aspec.freq = machine->sample_rate;
+	aspec.freq = machine->sample_rate();
 	aspec.format = AUDIO_S16SYS;	// keep endian independent
 	aspec.channels = n_channels;
 	aspec.samples = sdl_xfer_samples;
@@ -477,7 +477,7 @@ static int sdl_init(running_machine *machine)
 	}
 
 	// compute the buffer sizes
-	stream_buffer_size = machine->sample_rate * 2 * sizeof(INT16) * audio_latency / MAX_AUDIO_LATENCY;
+	stream_buffer_size = machine->sample_rate() * 2 * sizeof(INT16) * audio_latency / MAX_AUDIO_LATENCY;
 	stream_buffer_size = (stream_buffer_size / 1024) * 1024;
 	if (stream_buffer_size < 1024)
 		stream_buffer_size = 1024;

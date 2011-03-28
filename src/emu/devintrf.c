@@ -81,7 +81,7 @@ resource_pool &machine_get_pool(running_machine &machine)
 {
 	// temporary to get around include dependencies, until CPUs
 	// get a proper device class
-	return machine.m_respool;
+	return machine.respool();
 }
 
 
@@ -749,7 +749,7 @@ void device_t::start()
 	if (state_registrations == 0 && (interface(exec) || interface(sound)))
 	{
 		logerror("Device '%s' did not register any state to save!\n", tag());
-		if ((m_machine.gamedrv->flags & GAME_SUPPORTS_SAVE) != 0)
+		if ((m_machine.system().flags & GAME_SUPPORTS_SAVE) != 0)
 			fatalerror("Device '%s' did not register any state to save!", tag());
 	}
 

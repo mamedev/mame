@@ -2889,7 +2889,7 @@ static void dump_to_file(running_machine* machine, UINT8* ROM, int offset, int s
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"%s_%08x_%08x", machine->gamedrv->name, offset, size);
+		sprintf(filename,"%s_%08x_%08x", machine->system().name, offset, size);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{

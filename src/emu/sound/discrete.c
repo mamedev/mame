@@ -930,7 +930,7 @@ void discrete_device::device_start()
 	if (this->clock())
 		m_sample_rate = this->clock();
 	else
-		m_sample_rate = this->machine->sample_rate;
+		m_sample_rate = this->machine->sample_rate();
 	m_sample_time = 1.0 / m_sample_rate;
 	m_neg_sample_time = - m_sample_time;
 

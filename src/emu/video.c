@@ -336,7 +336,7 @@ void video_manager::save_snapshot(screen_device *screen, emu_file &file)
 
 	// add two text entries describing the image
 	astring text1(APPNAME, " ", build_version);
-	astring text2(m_machine.m_game.manufacturer, " ", m_machine.m_game.description);
+	astring text2(m_machine.system().manufacturer, " ", m_machine.system().description);
 	png_info pnginfo = { 0 };
 	png_add_text(&pnginfo, "Software", text1);
 	png_add_text(&pnginfo, "System", text2);
@@ -414,12 +414,12 @@ void video_manager::begin_recording(const char *name, movie_format format)
 		info.video_depth = 24;
 
 		info.audio_format = 0;
-		info.audio_timescale = m_machine.sample_rate;
+		info.audio_timescale = m_machine.sample_rate();
 		info.audio_sampletime = 1;
 		info.audio_numsamples = 0;
 		info.audio_channels = 2;
 		info.audio_samplebits = 16;
-		info.audio_samplerate = m_machine.sample_rate;
+		info.audio_samplerate = m_machine.sample_rate();
 
 		// create a new temporary movie file
 		file_error filerr;
@@ -1263,7 +1263,7 @@ void video_manager::record_frame()
 			if (m_movie_frame == 0)
 			{
 				astring text1(APPNAME, " ", build_version);
-				astring text2(m_machine.m_game.manufacturer, " ", m_machine.m_game.description);
+				astring text2(m_machine.system().manufacturer, " ", m_machine.system().description);
 				png_add_text(&pnginfo, "Software", text1);
 				png_add_text(&pnginfo, "System", text2);
 			}

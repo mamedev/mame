@@ -267,14 +267,14 @@ VIDEO_START( megasys1 )
 	state->_8x8_scroll_factor[1] = 1;	state->_16x16_scroll_factor[1] = 4;
 	state->_8x8_scroll_factor[2] = 1;	state->_16x16_scroll_factor[2] = 4;
 
-	if (strcmp(machine->gamedrv->name, "soldamj") == 0)
+	if (strcmp(machine->system().name, "soldamj") == 0)
 	{
 		state->_8x8_scroll_factor[1] = 4;	state->_16x16_scroll_factor[1] = 4;
 	}
 
 	state->hardware_type_z = 0;
-	if (strcmp(machine->gamedrv->name, "lomakai") == 0 ||
-		strcmp(machine->gamedrv->name, "makaiden") == 0)
+	if (strcmp(machine->system().name, "lomakai") == 0 ||
+		strcmp(machine->system().name, "makaiden") == 0)
 		state->hardware_type_z = 1;
 }
 
@@ -766,8 +766,8 @@ PALETTE_INIT( megasys1 )
 
 	i = 0;
 	while (	priorities[i].driver &&
-			strcmp(priorities[i].driver, machine->gamedrv->name) != 0 &&
-			strcmp(priorities[i].driver, machine->gamedrv->parent) != 0)
+			strcmp(priorities[i].driver, machine->system().name) != 0 &&
+			strcmp(priorities[i].driver, machine->system().parent) != 0)
 		i++;
 
 	if (priorities[i].driver)

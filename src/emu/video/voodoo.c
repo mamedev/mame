@@ -4488,7 +4488,6 @@ static DEVICE_START( voodoo )
 	assert(device->baseconfig().static_config() == NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
-	assert(device->machine->config != NULL);
 
 	/* validate configuration */
 	assert(config->screen != NULL);

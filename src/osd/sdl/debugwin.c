@@ -471,7 +471,7 @@ static void debugmain_set_cpu(device_t *device)
 		dv->view->set_source(*dv->view->source_list().match_device(device));
 
 		// then update the caption
-		title.printf("Debug: %s - %s '%s'", device->machine->gamedrv->name, device->name(), device->tag());
+		title.printf("Debug: %s - %s '%s'", device->machine->system().name, device->name(), device->tag());
 		gtk_window_set_title(GTK_WINDOW(dmain->win), title);
 		disasmview_update_checks(dmain);
 	}

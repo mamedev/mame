@@ -237,7 +237,7 @@ void generic_video_init(running_machine *machine)
 	machine->state().save_item(NAME(state->flip_screen_y));
 
 	// create spriteram buffers if necessary
-	if (machine->config->m_video_attributes & VIDEO_BUFFERS_SPRITERAM)
+	if (machine->config().m_video_attributes & VIDEO_BUFFERS_SPRITERAM)
 	{
 		assert_always(machine->generic.spriteram_size != 0, "Video buffers spriteram but spriteram size is 0");
 

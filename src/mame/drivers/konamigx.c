@@ -3671,12 +3671,12 @@ static MACHINE_RESET(konamigx)
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "dasp", INPUT_LINE_RESET, ASSERT_LINE);
 
-	if (!strcmp(machine->gamedrv->name, "tkmmpzdm"))
+	if (!strcmp(machine->system().name, "tkmmpzdm"))
 	{
 		// boost voice(chip 1 channel 3-7)
 		for (i=3; i<=7; i++) k054539_set_gain(k054539_2, i, 2.0);
 	}
-	else if ((!strcmp(machine->gamedrv->name, "dragoonj")) || (!strcmp(machine->gamedrv->name, "dragoona")))
+	else if ((!strcmp(machine->system().name, "dragoonj")) || (!strcmp(machine->system().name, "dragoona")))
 	{
 		// soften percussions(chip 1 channel 0-3), boost voice(chip 1 channel 4-7)
 		for (i=0; i<=3; i++)
@@ -3761,7 +3761,7 @@ static DRIVER_INIT(konamigx)
 	i = match = 0;
 	while ((gameDefs[i].cfgport != -1) && (!match))
 	{
-		if (!strcmp(machine->gamedrv->name, gameDefs[i].romname))
+		if (!strcmp(machine->system().name, gameDefs[i].romname))
 	{
 			match = 1;
 			konamigx_cfgport = gameDefs[i].cfgport;

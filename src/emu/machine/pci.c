@@ -272,7 +272,6 @@ static DEVICE_START( pci_bus )
 	assert(device->baseconfig().static_config() == NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
-	assert(device->machine->config != NULL);
 
 	/* store a pointer back to the device */
 	pcibus->config = (const pci_bus_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();

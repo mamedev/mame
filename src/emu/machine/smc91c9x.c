@@ -517,7 +517,6 @@ static DEVICE_START( smc91c9x )
 	assert(device->baseconfig().static_config() == NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
-	assert(device->machine->config != NULL);
 
 	/* store a pointer back to the device */
 	smc->device = device;

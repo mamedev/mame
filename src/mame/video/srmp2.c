@@ -285,7 +285,7 @@ static void mjyuugi_draw_sprites_map(running_machine *machine, bitmap_t *bitmap,
 	int offs, col;
 	int xoffs, yoffs;
 
-	int total_color_codes	=	machine->config->m_gfxdecodeinfo[0].total_color_codes;
+	int total_color_codes	=	machine->config().m_gfxdecodeinfo[0].total_color_codes;
 
 	int ctrl	=	spriteram16[ 0x600/2 ];
 	int ctrl2	=	spriteram16[ 0x602/2 ];

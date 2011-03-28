@@ -267,7 +267,7 @@ WRITE16_HANDLER( mcu_prog_w2 )
     {
 		char tmp[64];
         FILE *fp;
-	    sprintf(tmp,"cop3_%s.data", space->machine->gamedrv->name);
+	    sprintf(tmp,"cop3_%s.data", space->machine->system().name);
 
 		fp=fopen(tmp, "w+b");
         if (fp)

@@ -11,7 +11,7 @@
 
 
 #define TOTAL_COLORS(m,gfxn) ((m)->gfx[gfxn]->total_colors * (m)->gfx[gfxn]->color_granularity)
-#define COLOR(m,gfxn,offs) ((m)->config->m_gfxdecodeinfo[gfxn].color_codes_start + offs)
+#define COLOR(m,gfxn,offs) ((m)->config().m_gfxdecodeinfo[gfxn].color_codes_start + offs)
 
 
 

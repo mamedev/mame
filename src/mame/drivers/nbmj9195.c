@@ -137,9 +137,9 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 	nbmj9195_state *state = space->machine->driver_data<nbmj9195_state>();
 	int portdata;
 
-	if ((!strcmp(space->machine->gamedrv->name, "mscoutm")) ||
-		(!strcmp(space->machine->gamedrv->name, "imekura")) ||
-		(!strcmp(space->machine->gamedrv->name, "mjegolf")))
+	if ((!strcmp(space->machine->system().name, "mscoutm")) ||
+		(!strcmp(space->machine->system().name, "imekura")) ||
+		(!strcmp(space->machine->system().name, "mjegolf")))
 	{
 
 		switch (offset)
@@ -318,9 +318,9 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 
 static WRITE8_HANDLER( tmpz84c011_pio_w )
 {
-	if ((!strcmp(space->machine->gamedrv->name, "imekura")) ||
-		(!strcmp(space->machine->gamedrv->name, "mscoutm")) ||
-		(!strcmp(space->machine->gamedrv->name, "mjegolf")))
+	if ((!strcmp(space->machine->system().name, "imekura")) ||
+		(!strcmp(space->machine->system().name, "mscoutm")) ||
+		(!strcmp(space->machine->system().name, "mjegolf")))
 	{
 
 		switch (offset)

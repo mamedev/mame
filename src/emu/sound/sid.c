@@ -151,7 +151,7 @@ int sidEmuReset(_SID6581 *This)
 
 static void filterTableInit(running_machine *machine)
 {
-	int sample_rate = machine->sample_rate;
+	int sample_rate = machine->sample_rate();
 	UINT16 uk;
 	/* Parameter calculation has not been moved to a separate function */
 	/* by purpose. */

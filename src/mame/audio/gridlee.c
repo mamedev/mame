@@ -72,11 +72,11 @@ static DEVICE_START( gridlee_sound )
 	running_machine *machine = device->machine;
 
 	/* allocate the stream */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, machine->sample_rate, NULL, gridlee_stream_update);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 1, machine->sample_rate(), NULL, gridlee_stream_update);
 
 	state->samples = device->machine->device("samples");
 
-	state->freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
+	state->freq_to_step = (double)(1 << 24) / (double)machine->sample_rate();
 }
 
 

@@ -702,9 +702,9 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 
 	// make the window title
 	if (video_config.numscreens == 1)
-		sprintf(window->title, APPNAME ": %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
+		sprintf(window->title, APPNAME ": %s [%s]", machine->system().description, machine->system().name);
 	else
-		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->gamedrv->description, machine->gamedrv->name, index);
+		sprintf(window->title, APPNAME ": %s [%s] - Screen %d", machine->system().description, machine->system().name, index);
 
 	wp->window = window;
 

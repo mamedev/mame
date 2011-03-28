@@ -738,8 +738,8 @@ static MACHINE_RESET(model1)
 	model1_state *state = machine->driver_data<model1_state>();
 	memory_set_bankptr(machine, "bank1", machine->region("maincpu")->base() + 0x1000000);
 	irq_init(machine);
-	model1_tgp_reset(machine, !strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwaru") || !strcmp(machine->gamedrv->name, "wingwarj"));
-	if (!strcmp(machine->gamedrv->name, "swa"))
+	model1_tgp_reset(machine, !strcmp(machine->system().name, "swa") || !strcmp(machine->system().name, "wingwar") || !strcmp(machine->system().name, "wingwaru") || !strcmp(machine->system().name, "wingwarj"));
+	if (!strcmp(machine->system().name, "swa"))
 	{
 		state->sound_irq = 0;
 	}

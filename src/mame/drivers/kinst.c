@@ -169,7 +169,7 @@ static MACHINE_START( kinst )
 	device_t *ide = machine->device("ide");
 	UINT8 *features = ide_get_features(ide);
 
-	if (strncmp(machine->gamedrv->name, "kinst2", 6) != 0)
+	if (strncmp(machine->system().name, "kinst2", 6) != 0)
 	{
 		/* kinst: tweak the model number so we pass the check */
 		features[27*2+0] = 0x54;

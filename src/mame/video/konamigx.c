@@ -2060,7 +2060,7 @@ static void _gxcommoninit(running_machine *machine)
 
 VIDEO_START(konamigx_5bpp)
 {
-	if (!strcmp(machine->gamedrv->name,"sexyparo") || !strcmp(machine->gamedrv->name,"sexyparoa"))
+	if (!strcmp(machine->system().name,"sexyparo") || !strcmp(machine->system().name,"sexyparoa"))
 		game_tile_callback = konamigx_alpha_tile_callback;
 	else
 		game_tile_callback = konamigx_type2_tile_callback;
@@ -2072,29 +2072,29 @@ VIDEO_START(konamigx_5bpp)
 	/* here are some hand tuned per game scroll offsets to go with the per game visible areas,
        i see no better way of doing this for now... */
 
-	if (!strcmp(machine->gamedrv->name,"tbyahhoo"))
+	if (!strcmp(machine->system().name,"tbyahhoo"))
 	{
 		K056832_set_UpdateMode(1);
 		gx_tilemode = 1;
 	} else
 
-	if (!strcmp(machine->gamedrv->name,"puzldama"))
+	if (!strcmp(machine->system().name,"puzldama"))
 	{
 		K053247GP_set_SpriteOffset(-46, -23);
 		konamigx_mixer_primode(5);
 	} else
 
-	if (!strcmp(machine->gamedrv->name,"daiskiss"))
+	if (!strcmp(machine->system().name,"daiskiss"))
 	{
 		konamigx_mixer_primode(4);
 	} else
 
-	if (!strcmp(machine->gamedrv->name,"gokuparo") || !strcmp(machine->gamedrv->name,"fantjour") || !strcmp(machine->gamedrv->name,"fantjoura"))
+	if (!strcmp(machine->system().name,"gokuparo") || !strcmp(machine->system().name,"fantjour") || !strcmp(machine->system().name,"fantjoura"))
 	{
 		K053247GP_set_SpriteOffset(-46, -23);
 	} else
 
-	if (!strcmp(machine->gamedrv->name,"sexyparo") || !strcmp(machine->gamedrv->name,"sexyparoa"))
+	if (!strcmp(machine->system().name,"sexyparo") || !strcmp(machine->system().name,"sexyparoa"))
 	{
 		K053247GP_set_SpriteOffset(-42, -23);
 	}
@@ -2140,7 +2140,7 @@ VIDEO_START(konamigx_6bpp)
 
 	_gxcommoninit(machine);
 
-	if (!strcmp(machine->gamedrv->name,"tokkae") || !strcmp(machine->gamedrv->name,"tkmmpzdm"))
+	if (!strcmp(machine->system().name,"tokkae") || !strcmp(machine->system().name,"tkmmpzdm"))
 	{
 		K053247GP_set_SpriteOffset(-46, -23);
 		konamigx_mixer_primode(5);
@@ -2285,7 +2285,7 @@ VIDEO_START(konamigx_6bpp_2)
 {
 	K056832_vh_start(machine, "gfx1", K056832_BPP_6, 1, NULL, konamigx_type2_tile_callback, 0);
 
-	if (!strcmp(machine->gamedrv->name,"salmndr2") || !strcmp(machine->gamedrv->name,"salmndr2a"))
+	if (!strcmp(machine->system().name,"salmndr2") || !strcmp(machine->system().name,"salmndr2a"))
 	{
 		K055673_vh_start(machine, "gfx2", K055673_LAYOUT_GX6, -48, -23, konamigx_salmndr2_sprite_callback);
 

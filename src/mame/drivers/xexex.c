@@ -691,7 +691,7 @@ static DRIVER_INIT( xexex )
 
 	state->strip_0x1a = 0;
 
-	if (!strcmp(machine->gamedrv->name, "xexex"))
+	if (!strcmp(machine->system().name, "xexex"))
 	{
 		// Invulnerability
 //      *(UINT16 *)(machine->region("maincpu")->base() + 0x648d4) = 0x4a79;

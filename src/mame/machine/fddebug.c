@@ -564,7 +564,7 @@ static void set_default_key_params(running_machine *machine)
 
 	/* look for a matching game and set the key appropriately */
 	for (keynum = 0; keynum < ARRAY_LENGTH(default_keys); keynum++)
-		if (strcmp(machine->gamedrv->name, default_keys[keynum].gamename) == 0)
+		if (strcmp(machine->system().name, default_keys[keynum].gamename) == 0)
 		{
 			fd1094_global = default_keys[keynum].global;
 			fd1094_seed = default_keys[keynum].seed;
@@ -585,7 +585,7 @@ static void load_overlay_file(running_machine *machine)
 
 	/* determine the filename and open the file */
 	emu_file file(OPEN_FLAG_READ);
-	file_error filerr = file.open(machine->gamedrv->name, ".kov");
+	file_error filerr = file.open(machine->system().name, ".kov");
 	if (filerr == FILERR_NONE)
 	{
 		file.read(keystatus, keystatus_words * 2);
@@ -611,7 +611,7 @@ static void save_overlay_file(running_machine *machine)
 
 	/* determin the filename and open the file */
 	emu_file file(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	file_error filerr = file.open(machine->gamedrv->name, ".kov");
+	file_error filerr = file.open(machine->system().name, ".kov");
 	if (filerr == FILERR_NONE)
 	{
 		/* convert to big-endian */

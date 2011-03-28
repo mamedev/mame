@@ -232,7 +232,7 @@ static READ8_HANDLER( darktowr_mcu_bank_r )
    so just hack around the protection here.  (The hacks are 'right' as I have
    the original source code & notes to this version of TStrike to examine).
    */
-	if (!strcmp(space->machine->gamedrv->name, "tstrike"))
+	if (!strcmp(space->machine->system().name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
 		if (cpu_get_pc(space->cpu) == 0x9ace)

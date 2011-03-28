@@ -364,7 +364,7 @@ static STREAM_UPDATE( cdp1864_stream_update )
 	if (cdp1864->aoe)
 	{
 		double frequency = cdp1864->cpu->unscaled_clock() / 8 / 4 / (cdp1864->latch + 1) / 2;
-		int rate = device->machine->sample_rate / 2;
+		int rate = device->machine->sample_rate() / 2;
 
 		/* get progress through wave */
 		int incr = cdp1864->incr;
@@ -446,7 +446,7 @@ static DEVICE_START( cdp1864 )
 	cdp1864_init_palette(device, intf);
 
 	/* create sound stream */
-	cdp1864->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, cdp1864, cdp1864_stream_update);
+	cdp1864->stream = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), cdp1864, cdp1864_stream_update);
 
 	/* create the timers */
 	cdp1864->int_timer = device->machine->scheduler().timer_alloc(FUNC(cdp1864_int_tick), (void *)device);

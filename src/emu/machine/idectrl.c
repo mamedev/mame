@@ -1793,7 +1793,6 @@ static DEVICE_START( ide_controller )
 	assert(device->baseconfig().static_config() == NULL);
 	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 	assert(device->machine != NULL);
-	assert(device->machine->config != NULL);
 
 	/* store a pointer back to the device */
 	ide->device = device;

@@ -4547,8 +4547,8 @@ static time_t playback_init(running_machine *machine)
 	mame_printf_info("Recorded using %s\n", header + 0x20);
 
 	/* verify the header against the current game */
-	if (memcmp(machine->gamedrv->name, header + 0x14, strlen(machine->gamedrv->name) + 1) != 0)
-		mame_printf_info("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", header + 0x14, machine->gamedrv->name);
+	if (memcmp(machine->system().name, header + 0x14, strlen(machine->system().name) + 1) != 0)
+		mame_printf_info("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", header + 0x14, machine->system().name);
 
 	/* enable compression */
 	portdata->playback_file->compress(FCOMPRESS_MEDIUM);
@@ -4744,7 +4744,7 @@ static void record_init(running_machine *machine)
 	header[0x0f] = systime.time >> 56;
 	header[0x10] = INP_HEADER_MAJVERSION;
 	header[0x11] = INP_HEADER_MINVERSION;
-	strcpy((char *)header + 0x14, machine->gamedrv->name);
+	strcpy((char *)header + 0x14, machine->system().name);
 	sprintf((char *)header + 0x20, APPNAME " %s", build_version);
 
 	/* write it */

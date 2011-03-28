@@ -196,9 +196,9 @@ static int get_variable_value(running_machine &machine, const char *string, char
 	char temp[100];
 
 	// screen 0 parameters
-	for (const screen_device_config *devconfig = machine.m_config.first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
+	for (const screen_device_config *devconfig = machine.config().first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
 	{
-		int scrnum = machine.m_config.m_devicelist.indexof(SCREEN, devconfig->tag());
+		int scrnum = machine.config().m_devicelist.indexof(SCREEN, devconfig->tag());
 
 		// native X aspect factor
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
@@ -434,7 +434,7 @@ static void parse_orientation(running_machine &machine, xml_data_node *orientnod
 layout_element::layout_element(running_machine &machine, xml_data_node &elemnode, const char *dirname)
 	: m_next(NULL),
 	  m_machine(machine),
-	  m_complist(machine.m_respool),
+	  m_complist(machine.respool()),
 	  m_defstate(0),
 	  m_maxstate(0),
 	  m_elemtex(NULL)
@@ -1665,11 +1665,11 @@ layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simp
 	: m_next(NULL),
 	  m_aspect(1.0f),
 	  m_scraspect(1.0f),
-	  m_screens(machine.m_respool),
-	  m_backdrop_list(machine.m_respool),
-	  m_screen_list(machine.m_respool),
-	  m_overlay_list(machine.m_respool),
-	  m_bezel_list(machine.m_respool)
+	  m_screens(machine.respool()),
+	  m_backdrop_list(machine.respool()),
+	  m_screen_list(machine.respool()),
+	  m_overlay_list(machine.respool()),
+	  m_bezel_list(machine.respool())
 {
 	// allocate a copy of the name
 	m_name = xml_get_attribute_string_with_subst(machine, viewnode, "name", "");
@@ -1931,8 +1931,8 @@ int layout_view::item::state() const
 
 layout_file::layout_file(running_machine &machine, xml_data_node &rootnode, const char *dirname)
 	: m_next(NULL),
-	  m_elemlist(machine.m_respool),
-	  m_viewlist(machine.m_respool)
+	  m_elemlist(machine.respool()),
+	  m_viewlist(machine.respool())
 {
 	// find the layout node
 	xml_data_node *mamelayoutnode = xml_get_sibling(rootnode.child, "mamelayout");

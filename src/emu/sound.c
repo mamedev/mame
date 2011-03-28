@@ -775,7 +775,7 @@ sound_manager::sound_manager(running_machine &machine)
 	  m_attenuation(0),
 	  m_nosound_mode(!machine.options().sound()),
 	  m_wavfile(NULL),
-	  m_stream_list(machine.m_respool),
+	  m_stream_list(machine.respool()),
 	  m_update_attoseconds(STREAMS_UPDATE_ATTOTIME.attoseconds),
 	  m_last_update(attotime::zero)
 {
@@ -785,19 +785,19 @@ sound_manager::sound_manager(running_machine &machine)
 
 	// handle -nosound and lower sample rate if not recording WAV or AVI
 	if (m_nosound_mode && wavfile[0] == 0 && avifile[0] == 0)
-		machine.sample_rate = 11025;
+		machine.m_sample_rate = 11025;
 
 	// count the speakers
 	VPRINTF(("total speakers = %d\n", machine.m_devicelist.count(SPEAKER)));
 
 	// allocate memory for mix buffers
-	m_leftmix = auto_alloc_array(&machine, INT32, machine.sample_rate);
-	m_rightmix = auto_alloc_array(&machine, INT32, machine.sample_rate);
-	m_finalmix = auto_alloc_array(&machine, INT16, machine.sample_rate);
+	m_leftmix = auto_alloc_array(&machine, INT32, machine.sample_rate());
+	m_rightmix = auto_alloc_array(&machine, INT32, machine.sample_rate());
+	m_finalmix = auto_alloc_array(&machine, INT16, machine.sample_rate());
 
 	// open the output WAV file if specified
 	if (wavfile[0] != 0)
-		m_wavfile = wav_open(wavfile, machine.sample_rate, 2);
+		m_wavfile = wav_open(wavfile, machine.sample_rate(), 2);
 
 	// register callbacks
 	config_register(&machine, "mixer", &sound_manager::config_load, &sound_manager::config_save);

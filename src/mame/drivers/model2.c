@@ -691,15 +691,15 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 {
 	model2_state *state = space->machine->driver_data<model2_state>();
 	/* FIXME: clean this up */
-	if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "sfight" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "fvipers" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "vstriker" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "vstrikero" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "gunblade" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "von" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "vonj" ) == 0) ||
-		(strcmp(space->machine->gamedrv->name, "rchase2" ) == 0))
+	if ((strcmp(space->machine->system().name, "schamp" ) == 0) ||
+		(strcmp(space->machine->system().name, "sfight" ) == 0) ||
+		(strcmp(space->machine->system().name, "fvipers" ) == 0) ||
+		(strcmp(space->machine->system().name, "vstriker" ) == 0) ||
+		(strcmp(space->machine->system().name, "vstrikero" ) == 0) ||
+		(strcmp(space->machine->system().name, "gunblade" ) == 0) ||
+		(strcmp(space->machine->system().name, "von" ) == 0) ||
+		(strcmp(space->machine->system().name, "vonj" ) == 0) ||
+		(strcmp(space->machine->system().name, "rchase2" ) == 0))
 	{
 		sharc_external_iop_write(space->machine->device("dsp"), offset, data);
 	}
@@ -772,7 +772,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
 
 static READ32_HANDLER(geo_sharc_fifo_r)
 {
-    if ((strcmp(space->machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(space->machine->gamedrv->name, "srallyc" ) == 0))
+    if ((strcmp(space->machine->system().name, "manxtt" ) == 0) || (strcmp(space->machine->system().name, "srallyc" ) == 0))
     {
         return 8;
     }
@@ -801,7 +801,7 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
 static WRITE32_HANDLER(geo_sharc_iop_w)
 {
 	model2_state *state = space->machine->driver_data<model2_state>();
-    if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0))
+    if ((strcmp(space->machine->system().name, "schamp" ) == 0))
     {
         sharc_external_iop_write(space->machine->device("dsp2"), offset, data);
     }

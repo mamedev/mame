@@ -425,7 +425,7 @@ static MACHINE_START( s2650 )
 {
     dkong_state *state = machine->driver_data<dkong_state>();
     UINT8   *p = machine->region("user1")->base();
-    const char *game_name = machine->gamedrv->name;
+    const char *game_name = machine->system().name;
     int i;
 
     MACHINE_START_CALL(dkong2b);

@@ -468,8 +468,8 @@ static void cave_vh_start( running_machine *machine, int num )
 	state->row_effect_offs_n = -1;
 	state->row_effect_offs_f = 1;
 
-	state->background_color = machine->config->m_gfxdecodeinfo[0].color_codes_start +
-					(machine->config->m_gfxdecodeinfo[0].total_color_codes - 1) *
+	state->background_color = machine->config().m_gfxdecodeinfo[0].color_codes_start +
+					(machine->config().m_gfxdecodeinfo[0].total_color_codes - 1) *
 						machine->gfx[0]->color_granularity;
 
 	switch (state->kludge)

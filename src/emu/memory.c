@@ -1593,11 +1593,14 @@ void memory_init(running_machine *machine)
 	// dump the final memory configuration
 	generate_memdump(machine);
 
-	// borrow the first address space to be used as a dummy space
-	machine->m_nonspecific_space = memdata->spacelist.first();
-
 	// we are now initialized
 	memdata->initialized = true;
+}
+
+address_space *memory_nonspecific_space(running_machine *machine)
+{
+	memory_private *memdata = machine->memory_data;
+	return memdata->spacelist.first();
 }
 
 
@@ -4078,7 +4081,7 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 
 	// register for saving, but only if we're not part of a memory region
 	const memory_region *region;
-	for (region = space.m_machine.m_regionlist.first(); region != NULL; region = region->next())
+	for (region = space.m_machine.first_region(); region != NULL; region = region->next())
 		if (m_data >= region->base() && (m_data + (byteend - bytestart + 1)) < region->end())
 		{
 			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));

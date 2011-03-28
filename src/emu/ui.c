@@ -280,7 +280,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 
 	/* disable everything if we are using -str for 300 or fewer seconds, or if we're the empty driver,
        or if we are debugging */
-	if (!first_time || (str > 0 && str < 60*5) || machine->gamedrv == &GAME_NAME(empty) || (machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (!first_time || (str > 0 && str < 60*5) || &machine->system() == &GAME_NAME(empty) || (machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
 	/* initialize the on-screen display system */
@@ -305,9 +305,9 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 				if (show_warnings && warnings_string(machine, messagebox_text).len() > 0)
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
-					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
+					if (machine->system().flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_REQUIRES_ARTWORK | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
 						messagebox_backcolor = UI_YELLOW_COLOR;
-					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
+					if (machine->system().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
 						messagebox_backcolor = UI_RED_COLOR;
 				}
 				break;
@@ -883,7 +883,7 @@ int ui_is_menu_active(void)
 static astring &disclaimer_string(running_machine *machine, astring &string)
 {
 	string.cpy("Usage of emulators in conjunction with ROMs you don't own is forbidden by copyright law.\n\n");
-	string.catprintf("IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", machine->gamedrv->description);
+	string.catprintf("IF YOU ARE NOT LEGALLY ENTITLED TO PLAY \"%s\" ON THIS EMULATOR, PRESS ESC.\n\n", machine->system().description);
 	string.cat("Otherwise, type OK or move the joystick left then right to continue");
 	return string;
 }
@@ -912,19 +912,19 @@ static astring &warnings_string(running_machine *machine, astring &string)
 	string.reset();
 
 	/* if no warnings, nothing to return */
-	if (rom_load_warnings(machine) == 0 && rom_load_knownbad(machine) == 0 && !(machine->gamedrv->flags & WARNING_FLAGS))
+	if (rom_load_warnings(machine) == 0 && rom_load_knownbad(machine) == 0 && !(machine->system().flags & WARNING_FLAGS))
 		return string;
 
 	/* add a warning if any ROMs were loaded with warnings */
 	if (rom_load_warnings(machine) > 0)
 	{
 		string.cat("One or more ROMs/CHDs for this game are incorrect. The " GAMENOUN " may not run correctly.\n");
-		if (machine->gamedrv->flags & WARNING_FLAGS)
+		if (machine->system().flags & WARNING_FLAGS)
 			string.cat("\n");
 	}
 
 	/* if we have at least one warning flag, print the general header */
-	if ((machine->gamedrv->flags & WARNING_FLAGS) || rom_load_knownbad(machine) > 0)
+	if ((machine->system().flags & WARNING_FLAGS) || rom_load_knownbad(machine) > 0)
 	{
 		string.cat("There are known problems with this " GAMENOUN "\n\n");
 
@@ -935,46 +935,46 @@ static astring &warnings_string(running_machine *machine, astring &string)
 		/* add one line per warning flag */
 		if (input_machine_has_keyboard(machine))
 			string.cat("The keyboard emulation may not be 100% accurate.\n");
-		if (machine->gamedrv->flags & GAME_IMPERFECT_COLORS)
+		if (machine->system().flags & GAME_IMPERFECT_COLORS)
 			string.cat("The colors aren't 100% accurate.\n");
-		if (machine->gamedrv->flags & GAME_WRONG_COLORS)
+		if (machine->system().flags & GAME_WRONG_COLORS)
 			string.cat("The colors are completely wrong.\n");
-		if (machine->gamedrv->flags & GAME_IMPERFECT_GRAPHICS)
+		if (machine->system().flags & GAME_IMPERFECT_GRAPHICS)
 			string.cat("The video emulation isn't 100% accurate.\n");
-		if (machine->gamedrv->flags & GAME_IMPERFECT_SOUND)
+		if (machine->system().flags & GAME_IMPERFECT_SOUND)
 			string.cat("The sound emulation isn't 100% accurate.\n");
-		if (machine->gamedrv->flags & GAME_NO_SOUND)
+		if (machine->system().flags & GAME_NO_SOUND)
 			string.cat("The game lacks sound.\n");
-		if (machine->gamedrv->flags & GAME_NO_COCKTAIL)
+		if (machine->system().flags & GAME_NO_COCKTAIL)
 			string.cat("Screen flipping in cocktail mode is not supported.\n");
 
 		/* check if external artwork is present before displaying this warning? */
-		if (machine->gamedrv->flags & GAME_REQUIRES_ARTWORK)
+		if (machine->system().flags & GAME_REQUIRES_ARTWORK)
 			string.cat("The game requires external artwork files\n");
 
 		/* if there's a NOT WORKING, UNEMULATED PROTECTION or GAME MECHANICAL warning, make it stronger */
-		if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
+		if (machine->system().flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_MECHANICAL))
 		{
 			const game_driver *maindrv;
 			const game_driver *clone_of;
 			int foundworking;
 
 			/* add the strings for these warnings */
-			if (machine->gamedrv->flags & GAME_UNEMULATED_PROTECTION)
+			if (machine->system().flags & GAME_UNEMULATED_PROTECTION)
 				string.cat("The game has protection which isn't fully emulated.\n");
-			if (machine->gamedrv->flags & GAME_NOT_WORKING)
+			if (machine->system().flags & GAME_NOT_WORKING)
 				string.cat("\nTHIS " CAPGAMENOUN " DOESN'T WORK. The emulation for this game is not yet complete. "
 					 "There is nothing you can do to fix this problem except wait for the developers to improve the emulation.\n");
-			if (machine->gamedrv->flags & GAME_MECHANICAL)
+			if (machine->system().flags & GAME_MECHANICAL)
 				string.cat("\nCertain elements of this " GAMENOUN " cannot be emulated as it requires actual physical interaction or consists of mechanical devices. "
 					 "It is not possible to fully play this " GAMENOUN ".\n");
 
 			/* find the parent of this driver */
-			clone_of = driver_get_clone(machine->gamedrv);
+			clone_of = driver_get_clone(&machine->system());
 			if (clone_of != NULL && !(clone_of->flags & GAME_IS_BIOS_ROOT))
 				maindrv = clone_of;
 			else
-				maindrv = machine->gamedrv;
+				maindrv = &machine->system();
 
 			/* scan the driver list for any working clones and add them */
 			foundworking = FALSE;
@@ -1013,7 +1013,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 	int found_sound = FALSE;
 
 	/* print description, manufacturer, and CPU: */
-	string.printf("%s\n%s %s\n\nCPU:\n", machine->gamedrv->description, machine->gamedrv->year, machine->gamedrv->manufacturer);
+	string.printf("%s\n%s %s\n\nCPU:\n", machine->system().description, machine->system().year, machine->system().manufacturer);
 
 	/* loop over all CPUs */
 	device_execute_interface *exec = NULL;
@@ -1103,7 +1103,7 @@ astring &game_info_astring(running_machine *machine, astring &string)
 				string.catprintf("%d " UTF8_MULTIPLY " %d (%s) %f" UTF8_NBSP "Hz\n",
 						visarea.max_x - visarea.min_x + 1,
 						visarea.max_y - visarea.min_y + 1,
-						(machine->gamedrv->flags & ORIENTATION_SWAP_XY) ? "V" : "H",
+						(machine->system().flags & ORIENTATION_SWAP_XY) ? "V" : "H",
 						ATTOSECONDS_TO_HZ(screen->frame_period().attoseconds));
 			}
 		}
@@ -1311,7 +1311,7 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 	}
 
 	/* determine if we should disable the rest of the UI */
-	int ui_disabled = (input_machine_has_keyboard(machine) && !machine->ui_active);
+	int ui_disabled = (input_machine_has_keyboard(machine) && !machine->ui_active());
 
 	/* is ScrLk UI toggling applicable here? */
 	if (input_machine_has_keyboard(machine))
@@ -1320,10 +1320,10 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 		if (ui_input_pressed(machine, IPT_UI_TOGGLE_UI))
 		{
 			/* toggle the UI */
-			machine->ui_active = !machine->ui_active;
+			machine->set_ui_active(!machine->ui_active());
 
 			/* display a popup indicating the new status */
-			if (machine->ui_active)
+			if (machine->ui_active())
 			{
 				ui_popup_time(2, "%s\n%s\n%s\n%s\n%s\n%s\n",
 					"Keyboard Emulation Status",

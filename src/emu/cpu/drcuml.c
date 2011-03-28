@@ -154,8 +154,8 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, UINT32 flags, int
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine, drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits))) :
 			*static_cast<drcbe_interface *>(auto_alloc(device.machine, drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits)))),
 	  m_umllog(NULL),
-	  m_blocklist(device.machine->m_respool),
-	  m_symlist(device.machine->m_respool)
+	  m_blocklist(device.machine->respool()),
+	  m_symlist(device.machine->respool())
 {
 	// if we're to log, create the logfile
 	if (flags & DRCUML_OPTION_LOG_UML)

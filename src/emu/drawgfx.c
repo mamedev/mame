@@ -81,7 +81,7 @@ INLINE INT32 normalize_yscroll(bitmap_t *bitmap, INT32 yscroll)
 
 void gfx_init(running_machine *machine)
 {
-	const gfx_decode_entry *gfxdecodeinfo = machine->config->m_gfxdecodeinfo;
+	const gfx_decode_entry *gfxdecodeinfo = machine->config().m_gfxdecodeinfo;
 	int curgfx;
 
 	/* skip if nothing to do */

@@ -3266,7 +3266,7 @@ static DEVICE_START( k051960 )
 		fatalerror("Unknown plane_order");
 	}
 
-	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
@@ -4067,7 +4067,7 @@ static DEVICE_START( k05324x )
 		fatalerror("Unsupported plane_order");
 	}
 
-	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* deinterleave the graphics, if needed */
@@ -4494,9 +4494,9 @@ void k053247_sprites_draw( device_t *device, bitmap_t *bitmap, const rectangle *
 
         VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
     */
-	if (machine->config->m_video_attributes & VIDEO_HAS_SHADOWS)
+	if (machine->config().m_video_attributes & VIDEO_HAS_SHADOWS)
 	{
-		if (bitmap->bpp == 32 && (machine->config->m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
+		if (bitmap->bpp == 32 && (machine->config().m_video_attributes & VIDEO_HAS_HIGHLIGHTS))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -4905,12 +4905,12 @@ static DEVICE_START( k053247 )
 	{
 		if (k053247->screen->format() == BITMAP_FORMAT_RGB32)
 		{
-			if ((machine->config->m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
+			if ((machine->config().m_video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 		}
 		else
 		{
-			if (!(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
+			if (!(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
 				popmessage("driver should use VIDEO_HAS_SHADOWS");
 		}
 	}
@@ -5038,7 +5038,7 @@ static DEVICE_START( k055673 )
 		fatalerror("Unsupported layout");
 	}
 
-	if (VERBOSE && !(machine->config->m_video_attributes & VIDEO_HAS_SHADOWS))
+	if (VERBOSE && !(machine->config().m_video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	k053247->dx = intf->dx;

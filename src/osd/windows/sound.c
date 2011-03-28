@@ -300,7 +300,7 @@ static HRESULT dsound_init(running_machine *machine)
 	stream_format.wBitsPerSample	= 16;
 	stream_format.wFormatTag		= WAVE_FORMAT_PCM;
 	stream_format.nChannels			= 2;
-	stream_format.nSamplesPerSec	= machine->sample_rate;
+	stream_format.nSamplesPerSec	= machine->sample_rate();
 	stream_format.nBlockAlign		= stream_format.wBitsPerSample * stream_format.nChannels / 8;
 	stream_format.nAvgBytesPerSec	= stream_format.nSamplesPerSec * stream_format.nBlockAlign;
 

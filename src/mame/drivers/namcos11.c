@@ -586,7 +586,7 @@ static INTERRUPT_GEN( namcos11_vblank )
 	namcos11_state *state = device->machine->driver_data<namcos11_state>();
 	UINT32 *p_n_psxram = state->p_n_psxram;
 
-	if( strcmp( device->machine->gamedrv->name, "pocketrc" ) == 0 )
+	if( strcmp( device->machine->system().name, "pocketrc" ) == 0 )
 	{
 		if( p_n_psxram[ 0x12c74 / 4 ] == 0x1440fff9 )
 		{
@@ -917,7 +917,7 @@ static DRIVER_INIT( namcos11 )
 
 	machine->device("c76")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(c76_speedup_r), FUNC(c76_speedup_w));
 
-	if( strcmp( machine->gamedrv->name, "pocketrc" ) == 0 )
+	if( strcmp( machine->system().name, "pocketrc" ) == 0 )
 	{
 		machine->device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC0_L, FUNC(pocketrc_steer_r));
 		machine->device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC1_L, M37710_ADC1_L, FUNC(pocketrc_gas_r));
@@ -928,7 +928,7 @@ static DRIVER_INIT( namcos11 )
 	n_game = 0;
 	while( namcos11_config_table[ n_game ].s_name != NULL )
 	{
-		if( strcmp( machine->gamedrv->name, namcos11_config_table[ n_game ].s_name ) == 0 )
+		if( strcmp( machine->system().name, namcos11_config_table[ n_game ].s_name ) == 0 )
 		{
 			if( namcos11_config_table[ n_game ].keycus_r != NULL )
 			{
@@ -977,7 +977,7 @@ static DRIVER_INIT( namcos11 )
 		n_game++;
 	}
 
-	if( strcmp( machine->gamedrv->name, "ptblank2a" ) == 0 )
+	if( strcmp( machine->system().name, "ptblank2a" ) == 0 )
 	{
 		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(lightgun_w) );
 		machine->device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(lightgun_r) );

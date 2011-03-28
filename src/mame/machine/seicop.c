@@ -1450,7 +1450,7 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
     {
         FILE *fp;
         char filename[256];
-        sprintf(filename,"copdat_%s.table2", machine->gamedrv->name);
+        sprintf(filename,"copdat_%s.table2", machine->system().name);
         fp=fopen(filename, "w+b");
         if (fp)
         {
@@ -1461,7 +1461,7 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
     {
         FILE *fp;
         char filename[256];
-        sprintf(filename,"copdat_%s.table3", machine->gamedrv->name);
+        sprintf(filename,"copdat_%s.table3", machine->system().name);
         fp=fopen(filename, "w+b");
         if (fp)
         {
@@ -1472,7 +1472,7 @@ static void copd2_set_tableoffset(running_machine *machine, UINT16 data)
     {
         FILE *fp;
         char filename[256];
-        sprintf(filename,"copdat_%s.table4", machine->gamedrv->name);
+        sprintf(filename,"copdat_%s.table4", machine->system().name);
         fp=fopen(filename, "w+b");
         if (fp)
         {
@@ -1513,7 +1513,7 @@ static void copd2_set_tabledata(running_machine *machine, UINT16 data)
     {
         FILE *fp;
         char filename[256];
-        sprintf(filename,"copdat_%s.data", machine->gamedrv->name);
+        sprintf(filename,"copdat_%s.data", machine->system().name);
         fp=fopen(filename, "w+b");
         if (fp)
         {

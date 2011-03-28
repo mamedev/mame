@@ -2001,9 +2001,9 @@ static VIDEO_START( ss23 )
 	tilemap_set_transparent_pen(bgtilemap, 0xf);
 
 	// Gorgon's tilemap offset is 0, S23/SS23's is 860
-	if ((!strcmp(machine->gamedrv->name, "rapidrvr")) ||
-	    (!strcmp(machine->gamedrv->name, "rapidrvr2")) ||
-	    (!strcmp(machine->gamedrv->name, "finlflng")))
+	if ((!strcmp(machine->system().name, "rapidrvr")) ||
+	    (!strcmp(machine->system().name, "rapidrvr2")) ||
+	    (!strcmp(machine->system().name, "finlflng")))
 	{
 		tilemap_set_scrolldx(bgtilemap, 0, 0);
 	}
@@ -2649,21 +2649,21 @@ static DRIVER_INIT(ss23)
 	render_count[0] = render_count[1] = 0;
 	render_cur = 0;
 
-	if ((!strcmp(machine->gamedrv->name, "motoxgo")) ||
-	    (!strcmp(machine->gamedrv->name, "panicprk")) ||
-	    (!strcmp(machine->gamedrv->name, "rapidrvr")) ||
-	    (!strcmp(machine->gamedrv->name, "rapidrvr2")) ||
-	    (!strcmp(machine->gamedrv->name, "finlflng")) ||
-	    (!strcmp(machine->gamedrv->name, "gunwars")) ||
-	    (!strcmp(machine->gamedrv->name, "downhill")) ||
-	    (!strcmp(machine->gamedrv->name, "finfurl2")) ||
-	    (!strcmp(machine->gamedrv->name, "finfurl2j")) ||
-	    (!strcmp(machine->gamedrv->name, "raceon")) ||
-	    (!strcmp(machine->gamedrv->name, "crszone")) ||
-	    (!strcmp(machine->gamedrv->name, "crszonea")) ||
-	    (!strcmp(machine->gamedrv->name, "crszoneb")) ||
-	    (!strcmp(machine->gamedrv->name, "timecrs2b")) ||
-	    (!strcmp(machine->gamedrv->name, "timecrs2")))
+	if ((!strcmp(machine->system().name, "motoxgo")) ||
+	    (!strcmp(machine->system().name, "panicprk")) ||
+	    (!strcmp(machine->system().name, "rapidrvr")) ||
+	    (!strcmp(machine->system().name, "rapidrvr2")) ||
+	    (!strcmp(machine->system().name, "finlflng")) ||
+	    (!strcmp(machine->system().name, "gunwars")) ||
+	    (!strcmp(machine->system().name, "downhill")) ||
+	    (!strcmp(machine->system().name, "finfurl2")) ||
+	    (!strcmp(machine->system().name, "finfurl2j")) ||
+	    (!strcmp(machine->system().name, "raceon")) ||
+	    (!strcmp(machine->system().name, "crszone")) ||
+	    (!strcmp(machine->system().name, "crszonea")) ||
+	    (!strcmp(machine->system().name, "crszoneb")) ||
+	    (!strcmp(machine->system().name, "timecrs2b")) ||
+	    (!strcmp(machine->system().name, "timecrs2")))
 	{
 		has_jvsio = 1;
 	}

@@ -57,8 +57,8 @@ public:
 	uPD71054_state uPD71054;
 	const game_offset *global_offsets;
 
+	bool coin_lockout_initialized;
 	int coin_lockout;
-	const game_driver *driver;
 
 	int sub_ctrl_data;
 

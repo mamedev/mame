@@ -916,7 +916,7 @@ ROM_END
 static DRIVER_INIT( moo )
 {
 	moo_state *state = machine->driver_data<moo_state>();
-	state->game_type = (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua"));
+	state->game_type = (!strcmp(machine->system().name, "bucky") || !strcmp(machine->system().name, "buckyua"));
 }
 
 

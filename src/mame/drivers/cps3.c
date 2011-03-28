@@ -634,7 +634,7 @@ static void cps3_decrypt_bios(running_machine *machine)
 	/* Dump to file */
 	{
 		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
+		const char *gamename = machine->system().name;
 		char filename[256];
 		sprintf(filename, "%s_bios.dump", gamename);
 
@@ -2353,7 +2353,7 @@ static void copy_from_nvram(running_machine *machine)
 	/*
     {
         FILE *fp;
-        const char *gamename = machine->gamedrv->name;
+        const char *gamename = machine->system().name;
         char filename[256];
         sprintf(filename, "%s_bios.dump", gamename);
 

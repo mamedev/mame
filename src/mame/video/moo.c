@@ -43,7 +43,7 @@ VIDEO_START(moo)
 
 	state->alpha_enabled = 0;
 
-	if (!strcmp(machine->gamedrv->name, "bucky") || !strcmp(machine->gamedrv->name, "buckyua") || !strcmp(machine->gamedrv->name, "buckyaa"))
+	if (!strcmp(machine->system().name, "bucky") || !strcmp(machine->system().name, "buckyua") || !strcmp(machine->system().name, "buckyaa"))
 	{
 		// Bucky doesn't chain tilemaps
 		k056832_set_layer_association(state->k056832, 0);

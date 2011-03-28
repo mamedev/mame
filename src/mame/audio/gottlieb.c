@@ -133,7 +133,7 @@ static void trigger_sample(device_t *samples, UINT8 data)
 {
 	gottlieb_state *state = samples->machine->driver_data<gottlieb_state>();
 	/* Reactor samples */
-	if (strcmp(samples->machine->gamedrv->name, "reactor") == 0)
+	if (strcmp(samples->machine->system().name, "reactor") == 0)
 	{
 		switch (data)
 		{
@@ -186,7 +186,7 @@ static void trigger_sample(device_t *samples, UINT8 data)
 void gottlieb_knocker(running_machine *machine)
 {
 	device_t *samples = space->machine->device("samples");
-	if (!strcmp(machine->gamedrv->name,"reactor"))	/* reactor */
+	if (!strcmp(machine->system().name,"reactor"))	/* reactor */
 	{
 	}
 	else if (samples != NULL)	/* qbert */

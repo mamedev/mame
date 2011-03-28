@@ -3480,7 +3480,7 @@ void dump_decrypted(running_machine* machine, UINT8* decrypt)
 {
     FILE *fp;
     char filename[256];
-    sprintf(filename,"dat_%s", machine->gamedrv->name);
+    sprintf(filename,"dat_%s", machine->system().name);
     fp=fopen(filename, "w+b");
     if (fp)
     {

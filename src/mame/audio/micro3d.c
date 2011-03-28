@@ -314,8 +314,8 @@ static DEVICE_START( micro3d_sound )
 	noise_state *state = get_safe_token(device);
 
 	/* Allocate the stream */
-	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate, state, micro3d_stream_update);
-	filter_init(machine, &state->filter, machine->sample_rate);
+	state->stream = device->machine->sound().stream_alloc(*device, 0, 2, machine->sample_rate(), state, micro3d_stream_update);
+	filter_init(machine, &state->filter, machine->sample_rate());
 
 	configure_filter(&state->noise_filters[0], 2.7e3 + 2.7e3, 1.0e-6);
 	configure_filter(&state->noise_filters[1], 2.7e3 + 1e3, 0.30e-6);

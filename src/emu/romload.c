@@ -338,7 +338,7 @@ static void determine_bios_rom(rom_load_data *romdata)
 
 	romdata->system_bios = 0;
 
-	for (const rom_source *source = rom_first_source(*romdata->machine->config); source != NULL; source = rom_next_source(*source))
+	for (const rom_source *source = rom_first_source(romdata->machine->config()); source != NULL; source = rom_next_source(*source))
 	{
 		/* first determine the default BIOS name */
 		for (rom = source->rom_region(); !ROMENTRY_ISEND(rom); rom++)
@@ -396,7 +396,7 @@ static void count_roms(rom_load_data *romdata)
 	romdata->romstotalsize = 0;
 
 	/* loop over regions, then over files */
-	for (source = rom_first_source(*romdata->machine->config); source != NULL; source = rom_next_source(*source))
+	for (source = rom_first_source(romdata->machine->config()); source != NULL; source = rom_next_source(*source))
 		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 				if (ROM_GETBIOSFLAGS(rom) == 0 || ROM_GETBIOSFLAGS(rom) == romdata->system_bios)
@@ -624,7 +624,7 @@ static int open_rom_file(rom_load_data *romdata, const char *regiontag, const ro
 	/* attempt reading up the chain through the parents. It automatically also
      attempts any kind of load by checksum supported by the archives. */
 	romdata->file = NULL;
-	for (drv = romdata->machine->gamedrv; romdata->file == NULL && drv != NULL; drv = driver_get_clone(drv))
+	for (drv = &romdata->machine->system(); romdata->file == NULL && drv != NULL; drv = driver_get_clone(drv))
 		if (drv->name != NULL && *drv->name != 0)
 			filerr = common_process_file(romdata->machine->options(), drv->name, has_crc, crc, romp, &romdata->file);
 
@@ -1226,7 +1226,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 
 			/* first open the source drive */
 			LOG(("Opening disk image: %s\n", filename.cstr()));
-			err = open_disk_image(romdata->machine->options(), romdata->machine->gamedrv, romp, &chd.origfile, &chd.origchd, locationtag);
+			err = open_disk_image(romdata->machine->options(), &romdata->machine->system(), romp, &chd.origfile, &chd.origchd, locationtag);
 			if (err != CHDERR_NONE)
 			{
 				if (err == CHDERR_FILE_NOT_FOUND)
@@ -1450,12 +1450,12 @@ static void process_region_list(rom_load_data *romdata)
 	const rom_entry *region;
 
 	/* loop until we hit the end */
-	for (source = rom_first_source(*romdata->machine->config); source != NULL; source = rom_next_source(*source))
+	for (source = rom_first_source(romdata->machine->config()); source != NULL; source = rom_next_source(*source))
 		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 		{
 			UINT32 regionlength = ROMREGION_GETLENGTH(region);
 
-			rom_region_name(regiontag, romdata->machine->gamedrv, source, region);
+			rom_region_name(regiontag, &romdata->machine->system(), source, region);
 			LOG(("Processing region \"%s\" (length=%X)\n", regiontag.cstr(), regionlength));
 
 			/* the first entry must be a region */
@@ -1495,7 +1495,7 @@ static void process_region_list(rom_load_data *romdata)
 		}
 
 	/* now go back and post-process all the regions */
-	for (source = rom_first_source(*romdata->machine->config); source != NULL; source = rom_next_source(*source))
+	for (source = rom_first_source(romdata->machine->config()); source != NULL; source = rom_next_source(*source))
 		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 			region_post_process(romdata, ROMREGION_GETTAG(region), ROMREGION_ISINVERTED(region));
 }

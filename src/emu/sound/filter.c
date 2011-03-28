@@ -134,7 +134,7 @@ filter* filter_lp_fir_alloc(double freq, int order) {
 void filter2_setup(device_t *device, int type, double fc, double d, double gain,
 					filter2_context *filter2)
 {
-	int sample_rate = device->machine->sample_rate;
+	int sample_rate = device->machine->sample_rate();
 	double w;	/* cutoff freq, in radians/sec */
 	double w_squared;
 	double den;	/* temp variable */

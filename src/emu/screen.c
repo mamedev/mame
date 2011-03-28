@@ -378,7 +378,7 @@ void screen_device::device_start()
 	m_scanline0_timer = machine->scheduler().timer_alloc(FUNC(static_scanline0_callback), (void *)this);
 
 	// allocate a timer to generate per-scanline updates
-	if ((machine->config->m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((machine->config().m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		m_scanline_timer = machine->scheduler().timer_alloc(FUNC(static_scanline_update_callback), (void *)this);
 
 	// configure the screen with the default parameters
@@ -389,7 +389,7 @@ void screen_device::device_start()
 	m_vblank_end_time = attotime(0, m_vblank_period);
 
 	// start the timer to generate per-scanline updates
-	if ((machine->config->m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
+	if ((machine->config().m_video_attributes & VIDEO_UPDATE_SCANLINE) != 0)
 		m_scanline_timer->adjust(time_until_pos(0));
 
 	// create burn-in bitmap
@@ -609,7 +609,7 @@ bool screen_device::update_partial(int scanline)
 	LOG_PARTIAL_UPDATES(("Partial: update_partial(%s, %d): ", tag(), scanline));
 
 	// these two checks only apply if we're allowed to skip frames
-	if (!(machine->config->m_video_attributes & VIDEO_ALWAYS_UPDATE))
+	if (!(machine->config().m_video_attributes & VIDEO_ALWAYS_UPDATE))
 	{
 		// if skipping this frame, bail
 		if (m_machine.video().skip_this_frame())
@@ -824,7 +824,7 @@ void screen_device::vblank_begin_callback()
 		(*item->m_callback)(*this, item->m_param, true);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine->primary_screen && !(machine->config->m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (this == machine->primary_screen && !(machine->config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine->video().frame_update();
 
 	// reset the VBLANK start timer for the next frame
@@ -850,7 +850,7 @@ void screen_device::vblank_end_callback()
 		(*item->m_callback)(*this, item->m_param, false);
 
 	// if this is the primary screen and we need to update now
-	if (this == machine->primary_screen && (machine->config->m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
+	if (this == machine->primary_screen && (machine->config().m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK))
 		machine->video().frame_update();
 
 	// increment the frame number counter
@@ -902,7 +902,7 @@ bool screen_device::update_quads()
 	if (m_machine.render().is_live(*this))
 	{
 		// only update if empty and not a vector game; otherwise assume the driver did it directly
-		if (m_config.m_type != SCREEN_TYPE_VECTOR && (machine->config->m_video_attributes & VIDEO_SELF_RENDER) == 0)
+		if (m_config.m_type != SCREEN_TYPE_VECTOR && (machine->config().m_video_attributes & VIDEO_SELF_RENDER) == 0)
 		{
 			// if we're not skipping the frame and if the screen actually changed, then update the texture
 			if (!m_machine.video().skip_this_frame() && m_changed)
@@ -1068,7 +1068,7 @@ void screen_device::finalize_burnin()
 		// add two text entries describing the image
 		sprintf(text, APPNAME " %s", build_version);
 		png_add_text(&pnginfo, "Software", text);
-		sprintf(text, "%s %s", machine->m_game.manufacturer, machine->m_game.description);
+		sprintf(text, "%s %s", machine->system().manufacturer, machine->system().description);
 		png_add_text(&pnginfo, "System", text);
 
 		// now do the actual work

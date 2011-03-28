@@ -139,22 +139,15 @@ static char giant_string_buffer[65536] = { 0 };
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, osd_interface &osd, bool exit_to_game_select)
-	: m_regionlist(m_respool),
-	  m_devicelist(m_respool),
-	  config(&_config),
-	  m_config(_config),
+	: m_devicelist(m_respool),
 	  firstcpu(NULL),
-	  gamedrv(&_config.gamedrv()),
-	  m_game(_config.gamedrv()),
 	  primary_screen(NULL),
 	  palette(NULL),
 	  pens(NULL),
 	  colortable(NULL),
 	  shadow_table(NULL),
 	  priority_bitmap(NULL),
-	  sample_rate(_config.options().sample_rate()),
 	  debug_flags(0),
-      ui_active(false),
 	  memory_data(NULL),
 	  palette_data(NULL),
 	  tilemap_data(NULL),
@@ -166,11 +159,19 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  generic_machine_data(NULL),
 	  generic_video_data(NULL),
 	  generic_audio_data(NULL),
-	  m_logerror_list(NULL),
+	
+	  m_config(_config),
+	  m_system(_config.gamedrv()),
+	  m_osd(osd),
+	  m_regionlist(m_respool),
 	  m_state(*this),
 	  m_scheduler(*this),
-	  m_osd(osd),
-	  m_basename(_config.gamedrv().name),
+	  m_cheat(NULL),
+	  m_render(NULL),
+	  m_sound(NULL),
+	  m_video(NULL),
+	  m_debug_view(NULL),
+	  m_driver_device(NULL),
 	  m_current_phase(MACHINE_PHASE_PREINIT),
 	  m_paused(false),
 	  m_hard_reset_pending(false),
@@ -178,21 +179,18 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_exit_to_game_select(exit_to_game_select),
 	  m_new_driver_pending(NULL),
 	  m_soft_reset_timer(NULL),
+	  m_rand_seed(0x9d14abd7),
+      m_ui_active(false),
+	  m_basename(_config.gamedrv().name),
+	  m_sample_rate(_config.options().sample_rate()),
 	  m_logfile(NULL),
 	  m_saveload_schedule(SLS_NONE),
 	  m_saveload_schedule_time(attotime::zero),
 	  m_saveload_searchpath(NULL),
-	  m_rand_seed(0x9d14abd7),
-	  m_driver_device(NULL),
-	  m_cheat(NULL),
-	  m_render(NULL),
-	  m_sound(NULL),
-	  m_video(NULL),
-	  m_debug_view(NULL)
+	  m_logerror_list(m_respool)
 {
 	memset(gfx, 0, sizeof(gfx));
 	memset(&generic, 0, sizeof(generic));
-	memset(m_notifier_list, 0, sizeof(m_notifier_list));
 	memset(&m_base_time, 0, sizeof(m_base_time));
 
 	// find the driver device config and tell it which game
@@ -284,7 +282,7 @@ void running_machine::start()
 	// initialize the input system and input ports for the game
 	// this must be done before memory_init in order to allow specifying
 	// callbacks based on input port tags
-	time_t newbase = input_port_init(this, m_game.ipt, m_config.m_devicelist);
+	time_t newbase = input_port_init(this, m_system.ipt, m_config.m_devicelist);
 	if (newbase != 0)
 		m_base_time = newbase;
 
@@ -332,7 +330,7 @@ void running_machine::start()
 		schedule_load(savegame);
 
 	// if we're in autosave mode, schedule a load
-	else if (options().autosave() && (m_game.flags & GAME_SUPPORTS_SAVE) != 0)
+	else if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) != 0)
 		schedule_load("auto");
 
 	// set up the cheat engine
@@ -458,7 +456,7 @@ void running_machine::schedule_exit()
 	m_scheduler.eat_all_cycles();
 
 	// if we're autosaving on exit, schedule a save as well
-	if (options().autosave() && (m_game.flags & GAME_SUPPORTS_SAVE) && this->time() > attotime::zero)
+	if (options().autosave() && (m_system.flags & GAME_SUPPORTS_SAVE) && this->time() > attotime::zero)
 		schedule_save("auto");
 }
 
@@ -637,19 +635,11 @@ void running_machine::add_notifier(machine_notification event, notify_callback c
 
 	// exit notifiers are added to the head, and executed in reverse order
 	if (event == MACHINE_NOTIFY_EXIT)
-	{
-		notifier_callback_item *notifier = auto_alloc(this, notifier_callback_item(callback));
-		notifier->m_next = m_notifier_list[event];
-		m_notifier_list[event] = notifier;
-	}
+		m_notifier_list[event].prepend(*global_alloc(notifier_callback_item(callback)));
 
 	// all other notifiers are added to the tail, and executed in the order registered
 	else
-	{
-		notifier_callback_item **tailptr;
-		for (tailptr = &m_notifier_list[event]; *tailptr != NULL; tailptr = &(*tailptr)->m_next) ;
-		*tailptr = auto_alloc(this, notifier_callback_item(callback));
-	}
+		m_notifier_list[event].append(*global_alloc(notifier_callback_item(callback)));
 }
 
 
@@ -661,10 +651,7 @@ void running_machine::add_notifier(machine_notification event, notify_callback c
 void running_machine::add_logerror_callback(logerror_callback callback)
 {
 	assert_always(m_current_phase == MACHINE_PHASE_INIT, "Can only call add_logerror_callback at init time!");
-
-	logerror_callback_item **tailptr;
-	for (tailptr = &m_logerror_list; *tailptr != NULL; tailptr = &(*tailptr)->m_next) ;
-	*tailptr = auto_alloc(this, logerror_callback_item(callback));
+	m_logerror_list.append(*auto_alloc(this, logerror_callback_item(callback)));
 }
 
 
@@ -675,7 +662,7 @@ void running_machine::add_logerror_callback(logerror_callback callback)
 void CLIB_DECL running_machine::logerror(const char *format, ...)
 {
 	// process only if there is a target
-	if (m_logerror_list != NULL)
+	if (m_logerror_list.first() != NULL)
 	{
 		va_list arg;
 		va_start(arg, format);
@@ -692,7 +679,7 @@ void CLIB_DECL running_machine::logerror(const char *format, ...)
 void CLIB_DECL running_machine::vlogerror(const char *format, va_list args)
 {
 	// process only if there is a target
-	if (m_logerror_list != NULL)
+	if (m_logerror_list.first() != NULL)
 	{
 		g_profiler.start(PROFILER_LOGERROR);
 
@@ -700,7 +687,7 @@ void CLIB_DECL running_machine::vlogerror(const char *format, va_list args)
 		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, args);
 
 		// log to all callbacks
-		for (logerror_callback_item *cb = m_logerror_list; cb != NULL; cb = cb->m_next)
+		for (logerror_callback_item *cb = m_logerror_list.first(); cb != NULL; cb = cb->next())
 			(*cb->m_func)(*this, giant_string_buffer);
 
 		g_profiler.stop();
@@ -752,7 +739,7 @@ UINT32 running_machine::rand()
 
 void running_machine::call_notifiers(machine_notification which)
 {
-	for (notifier_callback_item *cb = m_notifier_list[which]; cb != NULL; cb = cb->m_next)
+	for (notifier_callback_item *cb = m_notifier_list[which].first(); cb != NULL; cb = cb->next())
 		(*cb->m_func)(*this);
 }
 
@@ -814,7 +801,7 @@ void running_machine::handle_saveload()
 				break;
 
 			case STATERR_NONE:
-				if (!(m_game.flags & GAME_SUPPORTS_SAVE))
+				if (!(m_system.flags & GAME_SUPPORTS_SAVE))
 					popmessage("State successfully %s.\nWarning: Save states are not officially supported for this game.", opnamed);
 				else
 					popmessage("State successfully %s.", opnamed);
@@ -942,7 +929,7 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 
 driver_device_config_base::driver_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner)
 	: device_config(mconfig, type, "Driver Device", tag, owner, 0),
-	  m_game(NULL),
+	  m_system(NULL),
 	  m_palette_init(NULL)
 {
 	memset(m_callbacks, 0, sizeof(m_callbacks));
@@ -956,7 +943,7 @@ driver_device_config_base::driver_device_config_base(const machine_config &mconf
 
 void driver_device_config_base::static_set_game(device_config *device, const game_driver *game)
 {
-	downcast<driver_device_config_base *>(device)->m_game = game;
+	downcast<driver_device_config_base *>(device)->m_system = game;
 	downcast<driver_device_config_base *>(device)->m_shortname = game->name;
 }
 
@@ -992,7 +979,7 @@ void driver_device_config_base::static_set_palette_init(device_config *device, p
 
 const rom_entry *driver_device_config_base::rom_region() const
 {
-	return m_game->rom;
+	return m_system->rom;
 }
 
 
@@ -1146,8 +1133,8 @@ void driver_device::device_start()
 		throw device_missing_dependencies();
 
 	// call the game-specific init
-	if (m_config.m_game->driver_init != NULL)
-		(*m_config.m_game->driver_init)(&m_machine);
+	if (m_config.m_system->driver_init != NULL)
+		(*m_config.m_system->driver_init)(&m_machine);
 
 	// finish image devices init process
 	image_postdevice_init(&m_machine);

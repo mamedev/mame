@@ -1426,7 +1426,7 @@ static NVRAM_HANDLER( naomi_eeproms )
 
 			// some games require defaults to boot (vertical, 1 player etc.)
 			for (i=0; i<ARRAY_LENGTH(jvseeprom_default_game); i++)
-				if (!strcmp(machine->gamedrv->name, jvseeprom_default_game[i].name))
+				if (!strcmp(machine->system().name, jvseeprom_default_game[i].name))
 				{
 					jvseeprom_default = jvseeprom_default_game[i].eeprom;
 					break;

@@ -331,12 +331,12 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_execute_list(NULL),
 	m_basetime(attotime::zero),
 	m_timer_list(NULL),
-	m_timer_allocator(machine.m_respool),
+	m_timer_allocator(machine.respool()),
 	m_callback_timer(NULL),
 	m_callback_timer_modified(false),
 	m_callback_timer_expire_time(attotime::zero),
-	m_quantum_list(machine.m_respool),
-	m_quantum_allocator(machine.m_respool),
+	m_quantum_list(machine.respool()),
+	m_quantum_allocator(machine.respool()),
 	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
 {
 	// append a single never-expiring timer so there is always one in the list
@@ -719,22 +719,22 @@ void device_scheduler::rebuild_execute_list()
 	if (m_quantum_list.first() == NULL)
 	{
 		// set the core scheduling quantum
-		attotime min_quantum = m_machine.config->m_minimum_quantum;
+		attotime min_quantum = m_machine.config().m_minimum_quantum;
 
 		// if none specified default to 60Hz
 		if (min_quantum == attotime::zero)
 			min_quantum = attotime::from_hz(60);
 
 		// if the configuration specifies a device to make perfect, pick that as the minimum
-		if (m_machine.config->m_perfect_cpu_quantum != NULL)
+		if (m_machine.config().m_perfect_cpu_quantum != NULL)
 		{
-			device_t *device = m_machine.device(m_machine.config->m_perfect_cpu_quantum);
+			device_t *device = m_machine.device(m_machine.config().m_perfect_cpu_quantum);
 			if (device == NULL)
-				fatalerror("Device '%s' specified for perfect interleave is not present!", m_machine.config->m_perfect_cpu_quantum);
+				fatalerror("Device '%s' specified for perfect interleave is not present!", m_machine.config().m_perfect_cpu_quantum);
 
 			device_execute_interface *exec;
 			if (!device->interface(exec))
-				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", m_machine.config->m_perfect_cpu_quantum);
+				fatalerror("Device '%s' specified for perfect interleave is not an executing device!", m_machine.config().m_perfect_cpu_quantum);
 
 			min_quantum = min(attotime(0, exec->minimum_quantum()), min_quantum);
 		}

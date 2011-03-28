@@ -912,7 +912,7 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine)
 	#if 0
 	{
 		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
+		const char *gamename = machine->system().name;
 		char filename[256];
 		sprintf(filename, "%s_m1.dump", gamename);
 
@@ -929,7 +929,7 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine)
 	#if 0
 	{
 		FILE *fp;
-		const char *gamename = machine->gamedrv->name;
+		const char *gamename = machine->system().name;
 		char filename[256];
 		sprintf(filename, "%s_m1extra.dump", gamename);
 

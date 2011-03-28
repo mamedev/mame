@@ -253,7 +253,7 @@ struct _sn76477_state
 
 	/* others */
 	sound_stream *channel;				/* returned by stream_create() */
-	int sample_rate;					/* from machine->sample_rate */
+	int sample_rate;					/* from machine->sample_rate() */
 	device_t *device;
 
 	wav_file *file;						/* handle of the wave file to produce */
@@ -2406,7 +2406,7 @@ static DEVICE_START( sn76477 )
 
 	sn->device = device;
 
-	sn->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate, sn, SN76477_update);
+	sn->channel = device->machine->sound().stream_alloc(*device, 0, 1, device->machine->sample_rate(), sn, SN76477_update);
 
 	if (device->clock() > 0)
 	{
@@ -2414,7 +2414,7 @@ static DEVICE_START( sn76477 )
 	}
 	else
 	{
-		sn->sample_rate = device->machine->sample_rate;
+		sn->sample_rate = device->machine->sample_rate();
 	}
 
 	intialize_noise(sn);
