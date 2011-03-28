@@ -109,7 +109,7 @@ void sdlaudio_init(running_machine *machine)
 static void sdl_cleanup_audio(running_machine &machine)
 {
 	// if nothing to do, don't do it
-	if (machine.sample_rate == 0)
+	if (machine.sample_rate() == 0)
 		return;
 
 	// kill the buffers and dsound
@@ -264,7 +264,7 @@ static void copy_sample_data(running_machine &machine, const INT16 *data, int by
 void sdl_osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_frame)
 {
 	// if nothing to do, don't do it
-	if (machine().sample_rate != 0 && stream_buffer)
+	if (machine().sample_rate() != 0 && stream_buffer)
 	{
 		int bytes_this_frame = samples_this_frame * sizeof(INT16) * 2;
 		int play_position, write_position, stream_in;
@@ -272,7 +272,7 @@ void sdl_osd_interface::update_audio_stream(const INT16 *buffer, int samples_thi
 
 		play_position = stream_playpos;
 
-		write_position = stream_playpos + ((machine().sample_rate / 50) * sizeof(INT16) * 2);
+		write_position = stream_playpos + ((machine().sample_rate() / 50) * sizeof(INT16) * 2);
 		orig_write = write_position;
 
 		if (!stream_in_initialized)
