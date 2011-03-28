@@ -105,7 +105,7 @@ static void sdloutput_exit(running_machine &machine)
 {
 	if (output != NULL)
 	{
-		fprintf(output, "MAME " PID_FMT " STOP %s\n", osd_getpid(), machine.m_game.name);
+		fprintf(output, "MAME " PID_FMT " STOP %s\n", osd_getpid(), machine.system().name);
 		fflush(output);
 		fclose(output);
 		output = NULL;
