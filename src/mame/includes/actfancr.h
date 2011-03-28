@@ -14,6 +14,7 @@ public:
 	UINT8 *        main_ram;
 //  UINT8 *        spriteram;   // currently this uses buffered_spriteram
 //  UINT8 *        paletteram;  // currently this uses generic palette handling
+	UINT16 spriteram16[0x800/2]; // a 16-bit copy of spriteram for use with the MXC06 code		
 
 	/* video-related */
 	int            flipscreen;
@@ -37,7 +38,5 @@ READ8_HANDLER( actfancr_pf2_data_r );
 WRITE8_HANDLER( actfancr_pf2_control_w );
 
 VIDEO_START( actfancr );
-VIDEO_START( triothep );
-
 SCREEN_UPDATE( actfancr );
-SCREEN_UPDATE( triothep );
+
