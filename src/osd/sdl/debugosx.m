@@ -1746,7 +1746,7 @@ void console_create_window(running_machine *machine)
 	[regView selectSubviewForCPU:device];
 	[dasmView selectSubviewForCPU:device];
 	[window setTitle:[NSString stringWithFormat:@"Debug: %s - %s '%s'",
-												device->machine->gamedrv->name,
+												device->machine->system().name,
 												device->name(),
 												device->tag()]];
 }
@@ -2297,8 +2297,8 @@ void console_create_window(running_machine *machine)
 	NSString		*title;
 
 	title = [NSString stringWithFormat:@"Error Log: %@ [%@]",
-									   [NSString stringWithUTF8String:m->gamedrv->description],
-									   [NSString stringWithUTF8String:m->gamedrv->name]];
+									   [NSString stringWithUTF8String:m->system().description],
+									   [NSString stringWithUTF8String:m->system().name]];
 	if (!(self = [super initWithMachine:m title:title console:c]))
 		return nil;
 
