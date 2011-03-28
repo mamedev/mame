@@ -5,13 +5,14 @@
 *********************************************************************
 
     MXC-06 chip to produce sprites, see dec0.c
-    BAC-06 chip for background?
+    BAC-06 chip for background
+	??? for text layer
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "includes/stadhero.h"
-
+#include "video/decbac06.h"
 
 /******************************************************************************/
 
@@ -84,12 +85,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 SCREEN_UPDATE( stadhero )
 {
 	stadhero_state *state = screen->machine->driver_data<stadhero_state>();
-	state->flipscreen=state->pf2_control_0[0]&0x80;
-	tilemap_set_flip_all(screen->machine,state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	tilemap_set_scrollx( state->pf2_tilemap,0, state->pf2_control_1[0] );
-	tilemap_set_scrolly( state->pf2_tilemap,0, state->pf2_control_1[1] );
+//	tilemap_set_flip_all(screen->machine,state->flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	tilemap_draw(bitmap,cliprect,state->pf2_tilemap,0,0);
+	screen->machine->device<deco_bac06_device>("tilegen1")->set_bppmultmask(0x8, 0x7);
+	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
+
+	//pf2 draw
 	draw_sprites(screen->machine, bitmap,cliprect,0x00,0x00);
 	tilemap_draw(bitmap,cliprect,state->pf1_tilemap,0,0);
 	return 0;
@@ -104,43 +105,8 @@ WRITE16_HANDLER( stadhero_pf1_data_w )
 	tilemap_mark_tile_dirty(state->pf1_tilemap,offset);
 }
 
-READ16_HANDLER( stadhero_pf2_data_r )
-{
-	stadhero_state *state = space->machine->driver_data<stadhero_state>();
-	return state->pf2_data[((state->pf2_control_0[2] & 0x01) ? 0x1000 : 0) | offset];
-}
-
-WRITE16_HANDLER( stadhero_pf2_data_w )
-{
-	stadhero_state *state = space->machine->driver_data<stadhero_state>();
-	COMBINE_DATA(&state->pf2_data[((state->pf2_control_0[2] & 0x01) ? 0x1000 : 0) | offset]);
-	tilemap_mark_tile_dirty(state->pf2_tilemap,offset);
-}
-
 
 /******************************************************************************/
-
-static TILEMAP_MAPPER( stadhero_scan )
-{
-	/* logical (col,row) -> memory offset */
-	return (col & 0xf) + ((row & 0xf) << 4) + ((row & 0x30) << 4) + ((col & 0x30) << 6);
-}
-
-static TILE_GET_INFO( get_pf2_tile_info )
-{
-	stadhero_state *state = machine->driver_data<stadhero_state>();
-	int tile,color;
-
-	tile=state->pf2_data[((state->pf2_control_0[2] & 0x01) ? 0x1000 : 0) | tile_index];
-	color=tile >> 12;
-	tile=tile&0xfff;
-
-	SET_TILE_INFO(
-			1,
-			tile,
-			color,
-			0);
-}
 
 static TILE_GET_INFO( get_pf1_tile_info )
 {
@@ -160,10 +126,6 @@ VIDEO_START( stadhero )
 {
 	stadhero_state *state = machine->driver_data<stadhero_state>();
 	state->pf1_tilemap =     tilemap_create(machine, get_pf1_tile_info,tilemap_scan_rows, 8, 8,32,32);
-	state->pf2_tilemap =     tilemap_create(machine, get_pf2_tile_info,stadhero_scan,     16,16,64,64);
-
-	state->pf2_data = auto_alloc_array(machine, UINT16, 0x2000);
-
 	tilemap_set_transparent_pen(state->pf1_tilemap,0);
 }
 

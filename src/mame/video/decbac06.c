@@ -95,17 +95,17 @@ deco_bac06_device::deco_bac06_device(running_machine &_machine, const deco_bac06
 
 static TILEMAP_MAPPER( tile_shape0_scan )
 {
-	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x70) << 4);
+	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x1f0) << 4);
 }
 
 static TILEMAP_MAPPER( tile_shape1_scan )
 {
-	return (col & 0xf) + ((row & 0x1f) << 4) + ((col & 0x30) << 5);
+	return (col & 0xf) + ((row & 0x1f) << 4) + ((col & 0xf0) << 5);
 }
 
 static TILEMAP_MAPPER( tile_shape2_scan )
 {
-	return (col & 0xf) + ((row & 0x3f) << 4) + ((col & 0x10) << 6);
+	return (col & 0xf) + ((row & 0x3f) << 4) + ((col & 0x70) << 6);
 }
 
 static TILEMAP_MAPPER( tile_shape0_8x8_scan )
@@ -129,7 +129,9 @@ static TILEMAP_MAPPER( tile_shape2_8x8_scan )
 
 static TILE_GET_INFO_DEVICE( get_pf8x8_tile_info )
 {
+
 	deco_bac06_device *dev = (deco_bac06_device*)device;
+	if (dev->m_rambank&1) tile_index+=0x1000;
 	int tile=dev->pf_data[tile_index];
 	int colourpri=(tile>>12);
 	SET_TILE_INFO_DEVICE(dev->tile_region,tile&0xfff,0,0);
@@ -139,6 +141,7 @@ static TILE_GET_INFO_DEVICE( get_pf8x8_tile_info )
 static TILE_GET_INFO_DEVICE( get_pf16x16_tile_info )
 {
 	deco_bac06_device *dev = (deco_bac06_device*)device;
+	if (dev->m_rambank&1) tile_index+=0x1000;
 	int tile=dev->pf_data[tile_index];
 	int colourpri=(tile>>12);
 	SET_TILE_INFO_DEVICE(dev->tile_region,tile&0xfff,0,0);
@@ -156,7 +159,13 @@ void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 
 	tile_region = region16x16;
 
-	if (m_wide)
+	if (m_wide==2)
+	{
+		pf16x16_tilemap[0] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape0_scan, 16, 16, 256, 16);
+		pf16x16_tilemap[1] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape1_scan,  16, 16,  128, 32);
+		pf16x16_tilemap[2] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape2_scan,  16, 16,  64, 64);
+	}
+	else if (m_wide==1)
 	{
 		pf16x16_tilemap[0] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape0_scan, 16, 16, 128, 16);
 		pf16x16_tilemap[1] = tilemap_create_device(this, get_pf16x16_tile_info, tile_shape1_scan,  16, 16,  64, 32);
@@ -172,12 +181,16 @@ void deco_bac06_device::create_tilemaps(int region8x8, int region16x16)
 
 void deco_bac06_device::device_start()
 {
-	pf_data = auto_alloc_array_clear(this->machine, UINT16, 0x2000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror
+	pf_data = auto_alloc_array_clear(this->machine, UINT16, 0x4000 / 2); // 0x2000 is the maximum needed, some games / chip setups map less and mirror - stadium hero banks this to 0x4000?!
 	pf_rowscroll = auto_alloc_array_clear(this->machine, UINT16, 0x2000 / 2);
 	pf_colscroll = auto_alloc_array_clear(this->machine, UINT16, 0x2000 / 2);
 
 	create_tilemaps(m_gfxregion8x8, m_gfxregion16x16);
 	m_gfxcolmask = 0x0f;
+
+	m_bppmult = 0x10;
+	m_bppmask = 0x0f;
+	m_rambank = 0;
 }
 
 void deco_bac06_device::device_reset()
@@ -258,13 +271,13 @@ void deco_bac06_device::custom_tilemap_draw(running_machine *machine,
 			colpri =  *BITMAP_ADDR8(flags_bitmap, (src_y + column_offset)&height_mask, src_x&width_mask)&0xf;
 		
 			src_x++;
-			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&0xf))
+			if ((flags&TILEMAP_DRAW_OPAQUE) || (p&m_bppmask))
 			{
 
 				
 				if ((p&penmask)==pencondition)
 					if((colpri&colprimask)==colpricondition)
-						*BITMAP_ADDR16(bitmap, y, x) = p+(colpri&m_gfxcolmask)*0x10;
+						*BITMAP_ADDR16(bitmap, y, x) = p+(colpri&m_gfxcolmask)*m_bppmult;
 			}
 		}
 		src_y++;
@@ -309,12 +322,33 @@ WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w )
 {
 	offset &= 3;
 	deco_bac06_device *dev = (deco_bac06_device*)device;
+
 	COMBINE_DATA(&dev->pf_control_0[offset]);
+
+	if (offset==2)
+	{
+		int newbank = dev->pf_control_0[offset]&1;
+		if ((newbank&1) != (dev->m_rambank&1))
+		{
+			// I don't know WHY Stadium Hero uses this as a bank but the RAM test expects it..
+			// I'm curious as to if anything else sets it tho
+			if (strcmp(dev->machine->gamedrv->name,"stadhero"))
+				printf("tilemap ram bank change to %d\n", newbank&1);
+
+			dev->m_rambank = newbank&1;
+			tilemap_mark_all_tiles_dirty(dev->pf8x8_tilemap[0]);
+			tilemap_mark_all_tiles_dirty(dev->pf8x8_tilemap[1]);
+			tilemap_mark_all_tiles_dirty(dev->pf8x8_tilemap[2]);
+			tilemap_mark_all_tiles_dirty(dev->pf16x16_tilemap[0]);
+			tilemap_mark_all_tiles_dirty(dev->pf16x16_tilemap[1]);
+			tilemap_mark_all_tiles_dirty(dev->pf16x16_tilemap[2]);
+		}
+	}
 }
 
 READ16_DEVICE_HANDLER( deco_bac06_pf_control_1_r )
 {
-	offset &= 3;
+	offset &= 7;
 	deco_bac06_device *dev = (deco_bac06_device*)device;
 	return dev->pf_control_1[offset];
 }
@@ -328,7 +362,10 @@ WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_1_w )
 
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w )
 {
+
 	deco_bac06_device *dev = (deco_bac06_device*)device;
+	if (dev->m_rambank&1) offset+=0x1000;
+
 	COMBINE_DATA(&dev->pf_data[offset]);
 	tilemap_mark_tile_dirty(dev->pf8x8_tilemap[0],offset);
 	tilemap_mark_tile_dirty(dev->pf8x8_tilemap[1],offset);
@@ -341,6 +378,8 @@ WRITE16_DEVICE_HANDLER( deco_bac06_pf_data_w )
 READ16_DEVICE_HANDLER( deco_bac06_pf_data_r )
 {
 	deco_bac06_device *dev = (deco_bac06_device*)device;
+	if (dev->m_rambank&1) offset+=0x1000;
+
 	return dev->pf_data[offset];
 }
 
