@@ -48,6 +48,7 @@ To do:
 #include "sound/msm5205.h"
 #include "includes/dec8.h"
 #include "video/decbac06.h"
+#include "video/decmxc06.h"
 
 /******************************************************************************/
 
@@ -487,6 +488,17 @@ static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine, data); 
 
 /******************************************************************************/
 
+static WRITE8_HANDLER( dec8_mxc06_buffer_spriteram_w)
+{
+	dec8_state *state = space->machine->driver_data<dec8_state>();
+	UINT8* spriteram = space->machine->generic.spriteram.u8;
+	// copy to a 16-bit region for the sprite chip
+	for (int i=0;i<0x800/2;i++)
+	{
+		state->buffered_spriteram16[i] = spriteram[(i*2)+1] | (spriteram[(i*2)+0] <<8);
+	}
+}
+
 static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
@@ -506,7 +518,7 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3a00, 0x3a07) AM_DEVWRITE("tilegen2", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3a10, 0x3a1f) AM_DEVWRITE("tilegen2", deco_bac06_pf_control1_8bit_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(dec8_bank_w)
-	AM_RANGE(0x3c02, 0x3c02) AM_WRITE(buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x3c02, 0x3c02) AM_WRITE(dec8_mxc06_buffer_spriteram_w) /* DMA */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -597,7 +609,7 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3c04, 0x3c04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3c10, 0x3c1f) AM_DEVWRITE("tilegen1", deco_bac06_pf_control1_8bit_w)
-	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(buffer_spriteram_w)	/* DMA */
+	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(dec8_mxc06_buffer_spriteram_w)	/* DMA */
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)  		/* BNKS */
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w) 		/* SOUN */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP			/* COINCL */
@@ -1998,6 +2010,10 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_DEVICE_ADD("tilegen2", deco_bac06_, 0)
 	deco_bac06_device_config::set_gfx_region_wide(device, 3,3,0);
 
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 1);
+
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
@@ -2101,6 +2117,9 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 
 	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
 	deco_bac06_device_config::set_gfx_region_wide(device, 2,2,0);
+
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 1);
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)

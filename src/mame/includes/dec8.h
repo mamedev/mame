@@ -14,6 +14,7 @@ public:
 //  UINT8 *  paletteram_2;  // currently this uses generic palette handling
 //  UINT8 *  spriteram; // currently this uses buffered_spriteram in some games
 	size_t   videoram_size;
+	UINT16   buffered_spriteram16[0x800/2]; // for the mxc06 sprite chip emulation (oscar, cobra)
 
 	/* video-related */
 	tilemap_t  *bg_tilemap, *pf1_tilemap, *fix_tilemap;

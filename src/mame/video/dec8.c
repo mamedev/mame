@@ -44,6 +44,7 @@ sprites.
 #include "emu.h"
 #include "includes/dec8.h"
 #include "video/decbac06.h"
+#include "video/decmxc06.h"
 
 /***************************************************************************
 
@@ -283,70 +284,6 @@ static void draw_sprites1( running_machine* machine, bitmap_t *bitmap, const rec
 	}
 }
 
-/* 'Dec0' sprites, used by Cobra Command, Oscar */
-static void draw_sprites2( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int priority )
-{
-	UINT8 *buffered_spriteram = machine->generic.buffered_spriteram.u8;
-	int offs, x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-
-	/* Sprites */
-	for (offs = 0; offs < 0x800; offs += 8)
-	{
-		y = buffered_spriteram[offs + 1] + (buffered_spriteram[offs] << 8);
-		if ((y & 0x8000) == 0) continue;
-		x = buffered_spriteram[offs + 5] + (buffered_spriteram[offs + 4] << 8);
-		colour = ((x & 0xf000) >> 12);
-		flash = x & 0x800;
-		if (flash && (machine->primary_screen->frame_number() & 1)) continue;
-
-		if (priority == 1 &&  (colour & 4)) continue;
-		if (priority == 2 && !(colour & 4)) continue;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x1800) >> 11)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-											/* multi = 0   1   3   7 */
-		sprite = buffered_spriteram[offs + 3] + (buffered_spriteram[offs + 2] << 8);
-		sprite &= 0x0fff;
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 256) x -= 512;
-		if (y >= 256) y -= 512;
-		x = 240 - x;
-		y = 240 - y;
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_get(machine))
-		{
-			y = 240 - y;
-			x = 240 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else mult = -16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,0);
-			multi--;
-		}
-	}
-}
 
 static void srdarwin_draw_sprites( running_machine* machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
@@ -405,9 +342,9 @@ SCREEN_UPDATE( cobracom )
 	flip_screen_set(screen->machine, state->bg_control[0] >> 7);
 
 	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	draw_sprites2(screen->machine, bitmap, cliprect, 1);
+	screen->machine->device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->buffered_spriteram16, 0x04, 0x00, 0x03);
 	screen->machine->device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
-	draw_sprites2(screen->machine, bitmap, cliprect, 2);
+	screen->machine->device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->buffered_spriteram16, 0x04, 0x04, 0x03);
 	tilemap_draw(bitmap, cliprect, state->fix_tilemap, 0, 0);
 	return 0;
 }
@@ -486,7 +423,7 @@ SCREEN_UPDATE( oscar )
 
 	// we mimic the priority scheme in dec0.c, this was originally a bit different, so this could be wrong
 	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	draw_sprites2(screen->machine, bitmap, cliprect, 0);
+	screen->machine->device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, state->buffered_spriteram16, 0x00, 0x00, 0x0f);
 	screen->machine->device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen->machine,bitmap,cliprect,0, 0x08,0x08,0x08,0x08);
 	tilemap_draw(bitmap,cliprect, state->fix_tilemap, 0, 0);
 	return 0;
