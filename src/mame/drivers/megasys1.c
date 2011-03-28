@@ -3873,7 +3873,7 @@ GAME( 1989, lordofk,  astyanax, system_A,          astyanax, astyanax, ROT0,   "
 GAME( 1989, hachoo,   0,        system_A_hachoo,   hachoo,   hachoo,   ROT0,   "Jaleco", "Hachoo!", 0 )
 GAME( 1989, jitsupro, 0,        system_A,          jitsupro, jitsupro, ROT0,   "Jaleco", "Jitsuryoku!! Pro Yakyuu (Japan)", 0 )
 GAME( 1989, plusalph, 0,        system_A,          plusalph, plusalph, ROT270, "Jaleco", "Plus Alpha", 0 )
-GAME( 1989, stdragon, 0,        system_A,          stdragon, stdragon, ROT0,   "Jaleco", "Tensei Ryuu Saint Dragon", 0 )
+GAME( 1989, stdragon, 0,        system_A,          stdragon, stdragon, ROT0,   "Jaleco", "Saint Dragon", 0 )
 GAME( 1990, rodland,  0,        system_A,          rodland,  rodland,  ROT0,   "Jaleco", "Rod-Land (World)", 0 )
 GAME( 1990, rodlandj, rodland,  system_A,          rodland,  rodlandj, ROT0,   "Jaleco", "Rod-Land (Japan)", 0 )
 GAME( 1990, rodlandjb,rodland,  system_A,          rodland,  0,        ROT0,   "bootleg","Rod-Land (Japan bootleg)", 0 )
