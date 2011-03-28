@@ -16,6 +16,7 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "includes/vaportra.h"
+#include "video/decmxc06.h"
 
 /******************************************************************************/
 
@@ -292,6 +293,9 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	MCFG_DECO16IC_ADD("tilegen1", vaportra_deco16ic_tilegen1_intf)
 
 	MCFG_DECO16IC_ADD("tilegen2", vaportra_deco16ic_tilegen2_intf)
+
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 4);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

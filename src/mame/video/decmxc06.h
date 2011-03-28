@@ -21,14 +21,15 @@ class deco_mxc06_device : public device_t
 public:
 	void set_gfxregion(int region) { m_gfxregion = region; };
 	void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram16, int pri_mask, int pri_val, int col_mask );
-
+	void set_pri_type( int type ) { m_priority_type = type; }
 protected:
 	virtual void device_start();
 	virtual void device_reset();
 	const deco_mxc06_device_config &m_config;
 
 	UINT8 m_gfxregion;
-							
+	int m_priority_type; // just so we can support the existing drivers without converting everything to pdrawgfx just yet
+
 private:
 
 

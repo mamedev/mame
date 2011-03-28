@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "video/deco16ic.h"
 #include "includes/vaportra.h"
+#include "video/decmxc06.h"
 
 /******************************************************************************/
 
@@ -48,79 +49,6 @@ WRITE16_HANDLER( vaportra_palette_24bit_b_w )
 
 /******************************************************************************/
 
-static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
-{
-	vaportra_state *state = machine->driver_data<vaportra_state>();
-	UINT16 *buffered_spriteram = machine->generic.buffered_spriteram.u16;
-	int offs;
-	int priority_value = state->priority[1];
-
-	for (offs = 0; offs < 0x400; offs += 4)
-	{
-		int x, y, sprite, colour, multi, fx, fy, inc, flash, mult;
-
-		y = buffered_spriteram[offs];
-		if ((y & 0x8000) == 0)
-			continue;
-
-		sprite = buffered_spriteram[offs + 1] & 0x1fff;
-		x = buffered_spriteram[offs + 2];
-		colour = (x >> 12) & 0xf;
-		if (pri && (colour >= priority_value))
-			continue;
-		if (!pri && !(colour >= priority_value))
-			continue;
-
-		flash = x & 0x800;
-		if (flash && (machine->primary_screen->frame_number() & 1))
-			continue;
-
-		fx = y & 0x2000;
-		fy = y & 0x4000;
-		multi = (1 << ((y & 0x1800) >> 11)) - 1;	/* 1x, 2x, 4x, 8x height */
-
-		x = x & 0x01ff;
-		y = y & 0x01ff;
-		if (x >= 256) x -= 512;
-		if (y >= 256) y -= 512;
-		x = 240 - x;
-		y = 240 - y;
-
-		if (x > 256)
-			continue; /* Speedup */
-
-		sprite &= ~multi;
-		if (fy)
-			inc = -1;
-		else
-		{
-			sprite += multi;
-			inc = 1;
-		}
-
-		if (flip_screen_get(machine))
-		{
-			y = 240 - y;
-			x = 240 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			mult = 16;
-		}
-		else mult = -16;
-
-		while (multi >= 0)
-		{
-			drawgfx_transpen(bitmap,cliprect,machine->gfx[4],
-					sprite - multi * inc,
-					colour,
-					fx,fy,
-					x,y + mult * multi,0);
-
-			multi--;
-		}
-	}
-}
-
 
 SCREEN_UPDATE( vaportra )
 {
@@ -132,37 +60,39 @@ SCREEN_UPDATE( vaportra )
 	deco16ic_pf_update(state->deco_tilegen1, 0, 0);
 	deco16ic_pf_update(state->deco_tilegen2, 0, 0);
 
+	screen->machine->device<deco_mxc06_device>("spritegen")->set_pri_type(1); // force priorities to be handled in a different way for this driver for now
+
 	/* Draw playfields */
 	if (pri == 0)
 	{
 		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 0);
-		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		screen->machine->device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0, state->priority[1], 0x0f);
 		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 1)
 	{
 		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 0);
-		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		screen->machine->device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0, state->priority[1], 0x0f);
 		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	}
 	else if (pri == 2)
 	{
 		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
-		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		screen->machine->device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0, state->priority[1], 0x0f);
 		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		deco16ic_tilemap_1_draw(state->deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		deco16ic_tilemap_2_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
-		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		screen->machine->device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 0, state->priority[1], 0x0f);
 		deco16ic_tilemap_2_draw(state->deco_tilegen2, bitmap, cliprect, 0, 0);
 	}
 
-	draw_sprites(screen->machine, bitmap, cliprect, 1);
+	screen->machine->device<deco_mxc06_device>("spritegen")->draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.buffered_spriteram.u16, 1, state->priority[1], 0x0f);
 	deco16ic_tilemap_1_draw(state->deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

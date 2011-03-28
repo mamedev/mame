@@ -129,13 +129,36 @@ void deco_mxc06_device::draw_sprites( running_machine *machine, bitmap_t *bitmap
 			{
 				if (spriteram[offs] & 0x8000)
 				{
-					if ((color & pri_mask) == pri_val && (!flash || (machine->primary_screen->frame_number() & 1)))
+					int draw = 0;
+					if (!flash || (machine->primary_screen->frame_number() & 1))
+					{
+
+						if (m_priority_type==0) // most cases
+						{
+							if ((color & pri_mask) == pri_val)
+							{
+								draw = 1;
+							}
+						}
+						else if (m_priority_type==1) // vaportra
+						{
+							if (pri_mask && (color >= pri_val))
+								continue;
+				
+							if (!pri_mask && !(color >= pri_val))
+								continue;
+
+							draw = 1;
+						}
+					}
+					
+					if (draw)
 					{
 						drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
-								code - y * incy + h * x,
-								color & col_mask,
-								flipx,flipy,
-								sx + (mult * x),sy + (mult * y),0);
+							code - y * incy + h * x,
+							color & col_mask,
+							flipx,flipy,
+							sx + (mult * x),sy + (mult * y),0);
 					}
 				}
 			}
@@ -150,7 +173,7 @@ void deco_mxc06_device::draw_sprites( running_machine *machine, bitmap_t *bitmap
 
 void deco_mxc06_device::device_start()
 {
-
+	m_priority_type = 0;
 }
 
 void deco_mxc06_device::device_reset()
