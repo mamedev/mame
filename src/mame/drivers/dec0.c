@@ -162,7 +162,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/msm5205.h"
 #include "video/decbac06.h"
-
+#include "video/decmxc06.h"
 
 
 /******************************************************************************/
@@ -1309,6 +1309,9 @@ static MACHINE_CONFIG_START( dec0_base, dec0_state )
 	MCFG_DEVICE_ADD("tilegen3", deco_bac06_, 0)
 	deco_bac06_device_config::set_gfx_region_wide(device, 0,2,0);
 
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 3);
+
 	MCFG_VIDEO_START(dec0)
 MACHINE_CONFIG_END
 
@@ -1329,6 +1332,25 @@ static MACHINE_CONFIG_DERIVED( dec0_base_sound, dec0_base )
 	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( dec0_base_sound_alt, dec0_base )
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(0, "mono", 0.90)
+	MCFG_SOUND_ROUTE(1, "mono", 0.90)
+	MCFG_SOUND_ROUTE(2, "mono", 0.90)
+	MCFG_SOUND_ROUTE(3, "mono", 0.35)
+
+	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym3812b_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_CONFIG_END
+
 
 
 static MACHINE_CONFIG_DERIVED( automat, dec0_base )
@@ -1512,7 +1534,7 @@ static MACHINE_RESET( slyspy )
 	slyspy_set_protection_map(machine, 0);
 }
 
-static MACHINE_CONFIG_DERIVED( slyspy, dec0_base_sound )
+static MACHINE_CONFIG_DERIVED( slyspy, dec0_base_sound_alt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1538,7 +1560,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( secretab, dec0_base_sound )
+static MACHINE_CONFIG_DERIVED( secretab, dec0_base_sound_alt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1562,7 +1584,7 @@ static MACHINE_CONFIG_DERIVED( secretab, dec0_base_sound )
 	MCFG_VIDEO_START(dec0_nodma)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midres, dec0_base_sound )
+static MACHINE_CONFIG_DERIVED( midres, dec0_base_sound_alt )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */

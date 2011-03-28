@@ -1,0 +1,160 @@
+/*
+ Deco MXC06 sprite generator:
+
+ used by:
+ madmotor.c
+
+Notes (dec0.c)
+
+   Sprite data:  The unknown bits seem to be unused.
+
+    Byte 0:
+        Bit 0 : Y co-ord hi bit
+        Bit 1,2 : Sprite width (1x, 2x, 4x, 8x)
+        Bit 3,4 : Sprite height (1x, 2x, 4x, 8x)
+        Bit 5  - X flip
+        Bit 6  - Y flip
+        Bit 7  - Only display Sprite if set
+    Byte 1: Y-coords
+    Byte 2:
+        Bit 0,1,2,3: Hi bits of sprite number
+        Bit 4,5,6,7: (Probably unused MSB's of sprite)
+    Byte 3: Low bits of sprite number
+    Byte 4:
+        Bit 0 : X co-ords hi bit
+        Bit 1,2: ??
+        Bit 3: Sprite flash (sprite is displayed every other frame)
+        Bit 4,5,6,7:  - Colour
+    Byte 5: X-coords
+
+
+todo:
+    Implement sprite/tilemap orthogonality (not strictly needed as no
+    games make deliberate use of it). (pdrawgfx, or rendering to bitmap for manual mixing)
+
+	fix multi-width support, used by birdie try
+
+*/
+
+
+#include "emu.h"
+#include "decmxc06.h"
+
+deco_mxc06_device_config::deco_mxc06_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "decmxc06_device", tag, owner, clock)
+{
+	m_gfxregion = 0;
+}
+
+device_config *deco_mxc06_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(deco_mxc06_device_config(mconfig, tag, owner, clock));
+}
+
+device_t *deco_mxc06_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, deco_mxc06_device(machine, *this));
+}
+
+void deco_mxc06_device_config::set_gfx_region(device_config *device, int region)
+{
+	deco_mxc06_device_config *dev = downcast<deco_mxc06_device_config *>(device);
+	dev->m_gfxregion = region;
+}
+
+
+deco_mxc06_device::deco_mxc06_device(running_machine &_machine, const deco_mxc06_device_config &config)
+	: device_t(_machine, config),
+	  m_config(config),
+	  m_gfxregion(m_config.m_gfxregion)
+{
+}
+
+
+/* this implementation was originally from Mad Motor */
+void deco_mxc06_device::draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16* spriteram, int pri_mask, int pri_val, int col_mask )
+{
+	int offs;
+
+	offs = 0;
+	while (offs < 0x800 / 2)
+	{
+		int sx, sy, code, color, w, h, flipx, flipy, incy, flash, mult, x, y;
+
+		sy = spriteram[offs];
+		sx = spriteram[offs + 2];
+		color = sx >> 12;
+
+		flash = sx & 0x800;
+
+		flipx = sy & 0x2000;
+		flipy = sy & 0x4000;
+		h = (1 << ((sy & 0x1800) >> 11));	/* 1x, 2x, 4x, 8x height */
+		w = (1 << ((sy & 0x0600) >>  9));	/* 1x, 2x, 4x, 8x width */
+		/* multi width used only on the title screen? */
+
+	
+		code = spriteram[offs + 1] & 0x1fff;
+
+		sx = sx & 0x01ff;
+		sy = sy & 0x01ff;
+		if (sx >= 256) sx -= 512;
+		if (sy >= 256) sy -= 512;
+		sx = 240 - sx;
+		sy = 240 - sy;
+
+		code &= ~(h-1);
+		if (flipy)
+			incy = -1;
+		else
+		{
+			code += h-1;
+			incy = 1;
+		}
+
+		if (flip_screen_get(machine))
+		{
+			sy = 240 - sy;
+			sx = 240 - sx;
+			if (flipx) flipx = 0; else flipx = 1;
+			if (flipy) flipy = 0; else flipy = 1;
+			mult = 16;
+		}
+		else
+			mult = -16;
+
+		for (x = 0; x < w; x++)
+		{
+			for (y = 0; y < h; y++)
+			{
+				if (spriteram[offs] & 0x8000)
+				{
+					if ((color & pri_mask) == pri_val && (!flash || (machine->primary_screen->frame_number() & 1)))
+					{
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[m_gfxregion],
+								code - y * incy + h * x,
+								color & col_mask,
+								flipx,flipy,
+								sx + (mult * x),sy + (mult * y),0);
+					}
+				}
+			}
+
+			offs += 4;
+			if (offs >= 0x800 / 2 || spriteram[offs] & 0x8000)	// seems the expected behaviour on the title screen - WRONG for birdie try
+				 break;
+		}
+	}
+}
+
+
+void deco_mxc06_device::device_start()
+{
+
+}
+
+void deco_mxc06_device::device_reset()
+{
+
+}
+

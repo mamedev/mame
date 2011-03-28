@@ -20,6 +20,7 @@
 #include "sound/okim6295.h"
 #include "includes/madmotor.h"
 #include "video/decbac06.h"
+#include "video/decmxc06.h"
 
 /******************************************************************************/
 
@@ -280,6 +281,10 @@ static MACHINE_CONFIG_START( madmotor, madmotor_state )
 	deco_bac06_device_config::set_gfx_region_wide(device, 0,1,0);
 	MCFG_DEVICE_ADD("tilegen3", deco_bac06_, 0)
 	deco_bac06_device_config::set_gfx_region_wide(device, 0,2,1);
+
+	MCFG_DEVICE_ADD("spritegen", deco_mxc06_, 0)
+	deco_mxc06_device_config::set_gfx_region(device, 3);
+
 
 	MCFG_VIDEO_START(madmotor)
 
