@@ -18,6 +18,7 @@
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
 #include "includes/pcktgal.h"
+#include "video/decbac06.h"
 
 /***************************************************************************/
 
@@ -72,11 +73,12 @@ static READ8_DEVICE_HANDLER( pcktgal_adpcm_reset_r )
 
 static ADDRESS_MAP_START( pcktgal_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pcktgal_videoram_w) AM_BASE_MEMBER(pcktgal_state, videoram)
+	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_MEMBER(pcktgal_state, spriteram, spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(pcktgal_flipscreen_w)
-	/* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
+	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_control1_8bit_r, deco_bac06_pf_control1_8bit_w)
+
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE(pcktgal_sound_w)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pcktgal_bank_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
@@ -240,7 +242,9 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 	MCFG_PALETTE_LENGTH(512)
 
 	MCFG_PALETTE_INIT(pcktgal)
-	MCFG_VIDEO_START(pcktgal)
+
+	MCFG_DEVICE_ADD("tilegen1", deco_bac06_, 0)
+	deco_bac06_device_config::set_gfx_region_wide(device, 0,0,0);
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -259,6 +263,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bootleg, pcktgal )
 	MCFG_GFXDECODE(bootleg)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE(pcktgalb)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

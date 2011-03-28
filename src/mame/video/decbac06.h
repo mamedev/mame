@@ -35,6 +35,8 @@ public:
 	UINT16 pf_control_1[8];
 
 	void deco_bac06_pf_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags,UINT16 penmask, UINT16 pencondition,UINT16 colprimask, UINT16 colpricondition);
+	void deco_bac06_pf_draw_bootleg(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags, int mode, int type);
+
 	UINT8 get_flip_state(void) { return pf_control_0[0]&0x80; };
 	void set_colmask(int data) { m_gfxcolmask = data; }
 	void set_bppmultmask( int mult, int mask ) { m_bppmult = mult; m_bppmask = mask; } // stadium hero has 3bpp tiles
@@ -84,9 +86,8 @@ READ16_DEVICE_HANDLER( deco_bac06_pf_colscroll_r );
 
 /* 8-bit accessors */
 
-/* for dec8.c */
+/* for dec8.c, pcktgal.c */
 READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_r );
-WRITE8_DEVICE_HANDLER( deco_bac06_pf_control_8bit_w );
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_w );
 
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_w );
@@ -96,7 +97,7 @@ WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_w );
 READ8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_r );
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_rowscroll_8bit_w );
 
-/* for hippodrm (dec0.c) */
+/* for hippodrm (dec0.c) and actfancr / triothep (H6280 based games)*/
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control0_8bit_packed_w );
 WRITE8_DEVICE_HANDLER( deco_bac06_pf_control1_8bit_swap_w );
 READ8_DEVICE_HANDLER( deco_bac06_pf_data_8bit_swap_r );

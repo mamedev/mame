@@ -5,7 +5,14 @@
  we could implement this as either an 8-bit or a 16-bit chip, for now
  I'm using the 16-bit implementation from dec0.c
 
+ used by:
 
+ actfancr.c
+ dec0.c
+ dec8.c (oscar, cobracom, ghostb)
+ madmotor.c
+ stadhero.c
+ pcktgal.c
 
  Notes (from dec0.c)
 
@@ -218,12 +225,25 @@ void deco_bac06_device::custom_tilemap_draw(running_machine *machine,
 	const bitmap_t *flags_bitmap = tilemap_get_flagsmap(tilemap_ptr);
 	int x, y, p, colpri;
 	int column_offset=0, src_x=0, src_y=0;
-	UINT32 scrollx=control1[0];
-	UINT32 scrolly=control1[1];
+	UINT32 scrollx = 0;
+	UINT32 scrolly = 0;
+
+	if (control1)
+	{
+		scrollx = control1[0];
+		scrolly = control1[1];
+	}
+
 	int width_mask;
 	int height_mask;
-	int row_scroll_enabled = (rowscroll_ptr && (control0[0]&0x4));
-	int col_scroll_enabled = (colscroll_ptr && (control0[0]&0x8));
+	int row_scroll_enabled = 0;
+	int col_scroll_enabled = 0;
+
+	if (control0)
+	{
+		row_scroll_enabled = (rowscroll_ptr && (control0[0]&0x4));
+		col_scroll_enabled = (colscroll_ptr && (control0[0]&0x8));
+	}
 
 	if (!src_bitmap)
 		return;
@@ -316,6 +336,17 @@ void deco_bac06_device::deco_bac06_pf_draw(running_machine *machine,bitmap_t *bi
 		custom_tilemap_draw(machine,bitmap,cliprect,tm,pf_rowscroll,pf_colscroll,pf_control_0,pf_control_1,flags, penmask, pencondition, colprimask, colpricondition);
 
 }
+
+// used for pocket gal bootleg, which doesn't set registers properly and simply expects a fixed size tilemap.
+void deco_bac06_device::deco_bac06_pf_draw_bootleg(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int flags, int mode, int type)
+{
+	tilemap_t* tm = 0;
+	if (!mode) tm = pf8x8_tilemap[type];
+	else tm = pf16x16_tilemap[type];
+
+	custom_tilemap_draw(machine,bitmap,cliprect,tm,pf_rowscroll,pf_colscroll,0,0,flags, 0, 0, 0, 0);
+}
+
 
 
 WRITE16_DEVICE_HANDLER( deco_bac06_pf_control_0_w )
