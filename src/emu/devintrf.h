@@ -414,8 +414,11 @@ public:
 	}
 
 	// specialized helpers for common core interfaces
+	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != NULL); }
 	bool interface(device_execute_interface *&intf) const { intf = m_execute; return (intf != NULL); }
+	bool interface(device_memory_interface *&intf) { intf = m_memory; return (intf != NULL); }
 	bool interface(device_memory_interface *&intf) const { intf = m_memory; return (intf != NULL); }
+	bool interface(device_state_interface *&intf) { intf = m_state; return (intf != NULL); }
 	bool interface(device_state_interface *&intf) const { intf = m_state; return (intf != NULL); }
 	device_memory_interface &memory() const { assert(m_memory != NULL); return *m_memory; }
 
